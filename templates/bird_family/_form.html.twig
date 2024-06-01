@@ -1,0 +1,32 @@
+{# {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }} #}
+  {{ form_start(form) }}
+  
+    <div class="row mb-3">
+      <div class="col-sm-3">
+        {{ form_label(form.familyName, 'Nom') }}
+      </div>
+      <div class="col-sm-8">
+        {{ form_widget(form.familyName, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-sm-3">
+        {{ form_label(form.subFamily, 'Sous-famille') }}
+      </div>
+      <div class="col-sm-8">
+        {{ form_widget(form.subFamily, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-sm-3">
+        {{ form_label(form.tribe, 'Tribu') }}
+      </div>
+      <div class="col-sm-8">
+        {{ form_widget(form.tribe, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+
+  {{ form_end(form) }}

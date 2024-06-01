@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit BirdSpecies{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Modifier espèce d'oiseau</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item">Gestion des espèces</li>
+          <li class="breadcrumb-item active">Modification</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-10">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Modifier
+                        </h5>
+
+                        {{ include('bird_species/_form.html.twig', {'button_label': 'Update'}) }}
+                        
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <a href="{{ path('app_bird_species_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
+                            </div>
+                            <div class="col-lg-3">
+                                {{ include('bird_species/_delete_form.html.twig') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

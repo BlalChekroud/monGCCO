@@ -1,0 +1,115 @@
+{{ form_start(form) }}
+
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.scientificName, 'Nom Scientifique') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.scientificName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.frenchName, 'Nom français') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.frenchName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.wispeciescode, 'WI code espèse') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.wispeciescode, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.imageFile, 'Image') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+  <div class="col-sm-3">
+      {{ form_label(form.authority, 'Autorité') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.authority, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.birdLifeTaxTreat, 'birdLifeTaxTreat') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.birdLifeTaxTreat, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.commonName, 'Nom commun') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.commonName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.commonNameAlt, 'Nom commun alternatif') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.commonNameAlt, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.iucnRedListCategory, 'IURN Red List Category') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.iucnRedListCategory, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.synonyms, 'Synonyms') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.synonyms, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.taxonomicSources, 'Source(s) Taxonomique') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.taxonomicSources, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.sisRecId, 'sisRecId') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.sisRecId, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.spcRecId, 'spcRec Id') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.spcRecId, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3">
+      {{ form_label(form.subsppId, 'subspp Id') }}
+    </div>
+    <div class="col-sm-8">
+      {{ form_widget(form.subsppId, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+{{ form_end(form) }}<!-- End General Form Elements -->

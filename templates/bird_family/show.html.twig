@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Famille des espèces{% endblock %}
+
+{% block body %}
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Détail d'une famille d'espèces</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item">Gestion des familles</li>
+          <li class="breadcrumb-item active">Détail</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Détail
+                        </h5>
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Id</th>
+                                    <td>{{ bird_family.id }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom de la famille :</th>
+                                    <td>{{ bird_family.getFamilyName() }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Sous-famille :</th>
+                                    <td>{{ bird_family.getSubFamily() }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Tribu :</th>
+                                    <td>{{ bird_family.getTribe() }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Créé le</th>
+                                    <td>{{ bird_family.createdAt ? bird_family.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Dernière mise à jour le</th>
+                                    <td>{{ bird_family.updatedAt ? bird_family.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <a href="{{ path('app_bird_family_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
+                            </div>
+                            <div class="col-lg-2">
+                                <a href="{{ path('app_bird_family_edit', {id: bird_family.getId()}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm"> Modifier</a>
+                            </div>
+                            <div class="col-lg-2">
+                                {{ include('bird_family/_delete_form.html.twig') }}
+                            </div>
+                            <div class="col-lg-4">
+                                <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
+                                    Créer nouvelle famille
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

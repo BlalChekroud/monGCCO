@@ -1,0 +1,137 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espèce oiseau{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Espèce d'oiseau</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item">Gestion des espèces</li>
+          <li class="breadcrumb-item active">Détail</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    {# <img src="{{ vich_uploader_asset(bird_specy, 'imageFile') }}" class="card-img-top" alt="..."> #}
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Détail
+                        </h5>
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Id</th>
+                                    <td>{{ bird_specy.id }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom Scientifique</th>
+                                    <td>{{ bird_specy.scientificName }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom français</th>
+                                    <td>{{ bird_specy.frenchName }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Code WI espèce</th>
+                                    <td>{{ bird_specy.wispeciescode }}</td>
+                                </tr>
+                                {# <tr>
+                                    <th>Image</th>
+                                    <td>{{ bird_specy.imageFile }}</td>
+                                </tr> #}
+                                <tr>
+                                    <th>Authority</th>
+                                    <td>{{ bird_specy.authority }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Créé le</th>
+                                    <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Dernière mise à jour le</th>
+                                    <td>{{ bird_specy.updatedAt ? bird_specy.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>birdLifeTaxTreat</th>
+                                    <td>{{ bird_specy.birdLifeTaxTreat }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom commun</th>
+                                    <td>{{ bird_specy.commonName }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom commun alternatif</th>
+                                    <td>{{ bird_specy.commonNameAlt }}</td>
+                                </tr>
+                                <tr>
+                                    <th>IURN Red List Category</th>
+                                    <td>{{ bird_specy.iucnRedListCategory }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Synonyms</th>
+                                    <td>{{ bird_specy.synonyms }}</td>
+                                </tr>
+                                <tr>
+                                    <th> Source(s) Taxonomique</th>
+                                    <td>{{ bird_specy.taxonomicSources }}</td>
+                                </tr>
+                                <tr>
+                                    <th>sisRecId</th>
+                                    <td>{{ bird_specy.sisRecId }}</td>
+                                </tr>
+                                <tr>
+                                    <th>spcRecId</th>
+                                    <td>{{ bird_specy.spcRecId }}</td>
+                                </tr>
+                                <tr>
+                                    <th>subsppId</th>
+                                    <td>{{ bird_specy.subsppId }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Famille</th>
+                                    <td>{{ bird_specy.birdFamily.familyname }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Sous-famille</th>
+                                    <td>{{ bird_specy.birdFamily.subFamily }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Tribu</th>
+                                    <td>{{ bird_specy.birdFamily.tribe }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <a href="{{ path('app_bird_species_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
+                            </div>
+                            <div class="col-lg-2">
+                                <a href="{{ path('app_bird_species_edit', {'id': bird_specy.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm"> Modifier</a>
+                            </div>
+                            <div class="col-lg-2">
+                                {{ include('bird_species/_delete_form.html.twig') }}
+                            </div>
+                            <div class="col-lg-4">
+                                <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
+                                    Créer nouvelle espèce
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock %}

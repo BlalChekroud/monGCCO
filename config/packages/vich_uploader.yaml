@@ -1,0 +1,13 @@
+vich_uploader:
+    db_driver: orm
+    metadata:
+       type: attribute
+
+    mappings:
+       bird_Specy:
+           uri_prefix: /images/bird_Specy
+           upload_destination: '%kernel.project_dir%/public/images/bird_Specy'
+           namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+           inject_on_load: false
+           delete_on_update: true
+           delete_on_remove: true

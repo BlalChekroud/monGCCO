@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Consultation des espèces{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Espèces des oiseaux</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item">Gestion des espèces</li>
+          <li class="breadcrumb-item active">Consultation</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Listes</h5>
+              {# <p>Add lightweight datatables to your project with using the <a href="https://github.com/fiduswriter/Simple-DataTables" target="_blank">Simple DataTables</a> library. Just add <code>.datatable</code> class name to any table you wish to conver to a datatable. Check for <a href="https://fiduswriter.github.io/simple-datatables/demos/" target="_blank">more examples</a>.</p> #}
+
+              <!-- Table with stripped rows -->
+                  <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nom Scientifique</th>
+                            <th>Nom français</th>
+                            <th>Image</th>
+                            <th>CreatedAt</th>
+                            <th>actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for bird_specy in bird_species %}
+                        <tr>
+                            <td>{{ bird_specy.id }}</td>
+                            <td>{{ bird_specy.scientificName }}</td>
+                            <td>{{ bird_specy.frenchName }}</td>
+                            <td>{{ bird_specy.image }}</td>
+                            <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                            <td>
+                              <div class="d-flex justtify-content-end">
+                                  <a href="{{ path('app_bird_species_show', {'id': bird_specy.id}) }}" class="btn btn-outline-secondary btn-sm bi bi-card-text mx-2"> Détail</a>
+                                  <a href="{{ path('app_bird_species_edit', {'id': bird_specy.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm mx-2"> Modifier</a>
+                                  {{ include('bird_species/_delete_form.html.twig') }}
+                              </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="9">Aucun enregistrement trouvé</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+              <div>
+                <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
+                  Créer nouvelle espèce
+                </a>
+              </div>
+              <!-- End Table with stripped rows -->
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier une famille des espèces{% endblock %}
+
+{% block body %}
+
+    
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Modifier cette famille d'espèces</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item">Gestion des familles</li>
+          <li class="breadcrumb-item active">Modification</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-8">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Les nouveaux informations de la famille</h5>
+
+              {{ include('bird_family/_form.html.twig', {'button_label': 'Update'}) }}
+
+              <div class="d-flex justtify-content-end">
+                <a href="{{ path('app_bird_family_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>
+                {{ include('bird_family/_delete_form.html.twig') }}
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}
