@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Données collectées{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Données collectées</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_collected_data_index') }}">Gestion des données collectées</a></li>
+          <li class="breadcrumb-item active">Détail</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Détail
+                        </h5>
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Type de comptage effectué lors de cette visite:</th>
+                                    <td style="width: 70%;">{{ collected_datum.countType }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Qualité:</th>
+                                    <td style="width: 70%;">{{ collected_datum.quality }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">TotalCount</th>
+                                    <td style="width: 70%;">{{ collected_datum.totalCount }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Crée le</th>
+                                    <td style="width: 70%;">{{ collected_datum.createdAt ? collected_datum.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Dernière mise à jour le</th>
+                                    <td style="width: 70%;">{{ collected_datum.updatedAt ? collected_datum.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Méthode(s) utilisées pour le comptage:</th>
+                                    <td style="width: 70%;">{{ collected_datum.method|join(', ') }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Disturbé(e) <h6>(Indique si le comptage a été affecté par une perturbation):</h6></th>
+                                    <td style="width: 70%;">{{ collected_datum.disturbed }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Effets des conditions météorologiques sur les comptages <h6>(vent, pluie, brouillard) :</h6></th>
+                                    <td style="width: 70%;">{{ collected_datum.weather }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">L'état des eaux lors du comptage:</th>
+                                    <td style="width: 70%;">{{ collected_datum.water }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">La couverture de glace lors du comptage:</th>
+                                    <td style="width: 70%;">{{ collected_datum.ice }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Marée cours (la plupart) du comptage:</th>
+                                    <td style="width: 70%;">{{ collected_datum.tidal }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Campagne de comptage:</th>
+                                    <td style="width: 70%;">
+                                        {% if collected_datum.countingCampaign %}
+                                            {{ collected_datum.countingCampaign.campaignName }}
+                                            {% if collected_datum.countingCampaign.siteCollection is not empty %}
+                                                <ul>
+                                                    {% for site in collected_datum.countingCampaign.siteCollection %}
+                                                        <li>{{ site.siteName }} ({{ site.region }})</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% else %}
+                                                <p>Aucun site trouvé pour cette campagne</p>
+                                            {% endif %}
+                                        {% else %}
+                                            <p>Aucune campagne de comptage trouvée</p>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {# <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Site de collection:</th>
+                                    <td style="width: 70%;">
+                                        {% if collected_datum.siteCollection %}
+                                            {{ collected_datum.siteCollection.siteName }}
+                                        {% else %}
+                                            <p>Aucune site trouvée</p>
+                                        {% endif %}
+                                    </td>
+                                </tr> #}
+                                <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Les espèces oiseaux:</th>
+                                    <td style="width: 70%;">
+                                        <ul>
+                                            {% for specy in collected_datum.birdSpecies %}
+                                                <li>({{ specy.birdFamily.familyName }}) {{ specy.scientificName }}</li>
+                                            {% else %}
+                                                <p>Aucun Oiseau trouvé pour cette collection</p>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
+                            </div>
+                            <div class="col-lg-2">
+                                <a href="{{ path('app_collected_data_edit', {id: collected_datum.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm"> Modifier</a>
+                            </div>
+                            <div class="col-lg-2">
+                                {{ include('collected_data/_delete_form.html.twig') }}
+                            </div>
+                            <div class="col-lg-5">
+                                <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
+                                    Créer nouvelle collection des données
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

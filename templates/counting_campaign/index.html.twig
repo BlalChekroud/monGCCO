@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Consultation des campagnes{% endblock %}
+
+{% block body %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Consultation des campagnes</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item active">Gestion des campagnes</li>
+          {# <li class="breadcrumb-item active">Consultation</li> #}
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Listes</h5>
+
+              <!-- Table with stripped rows -->
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nom de la campagne</th>
+                            <th>Date de début</th>
+                            <th>Date de fin</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for counting_campaign in counting_campaigns %}
+                        <tr>
+                            <td>{{ counting_campaign.id }}</td>
+                            <td>{{ counting_campaign.campaignName }}</td>
+                            <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('Y-m-d') : '' }}</td>
+                            <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('Y-m-d') : '' }}</td>
+                            <td>
+                                <div class="d-flex justtify-content-end">
+                                    <a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" class="btn btn-outline-secondary btn-sm bi bi-card-text mx-2"> Détail</a>
+                                    <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm mx-2"> Modifier</a>
+                                    {{ include('counting_campaign/_delete_form.html.twig') }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7">Aucun enregistrement trouvé</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <!-- End Table with stripped rows -->              
+              
+                <div>
+                    <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3">
+                        Créer une nouvelle campagne
+                    </a>
+                    <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-fill">
+                      Créer nouvelle collection de sites
+                    </a>
+                </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+</main><!-- End #main -->
+{% endblock %}

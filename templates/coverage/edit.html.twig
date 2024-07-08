@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Coverage{% endblock %}
+
+{% block body %}
+    <h1>Edit Coverage</h1>
+
+    {{ include('coverage/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_coverage_index') }}">back to list</a>
+
+    {{ include('coverage/_delete_form.html.twig') }}
+{% endblock %}

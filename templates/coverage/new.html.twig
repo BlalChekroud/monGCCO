@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Coverage{% endblock %}
+
+{% block body %}
+    <h1>Create new Coverage</h1>
+
+    {{ include('coverage/_form.html.twig') }}
+
+    <a href="{{ path('app_coverage_index') }}">back to list</a>
+{% endblock %}

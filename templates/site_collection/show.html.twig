@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Collection de sites{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Détail d'une collection de sites</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_site_collection_index') }}">Gestion des sites</a></li>
+          <li class="breadcrumb-item active">Détail</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Détail
+                        </h5>
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Nom du site</th>
+                                    <td>{{ site_collection.siteName }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Code du site</th>
+                                    <td>{{ site_collection.siteCode }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Crée le</th>
+                                    <td>{{ site_collection.createdAt ? site_collection.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Dernière mise à jour le</th>
+                                    <td>{{ site_collection.updatedAt ? site_collection.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Code national</th>
+                                    <td>{{ site_collection.nationalSiteCode }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Code international</th>
+                                    <td>{{ site_collection.internationalSiteCode }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Latitude de départ</th>
+                                    <td>{{ site_collection.latDepart }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Longitude de départ</th>
+                                    <td>{{ site_collection.longDepart }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Latitude de fin</th>
+                                    <td>{{ site_collection.latFin }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Longitude de fin</th>
+                                    <td>{{ site_collection.longFin }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Région</th>
+                                    <td>{{ site_collection.region }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom du site parent</th>
+                                    <td>{{ site_collection.parentSiteName }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <a href="{{ path('app_site_collection_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
+                            </div>
+                            <div class="col-lg-2">
+                                <a href="{{ path('app_site_collection_edit', {id: site_collection.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm"> Modifier</a>
+                            </div>
+                            <div class="col-lg-2">
+                                {{ include('site_collection/_delete_form.html.twig') }}
+                            </div>
+                            <div class="col-lg-4">
+                                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-fill">
+                                    Créer nouvelle collection de sites
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

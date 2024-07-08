@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle données collectées{% endblock %}
+
+{% block body %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Créer une nouvelle données collectées</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_collected_data_index') }}">Gestion des données collectées</a></li>
+          <li class="breadcrumb-item active">création</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Informations de la nouvelle collection</h5>
+
+                        {{ include('collected_data/_form.html.twig') }}<br/>
+
+                        <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left mx-2"> 
+                            retour vers la liste
+                        </a>
+                        <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2">
+                            Créer nouvelle campagne
+                        </a>
+                        <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2">
+                            Créer nouvelle espèce
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+</main>
+{% endblock %}

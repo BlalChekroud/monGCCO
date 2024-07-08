@@ -10,7 +10,7 @@
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
-          <li class="breadcrumb-item">Gestion des espèces</li>
+          <li class="breadcrumb-item"><a href="{{ path('app_bird_species_index') }}">Gestion des espèces</a></li>
           <li class="breadcrumb-item active">création</li>
         </ol>
       </nav>
@@ -26,7 +26,7 @@
 
                         {{ include('bird_species/_form.html.twig') }}
 
-                        <a href="{{ path('app_bird_species_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
+                        <a href="{{ path('app_bird_species_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>
                         <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
                           Créer une nouvelle famille
                         </a>
@@ -38,4 +38,71 @@
         </div>
     </section>
 </main>
+
+<!-- Coverage Modal -->
+<div class="modal fade" id="coverageModal" tabindex="-1" aria-labelledby="coverageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="coverageModalLabel">Créer une nouvelle Couverture</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="coverageForm">
+                    <div class="mb-3">
+                        {{ form_widget(coverageForm) }}
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- birdLifeTaxTreat Modal -->
+<div class="modal fade" id="birdLifeTaxTreatModal" tabindex="-1" aria-labelledby="birdLifeTaxTreatModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="birdLifeTaxTreatModalLabel">Créer un nouveau traitement taxonomique pour BirdLife</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="birdLifeTaxTreatForm">
+                    <div class="mb-3">
+                        {{ form_widget(birdLifeTaxTreatForm) }}
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- iucnRedListCategory Modal -->
+<div class="modal fade" id="iucnRedListCategoryModal" tabindex="-1" aria-labelledby="iucnRedListCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="iucnRedListCategoryModalLabel">Créer une nouvelle catégorie de la liste rouge de l'UICN 2022</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="iucnRedListCategoryForm">
+                    <div class="mb-3">
+                        {{ form_widget(iucnRedListCategoryForm) }}
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Repeat modals for birdLifeTaxTreat and iucnRedListCategory -->
+
 {% endblock %}

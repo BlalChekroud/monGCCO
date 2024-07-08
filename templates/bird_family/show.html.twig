@@ -11,7 +11,7 @@
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
-          <li class="breadcrumb-item">Gestion des familles</li>
+          <li class="breadcrumb-item"><a href="{{ path('app_bird_family_index') }}">Gestion des familles</a></li>
           <li class="breadcrumb-item active">Détail</li>
         </ol>
       </nav>
@@ -23,6 +23,7 @@
 
                 <div class="card">
                     <div class="card-body">
+                     <div id="printableArea">
                         <h5 class="card-title">
                             Détail
                         </h5>
@@ -30,12 +31,16 @@
                         <table class="table">
                             <tbody>
                                 <tr>
-                                    <th>Id</th>
-                                    <td>{{ bird_family.id }}</td>
-                                </tr>
-                                <tr>
                                     <th>Nom de la famille :</th>
                                     <td>{{ bird_family.getFamilyName() }}</td>
+                                </tr>
+                                <tr>
+                                    <th>famille :</th>
+                                    <td>{{ bird_family.getFamily() }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Ordre :</th>
+                                    <td>{{ bird_family.getOrdre() }}</td>
                                 </tr>
                                 <tr>
                                     <th>Sous-famille :</th>
@@ -55,6 +60,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                     </div>
                         <div class="row">
                             <div class="col-lg-3">
                                 <a href="{{ path('app_bird_family_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
@@ -70,11 +76,30 @@
                                     Créer nouvelle famille
                                 </a>
                             </div>
+
                         </div>
                     </div>
                 </div>
+
+                <!-- Card with header and footer -->
+                <div class="card">
+                    <div class="card-header">
+                        {# Header #}
+                    </div>
+                    <div class="card-body">
+                    {# <h5 class="card-title">Card with header and footer</h5> #}
+                        <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+                        <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+                    </div>
+                    <div class="card-footer">
+                    {# Footer #}
+                    </div>
+                </div><!-- End Card with header and footer -->
+
+
             </div>
         </div>
     </section>
+
 </main>
 {% endblock %}

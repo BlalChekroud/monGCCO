@@ -1,0 +1,11 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <div class="row mb-3">
+      <div class="col-sm-3">
+        <button type="reset" class="btn btn-light bi bi-x-square"> Annuler</button>
+      </div>
+      <div class="col-sm-4">
+        <button class="btn btn-outline-primary bi bi-save"> {{ button_label|default('Enregistrer') }}</button>
+      </div>
+    </div>
+{{ form_end(form) }}

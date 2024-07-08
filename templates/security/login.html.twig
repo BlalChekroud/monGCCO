@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="{{ asset('/img/favicon.png') }}" rel="icon">
+    <link href="{{ asset('/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{{ asset('/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/quill/quill.snow.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/quill/quill.bubble.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/simple-datatables/style.css') }}" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+
+      <title>{% block title %}Se connecter{% endblock %}</title>
+      <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+      {% block stylesheets %}
+      {% endblock %}
+
+      {% block javascripts %}
+          {% block importmap %}{{ importmap('app') }}{% endblock %}
+      {% endblock %}
+  </head>
+
+  <body>
+    {% block body %}
+      <main>
+        <div class="container">
+
+          <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+            <div class="container">
+              <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+
+                  <div class="d-flex justify-content-center py-4">
+                    <a href="{{ path('home')}}" class="logo d-flex align-items-center w-auto">
+                      <img src="{{ asset('/img/GCCO 1.png') }}" alt="">
+                      {# <span class="d-none d-lg-block">Gestion des Campagnes de Comptage des Oiseaux Marin</span> #}
+                    </a>
+                  </div><!-- End Logo -->
+
+                  <div class="card mb-3">
+
+                    <div class="card-body">
+
+                      <div class="pt-4 pb-2">
+                        <h5 class="card-title text-center pb-0 fs-4">Connexion à votre compte</h5>
+                        <p class="text-center small">Entrez votre e-mail & mot de passe pour vous connecter</p>
+                      </div>
+
+                      <form method="post" class="row g-3 needs-validation" novalidate>
+                        {% if error %}
+                            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                        {% endif %}
+
+                        {% if app.user %}
+                            <div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
+                              <i class="bi bi-exclamation-triangle me-1"></i>
+                              Vous êtes connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>, <a href="{{ path('app_logout') }}">Déconnexion</a>
+                            </div>
+                        {% endif %}
+
+                        {% if not app.user %}
+                          <div class="col-12">
+                            <label for="username" class="form-label">Email</label>
+                            <div class="input-group has-validation">
+                              <span class="input-group-text" id="inputGroupPrepend">@</span>
+                              <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
+                              <div class="invalid-feedback">Veuillez entrer votre E-mail</div>
+                            </div>
+                          </div>
+
+                          <div class="col-12">
+                            <label for="password" class="form-label">Mot de passe</label>
+                            <div class="input-group has-validation">
+                              <span class="input-group-text" id="inputGroupPrepend"> 
+                                <div class="password-icon">
+                                  <i data-feather="eye"></i>
+                                  <i data-feather="eye-off"></i>
+                                </div>
+                              </span>
+                              <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+                            </div>                
+                            <div class="invalid-feedback">Veuillez entrer votre mot de passe!</div>
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                          </div>
+
+                          <div class="col-12">
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" name="_remember_me" value="true" id="rememberMe">
+                              <label class="form-check-label" for="rememberMe">Souvenir de moi</label>
+                            </div>
+                          </div>
+                          <div class="col-12">
+                            <button class="btn btn-primary w-100" type="submit">Connexion</button>
+                          </div>
+                          <div class="col-12">
+                            <a href="{{ path('app_forgot_password_request') }}">Mot de passe oublié ?</a>
+                          </div>
+                          <div class="col-12">
+                            <p class="small mb-0">Vous n'avez pas de compte ? <a href="{{ path('app_register')}}">Créer un compte</a></p>
+                          </div>
+                        {% endif %}
+                      </form>
+
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </section>
+
+        </div>
+      </main><!-- End #main -->
+
+      <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+      <!-- Vendor JS Files -->
+
+      <script src="{{ asset('/vendor/apexcharts/apexcharts.min.js') }}"></script>
+      <script src="{{ asset('/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+      <script src="{{ asset('/vendor/chart.js/chart.umd.js') }}"></script>
+      <script src="{{ asset('/vendor/echarts/echarts.min.js') }}"></script>
+      <script src="{{ asset('/vendor/quill/quill.js') }}"></script>
+      <script src="{{ asset('/vendor/simple-datatables/simple-datatables.js') }}"></script>
+      <script src="{{ asset('/vendor/tinymce/tinymce.min.js') }}"></script>
+      <script src="{{ asset('/vendor/php-email-form/validate.js') }}"></script>
+      
+      <!-- ICON SCRIPT -->
+      <script src="https://unpkg.com/feather-icons"></script>
+      <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
+    {% endblock %}
+  </body>
+
+</html>

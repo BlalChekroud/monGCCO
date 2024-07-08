@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Consultation de données collectées{% endblock %}
+
+{% block body %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Consultation de données collectées</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item active">Gestion de données collectées</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Listes</h5>
+
+              <!-- Table with stripped rows -->
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Type de comptage</th>
+                            <th>Qualité</th>
+                            <th>TotalCount</th>
+                            <th>Crée le</th>
+                            <th>Méthode(s)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for collected_datum in collected_datas %}
+                        <tr>
+                            <td>{{ collected_datum.id }}</td>
+                            <td>{{ collected_datum.countType }}</td>
+                            <td>{{ collected_datum.quality }}</td>
+                            <td>{{ collected_datum.totalCount }}</td>
+                            <td>{{ collected_datum.createdAt ? collected_datum.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                            <td>{{ collected_datum.method|join(', ') }}</td>
+                            <td>
+                                <a href="{{ path('app_collected_data_show', {'id': collected_datum.id}) }}" class="btn btn-outline-secondary btn-sm bi bi-card-text mx-2"> Détail</a>
+                                <a href="{{ path('app_collected_data_edit', {'id': collected_datum.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm mx-2"> Modifier</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="13">Aucun enregistrement trouvé</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <!-- End Table with stripped rows -->              
+              
+                <div>
+                    <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm ri-database-line">
+                      Créer nouvelle données collectées
+                    </a>
+                    <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3">
+                        Créer une nouvelle campagne
+                    </a>
+                </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+</main><!-- End #main -->
+{% endblock %}

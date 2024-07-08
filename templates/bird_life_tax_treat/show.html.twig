@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BirdLifeTaxTreat{% endblock %}
+
+{% block body %}
+    <h1>BirdLifeTaxTreat</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ bird_life_tax_treat.id }}</td>
+            </tr>
+            <tr>
+                <th>Label</th>
+                <td>{{ bird_life_tax_treat.label }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_bird_life_tax_treat_index') }}">back to list</a>
+
+    <a href="{{ path('app_bird_life_tax_treat_edit', {'id': bird_life_tax_treat.id}) }}">edit</a>
+
+    {{ include('bird_life_tax_treat/_delete_form.html.twig') }}
+{% endblock %}

@@ -3,7 +3,8 @@
 namespace App\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-// use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 use App\Entity\BirdFamily;
 use Symfony\Component\Form\AbstractType;
@@ -15,13 +16,11 @@ class BirdFamilyType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('ordre')
             ->add('familyName')
+            ->add('family')
             ->add('subFamily')
             ->add('tribe')
-            ->add('save', SubmitType::class, [
-                'label' => ' Enregistrer',
-                'attr' => ['class' => 'btn btn-outline-primary bi bi-save'],
-            ])
         ;
     }
 

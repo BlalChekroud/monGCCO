@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New IucnRedListCategory{% endblock %}
+
+{% block body %}
+    <h1>Create new IucnRedListCategory</h1>
+
+    {{ include('iucn_red_list_category/_form.html.twig') }}
+
+    <a href="{{ path('app_iucn_red_list_category_index') }}">back to list</a>
+{% endblock %}

@@ -36,10 +36,31 @@ class BirdFamily
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(length: 25, nullable: true)]
+    private ?string $ordre = null;
+
     public function __construct()
     {
         $this->birdSpecies = new ArrayCollection();
     }
+
+    // #[ORM\Column(type: 'string', nullable: true)]
+    // private string $csvFilename;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $family = null;
+
+    // public function getCsvFilename(): string
+    // {
+    //     return $this->csvFilename;
+    // }
+
+    // public function setCsvFilename(string $csvFilename): self
+    // {
+    //     $this->csvFilename = $csvFilename;
+
+    //     return $this;
+    // }
 
     public function getId(): ?int
     {
@@ -132,6 +153,30 @@ class BirdFamily
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getOrdre(): ?string
+    {
+        return $this->ordre;
+    }
+
+    public function setOrdre(?string $ordre): static
+    {
+        $this->ordre = $ordre;
+
+        return $this;
+    }
+
+    public function getFamily(): ?string
+    {
+        return $this->family;
+    }
+
+    public function setFamily(?string $family): static
+    {
+        $this->family = $family;
 
         return $this;
     }

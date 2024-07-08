@@ -10,8 +10,8 @@
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
-          <li class="breadcrumb-item">Gestion des espèces</li>
-          <li class="breadcrumb-item active">Consultation</li>
+          <li class="breadcrumb-item active">Gestion des espèces</li>
+          {# <li class="breadcrumb-item active">Consultation</li> #}
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -23,18 +23,17 @@
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Listes</h5>
-              {# <p>Add lightweight datatables to your project with using the <a href="https://github.com/fiduswriter/Simple-DataTables" target="_blank">Simple DataTables</a> library. Just add <code>.datatable</code> class name to any table you wish to conver to a datatable. Check for <a href="https://fiduswriter.github.io/simple-datatables/demos/" target="_blank">more examples</a>.</p> #}
 
               <!-- Table with stripped rows -->
                   <table class="table">
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <th>#</th>
                             <th>Nom Scientifique</th>
                             <th>Nom français</th>
                             <th>Image</th>
-                            <th>CreatedAt</th>
-                            <th>actions</th>
+                            <th>Date de création</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,7 +42,13 @@
                             <td>{{ bird_specy.id }}</td>
                             <td>{{ bird_specy.scientificName }}</td>
                             <td>{{ bird_specy.frenchName }}</td>
-                            <td>{{ bird_specy.image }}</td>
+                            <td>
+                              {% if bird_specy.imageFilename %}
+                                  <img src="{{ vich_uploader_asset(bird_specy, 'imageFile') }}" alt="{{ bird_specy.frenchName }}" class="imgIndex rounded mx-auto d-block"/>
+                              {% else %}
+                                  <p>Aucune image disponible</p>
+                              {% endif %}
+                            </td>
                             <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                             <td>
                               <div class="d-flex justtify-content-end">
@@ -75,5 +80,5 @@
       </div>
     </section>
 
-  </main><!-- End #main -->
+</main><!-- End #main -->
 {% endblock %}

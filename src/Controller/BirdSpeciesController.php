@@ -5,6 +5,10 @@ namespace App\Controller;
 use Monolog\DateTimeImmutable;
 use DateTime;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
+use App\Form\CoverageType;
+use App\Form\BirdLifeTaxTreatType;
+use App\Form\IucnRedListCategoryType;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use App\Entity\BirdSpecies;
 use App\Form\BirdSpeciesType;
@@ -16,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/bird/species')]
+#[IsGranted('ROLE_COLLECTOR')]
 class BirdSpeciesController extends AbstractController
 {
     #[Route('/', name: 'app_bird_species_index', methods: ['GET'])]
@@ -34,6 +39,12 @@ class BirdSpeciesController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('imageFile')->getData();
+
+            if ($imageFile) {
+                $birdSpecy->setImageFile($imageFile);
+            }
             $birdSpecy->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
             $entityManager->persist($birdSpecy);
             $entityManager->flush();
@@ -42,9 +53,16 @@ class BirdSpeciesController extends AbstractController
             return $this->redirectToRoute('app_bird_species_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $coverageForm = $this->createForm(CoverageType::class);
+        $birdLifeTaxTreatForm = $this->createForm(BirdLifeTaxTreatType::class);
+        $iucnRedListCategoryForm = $this->createForm(IucnRedListCategoryType::class);
+
         return $this->render('bird_species/new.html.twig', [
             'bird_specy' => $birdSpecy,
             'form' => $form,
+            'coverageForm' => $coverageForm->createView(),
+            'birdLifeTaxTreatForm' => $birdLifeTaxTreatForm->createView(),
+            'iucnRedListCategoryForm' => $iucnRedListCategoryForm->createView(),
         ]);
     }
 
@@ -59,12 +77,17 @@ class BirdSpeciesController extends AbstractController
     #[Route('/{id}/edit', name: 'app_bird_species_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, BirdSpecies $birdSpecy, EntityManagerInterface $entityManager): Response
     {
-        // dd($helper->asset($birdSpecy, 'imageFile'));
         
         $form = $this->createForm(BirdSpeciesType::class, $birdSpecy);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('imageFile')->getData();
+
+            if ($imageFile) {
+                $birdSpecy->setImageFile($imageFile);
+            }
             $birdSpecy->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
             $entityManager->flush();
             $this->addFlash('success', "L'espèse a bien été modifié");

@@ -13,7 +13,7 @@
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
-          <li class="breadcrumb-item">Gestion des familles</li>
+          <li class="breadcrumb-item"><a href="{{ path('app_bird_family_index') }}">Gestion des familles</a></li>
           <li class="breadcrumb-item active">Modification</li>
         </ol>
       </nav>
@@ -27,7 +27,7 @@
             <div class="card-body">
               <h5 class="card-title">Les nouveaux informations de la famille</h5>
 
-              {{ include('bird_family/_form.html.twig', {'button_label': 'Update'}) }}
+              {{ include('bird_family/_form.html.twig', {'button_label': ' Mise à jour'}) }}
 
               <div class="d-flex justtify-content-end">
                 <a href="{{ path('app_bird_family_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit IucnRedListCategory{% endblock %}
+
+{% block body %}
+    <h1>Edit IucnRedListCategory</h1>
+
+    {{ include('iucn_red_list_category/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_iucn_red_list_category_index') }}">back to list</a>
+
+    {{ include('iucn_red_list_category/_delete_form.html.twig') }}
+{% endblock %}

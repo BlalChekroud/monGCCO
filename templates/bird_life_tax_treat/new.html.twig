@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New BirdLifeTaxTreat{% endblock %}
+
+{% block body %}
+    <h1>Create new BirdLifeTaxTreat</h1>
+
+    {{ include('bird_life_tax_treat/_form.html.twig') }}
+
+    <a href="{{ path('app_bird_life_tax_treat_index') }}">back to list</a>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Coverage index{% endblock %}
+
+{% block body %}
+    <h1>Coverage index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Label</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for coverage in coverages %}
+            <tr>
+                <td>{{ coverage.id }}</td>
+                <td>{{ coverage.label }}</td>
+                <td>
+                    <a href="{{ path('app_coverage_show', {'id': coverage.id}) }}">show</a>
+                    <a href="{{ path('app_coverage_edit', {'id': coverage.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_coverage_new') }}">Create new</a>
+{% endblock %}

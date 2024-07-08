@@ -11,8 +11,8 @@
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
-          <li class="breadcrumb-item">Gestion des Familles</li>
-          <li class="breadcrumb-item active">Consultation</li>
+          <li class="breadcrumb-item active">Gestion des Familles</li>
+          {# <li class="breadcrumb-item active">Consultation</li> #}
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -24,7 +24,6 @@
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Listes</h5>
-              {# <p>Add lightweight datatables to your project with using the <a href="https://github.com/fiduswriter/Simple-DataTables" target="_blank">Simple DataTables</a> library. Just add <code>.datatable</code> class name to any table you wish to conver to a datatable. Check for <a href="https://fiduswriter.github.io/simple-datatables/demos/" target="_blank">more examples</a>.</p> #}
 
               <!-- Table with stripped rows -->
               <table class="table datatable">
@@ -33,7 +32,7 @@
                     <th>
                       <b>N</b>om de famille
                     </th>
-                    <th>Tribu</th>
+                    <th>Sous famille</th>
                     <th data-type="date" data-format="DD/MM/YYYY">Date d'ajout</th>
                     <th>Action</th>
                 </thead>
@@ -45,8 +44,8 @@
                         {{ bird_family.getFamilyName() }}
                       </a>
                     </td>
-                    <td>{{ bird_family.getTribe() }}</td>
-                    <td>{{ bird_family.getCreatedAt()| date('d-m-Y H:i:s') }}</td>
+                    <td>{{ bird_family.getSubFamily() }}</td>
+                    <td>{{ bird_family.getCreatedAt()| date('d-m-Y') }}</td>
                     <td>
                       <div class="d-flex justtify-content-end">
                         <a href="{{ path('app_bird_family_show', {'id': bird_family.id}) }}" class="btn btn-outline-secondary btn-sm bi bi-card-text mx-2"> Détail</a>
@@ -69,9 +68,48 @@
                 <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
                   Créer une nouvelle famille
                 </a>
+                <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-3">
+                  Créer nouvelle espèce
+                </a>
+
               </div>
             </div>
           </div>
+
+          <!-- Card with header and footer -->
+          <div class="card">
+            <div class="card-header">
+                {# header #}
+            </div>
+            <div class="card-body">
+              <div class="row">
+
+                <div class="col-lg-4">
+                  {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+                    {{ form_row(form.csvFile) }}
+                    <button type="submit" formaction="{{ path('app_bird_family_preview') }}" class="btn btn-outline-primary btn-sm bi bi-eye"> Aperçu CSV</button>
+                    <button type="submit" formaction="{{ path('app_bird_family_import') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
+                        {% for error in form.csvFile.vars.errors %}
+                            <div class="alert alert-danger">{{ error.message }}</div>
+                        {% endfor %}
+                        
+                        {% for flash_error in app.flashes('error') %}
+                            <div class="alert alert-danger">{{ flash_error }}</div>
+                        {% endfor %}
+                  {{ form_end(form) }}
+                </div>
+                <div class="col-lg-4">
+                  <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+                  <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+                </div>
+              </div>
+              <a href="{{ path('app_bird_family_import') }}" class="btn btn-light"><i class="bi bi-collection"> </i>Page Importer CSV</a>
+
+            </div>
+            <div class="card-footer">
+              {# Footer #}
+            </div>
+          </div><!-- End Card with header and footer -->
 
         </div>
       </div>

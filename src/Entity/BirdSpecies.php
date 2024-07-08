@@ -2,37 +2,38 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\DBAL\Types\Types;
 
 use App\Repository\BirdSpeciesRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BirdSpeciesRepository::class)]
-// #[Vich\Uploadable]
+#[Vich\Uploadable]
 class BirdSpecies
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Vich\Uploadable()]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
     private ?string $scientificName = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $frenchName = null;
 
     #[ORM\Column(length: 25)]
     private ?string $wispeciescode = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $image = null;
-    
-    #[Vich\UploadableField(mapping: "bird_Specy", fileNameProperty: "image")]
-    #[Assert\Image()]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $imageFilename = null;
+
+    #[Vich\UploadableField(mapping: 'bird_Specy', fileNameProperty: 'imageFilename')]
     private ?File $imageFile = null;
 
     #[ORM\Column(length: 40, nullable: true)]
@@ -48,22 +49,16 @@ class BirdSpecies
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(length: 2)]
-    private ?string $birdLifeTaxTreat = null;
-
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $commonName = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $commonNameAlt = null;
 
-    #[ORM\Column(length: 7, nullable: true)]
-    private ?string $iucnRedListCategory = null;
-
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $synonyms = null;
 
-    #[ORM\Column(length: 300, nullable: true)]
+    #[ORM\Column(length: 400, nullable: true)]
     private ?string $taxonomicSources = null;
 
     #[ORM\Column(nullable: true)]
@@ -74,6 +69,26 @@ class BirdSpecies
 
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $subsppId = null;
+
+    /**
+     * @var Collection<int, CollectedData>
+     */
+    #[ORM\ManyToMany(targetEntity: CollectedData::class, mappedBy: 'birdSpecies')]
+    private Collection $collectedData;
+
+    #[ORM\ManyToOne(inversedBy: 'coverage')]
+    private ?Coverage $coverage = null;
+
+    #[ORM\ManyToOne(inversedBy: 'birdLifeTaxTreat')]
+    private ?BirdLifeTaxTreat $birdLifeTaxTreat = null;
+
+    #[ORM\ManyToOne(inversedBy: 'iucnRedListCategory')]
+    private ?IucnRedListCategory $iucnRedListCategory = null;
+
+    public function __construct()
+    {
+        $this->collectedData = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -116,16 +131,13 @@ class BirdSpecies
         return $this;
     }
 
-    public function getImage(): ?string
+    public function setImageFile(?File $imageFile = null): void
     {
-        return $this->image;
-    }
+        $this->imageFile = $imageFile;
 
-    public function setImage(?string $image): static
-    {
-        $this->image = $image;
-
-        return $this;
+        if (null !== $imageFile) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
     }
 
     public function getImageFile(): ?File
@@ -133,11 +145,14 @@ class BirdSpecies
         return $this->imageFile;
     }
 
-    public function setImageFile(?File $imageFile): static
+    public function setImageFilename(?string $imageFilename): void
     {
-        $this->imageFile = $imageFile;
+        $this->imageFilename = $imageFilename;
+    }
 
-        return $this;
+    public function getImageFilename(): ?string
+    {
+        return $this->imageFilename;
     }
 
     public function getAuthority(): ?string
@@ -188,18 +203,6 @@ class BirdSpecies
         return $this;
     }
 
-    public function getBirdLifeTaxTreat(): ?string
-    {
-        return $this->birdLifeTaxTreat;
-    }
-
-    public function setBirdLifeTaxTreat(string $birdLifeTaxTreat): static
-    {
-        $this->birdLifeTaxTreat = $birdLifeTaxTreat;
-
-        return $this;
-    }
-
     public function getCommonName(): ?string
     {
         return $this->commonName;
@@ -220,18 +223,6 @@ class BirdSpecies
     public function setCommonNameAlt(?string $commonNameAlt): static
     {
         $this->commonNameAlt = $commonNameAlt;
-
-        return $this;
-    }
-
-    public function getIucnRedListCategory(): ?string
-    {
-        return $this->iucnRedListCategory;
-    }
-
-    public function setIucnRedListCategory(?string $iucnRedListCategory): static
-    {
-        $this->iucnRedListCategory = $iucnRedListCategory;
 
         return $this;
     }
@@ -292,6 +283,69 @@ class BirdSpecies
     public function setSubsppId(?string $subsppId): static
     {
         $this->subsppId = $subsppId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CollectedData>
+     */
+    public function getCollectedData(): Collection
+    {
+        return $this->collectedData;
+    }
+
+    public function addCollectedData(CollectedData $collectedData): static
+    {
+        if (!$this->collectedData->contains($collectedData)) {
+            $this->collectedData->add($collectedData);
+            $collectedData->addBirdSpecies($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCollectedData(CollectedData $collectedData): static
+    {
+        if ($this->collectedData->removeElement($collectedData)) {
+            $collectedData->removeBirdSpecies($this);
+        }
+
+        return $this;
+    }
+
+    public function getCoverage(): ?Coverage
+    {
+        return $this->coverage;
+    }
+
+    public function setCoverage(?Coverage $coverage): static
+    {
+        $this->coverage = $coverage;
+
+        return $this;
+    }
+
+    public function getBirdLifeTaxTreat(): ?BirdLifeTaxTreat
+    {
+        return $this->birdLifeTaxTreat;
+    }
+
+    public function setBirdLifeTaxTreat(?BirdLifeTaxTreat $birdLifeTaxTreat): static
+    {
+        $this->birdLifeTaxTreat = $birdLifeTaxTreat;
+
+        return $this;
+    }
+
+    public function getIucnRedListCategory(): ?IucnRedListCategory
+    {
+        return $this->iucnRedListCategory;
+    }
+
+    public function setIucnRedListCategory(?IucnRedListCategory $iucnRedListCategory): static
+    {
+        $this->iucnRedListCategory = $iucnRedListCategory;
 
         return $this;
     }

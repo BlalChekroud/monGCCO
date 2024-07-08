@@ -10,7 +10,7 @@
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
-          <li class="breadcrumb-item">Gestion des espèces</li>
+          <li class="breadcrumb-item"><a href="{{ path('app_bird_species_index') }}">Gestion des espèces</a></li>
           <li class="breadcrumb-item active">Détail</li>
         </ol>
       </nav>
@@ -18,10 +18,14 @@
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-10">
 
                 <div class="card">
-                    {# <img src="{{ vich_uploader_asset(bird_specy, 'imageFile') }}" class="card-img-top" alt="..."> #}
+                    {% if bird_specy.imageFilename %}
+                        <img src="{{ vich_uploader_asset(bird_specy, 'imageFile') }}" alt="{{ bird_specy.frenchName }}" class="imgShow rounded mx-auto d-block">
+                    {% else %}
+                        <p>Aucune image disponible</p>
+                    {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">
                             Détail
@@ -29,10 +33,6 @@
 
                         <table class="table">
                             <tbody>
-                                <tr>
-                                    <th>Id</th>
-                                    <td>{{ bird_specy.id }}</td>
-                                </tr>
                                 <tr>
                                     <th>Nom Scientifique</th>
                                     <td>{{ bird_specy.scientificName }}</td>
@@ -50,8 +50,12 @@
                                     <td>{{ bird_specy.imageFile }}</td>
                                 </tr> #}
                                 <tr>
-                                    <th>Authority</th>
+                                    <th>Autorité</th>
                                     <td>{{ bird_specy.authority }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Couverture</th>
+                                    <td>{{ bird_specy.coverage }}</td>
                                 </tr>
                                 <tr>
                                     <th>Créé le</th>
@@ -62,7 +66,7 @@
                                     <td>{{ bird_specy.updatedAt ? bird_specy.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>birdLifeTaxTreat</th>
+                                    <th>Traitement taxonomique de BirdLife</th>
                                     <td>{{ bird_specy.birdLifeTaxTreat }}</td>
                                 </tr>
                                 <tr>
@@ -70,11 +74,11 @@
                                     <td>{{ bird_specy.commonName }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Nom commun alternatif</th>
+                                    <th>Noms communs alternatifs</th>
                                     <td>{{ bird_specy.commonNameAlt }}</td>
                                 </tr>
                                 <tr>
-                                    <th>IURN Red List Category</th>
+                                    <th>Catégorie de la liste rouge de l'UICN 2022</th>
                                     <td>{{ bird_specy.iucnRedListCategory }}</td>
                                 </tr>
                                 <tr>
@@ -86,15 +90,15 @@
                                     <td>{{ bird_specy.taxonomicSources }}</td>
                                 </tr>
                                 <tr>
-                                    <th>sisRecId</th>
+                                    <th>sisRec ID</th>
                                     <td>{{ bird_specy.sisRecId }}</td>
                                 </tr>
                                 <tr>
-                                    <th>spcRecId</th>
+                                    <th>spcRec ID</th>
                                     <td>{{ bird_specy.spcRecId }}</td>
                                 </tr>
                                 <tr>
-                                    <th>subsppId</th>
+                                    <th>subspp ID</th>
                                     <td>{{ bird_specy.subsppId }}</td>
                                 </tr>
                                 <tr>

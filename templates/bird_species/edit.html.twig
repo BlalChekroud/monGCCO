@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit BirdSpecies{% endblock %}
+{% block title %}Modification espèce d'oiseau{% endblock %}
 
 {% block body %}
 <main id="main" class="main">
@@ -10,7 +10,7 @@
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
-          <li class="breadcrumb-item">Gestion des espèces</li>
+          <li class="breadcrumb-item"><a href="{{ path('app_bird_species_index') }}">Gestion des espèces</a></li>
           <li class="breadcrumb-item active">Modification</li>
         </ol>
       </nav>
@@ -26,7 +26,7 @@
                             Modifier
                         </h5>
 
-                        {{ include('bird_species/_form.html.twig', {'button_label': 'Update'}) }}
+                        {{ include('bird_species/_form.html.twig', {'button_label': ' Mise à jour'}) }}
                         
                         <div class="row">
                             <div class="col-lg-4">

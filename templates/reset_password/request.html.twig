@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="{{ asset('/img/favicon.png') }}" rel="icon">
+    <link href="{{ asset('/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{{ asset('/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/quill/quill.snow.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/quill/quill.bubble.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
+    <link href="{{ asset('/vendor/simple-datatables/style.css') }}" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+
+      <title>{% block title %}Réinitialiser votre mot de passe{% endblock %}</title>
+      <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+      {% block stylesheets %}
+      {% endblock %}
+
+      {% block javascripts %}
+          {% block importmap %}{{ importmap('app') }}{% endblock %}
+      {% endblock %}
+  </head>
+  <body>
+    {% block body %}
+
+        <main id="main" class="main">
+
+            <section class="section">
+                <div class="row">
+                    <div class="col-lg-10 mb-3">
+                        {% for flash_error in app.flashes('reset_password_error') %}
+                            <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+                        {% endfor %}
+                        <h1>Réinitialiser votre mot de passe</h1>
+
+                        {{ form_start(requestForm) }}
+                            {{ form_row(requestForm.email) }}
+                            <div>
+                                <small>
+                                    Veuillez saisir votre adresse e-mail et nous vous enverrons un 
+                                    lien pour réinitialiser votre mot de passe.
+                                </small>
+                            </div>
+
+                            <button class="btn btn-primary">Envoyer un e-mail de réinitialisation du mot de passe</button>
+                        {{ form_end(requestForm) }}
+                    </div>
+                    <div class="col-12">
+                        <a href="{{ path('app_login')}}">Annuler</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+      <!-- Vendor JS Files -->
+
+      <script src="{{ asset('/vendor/apexcharts/apexcharts.min.js') }}"></script>
+      <script src="{{ asset('/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+      <script src="{{ asset('/vendor/chart.js/chart.umd.js') }}"></script>
+      <script src="{{ asset('/vendor/echarts/echarts.min.js') }}"></script>
+      <script src="{{ asset('/vendor/quill/quill.js') }}"></script>
+      <script src="{{ asset('/vendor/simple-datatables/simple-datatables.js') }}"></script>
+      <script src="{{ asset('/vendor/tinymce/tinymce.min.js') }}"></script>
+      <script src="{{ asset('/vendor/php-email-form/validate.js') }}"></script>
+
+      <!-- Template Main JS File -->
+      <script src="{{ asset('/js/main.js') }}"></script>
+      
+      <!-- ICON SCRIPT -->
+      <script src="https://unpkg.com/feather-icons"></script>
+    {% endblock %}
+  </body>
+
+</html>
