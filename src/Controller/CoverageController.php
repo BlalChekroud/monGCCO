@@ -31,16 +31,18 @@ class CoverageController extends AbstractController
         $coverage = new Coverage();
         $form = $this->createForm(CoverageType::class, $coverage);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($coverage);
             $entityManager->flush();
-
+    
             return new JsonResponse(['success' => true, 'coverage' => ['id' => $coverage->getId(), 'label' => $coverage->getLabel()]]);
         }
-
+    
         return new JsonResponse(['success' => false, 'errors' => (string) $form->getErrors(true, false)]);
     }
+    
+    
     
     #[Route('/list', name: 'app_coverage_list', methods: ['GET'])]
     public function list(EntityManagerInterface $entityManager): JsonResponse

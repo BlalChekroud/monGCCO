@@ -10,71 +10,125 @@
       <h1>Consultation des campagnes</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
           <li class="breadcrumb-item active">Gestion des campagnes</li>
-          {# <li class="breadcrumb-item active">Consultation</li> #}
         </ol>
       </nav>
     </div><!-- End Page Title -->
 
     <section class="section">
       <div class="row">
-        <div class="col-lg-12">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
 
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Listes</h5>
 
-              <!-- Table with stripped rows -->
-
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nom de la campagne</th>
-                            <th>Date de début</th>
-                            <th>Date de fin</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+              <div id="printableArea">
+                <!-- Table with stripped rows -->
+                <table class="table datatable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Nom de la campagne</th>
+                      <th>Date de début</th>
+                      <th>Date de fin</th>
+                      <th>Etat</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
                     {% for counting_campaign in counting_campaigns %}
-                        <tr>
-                            <td>{{ counting_campaign.id }}</td>
-                            <td>{{ counting_campaign.campaignName }}</td>
-                            <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('Y-m-d') : '' }}</td>
-                            <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('Y-m-d') : '' }}</td>
-                            <td>
-                                <div class="d-flex justtify-content-end">
-                                    <a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" class="btn btn-outline-secondary btn-sm bi bi-card-text mx-2"> Détail</a>
-                                    <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm mx-2"> Modifier</a>
-                                    {{ include('counting_campaign/_delete_form.html.twig') }}
-                                </div>
-                            </td>
-                        </tr>
+                      <tr>
+                        <td>{{ counting_campaign.id }}</td>
+                        <td>{{ counting_campaign.campaignName }}</td>
+                        <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y') : '' }}</td>
+                        <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y') : '' }}</td>
+                        <td>
+                          {% if counting_campaign.campaignStatus.label == 'En attente' %}
+                            <div class="btn-action btn btn-info" role="status">
+                              <i class="bi bi-circle-fill"></i>
+                              {{ counting_campaign.campaignStatus.label }}
+                            </div>
+                            {% elseif counting_campaign.campaignStatus.label == 'En cours' %}
+                              <div class="btn btn-primary" role="status">
+                                <i class="bi bi-circle-fill"></i>
+                                {{ counting_campaign.campaignStatus.label }}
+                              </div>
+                            {% elseif counting_campaign.campaignStatus.label == 'Terminé' %}
+                              <div class="btn btn-success">
+                                <i class="bi bi-check-circle"> </i>
+                              </div>
+                              {{ counting_campaign.campaignStatus.label }}
+                            {% elseif counting_campaign.campaignStatus.label == 'Annulé' %}
+                              <div class="btn btn-dark">
+                                <i class="bi bi-x-lg"> </i>
+                                {{ counting_campaign.campaignStatus.label }}
+                              </div>
+                            {% elseif counting_campaign.campaignStatus.label == 'Erreur' %}
+                              <div class="btn btn-warning">
+                                 <i class="bi bi-exclamation-triangle"> </i>
+                                 {{ counting_campaign.campaignStatus.label }}
+                              </div>
+                            {% elseif counting_campaign.campaignStatus.label == 'Validé' %}
+                             <div class="btn btn-success">
+                                <i class="bi bi-check-circle"> </i>
+                                {{ counting_campaign.campaignStatus.label }}
+                              </div>
+                            {% elseif counting_campaign.campaignStatus.label == 'Rejeté' %}
+                              <div class="btn btn-danger">
+                                <i class="bi bi-exclamation-triangle"> </i>
+                                {{ counting_campaign.campaignStatus.label }}
+                              </div>
+                            {% elseif counting_campaign.campaignStatus.label == 'Suspens' %}
+                              <div class="btn btn-secondary" role="status">
+                                <i class="bi bi-circle-fill"></i>
+                                {{ counting_campaign.campaignStatus.label }}
+                              </div>
+                            {% else %} 
+                              {{ counting_campaign.campaignStatus.label }}
+                          {% endif %}
+                        </td>
+                        <td>
+                          <div class="d-flex justtify-content-end">
+                            <a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-2"> Détail</a>
+                            <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
+                            {{ include('counting_campaign/_delete_form.html.twig') }}
+                          </div>
+                        </td>
+                      </tr>
                     {% else %}
-                        <tr>
-                            <td colspan="7">Aucun enregistrement trouvé</td>
-                        </tr>
+                      <tr>
+                        <td colspan="7">Aucun enregistrement trouvé</td>
+                      </tr>
                     {% endfor %}
                     </tbody>
                 </table>
-                <!-- End Table with stripped rows -->              
-              
-                <div>
-                    <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3">
-                        Créer une nouvelle campagne
-                    </a>
-                    <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-fill">
-                      Créer nouvelle collection de sites
-                    </a>
-                </div>
+                <!-- End Table with stripped rows -->
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="d-flex justtify-content-end">
+                <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3"> Créer une nouvelle campagne</a>
+                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer nouvelle site de collection</a>
+              </div>
             </div>
           </div>
 
         </div>
       </div>
     </section>
+    
+    <div class="alert border-light alert-dismissible fade show" role="alert">
+      <!-- Card with header and footer -->
+      <div class="card">
+        <div class="card-footer">
+          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div><!-- End Card with header and footer -->
+    </div>
 
 </main><!-- End #main -->
 {% endblock %}

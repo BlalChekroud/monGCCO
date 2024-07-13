@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Aperçu du fichier CSV{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Aperçu du fichier CSV</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+        <li class="breadcrumb-item active">Aperçu CSV</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Aperçu du fichier CSV</h5>
+
+            <!-- Table with stripped rows -->
+            <table class="table datatable">
+              <thead>
+                <tr>
+                  {% for header in headers %}
+                    <th>{{ header }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in rows %}
+                  <tr>
+                    {% for cell in row %}
+                      <td>{{ cell }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+
+            <div class="mt-4">
+              <a href="{{ path('app_bird_family_index') }}" class="btn btn-secondary">Annuler</a>
+              <form method="post" action="{{ path('app_bird_family_import') }}" class="d-inline-block">
+                <input type="hidden" name="csvData" value="{{ csvData }}">
+                <button type="submit" class="btn btn-primary">Confirmer l'importation</button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main><!-- End #main -->
+{% endblock %}

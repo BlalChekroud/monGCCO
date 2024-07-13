@@ -40,7 +40,6 @@ class BirdSpecies
     private ?string $authority = null;
 
     #[ORM\ManyToOne(inversedBy: 'birdSpecies')]
-    #[ORM\JoinColumn(nullable: true)]
     private ?BirdFamily $birdFamily = null;
 
     #[ORM\Column]
@@ -76,13 +75,16 @@ class BirdSpecies
     #[ORM\ManyToMany(targetEntity: CollectedData::class, mappedBy: 'birdSpecies')]
     private Collection $collectedData;
 
+    #[ORM\JoinColumn(nullable: true)]
     #[ORM\ManyToOne(inversedBy: 'coverage')]
     private ?Coverage $coverage = null;
 
+    #[ORM\JoinColumn(nullable: true)]
     #[ORM\ManyToOne(inversedBy: 'birdLifeTaxTreat')]
     private ?BirdLifeTaxTreat $birdLifeTaxTreat = null;
 
     #[ORM\ManyToOne(inversedBy: 'iucnRedListCategory')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?IucnRedListCategory $iucnRedListCategory = null;
 
     public function __construct()

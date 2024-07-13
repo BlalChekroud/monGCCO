@@ -9,23 +9,23 @@
       <h1>Espèces des oiseaux</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
           <li class="breadcrumb-item active">Gestion des espèces</li>
-          {# <li class="breadcrumb-item active">Consultation</li> #}
         </ol>
       </nav>
     </div><!-- End Page Title -->
 
     <section class="section">
       <div class="row">
-        <div class="col-lg-12">
-
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                     
+         <div id="printableArea">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Listes</h5>
 
-              <!-- Table with stripped rows -->
-                  <table class="table">
+                  <!-- Table with stripped rows -->
+                  <table class="table datatable">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -52,8 +52,8 @@
                             <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                             <td>
                               <div class="d-flex justtify-content-end">
-                                  <a href="{{ path('app_bird_species_show', {'id': bird_specy.id}) }}" class="btn btn-outline-secondary btn-sm bi bi-card-text mx-2"> Détail</a>
-                                  <a href="{{ path('app_bird_species_edit', {'id': bird_specy.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm mx-2"> Modifier</a>
+                                  <a href="{{ path('app_bird_species_show', {'id': bird_specy.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text"> Détail</a>
+                                  <a href="{{ path('app_bird_species_edit', {'id': bird_specy.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
                                   {{ include('bird_species/_delete_form.html.twig') }}
                               </div>
                             </td>
@@ -66,19 +66,46 @@
                     </tbody>
                 </table>
 
-              <div>
-                <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
-                  Créer nouvelle espèce
-                </a>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                  <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer nouvelle espèce</a>
+                  <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer nouvelle famille</a>
+                </div>
               </div>
               <!-- End Table with stripped rows -->
 
             </div>
           </div>
+         </div>
 
         </div>
       </div>
     </section>
+        
+    <div class="alert border-light alert-dismissible fade show" role="alert">
+      <!-- Card with header and footer -->
+      <div class="card">
+        <div class="card-header">
+          {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+            {{ form_row(form.csvFile) }}
+            <button type="submit" formaction="{{ path('app_bird_species_preview') }}" class="btn btn-outline-primary btn-sm bi bi-eye"> Aperçu CSV</button>
+            <button type="submit" formaction="{{ path('app_bird_species_import') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
+            {% for error in form.csvFile.vars.errors %}
+              <div class="alert alert-danger">{{ error.message }}</div>
+            {% endfor %}
+              
+            {% for flash_error in app.flashes('error') %}
+              <div class="alert alert-danger">{{ flash_error }}</div>
+            {% endfor %}
+          {{ form_end(form) }}
+        </div>
+        <div class="card-footer">
+          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div><!-- End Card with header and footer -->
+    </div>
 
 </main><!-- End #main -->
 {% endblock %}

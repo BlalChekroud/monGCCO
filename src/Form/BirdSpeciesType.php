@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Entity\Coverage;
 use App\Entity\BirdLifeTaxTreat;
 use App\Entity\IucnRedListCategory;
+use App\Repository\BirdFamilyRepository;
 
 use App\Entity\BirdFamily;
 use App\Entity\BirdSpecies;
@@ -66,7 +67,7 @@ class BirdSpeciesType extends AbstractType
                 'choice_label' => 'label',
                 'label' => 'Couverture pour cette espèce',
                 'placeholder' => '',
-                'attr' => ['class' => 'form-control', 'id' => 'coverageDropdown']
+                'attr' => ['class' => 'form-control']
             ])
             ->add('birdLifeTaxTreat', EntityType::class, [
                 'class' => BirdLifeTaxTreat::class,
@@ -107,11 +108,19 @@ class BirdSpeciesType extends AbstractType
             ->add('birdFamily', EntityType::class, [
                 'class' => BirdFamily::class,
                 'choice_label' => function (BirdFamily $birdFamily) {
-                    return $birdFamily->getFamilyName() . ' (' . $birdFamily->getSubFamily() . ')';
+                    return $birdFamily->getFamily() . ' (' . $birdFamily->getFamilyName() . ') \ ' .$birdFamily->getSubFamily() . ' \ ' .$birdFamily->getTribe();
                 },
-                'label' => "Famille (sous-famille) d'espèce",
+                'label' => "Famille (Nom de famille) \ Sous-famille \ Tribe d'espèce",
                 'placeholder' => '',
+                'required' => true,
+                'query_builder' => function (BirdFamilyRepository $repository) {
+                    return $repository->createQueryBuilder('b')
+                        ->orderBy('b.family', 'ASC'); // Or any other field you want to sort by
+                },
             ])
+            // ->add('save', SubmitType::class, [
+            //     'label' => 'Enregistrer les modifications'
+            // ])
         ;
     }
 

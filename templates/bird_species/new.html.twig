@@ -9,16 +9,16 @@
       <h1>Création d'une espèce oiseau</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
           <li class="breadcrumb-item"><a href="{{ path('app_bird_species_index') }}">Gestion des espèces</a></li>
-          <li class="breadcrumb-item active">création</li>
+          <li class="breadcrumb-item active">Création</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
 
                 <div class="card">
                     <div class="card-body">
@@ -26,7 +26,9 @@
 
                         {{ include('bird_species/_form.html.twig') }}
 
-                        <a href="{{ path('app_bird_species_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ path('app_bird_species_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>
                         <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
                           Créer une nouvelle famille
                         </a>
@@ -53,12 +55,14 @@
                         {{ form_widget(coverageForm) }}
                     </div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="submit" class="btn btn-primary" id="saveCoverage">Enregistrer</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+
 
 <!-- birdLifeTaxTreat Modal -->
 <div class="modal fade" id="birdLifeTaxTreatModal" tabindex="-1" aria-labelledby="birdLifeTaxTreatModalLabel" aria-hidden="true">
@@ -101,8 +105,5 @@
         </div>
     </div>
 </div>
-
-
-<!-- Repeat modals for birdLifeTaxTreat and iucnRedListCategory -->
 
 {% endblock %}

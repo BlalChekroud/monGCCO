@@ -1,3 +1,20 @@
+(function() {
+document.addEventListener("DOMContentLoaded", function() {
+    
+    /* cacher les messages après quelques secondes */
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM fully loaded and parsed");
+        
+        setTimeout(function() {
+            const flashMessages = document.querySelectorAll('.alertFlash');
+            flashMessages.forEach(function(message) {
+                message.style.display = 'none';
+                console.log("Hiding message: ", message);
+            });
+        }, 5000); // 5000 milliseconds = 5 seconds
+    });
+
+
 /* CLOCK */
 function showDateTime() {
     const date = new Date();
@@ -28,31 +45,33 @@ function showDateTime() {
   
     
   /* eyes */
-document.addEventListener("DOMContentLoaded", function() {
+// document.addEventListener("DOMContentLoaded", function() {
 
-    feather.replace();
-    const eye = document.querySelector(".feather-eye");
-    const eyeoff = document.querySelector(".feather-eye-off");
-    const passwordField = document.querySelector("input[type=password]");
+//     feather.replace();
+//     const eye = document.querySelector(".feather-eye");
+//     const eyeoff = document.querySelector(".feather-eye-off");
+//     const passwordField = document.querySelector("input[type=password]");
 
-    eye.addEventListener("click", () => {
-    eye.style.display = "none";
-    eyeoff.style.display = "block";
-    passwordField.type = "text";
-    });
+//     eye.addEventListener("click", () => {
+//     eye.style.display = "none";
+//     eyeoff.style.display = "block";
+//     passwordField.type = "text";
+//     });
 
-    eyeoff.addEventListener("click", () => {
-    eyeoff.style.display = "none";
-    eye.style.display = "block";
-    passwordField.type = "password";
-    });
-});
+//     eyeoff.addEventListener("click", () => {
+//     eyeoff.style.display = "none";
+//     eye.style.display = "block";
+//     passwordField.type = "password";
+//     });
+// });
 
 
   /* Imprimer */
-  document.getElementById("printButton").addEventListener("click", function() {
-    window.print();
-  });
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("printButton").addEventListener("click", function() {
+        window.print();
+    });
+});
 
   
 /* Buttons d'ajout */
@@ -205,3 +224,17 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error updating IUCN Red List Category list:', error));
     }
 });
+
+});
+
+/* Test*/
+// let pseudo = false;
+
+// document.querySelector("#coverage_label").addEventListener("input", chechPseudo);
+
+// function chechPseudo(){
+//     pseudo = this.value.length > 2;
+//     console.log(pseudo);
+// }
+
+})();

@@ -43,10 +43,35 @@ class CountingCampaign
     #[ORM\OneToMany(targetEntity: CollectedData::class, mappedBy: 'countingCampaign')]
     private Collection $collectedData;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\ManyToOne(inversedBy: 'status')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?CampaignStatus $campaignStatus = null;
+
     public function __construct()
     {
         $this->siteCollection = new ArrayCollection();
         $this->collectedData = new ArrayCollection();
+    }
+
+    public function generateCampaignName(): void
+    {
+        if ($this->getStartDate() === null || $this->getEndDate() === null) {
+            throw new InvalidArgumentException('Les dates de début et de fin doivent être définies pour générer le nom de la campagne.');
+        }
+
+        $regionNames = [];
+        foreach ($this->getSiteCollection() as $site) {
+            $regionNames[] = $site->getRegion();
+        }
+        $uniqueRegionNames = array_unique($regionNames);
+
+        $startDate = $this->getStartDate()->format('d-m-Y');
+        $endDate = $this->getEndDate()->format('d-m-Y');
+
+        $this->campaignName = sprintf('%s %s (%s - %s)','Campagne', implode(', ', $uniqueRegionNames), $startDate, $endDate);
     }
 
     public function getId(): ?int
@@ -167,4 +192,29 @@ class CountingCampaign
 
         return $this;
     }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getCampaignStatus(): ?CampaignStatus
+    {
+        return $this->campaignStatus;
+    }
+
+    public function setCampaignStatus(?CampaignStatus $campaignStatus): static
+    {
+        $this->campaignStatus = $campaignStatus;
+
+        return $this;
+    }
+
 }

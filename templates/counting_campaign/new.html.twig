@@ -10,24 +10,32 @@
       <h1>Créer une nouvelle campagne de comptage</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
           <li class="breadcrumb-item"><a href="{{ path('app_counting_campaign_index') }}">Gestion des campagnes</a></li>
-          <li class="breadcrumb-item active">création</li>
+          <li class="breadcrumb-item active">Création</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
 
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Informations de la nouvelle campagne</h5>
 
                         {{ include('counting_campaign/_form.html.twig') }}<br/>
+                        
+                        <div class="card-footer">
+                          <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
+                              <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer nouvelle collection de sites</a>
+                            </div>
+                          </div>
+                        </div>
 
-                        <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
                     </div>
                 </div>
 

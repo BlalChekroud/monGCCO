@@ -38,9 +38,9 @@ class ImportCsvType extends AbstractType
                     'accept' => '.csv,.txt'
             ],
         ])
-        // ->add('submit', SubmitType::class, [
-        //     'label' => 'Importer CSV',
-        //     'attr' => ['class' => 'btn-primary'],
+        // ->add('preview', SubmitType::class, [
+        //     'label' => 'Prévisualiser',
+        //     'attr' => ['class' => 'btn-secondary'],
         // ])
         ;
     }

@@ -43,9 +43,24 @@ class SiteCollectionType extends AbstractType
             ->add('region',TextType::class, [
                 'label' => 'Région'
             ])
+            ->add('country',TextType::class, [
+                'label' => 'Pays'
+            ])
             ->add('parentSiteName',TextType::class, [
                 'label' => 'Nom du site parent'
             ])
+            // ->add('siteName')
+            // ->add('siteCode')
+            // ->add('nationalSiteCode')
+            // ->add('internationalSiteCode')
+            // ->add('latDepart')
+            // ->add('longDepart')
+            // ->add('latFin')
+            // ->add('longFin')
+            // ->add('region')
+            // ->add('parentSiteName')
+
+
             // ->add('countingCampaigns', EntityType::class, [
             //     'class' => CountingCampaign::class,
             //     'choice_label' => 'id',

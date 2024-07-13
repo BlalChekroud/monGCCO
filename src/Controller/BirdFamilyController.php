@@ -245,6 +245,7 @@ class BirdFamilyController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$birdFamily->getId(), $request->getPayload()->get('_token'))) {
             $entityManager->remove($birdFamily);
             $entityManager->flush();
+            $this->addFlash('success', "Famille d'espèse a bien été supprimée");
         }
 
         return $this->redirectToRoute('app_bird_family_index', [], Response::HTTP_SEE_OTHER);

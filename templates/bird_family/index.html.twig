@@ -10,46 +10,42 @@
       <h1>Famille des oiseaux</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
           <li class="breadcrumb-item active">Gestion des Familles</li>
-          {# <li class="breadcrumb-item active">Consultation</li> #}
         </ol>
       </nav>
     </div><!-- End Page Title -->
 
     <section class="section">
       <div class="row">
-        <div class="col-lg-12">
-
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Listes</h5>
-
+             <div id="printableArea">
               <!-- Table with stripped rows -->
               <table class="table datatable">
                 <thead>
                   <tr>
-                    <th>
-                      <b>N</b>om de famille
-                    </th>
+                    <th>#</th>
+                    <th>Nom de famille</th>
+                    <th>Famille</th>
                     <th>Sous famille</th>
-                    <th data-type="date" data-format="DD/MM/YYYY">Date d'ajout</th>
+                    <th>Date d'ajout</th>
                     <th>Action</th>
                 </thead>
                 <tbody>
                 {% for bird_family in bird_families %}
                   <tr>
-                    <td>
-                      <a href="{{ path('app_bird_family_show', {id: bird_family.getId()} )}}"  class="logo d-flex align-items-center">
-                        {{ bird_family.getFamilyName() }}
-                      </a>
-                    </td>
+                    <td>{{ bird_family.getID() }}</td>
+                    <td>{{ bird_family.getFamilyName() }}</td>
+                    <td>{{ bird_family.getFamily() }}</td>
                     <td>{{ bird_family.getSubFamily() }}</td>
                     <td>{{ bird_family.getCreatedAt()| date('d-m-Y') }}</td>
                     <td>
                       <div class="d-flex justtify-content-end">
-                        <a href="{{ path('app_bird_family_show', {'id': bird_family.id}) }}" class="btn btn-outline-secondary btn-sm bi bi-card-text mx-2"> Détail</a>
-                        <a href="{{ path('app_bird_family_edit', {'id': bird_family.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm mx-2"> Modifier</a>
+                        <a href="{{ path('app_bird_family_show', {'id': bird_family.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail</a>
+                        <a href="{{ path('app_bird_family_edit', {'id': bird_family.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
                         {{ include('bird_family/_delete_form.html.twig') }}
                       </div>
                     </td>
@@ -62,58 +58,48 @@
                   
                 </tbody>
               </table>
-              <!-- End Table with stripped rows -->              
+              <!-- End Table with stripped rows -->    
+             </div>          
               
-              <div>
-                <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
-                  Créer une nouvelle famille
-                </a>
-                <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-3">
-                  Créer nouvelle espèce
-                </a>
-
-              </div>
-            </div>
-          </div>
-
-          <!-- Card with header and footer -->
-          <div class="card">
-            <div class="card-header">
-                {# header #}
-            </div>
-            <div class="card-body">
-              <div class="row">
-
-                <div class="col-lg-4">
-                  {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-                    {{ form_row(form.csvFile) }}
-                    <button type="submit" formaction="{{ path('app_bird_family_preview') }}" class="btn btn-outline-primary btn-sm bi bi-eye"> Aperçu CSV</button>
-                    <button type="submit" formaction="{{ path('app_bird_family_import') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
-                        {% for error in form.csvFile.vars.errors %}
-                            <div class="alert alert-danger">{{ error.message }}</div>
-                        {% endfor %}
-                        
-                        {% for flash_error in app.flashes('error') %}
-                            <div class="alert alert-danger">{{ flash_error }}</div>
-                        {% endfor %}
-                  {{ form_end(form) }}
-                </div>
-                <div class="col-lg-4">
-                  <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-                  <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-                </div>
-              </div>
-              <a href="{{ path('app_bird_family_import') }}" class="btn btn-light"><i class="bi bi-collection"> </i>Page Importer CSV</a>
-
             </div>
             <div class="card-footer">
-              {# Footer #}
+              <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
+                Créer une nouvelle famille
+              </a>
+              <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-3">
+                Créer nouvelle espèce
+              </a>
             </div>
-          </div><!-- End Card with header and footer -->
+          </div>
 
         </div>
       </div>
     </section>
+
+    <div class="alert border-light alert-dismissible fade show" role="alert">
+      <!-- Card with header and footer -->
+      <div class="card">
+        <div class="card-header">
+          {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+            {{ form_row(form.csvFile) }}
+            <button type="submit" formaction="{{ path('app_bird_family_preview') }}" class="btn btn-outline-primary btn-sm bi bi-eye"> Aperçu CSV</button>
+            <button type="submit" formaction="{{ path('app_bird_family_import') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
+            {% for error in form.csvFile.vars.errors %}
+              <div class="alert alert-danger">{{ error.message }}</div>
+            {% endfor %}
+              
+            {% for flash_error in app.flashes('error') %}
+              <div class="alert alert-danger">{{ flash_error }}</div>
+            {% endfor %}
+          {{ form_end(form) }}
+        </div>
+        <div class="card-footer">
+          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div><!-- End Card with header and footer -->
+    </div>
 
   </main><!-- End #main -->
 {% endblock %}

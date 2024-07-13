@@ -9,7 +9,7 @@
       <h1>Espèce d'oiseau</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
           <li class="breadcrumb-item"><a href="{{ path('app_bird_species_index') }}">Gestion des espèces</a></li>
           <li class="breadcrumb-item active">Détail</li>
         </ol>
@@ -18,8 +18,8 @@
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-10">
-
+            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+              <div id="printableArea">
                 <div class="card">
                     {% if bird_specy.imageFilename %}
                         <img src="{{ vich_uploader_asset(bird_specy, 'imageFile') }}" alt="{{ bird_specy.frenchName }}" class="imgShow rounded mx-auto d-block">
@@ -45,10 +45,6 @@
                                     <th>Code WI espèce</th>
                                     <td>{{ bird_specy.wispeciescode }}</td>
                                 </tr>
-                                {# <tr>
-                                    <th>Image</th>
-                                    <td>{{ bird_specy.imageFile }}</td>
-                                </tr> #}
                                 <tr>
                                     <th>Autorité</th>
                                     <td>{{ bird_specy.authority }}</td>
@@ -115,27 +111,36 @@
                                 </tr>
                             </tbody>
                         </table>
+
+                    </div>
+                    <div class="card-footer">
                         <div class="row">
-                            <div class="col-lg-3">
-                                <a href="{{ path('app_bird_species_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
-                            </div>
-                            <div class="col-lg-2">
-                                <a href="{{ path('app_bird_species_edit', {'id': bird_specy.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm"> Modifier</a>
-                            </div>
-                            <div class="col-lg-2">
+                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justtify-content-end">
+                                <a href="{{ path('app_bird_species_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-1"> retour vers la liste</a>
+                                <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Créer nouvelle espèce</a>
+                                <a href="{{ path('app_bird_species_edit', {'id': bird_specy.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
                                 {{ include('bird_species/_delete_form.html.twig') }}
-                            </div>
-                            <div class="col-lg-4">
-                                <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
-                                    Créer nouvelle espèce
-                                </a>
                             </div>
                         </div>
                     </div>
+
                 </div>
+              </div>
             </div>
         </div>
     </section>
+        
+    <div class="alert border-light alert-dismissible fade show" role="alert">
+      <!-- Card with header and footer -->
+      <div class="card">
+        <div class="card-footer">
+          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div><!-- End Card with header and footer -->
+    </div>
+
 </main>
 
 {% endblock %}

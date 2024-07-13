@@ -6,10 +6,10 @@
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Détail d'une collection de sites</h1>
+      <h1>Détail d'une site de collection</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
           <li class="breadcrumb-item"><a href="{{ path('app_site_collection_index') }}">Gestion des sites</a></li>
           <li class="breadcrumb-item active">Détail</li>
         </ol>
@@ -18,7 +18,7 @@
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
 
                 <div class="card">
                     <div class="card-body">
@@ -73,29 +73,25 @@
                                     <td>{{ site_collection.region }}</td>
                                 </tr>
                                 <tr>
+                                    <th>Pays</th>
+                                    <td>{{ site_collection.country }}</td>
+                                </tr>
+                                <tr>
                                     <th>Nom du site parent</th>
                                     <td>{{ site_collection.parentSiteName }}</td>
                                 </tr>
                             </tbody>
                         </table>
-
-                        <div class="row">
-                            <div class="col-lg-3">
-                                <a href="{{ path('app_site_collection_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
-                            </div>
-                            <div class="col-lg-2">
-                                <a href="{{ path('app_site_collection_edit', {id: site_collection.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm"> Modifier</a>
-                            </div>
-                            <div class="col-lg-2">
-                                {{ include('site_collection/_delete_form.html.twig') }}
-                            </div>
-                            <div class="col-lg-4">
-                                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-fill">
-                                    Créer nouvelle collection de sites
-                                </a>
-                            </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justtify-content-end">
+                            <a href="{{ path('app_site_collection_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
+                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Créer nouvelle site de collection</a>
+                            <a href="{{ path('app_site_collection_edit', {'id': site_collection.id}) }}" class="bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
+                            {{ include('site_collection/_delete_form.html.twig') }}
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

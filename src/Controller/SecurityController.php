@@ -2,6 +2,19 @@
 
 namespace App\Controller;
 
+// use Symfony\Component\HttpFoundation\File\Exception\FileException;
+// use Symfony\Component\HttpFoundation\File\UploadedFile;
+// use Symfony\Component\String\Slugger\SluggerInterface;
+use Monolog\DateTimeImmutable;
+use DateTime;
+use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Form\EditPasswordType;
+use App\Form\UserType;
+use App\Entity\User;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -30,15 +43,75 @@ class SecurityController extends AbstractController
         throw new \LogicException('Ce champ de méthode peut être vide - il sera intercepté par la clé de déconnexion de votre pare-feu.');
     }
 
-    #[Route(path: '/profile', name: 'app_profile')]
-    public function profile(): Response
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas le droit d\'accès.')]
+    #[Route('/profile', name: 'app_profile', methods: ['GET'])]
+    public function index(UserRepository $userRepository): Response
     {
-        $user = $this->getUser();
-
         return $this->render('security/profile.html.twig', [
-            'user' => $user,
+            'users' => $userRepository->findAll(),
         ]);
     }
+
+
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route('/profile/{id}/edit', name: 'app_profile_edit', methods: ['GET', 'POST'])]
+    public function edit(User $user, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $hasher): Response
+    {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+    
+        if ($this->getUser() !== $user && !$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('home');
+        }
+    
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+    
+        $formPassword = $this->createForm(EditPasswordType::class, $user);
+        $formPassword->handleRequest($request);
+    
+        // Traitement du formulaire d'édition du profil
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($hasher->isPasswordValid($user, $form->get('password')->getData())) {
+                /** @var UploadedFile $imageFile */
+                $imageFile = $form->get('imageFile')->getData();
+                if ($imageFile) {
+                    $user->setImageFile($imageFile);
+                }
+    
+                $user->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                $entityManager->flush();
+                $this->addFlash('success', 'Les informations de votre compte ont été bien modifiées');
+                return $this->redirectToRoute('app_profile_edit', ['id' => $user->getId()], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('warning', 'Le mot de passe renseigné est incorrect.');
+            }
+        }
+    
+        // Traitement du formulaire de changement de mot de passe
+        if ($formPassword->isSubmitted() && $formPassword->isValid()) {
+            $currentPassword = $formPassword->get('password')->getData();
+            $newPassword = $formPassword->get('plainPassword')->getData();
+    
+            if ($hasher->isPasswordValid($user, $currentPassword)) {
+                $user->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                $user->setPassword($hasher->hashPassword($user, $newPassword));
+                $entityManager->flush();
+                $this->addFlash('success', 'Le mot de passe a été bien modifié.');
+                return $this->redirectToRoute('home', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('warning', 'Le mot de passe renseigné est incorrect.');
+            }
+        }
+    
+        return $this->render('security/edit.html.twig', [
+            'user' => $user,
+            'form' => $form->createView(),
+            'formPassword' => $formPassword->createView(),
+        ]);
+    }
+
 
     // public function onAuthenticationSuccess(Request $request, TokenInteface $token, string $firewallName): ?Response
     // {

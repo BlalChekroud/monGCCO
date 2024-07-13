@@ -10,7 +10,7 @@
       <h1>Détail d'une famille d'espèces</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
           <li class="breadcrumb-item"><a href="{{ path('app_bird_family_index') }}">Gestion des familles</a></li>
           <li class="breadcrumb-item active">Détail</li>
         </ol>
@@ -19,8 +19,7 @@
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-12">
-
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
                 <div class="card">
                     <div class="card-body">
                      <div id="printableArea">
@@ -35,7 +34,7 @@
                                     <td>{{ bird_family.getFamilyName() }}</td>
                                 </tr>
                                 <tr>
-                                    <th>famille :</th>
+                                    <th>Famille :</th>
                                     <td>{{ bird_family.getFamily() }}</td>
                                 </tr>
                                 <tr>
@@ -61,45 +60,33 @@
                             </tbody>
                         </table>
                      </div>
+
+                    </div>
+                    <div class="card-footer">
                         <div class="row">
-                            <div class="col-lg-3">
-                                <a href="{{ path('app_bird_family_index') }}" class="btn btn-outline-secondary btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
-                            </div>
-                            <div class="col-lg-2">
-                                <a href="{{ path('app_bird_family_edit', {id: bird_family.getId()}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm"> Modifier</a>
-                            </div>
-                            <div class="col-lg-2">
+                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justtify-content-end">
+                                <a href="{{ path('app_bird_family_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-1"> retour vers la liste</a>
+                                <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer nouvelle famille</a>
+                                <a href="{{ path('app_bird_family_edit', {'id': bird_family.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
                                 {{ include('bird_family/_delete_form.html.twig') }}
-                            </div>
-                            <div class="col-lg-4">
-                                <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
-                                    Créer nouvelle famille
-                                </a>
                             </div>
 
                         </div>
                     </div>
                 </div>
 
-                <!-- Card with header and footer -->
-                <div class="card">
-                    <div class="card-header">
-                        {# Header #}
-                    </div>
-                    <div class="card-body">
-                    {# <h5 class="card-title">Card with header and footer</h5> #}
-                        <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-                        <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-                    </div>
-                    <div class="card-footer">
-                    {# Footer #}
-                    </div>
-                </div><!-- End Card with header and footer -->
-
-
             </div>
         </div>
     </section>
-
+    <div class="alert border-light alert-dismissible fade show" role="alert">
+      <!-- Card with header and footer -->
+      <div class="card">
+        <div class="card-footer">
+          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div><!-- End Card with header and footer -->
+    </div>
 </main>
 {% endblock %}

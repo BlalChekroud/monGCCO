@@ -6,77 +6,108 @@
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Collection des sites</h1>
+      <h1>Sites de Collection</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
           <li class="breadcrumb-item active">Gestion des sites</li>
-          {# <li class="breadcrumb-item active">Consultation</li> #}
         </ol>
       </nav>
     </div><!-- End Page Title -->
 
     <section class="section">
       <div class="row">
-        <div class="col-lg-12">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div id="printableArea">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Listes</h5>
 
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Listes</h5>
+                <!-- Table with stripped rows -->
+                <table class="table datatable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nom du site</th>
+                            <th>Région</th>
+                            <th>Pays</th>
+                            <th>Nom du site parent</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for site_collection in site_collections %}
+                        <tr>
+                            <td>{{ site_collection.id }}</td>
+                            <td>{{ site_collection.siteName }}</td>
+                            <td>{{ site_collection.region }}</td>
+                            <td>{{ site_collection.country }}</td>
+                            <td>{{ site_collection.parentSiteName }}</td>
+                            <td>
+                                <div class="d-flex justtify-content-end">
+                                      <a href="{{ path('app_site_collection_show', {'id': site_collection.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-2"> Détail</a>
+                                      <a href="{{ path('app_site_collection_edit', {'id': site_collection.id}) }}" class="bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
+                                      {{ include('site_collection/_delete_form.html.twig') }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="14">Aucun enregistrement trouvé</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div class="row">
+                  <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
 
-              <!-- Table with stripped rows -->
-              <table class="table">
-                  <thead>
-                      <tr>
-                          <th>#</th>
-                          <th>Nom du site</th>
-                          <th>Crée le</th>
-                          <th>Région</th>
-                          <th>Nom du site parent</th>
-                          <th>Actions</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                  {% for site_collection in site_collections %}
-                      <tr>
-                          <td>{{ site_collection.id }}</td>
-                          <td>{{ site_collection.siteName }}</td>
-                          <td>{{ site_collection.createdAt ? site_collection.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                          <td>{{ site_collection.region }}</td>
-                          <td>{{ site_collection.parentSiteName }}</td>
-                          <td>
-                              <div class="d-flex justtify-content-end">
-                                    <a href="{{ path('app_site_collection_show', {'id': site_collection.id}) }}" class="btn btn-outline-secondary btn-sm bi bi-card-text mx-2"> Détail</a>
-                                    <a href="{{ path('app_site_collection_edit', {'id': site_collection.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm mx-2"> Modifier</a>
-                                    {{ include('site_collection/_delete_form.html.twig') }}
-                              </div>
-                          </td>
-                      </tr>
-                  {% else %}
-                      <tr>
-                          <td colspan="14">Aucun enregistrement trouvé</td>
-                      </tr>
-                  {% endfor %}
-                  </tbody>
-              </table>
-              <div class="row">
-                <div class="col-lg-4">
-                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-fill">
-                    Créer nouvelle collection de sites
-                  </a>
-                </div>
-                <div class="col-lg-5">
-                  <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3">
-                    Créer une nouvelle campagne
-                  </a>
+                  </div>
                 </div>
               </div>
+              
+              <div class="card-footer">
+                <div class="d-flex justtify-content-end">
+                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer nouvelle site de collection</a>
+                  <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-3"> Créer une nouvelle campagne</a>
+                </div>
+              </div>
+
             </div>
           </div>
-
         </div>
       </div>
     </section>
+
+    <div class="alert border-light alert-dismissible fade show" role="alert">
+      <!-- Card with header and footer -->
+      <div class="card">
+        <div class="card-header">
+          {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+            {{ form_row(form.csvFile) }}
+            <button type="submit" formaction="{{ path('app_site_collection_preview') }}" class="btn btn-outline-primary btn-sm bi bi-eye"> Aperçu CSV</button>
+            <button type="submit" formaction="{{ path('app_site_collection_import') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
+            {% for error in form.csvFile.vars.errors %}
+              <div class="alert alert-danger">{{ error.message }}</div>
+            {% endfor %}
+              
+            {% for flash_error in app.flashes('error') %}
+              <div class="alert alert-danger">{{ flash_error }}</div>
+            {% endfor %}
+          {{ form_end(form) }}
+          {# {{ form_start(form) }}
+            {{ form_row(form.csvFile) }}
+            <button type="submit" class="btn btn-outline-primary bi bi-upload"> Importer</button>
+            {{ form_row(form.preview) }}
+        {{ form_end(form) }} #}
+
+        </div>
+        <div class="card-footer">
+          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div><!-- End Card with header and footer -->
+    </div>
 
   </main><!-- End #main -->
 {% endblock %}

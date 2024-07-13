@@ -2,6 +2,12 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use App\Form\ImportCsvType;
+use App\Service\FileUploader;
+
 use Monolog\DateTimeImmutable;
 use DateTime;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
@@ -24,11 +30,138 @@ use Symfony\Component\Routing\Attribute\Route;
 class BirdSpeciesController extends AbstractController
 {
     #[Route('/', name: 'app_bird_species_index', methods: ['GET'])]
-    public function index(BirdSpeciesRepository $birdSpeciesRepository): Response
+    public function index(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager): Response
     {
+        $form = $this->createForm(ImportCsvType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $csvFile */
+            $csvFile = $form->get('csvFile')->getData();
+
+            if ($csvFile) {
+                try {
+                    $this->processCsv($csvFile, $entityManager);
+                    $this->addFlash('success', 'Les données ont été importées avec succès.');
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Une erreur s\'est produite lors de l\'importation du fichier CSV : ' . $e->getMessage());
+                }
+
+                return $this->redirectToRoute('app_bird_species_index');
+            }
+        }
         return $this->render('bird_species/index.html.twig', [
             'bird_species' => $birdSpeciesRepository->findAll(),
+            'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/import', name: 'app_bird_species_import', methods: ['POST'])]
+    public function import(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(ImportCsvType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $csvFile = $form->get('csvFile')->getData();
+                $extension = $csvFile->getClientOriginalExtension();
+
+                if (!in_array($extension, ['csv', 'txt'])) {
+                    $this->addFlash('error', 'Veuillez charger un fichier CSV ou TXT valide.');
+                    return $this->redirectToRoute('app_bird_species_import');
+                }
+
+                if ($csvFile) {
+                    try {
+                        $this->processCsv($csvFile, $entityManager);
+                        $this->addFlash('success', 'Les données ont été importées avec succès.');
+                        return $this->redirectToRoute('app_bird_species_index');
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', 'Une erreur s\'est produite lors de l\'importation du fichier CSV : ' . $e->getMessage());
+                    }
+                }
+            } else {
+                $this->addFlash('error', 'Le fichier CSV contient des erreurs de validation.');
+            }
+        }
+
+        return $this->render('bird_species/import.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    private function processCsv(UploadedFile $csvFile, EntityManagerInterface $entityManager)
+    {
+        $csvData = file_get_contents($csvFile->getPathname());
+        $rows = array_map(function($row) {
+            return str_getcsv($row, ';');
+        }, explode("\n", $csvData));
+        
+        $headers = array_shift($rows);
+    
+        foreach ($rows as $row) {
+            if (count($row) !== count($headers)) {
+                continue; // Skip rows where the number of columns does not match the number of headers
+            }
+    
+            $data = array_combine($headers, $row);
+    
+            if ($data === false) {
+                continue; // Skip rows where array_combine fails
+            }
+    
+            $birdSpecy = new BirdSpecies();
+            $birdSpecy->setScientificName($data['Scientific name'] ?? null);
+            $birdSpecy->setFrenchName($data['....'] ?? null);
+            $birdSpecy->setWispeciescode($data['....'] ?? null);
+            $birdSpecy->setAuthority($data['Authority'] ?? null);
+            $birdSpecy->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+            $birdSpecy->setCommonName($data['Common name'] ?? null);
+            $birdSpecy->setCommonNameAlt($data['Subfamily'] ?? null);
+            $birdSpecy->setSynonyms($data['Synonyms'] ?? null);
+            // $birdSpecy->setAlternativeCommonNames($data['Alternative common names'] ?? null);
+            $birdSpecy->setTaxonomicSources($data['Taxonomic source'] ?? null);
+            $birdSpecy->setSisRecId($data['SISRecID'] ?? null);
+            $birdSpecy->setSpcRecId($data['SpcRecID'] ?? null);
+            $birdSpecy->setSubsppId($data['SubsppID'] ?? null);
+            $birdSpecy->setBirdFamily($data['Family name'] ?? null);
+            $birdSpecy->setCoverage($data['Coverage'] ?? null);
+            $birdSpecy->setBirdLifeTaxTreat($data['BirdLife taxonomic treatment'] ?? null);
+            $birdSpecy->setIucnRedListCategory($data['IUCN 2022 Red List category'] ?? null);
+    
+            $entityManager->persist($birdSpecy);
+        }
+    
+        $entityManager->flush();
+    }
+
+    #[Route('/preview', name: 'app_bird_species_preview', methods: ['POST'])]
+    public function preview(Request $request): Response
+    {
+        $form = $this->createForm(ImportCsvType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $csvFile */
+            $csvFile = $form->get('csvFile')->getData();
+            if ($csvFile) {
+                $csvData = file_get_contents($csvFile->getPathname());
+                $rows = array_map(function($row) {
+                    return str_getcsv($row, ';');
+                }, explode("\n", $csvData));
+                
+                $headers = array_shift($rows);
+
+                return $this->render('bird_species/preview.html.twig', [
+                    'headers' => $headers,
+                    'rows' => $rows,
+                    'csvData' => $csvData, // Pass the raw CSV data to the template
+                ]);
+            }
+        }
+
+        return $this->redirectToRoute('app_bird_species_index');
     }
 
     #[Route('/new', name: 'app_bird_species_new', methods: ['GET', 'POST'])]

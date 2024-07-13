@@ -1,0 +1,218 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateurs / Profil{% endblock %}
+
+{% block body %}
+  {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+    <main id="main" class="main">
+      <div class="pagetitle">
+        <h1>Profil</h1>
+        <nav>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('app_profile') }}">Utilisateurs</a></li>
+            <li class="breadcrumb-item active">Profil</li>
+          </ol>
+        </nav>
+      </div>
+
+      <section class="section profile">
+        <div class="row">
+          <div class="col-xl-4">
+            <div class="card">
+              <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                {% if app.user %}
+                  <img src="{{ vich_uploader_asset(user, 'imageFile') }}" alt="Profile" class="imageProfile rounded-circle">
+                  <h2>{{ user.getName() }} {{ user.getLastName() }}</h2>
+                  <h3>{{ user.getRoles()|join(', ') }}</h3>
+                  <div class="social-links mt-2">
+                    <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+                  </div>
+                {% else %}
+                  <li><a href="{{ path('app_login') }}">Se connecter</a></li>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-8">
+            <div class="card">
+              <div class="card-body pt-3">
+                <ul class="nav nav-tabs nav-tabs-bordered">
+                  <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Aperçu</button>
+                  </li>
+                  <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Modifier le Profil</button>
+                  </li>
+                  <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-settings">Paramètres</button>
+                  </li>
+                  <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Changer votre mot de passe</button>
+                  </li>
+                </ul>
+
+                <div class="tab-content pt-2">
+                  <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                    <h5 class="card-title">Détails du Profil</h5>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Nom</div>
+                      <div class="col-lg-9 col-md-8">{{ user.getName() }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Prénom</div>
+                      <div class="col-lg-9 col-md-8">{{ user.getLastName() }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Rôle</div>
+                      <div class="col-lg-9 col-md-8">{{ user.getRoles()|join(', ') }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Numéro de Téléphone</div>
+                      <div class="col-lg-9 col-md-8">{{ user.getPhone() }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Email</div>
+                      <div class="col-lg-9 col-md-8">{{ user.getEmail() }}</div>
+                    </div>
+                  </div>
+
+                  <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+                   {{ form_start(form) }}
+                    <div class="row mb-3">
+                      <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Image de Profil</label>
+                      <div class="col-md-8 col-lg-9">
+                        {% if user.imageFilename %} 
+                            {# <img src="{{ vich_uploader_asset(user, 'imageFile') }}" alt="Profile"> #}
+                            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                        {% else %}
+                            <p>Aucune image disponible</p>
+                            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                        {% endif %}
+                        {# <div class="pt-2"> #}
+                          {# <div class="input-group">
+                            <span class="input-group-text"><i class="text-primary bi bi-upload"></i></span>
+                            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                          </div> #}
+
+                          {# {{ include('security/delete_image.html.twig') }} #}
+                          {# <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a> #}
+                        {# </div> #}
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Nom</label>
+                      <div class="col-md-8 col-lg-9">
+                        {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <label for="lastName" class="col-md-4 col-lg-3 col-form-label">Prénom</label>
+                      <div class="col-md-8 col-lg-9">
+                        {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
+                      </div>
+                    </div>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <div class="row mb-3">
+                      <label for="roles" class="col-md-4 col-lg-3 col-form-label">Rôles</label>
+                      <div class="col-md-8 col-lg-9">
+                        {{ form_widget(form.roles, {'attr': {'class': 'form-control'}}) }}
+                      </div>
+                    </div>
+                    {% endif %}
+                    <div class="row mb-3">
+                      <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Numéro de Téléphone</label>
+                      <div class="col-md-8 col-lg-9">
+                        {{ form_widget(form.phone, {'attr': {'class': 'form-control'}}) }}
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <label for="password" class="col-md-4 col-lg-3 col-form-label">Mot de passe</label>
+                      <div class="col-md-8 col-lg-9">
+                        {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+                      </div>
+                    </div>
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-outline-primary bi bi-save"> Enregistrer les modifications</button>
+                    </div>
+                   {{ form_end(form) }}
+                  </div>
+
+                  <div class="tab-pane fade pt-3" id="profile-settings">
+                    <h5 class="card-title">Paramètres</h5>
+                    <form>
+                      <div class="row mb-3">
+                        <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                        <div class="col-md-8 col-lg-9">
+                          <input type="email" class="form-control" id="email" value="{{ user.getEmail() }}">
+                        </div>
+                      </div>
+                      <div class="row mb-3">
+                        <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
+                        <div class="col-md-8 col-lg-9">
+                          <textarea class="form-control" id="about" style="height: 100px"></textarea>
+                        </div>
+                      </div>
+                      <div class="text-center">
+                        <button type="submit" class="btn btn-outline-primary bi bi-save"> Enregistrer les modifications</button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div class="tab-pane fade pt-3" id="profile-change-password">
+                    {{ form_start(formPassword) }}
+                    <div class="row mb-3">
+                      <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Mot de passe Actuel</label>
+                      <div class="col-md-8 col-lg-9">
+                        {{ form_widget(formPassword.password, {'attr': {'class': 'form-control'}}) }}
+                        {% if formPassword.password.vars.errors|length > 0 %}
+                          <div class="invalid-feedback d-block">
+                              {{ form_errors(formPassword.password) }}
+                          </div>
+                      {% endif %}
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">Nouveau mot de passe</label>
+                      <div class="col-md-8 col-lg-9">
+                        {{ form_widget(formPassword.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                        {% if formPassword.plainPassword.first.vars.errors|length > 0 %}
+                          <div class="invalid-feedback d-block">
+                              {{ form_errors(formPassword.plainPassword.first) }}
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Confirmer le nouveau mot de passe</label>
+                      <div class="col-md-8 col-lg-9">
+                        {{ form_widget(formPassword.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                        {% if formPassword.plainPassword.second.vars.errors|length > 0 %}
+                            <div class="invalid-feedback d-block">
+                                {{ form_errors(formPassword.plainPassword.second) }}
+                            </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-outline-primary bi bi-save"> Enregistrer les modifications</button>
+                    </div>
+                    {{ form_end(formPassword) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  {% else %}
+    <h1>Vous n'êtes pas connecté</h1>
+    <li><a href="{{ path('app_login') }}">Se connecter</a></li>
+  {% endif %}
+{% endblock %}

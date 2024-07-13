@@ -38,6 +38,71 @@
     font-family: "Nunito", sans-serif;
   }
 
+  /*--------------------------------------------------------------
+  # user image
+  --------------------------------------------------------------*/
+  .imageProfile {
+    width: 50%;
+    height: 50%;
+  }
+
+/*--------------------------------------------------------------
+# Buttons actions
+--------------------------------------------------------------*/
+.btn-action {
+  font-size: 0.75rem;
+  font-weight: bold; 
+}
+
+/* Buttons Status */
+.btn-success,
+.btn-primary,
+.btn-secondary,
+.btn-warning,
+.btn-danger,
+.btn-dark {
+  font-size: 0.8rem; 
+}
+/* .text-dark {
+  font-size: 0.8rem; 
+  background: black;
+} */
+    /*--------------------------------------------------------------
+  # afflash alert
+  --------------------------------------------------------------*/
+.alert {
+    position: relative;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
     /*--------------------------------------------------------------
   # print
   --------------------------------------------------------------*/
@@ -64,9 +129,9 @@
   # eyes
   --------------------------------------------------------------*/
 
-  label {
+  /* label {
     position: relative;
-  }
+  } */
   
   /* label input {
     font-size: 1em;
@@ -83,7 +148,7 @@
     border-color: #ff4754;
   } */
 
-  .password-icon {
+  /* .password-icon {
     display: flex;
     align-items: center;
     position: absolute;
@@ -102,7 +167,8 @@
   
   .password-icon .feather-eye-off {
     display: none;
-  }
+  } */
+
   /*--------------------------------------------------------------
   # clock
   --------------------------------------------------------------*/
@@ -328,7 +394,7 @@
   .card-header,
   .card-footer {
     border-color: #ebeef4;
-    background-color: #fff;
+    background-color: #c2c4c76e;/*#fff*/
     color: #798eb3;
     padding: 15px;
   }

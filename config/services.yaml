@@ -4,12 +4,29 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    csvs_directory: '%kernel.project_dir%/public/uploads/csvs'
+    csvs_directory: '%kernel.project_dir%/public/uploads/csvs/'
+    # images_directory: '%kernel.project_dir%/public/uploads/images/users/'
 
 services:
     App\Service\FileUploader:
         arguments:
             $targetDirectory: '%csvs_directory%'
+            
+    # Définir le service CsvUploader
+    # App\Service\FileUploader\CsvUploader:
+    #     class: App\Service\FileUploader
+    #     arguments:
+    #         $targetDirectory: '%csvs_directory%'
+    #         $slugger: '@slugger'
+            
+    # # Définir le service ImageUploader
+    # App\Service\FileUploader\ImageUploader:
+    #     class: App\Service\FileUploader
+    #     arguments:
+    #         $targetDirectory: '%images_directory%'
+    #         $slugger: '@slugger'
+
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.

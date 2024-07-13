@@ -58,7 +58,7 @@ class SiteCollection
     #[ORM\ManyToMany(targetEntity: CountingCampaign::class, mappedBy: 'siteCollection')]
     private Collection $countingCampaigns;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $country = null;
 
     /**
