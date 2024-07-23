@@ -8,8 +8,8 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Name</th>
+                <th>#</th>
+                <th>Label</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -17,7 +17,9 @@
         {% for iucn_red_list_category in iucn_red_list_categories %}
             <tr>
                 <td>{{ iucn_red_list_category.id }}</td>
-                <td>{{ iucn_red_list_category.name }}</td>
+                <td>{{ iucn_red_list_category.Label }}</td>
+                <td>{{ iucn_red_list_category.createdAt ? iucn_red_list_category.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ iucn_red_list_category.updatedAt ? iucn_red_list_category.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                 <td>
                     <a href="{{ path('app_iucn_red_list_category_show', {'id': iucn_red_list_category.id}) }}">show</a>
                     <a href="{{ path('app_iucn_red_list_category_edit', {'id': iucn_red_list_category.id}) }}">edit</a>

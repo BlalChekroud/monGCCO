@@ -16,6 +16,17 @@ class CountingCampaignRepository extends ServiceEntityRepository
         parent::__construct($registry, CountingCampaign::class);
     }
 
+    public function findByUser($user)
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.agentsGroups', 'g')
+            ->join('g.groupMember', 'm')
+            ->where('m = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return CountingCampaign[] Returns an array of CountingCampaign objects
     //     */

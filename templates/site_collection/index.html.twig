@@ -29,7 +29,7 @@
                         <tr>
                             <th>#</th>
                             <th>Nom du site</th>
-                            <th>Région</th>
+                            <th>Ville</th>
                             <th>Pays</th>
                             <th>Nom du site parent</th>
                             <th>Actions</th>
@@ -40,8 +40,8 @@
                         <tr>
                             <td>{{ site_collection.id }}</td>
                             <td>{{ site_collection.siteName }}</td>
-                            <td>{{ site_collection.region }}</td>
-                            <td>{{ site_collection.country }}</td>
+                            <td>{{ site_collection.city.name }}</td>
+                            <td>{{ site_collection.city.country.name }}</td>
                             <td>{{ site_collection.parentSiteName }}</td>
                             <td>
                                 <div class="d-flex justtify-content-end">
@@ -58,11 +58,6 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <div class="row">
-                  <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
-
-                  </div>
-                </div>
               </div>
               
               <div class="card-footer">

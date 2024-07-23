@@ -2,9 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Image;
+use App\Form\ImageType;
+// use App\Repository\ImageRepository;
 // use Symfony\Component\HttpFoundation\File\Exception\FileException;
-// use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 // use Symfony\Component\String\Slugger\SluggerInterface;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Monolog\DateTimeImmutable;
 use DateTime;
 use App\Repository\UserRepository;
@@ -65,22 +69,41 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('home');
         }
     
+        // Récupérer l'image associée à l'utilisateur ou en créer une nouvelle
+        // $image = $user->getImage() ?: new Image();
+
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
     
         $formPassword = $this->createForm(EditPasswordType::class, $user);
         $formPassword->handleRequest($request);
+
+        // $formImage = $this->createForm(ImageType::class, $image);
+        // $formImage->handleRequest($request);
     
         // Traitement du formulaire d'édition du profil
         if ($form->isSubmitted() && $form->isValid()) {
             if ($hasher->isPasswordValid($user, $form->get('password')->getData())) {
-                /** @var UploadedFile $imageFile */
+                
+                // /** @var UploadedFile $imageFile */
+                // $imageFile = $formImage->get('imageFile')->getData();
+                // if ($imageFile) {
+                //     $image->setImageFile($imageFile);
+                //     $image->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                //     $entityManager->persist($image);
+                //     $user->setImage($image); // Associer l'image à l'utilisateur
+                // }
+
                 $imageFile = $form->get('imageFile')->getData();
+
                 if ($imageFile) {
                     $user->setImageFile($imageFile);
                 }
     
                 $user->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                
+                // $entityManager->persist($user);
+
                 $entityManager->flush();
                 $this->addFlash('success', 'Les informations de votre compte ont été bien modifiées');
                 return $this->redirectToRoute('app_profile_edit', ['id' => $user->getId()], Response::HTTP_SEE_OTHER);
@@ -109,6 +132,7 @@ class SecurityController extends AbstractController
             'user' => $user,
             'form' => $form->createView(),
             'formPassword' => $formPassword->createView(),
+            // 'formImage' => $formImage->createView(),
         ]);
     }
 

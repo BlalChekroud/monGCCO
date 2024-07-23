@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelles conditions d'environnement{% endblock %}
+
+{% block body %}
+    <main id="main" class="main">
+
+        <div class="pagetitle">
+        <h1>Création de conditions d'environnement</h1>
+        <nav>
+            <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('app_environmental_conditions_index') }}">Gestion des conditions</a></li>
+            <li class="breadcrumb-item active">Création</li>
+            </ol>
+        </nav>
+        </div><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Informations sur les conditions d'environnement</h5>
+
+                            {{ include('environmental_conditions/_form.html.twig') }}
+
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>
+                            <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Collecter des données</a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+    </main>
+{% endblock %}

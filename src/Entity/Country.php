@@ -17,7 +17,7 @@ class Country
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 25)]
+    #[ORM\Column(length: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 2)]
@@ -32,12 +32,20 @@ class Country
     /**
      * @var Collection<int, City>
      */
-    #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'country', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'country')]
     private Collection $city;
+
+    /**
+     * @var Collection<int, AgentsGroup>
+     */
+    #[ORM\OneToMany(targetEntity: AgentsGroup::class, mappedBy: 'country')]
+    private Collection $agentsGroups;
+    // , orphanRemoval: false
 
     public function __construct()
     {
         $this->city = new ArrayCollection();
+        $this->agentsGroups = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -117,6 +125,36 @@ class Country
             // set the owning side to null (unless already changed)
             if ($city->getCountry() === $this) {
                 $city->setCountry(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AgentsGroup>
+     */
+    public function getAgentsGroups(): Collection
+    {
+        return $this->agentsGroups;
+    }
+
+    public function addAgentsGroup(AgentsGroup $agentsGroup): static
+    {
+        if (!$this->agentsGroups->contains($agentsGroup)) {
+            $this->agentsGroups->add($agentsGroup);
+            $agentsGroup->setCountry($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAgentsGroup(AgentsGroup $agentsGroup): static
+    {
+        if ($this->agentsGroups->removeElement($agentsGroup)) {
+            // set the owning side to null (unless already changed)
+            if ($agentsGroup->getCountry() === $this) {
+                $agentsGroup->setCountry(null);
             }
         }
 

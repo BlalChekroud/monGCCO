@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block body %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Toutes les notifications</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item active">Gestion des notifications</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+                <ul>
+                    {% for type, messages in notifications %}
+                        {% for message in messages %}
+                            <li class="notification-item">
+                                {% if type == 'warning' %}
+                                    <i class="bi bi-exclamation-circle text-warning"></i>
+                                {% elseif type == 'danger' %}
+                                    <i class="bi bi-x-circle text-danger"></i>
+                                {% elseif type == 'success' %}
+                                    <i class="bi bi-check-circle text-success"></i>
+                                {% elseif type == 'info' %}
+                                    <i class="bi bi-info-circle text-primary"></i>
+                                {% endif %}
+                                <div>
+                                    <h4>{{ type|capitalize }}</h4>
+                                    <p>{{ message }}</p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>   
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}

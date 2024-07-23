@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Repository\CityRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,7 +17,7 @@ class City
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -33,6 +35,17 @@ class City
     #[ORM\ManyToOne(inversedBy: 'city')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Country $country = null;
+
+    /**
+     * @var Collection<int, SiteCollection>
+     */
+    #[ORM\OneToMany(targetEntity: SiteCollection::class, mappedBy: 'city')]
+    private Collection $siteCollections;
+
+    public function __construct()
+    {
+        $this->siteCollections = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -107,6 +120,36 @@ class City
     public function setCountry(?Country $country): static
     {
         $this->country = $country;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SiteCollection>
+     */
+    public function getSiteCollections(): Collection
+    {
+        return $this->siteCollections;
+    }
+
+    public function addSiteCollection(SiteCollection $siteCollection): static
+    {
+        if (!$this->siteCollections->contains($siteCollection)) {
+            $this->siteCollections->add($siteCollection);
+            $siteCollection->setCity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSiteCollection(SiteCollection $siteCollection): static
+    {
+        if ($this->siteCollections->removeElement($siteCollection)) {
+            // set the owning side to null (unless already changed)
+            if ($siteCollection->getCity() === $this) {
+                $siteCollection->setCity(null);
+            }
+        }
 
         return $this;
     }

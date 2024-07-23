@@ -21,13 +21,13 @@ class BirdSpecies
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 255)]
     private ?string $scientificName = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $frenchName = null;
 
-    #[ORM\Column(length: 25)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $wispeciescode = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -36,7 +36,7 @@ class BirdSpecies
     #[Vich\UploadableField(mapping: 'bird_Specy', fileNameProperty: 'imageFilename')]
     private ?File $imageFile = null;
 
-    #[ORM\Column(length: 40, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $authority = null;
 
     #[ORM\ManyToOne(inversedBy: 'birdSpecies')]
@@ -48,16 +48,16 @@ class BirdSpecies
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $commonName = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $commonNameAlt = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $synonyms = null;
 
-    #[ORM\Column(length: 400, nullable: true)]
+    #[ORM\Column(length: 500, nullable: true)]
     private ?string $taxonomicSources = null;
 
     #[ORM\Column(nullable: true)]
@@ -66,7 +66,7 @@ class BirdSpecies
     #[ORM\Column(nullable: true)]
     private ?int $spcRecId = null;
 
-    #[ORM\Column(length: 15, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $subsppId = null;
 
     /**

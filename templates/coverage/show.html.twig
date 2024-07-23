@@ -8,12 +8,20 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
+                <th>#</th>
                 <td>{{ coverage.id }}</td>
             </tr>
             <tr>
                 <th>Label</th>
                 <td>{{ coverage.label }}</td>
+            </tr>
+            <tr>
+                <th>Créé le</th>
+                <td>{{ coverage.createdAt ? coverage.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Dernière mise à jour le</th>
+                <td>{{ coverage.updatedAt ? coverage.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
             </tr>
         </tbody>
     </table>

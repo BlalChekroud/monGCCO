@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/bird/life/tax/treat')]
-#[IsGranted('ROLE_COLLECTOR')]
+#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class BirdLifeTaxTreatController extends AbstractController
 {
     #[Route('/', name: 'app_bird_life_tax_treat_index', methods: ['GET'])]

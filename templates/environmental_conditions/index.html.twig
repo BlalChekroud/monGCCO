@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EnvironmentalConditions index{% endblock %}
+
+{% block body %}
+    <h1>EnvironmentalConditions index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Site de conditions</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for environmental_condition in environmental_conditions %}
+            <tr>
+                <td>{{ environmental_condition.id }}</td>
+                <td>{{ environmental_condition.siteCollection.siteName }}</td>
+                <td>{{ environmental_condition.createdAt ? environmental_condition.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ environmental_condition.updatedAt ? environmental_condition.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_environmental_conditions_show', {'id': environmental_condition.id}) }}">show</a>
+                    <a href="{{ path('app_environmental_conditions_edit', {'id': environmental_condition.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_environmental_conditions_new') }}">Create new</a>
+{% endblock %}

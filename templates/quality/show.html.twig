@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Quality{% endblock %}
+
+{% block body %}
+    <h1>Quality</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ quality.id }}</td>
+            </tr>
+            <tr>
+                <th>Label</th>
+                <td>{{ quality.label }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ quality.createdAt ? quality.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ quality.updatedAt ? quality.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_quality_index') }}">back to list</a>
+
+    <a href="{{ path('app_quality_edit', {'id': quality.id}) }}">edit</a>
+
+    {{ include('quality/_delete_form.html.twig') }}
+{% endblock %}

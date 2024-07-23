@@ -2,6 +2,8 @@
 
 namespace App\Form;
 
+use App\Repository\CityRepository;
+use App\Entity\City;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Entity\CountingCampaign;
@@ -23,10 +25,12 @@ class SiteCollectionType extends AbstractType
                 'label' => 'Code du site'
             ])
             ->add('nationalSiteCode',TextType::class, [
-                'label' => 'Code national'
+                'label' => 'Code national',
+                'required' => false,
             ])
             ->add('internationalSiteCode',TextType::class, [
-                'label' => 'Code international'
+                'label' => 'Code international',
+                'required' => false,
             ])
             ->add('latDepart',TextType::class, [
                 'label' => 'Latitude de départ'
@@ -40,14 +44,23 @@ class SiteCollectionType extends AbstractType
             ->add('longFin',TextType::class, [
                 'label' => 'Longitude de fin'
             ])
-            ->add('region',TextType::class, [
-                'label' => 'Région'
-            ])
-            ->add('country',TextType::class, [
-                'label' => 'Pays'
+            ->add('city', EntityType::class, [
+                'class' => City::class,
+                'choice_label' => function (City $city) {
+                    return $city->getName() . ' - ' . $city->getCountry()->getName() . ' (' . $city->getCountry()->getIso2() . ')';
+                },
+                'label' => 'Ville',
+                'placeholder' => 'Choisir une ville',
+                'required' => true,
+                'query_builder' => function (CityRepository $repository) {
+                    return $repository->createQueryBuilder('b')
+                        ->orderBy('b.name', 'ASC'); // Or any other field you want to sort by
+                },
+                'attr' => ['class' => 'form-control']
             ])
             ->add('parentSiteName',TextType::class, [
-                'label' => 'Nom du site parent'
+                'label' => 'Nom du site parent',
+                'required' => false,
             ])
             // ->add('siteName')
             // ->add('siteCode')

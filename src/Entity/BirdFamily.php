@@ -15,13 +15,13 @@ class BirdFamily
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 255)]
     private ?string $familyName = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $subFamily = null;
 
-    #[ORM\Column(length: 25, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $tribe = null;
 
     /**
@@ -36,7 +36,7 @@ class BirdFamily
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(length: 25, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $ordre = null;
 
     public function __construct()
@@ -44,23 +44,8 @@ class BirdFamily
         $this->birdSpecies = new ArrayCollection();
     }
 
-    // #[ORM\Column(type: 'string', nullable: true)]
-    // private string $csvFilename;
-
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $family = null;
-
-    // public function getCsvFilename(): string
-    // {
-    //     return $this->csvFilename;
-    // }
-
-    // public function setCsvFilename(string $csvFilename): self
-    // {
-    //     $this->csvFilename = $csvFilename;
-
-    //     return $this;
-    // }
 
     public function getId(): ?int
     {

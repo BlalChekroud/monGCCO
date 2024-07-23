@@ -1,0 +1,5 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="reset" class="btn btn-outline-dark bi bi-x-square"> Annuler</button>
+    <button class="btn btn-outline-primary bi bi-save mx-4"> {{ button_label|default('Enregistrer') }}</button>
+{{ form_end(form) }}

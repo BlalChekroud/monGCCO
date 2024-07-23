@@ -2,10 +2,11 @@
 
 namespace App\Form;
 
+use App\Entity\AgentsGroup;
+use App\Repository\AgentsGroupRepository;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use App\Repository\SiteCollectionRepository;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Entity\CountingCampaign;
 use App\Entity\SiteCollection;
 use App\Entity\CampaignStatus;
@@ -19,22 +20,36 @@ class CountingCampaignType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            // ->add('campaignName',TextType::class, [
-            //     'label' => 'Nom de la campagne'
-            // ])
-            ->add('startDate', null, [
+            ->add('startDate', DateTimeType::class, [
                 'widget' => 'single_text',
-                'label' => 'Date de début'
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Date de début',
             ])
-            ->add('endDate', null, [
+            ->add('endDate', DateTimeType::class, [
                 'widget' => 'single_text',
+                'attr' => ['class' => 'form-control'],
                 'label' => 'Date de fin'
+            ])
+            ->add('agentsGroups', EntityType::class, [
+                'class' => AgentsGroup::class,
+                'label' => 'Groupe(s):',
+                'required' => true,
+                'choice_label' => function (AgentsGroup $agentsGroup) {
+                    return $agentsGroup->getGroupName() . ' / ' . $agentsGroup->getLeader()->getName() . ' ' . $agentsGroup->getLeader()->getLastName();
+                },
+                'expanded' => true,
+                'multiple' => true,
+                'query_builder' => function (AgentsGroupRepository $repository) {
+                    return $repository->createQueryBuilder('b')
+                        ->orderBy('b.groupName', 'ASC'); // Or any other field you want to sort by
+                },
             ])
             ->add('siteCollection', EntityType::class, [
                 'class' => SiteCollection::class,
                 'label' => 'Sites de collection',
+                'required' => true,
                 'choice_label' => function (SiteCollection $siteCollection) {
-                    return $siteCollection->getSiteName() . ' (' . $siteCollection->getRegion() . ')';
+                    return $siteCollection->getSiteName() . ' (' . $siteCollection->getCity()->getName() . ' / ' . $siteCollection->getCity()->getCountry()->getName() . ' )';
                 },
                 'expanded' => true,
                 'multiple' => true,
@@ -46,7 +61,6 @@ class CountingCampaignType extends AbstractType
             ->add('campaignStatus', EntityType::class, [
                 'class' => CampaignStatus::class,
                 'choice_label' => 'label',
-                'placeholder' => '',
                 'required' => true,
             ])
             ->add('description',TextareaType::class, [

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,7 +26,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(message: 'Veuillez entrer une adresse e-mail')]
     #[Assert\Email(message: 'L\'adresse e-mail "{{ value }}" n\'est pas une adresse e-mail valide.')]
@@ -60,12 +61,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
+// 
+    // #[ORM\OneToOne(mappedBy: 'userImage', cascade: ['persist', 'remove'])]
+    // private ?Image $image = null;
+// 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $imageFilename = null;
 
     #[Vich\UploadableField(mapping: 'userImage', fileNameProperty: 'imageFilename')]
     private ?File $imageFile = null;
-    
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $imageFilename = null;
+
+    /**
+     * @var Collection<int, AgentsGroup>
+     */
+    #[ORM\ManyToMany(targetEntity: AgentsGroup::class, mappedBy: 'groupMember')]
+    private Collection $agentsGroups;
+
+    /**
+     * @var Collection<int, AgentsGroup>
+     */
+    #[ORM\OneToMany(targetEntity: AgentsGroup::class, mappedBy: 'leader')]
+    private Collection $leader;
+
+    /**
+     * @var Collection<int, EnvironmentalConditions>
+     */
+    #[ORM\OneToMany(targetEntity: EnvironmentalConditions::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $environmentalConditions;
+
+    public function __construct()
+    {
+        $this->agentsGroups = new ArrayCollection();
+        $this->leader = new ArrayCollection();
+        $this->environmentalConditions = new ArrayCollection();
+    }
 
     public function setImageFile(?File $imageFile = null): void
     {
@@ -223,6 +252,120 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getImage(): ?Image
+    {
+        return $this->image;
+    }
+
+    public function setImage(?Image $image): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($image === null && $this->image !== null) {
+            $this->image->setUserImage(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($image !== null && $image->getUserImage() !== $this) {
+            $image->setUserImage($this);
+        }
+
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AgentsGroup>
+     */
+    public function getAgentsGroups(): Collection
+    {
+        return $this->agentsGroups;
+    }
+
+    public function addAgentsGroup(AgentsGroup $agentsGroup): static
+    {
+        if (!$this->agentsGroups->contains($agentsGroup)) {
+            $this->agentsGroups->add($agentsGroup);
+            $agentsGroup->addGroupMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAgentsGroup(AgentsGroup $agentsGroup): static
+    {
+        if ($this->agentsGroups->removeElement($agentsGroup)) {
+            $agentsGroup->removeGroupMember($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AgentsGroup>
+     */
+    public function getLeader(): Collection
+    {
+        return $this->leader;
+    }
+
+    public function addLeader(AgentsGroup $leader): static
+    {
+        if (!$this->leader->contains($leader)) {
+            $this->leader->add($leader);
+            $leader->setLeader($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLeader(AgentsGroup $leader): static
+    {
+        if ($this->leader->removeElement($leader)) {
+            // set the owning side to null (unless already changed)
+            if ($leader->getLeader() === $this) {
+                $leader->setLeader(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getEmail() ?: '';
+    }
+
+    /**
+     * @return Collection<int, EnvironmentalConditions>
+     */
+    public function getEnvironmentalConditions(): Collection
+    {
+        return $this->environmentalConditions;
+    }
+
+    public function addEnvironmentalCondition(EnvironmentalConditions $environmentalCondition): static
+    {
+        if (!$this->environmentalConditions->contains($environmentalCondition)) {
+            $this->environmentalConditions->add($environmentalCondition);
+            $environmentalCondition->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEnvironmentalCondition(EnvironmentalConditions $environmentalCondition): static
+    {
+        if ($this->environmentalConditions->removeElement($environmentalCondition)) {
+            // set the owning side to null (unless already changed)
+            if ($environmentalCondition->getUser() === $this) {
+                $environmentalCondition->setUser(null);
+            }
+        }
 
         return $this;
     }

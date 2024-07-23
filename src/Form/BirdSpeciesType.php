@@ -66,14 +66,16 @@ class BirdSpeciesType extends AbstractType
                 'class' => Coverage::class,
                 'choice_label' => 'label',
                 'label' => 'Couverture pour cette espèce',
-                'placeholder' => '',
+                // 'placeholder' => '',
+                'required' => false,
                 'attr' => ['class' => 'form-control']
             ])
             ->add('birdLifeTaxTreat', EntityType::class, [
                 'class' => BirdLifeTaxTreat::class,
                 'choice_label' => 'label',
                 'label' => 'Traitement taxonomique de BirdLife',
-                'placeholder' => '',
+                // 'placeholder' => '',
+                'required' => false,
                 'attr' => ['class' => 'form-control', 'id' => 'birdLifeTaxTreatDropdown']
             ])
             ->add('commonName')
@@ -97,7 +99,8 @@ class BirdSpeciesType extends AbstractType
                 'class' => IucnRedListCategory::class,
                 'choice_label' => 'label',
                 'label' => "Catégorie de la liste rouge de l'UICN 2022",
-                'placeholder' => '',
+                // 'placeholder' => '',
+                'required' => false,
                 'attr' => ['class' => 'form-control', 'id' => 'iucnRedListCategoryDropdown']
             ])
             ->add('synonyms')
@@ -108,9 +111,9 @@ class BirdSpeciesType extends AbstractType
             ->add('birdFamily', EntityType::class, [
                 'class' => BirdFamily::class,
                 'choice_label' => function (BirdFamily $birdFamily) {
-                    return $birdFamily->getFamily() . ' (' . $birdFamily->getFamilyName() . ') \ ' .$birdFamily->getSubFamily() . ' \ ' .$birdFamily->getTribe();
+                    return $birdFamily->getFamily() . ' (' . $birdFamily->getFamilyName() . ') \ ' .$birdFamily->getSubFamily() . ' \ ' .$birdFamily->getTribe(). ' \ ' .$birdFamily->getOrdre();
                 },
-                'label' => "Famille (Nom de famille) \ Sous-famille \ Tribe d'espèce",
+                'label' => "Famille (Nom de famille) \ Sous-famille \ Tribe \ Ordre d'espèce",
                 'placeholder' => '',
                 'required' => true,
                 'query_builder' => function (BirdFamilyRepository $repository) {

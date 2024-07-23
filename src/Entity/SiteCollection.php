@@ -16,10 +16,10 @@ class SiteCollection
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 255)]
     private ?string $siteName = null;
 
-    #[ORM\Column(length: 25)]
+    #[ORM\Column(length: 255)]
     private ?string $siteCode = null;
 
     #[ORM\Column]
@@ -28,10 +28,10 @@ class SiteCollection
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $nationalSiteCode = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $internationalSiteCode = null;
 
     #[ORM\Column(length: 255)]
@@ -46,10 +46,7 @@ class SiteCollection
     #[ORM\Column(length: 255)]
     private ?string $longFin = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $region = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $parentSiteName = null;
 
     /**
@@ -58,8 +55,15 @@ class SiteCollection
     #[ORM\ManyToMany(targetEntity: CountingCampaign::class, mappedBy: 'siteCollection')]
     private Collection $countingCampaigns;
 
-    #[ORM\Column(length: 50, nullable: true)]
-    private ?string $country = null;
+    #[ORM\ManyToOne(inversedBy: 'siteCollections')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?City $city = null;
+
+    /**
+     * @var Collection<int, EnvironmentalConditions>
+     */
+    #[ORM\OneToMany(targetEntity: EnvironmentalConditions::class, mappedBy: 'siteCollection', orphanRemoval: true)]
+    private Collection $environmentalConditions;
 
     /**
      * @var Collection<int, CollectedData>
@@ -71,6 +75,7 @@ class SiteCollection
     {
         $this->countingCampaigns = new ArrayCollection();
         // $this->collectedData = new ArrayCollection();
+        $this->environmentalConditions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -198,17 +203,17 @@ class SiteCollection
         return $this;
     }
 
-    public function getRegion(): ?string
-    {
-        return $this->region;
-    }
+    // public function getRegion(): ?string
+    // {
+    //     return $this->region;
+    // }
 
-    public function setRegion(?string $region): static
-    {
-        $this->region = $region;
+    // public function setRegion(?string $region): static
+    // {
+    //     $this->region = $region;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     public function getParentSiteName(): ?string
     {
@@ -279,14 +284,44 @@ class SiteCollection
     //     return $this;
     // }
 
-    public function getCountry(): ?string
+    public function getCity(): ?City
     {
-        return $this->country;
+        return $this->city;
     }
 
-    public function setCountry(string $country): static
+    public function setCity(?City $city): static
     {
-        $this->country = $country;
+        $this->city = $city;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EnvironmentalConditions>
+     */
+    public function getEnvironmentalConditions(): Collection
+    {
+        return $this->environmentalConditions;
+    }
+
+    public function addEnvironmentalCondition(EnvironmentalConditions $environmentalCondition): static
+    {
+        if (!$this->environmentalConditions->contains($environmentalCondition)) {
+            $this->environmentalConditions->add($environmentalCondition);
+            $environmentalCondition->setSiteCollection($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEnvironmentalCondition(EnvironmentalConditions $environmentalCondition): static
+    {
+        if ($this->environmentalConditions->removeElement($environmentalCondition)) {
+            // set the owning side to null (unless already changed)
+            if ($environmentalCondition->getSiteCollection() === $this) {
+                $environmentalCondition->setSiteCollection(null);
+            }
+        }
 
         return $this;
     }

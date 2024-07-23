@@ -2,6 +2,9 @@
 
 namespace App\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Image;
+
 use Vich\UploaderBundle\Form\Type\VichImageType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
@@ -38,6 +41,26 @@ class UserType extends AbstractType
                 'multiple' => true,
                 'label' => 'Rôles',
             ])
+            // ->add('image', EntityType::class, [
+            //     'class' => Image::class,
+            //     'choice_label' => 'imageFilename',
+            //     'label' => 'Image de profil',
+            //     'required' => false,
+            // ])
+            // ->add('imageFile', VichImageType::class, [
+            //     'label' => 'Image (JPG ou PNG)',
+            //     'required' => false,
+            //     'allow_delete' => true,
+            //     'download_uri' => true,
+            //     'imagine_pattern' => 'squared_thumbnail_small',
+            // ])
+            
+
+            // ->add('imageFile', FileType::class, [
+            //     'required' => false,
+            //     'label' => 'Image de profil (fichiers PNG ou JPG)',
+            // ])
+
             ->add('imageFile', VichImageType::class, [
                 'label' => 'Image (JPG ou PNG)',
                 'label_attr' => [
@@ -45,7 +68,7 @@ class UserType extends AbstractType
                 ],
                 'mapped' => false,
                 'required' => false,
-                // 'download_uri' => false,
+                'download_uri' => false,
                 'delete_label' => 'Supprimer',
                 'download_label' => 'Télécharger',
                 'constraints' => [
@@ -53,7 +76,6 @@ class UserType extends AbstractType
                         'maxSize' => '1024k',
                         'mimeTypes' => [
                             'image/jpeg',
-                            'image/jpg',
                             'image/png',
                         ],
                         'mimeTypesMessage' => "Veuillez télécharger un fichier d'image valide (JPEG ou PNG)",
@@ -113,6 +135,9 @@ class UserType extends AbstractType
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller
                 'mapped' => false,
+                'toggle' => true,
+                'hidden_label' => 'Masquer',
+                'visible_label' => 'Afficher',
                 'attr' => ['autocomplete' => 'new-password'],
                 'required' => true,
                 'constraints' => [

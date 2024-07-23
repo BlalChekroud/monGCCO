@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/bird/family')]
-#[IsGranted('ROLE_COLLECTOR')]
+#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class BirdFamilyController extends AbstractController
 {
     #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
@@ -166,15 +166,39 @@ class BirdFamilyController extends AbstractController
                 continue; // Skip rows where array_combine fails
             }
     
-            $birdFamily = new BirdFamily();
-            $birdFamily->setOrdre($data['Ordre'] ?? null);
-            $birdFamily->setFamilyName($data['Family name'] ?? null);
-            $birdFamily->setFamily($data['Family'] ?? null);
-            $birdFamily->setSubFamily($data['Subfamily'] ?? null);
-            $birdFamily->setTribe($data['Tribe'] ?? null);
-            $birdFamily->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+            // $birdFamily = new BirdFamily();
+            // $birdFamily->setOrdre($data['Ordre'] ?? null);
+            // $birdFamily->setFamilyName($data['Family name'] ?? null);
+            // $birdFamily->setFamily($data['Family'] ?? null);
+            // $birdFamily->setSubFamily($data['Subfamily'] ?? null);
+            // $birdFamily->setTribe($data['Tribe'] ?? null);
+            // $birdFamily->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
     
-            $entityManager->persist($birdFamily);
+            // $entityManager->persist($birdFamily);
+
+            // Fetch or create the Birdfamily entity
+            $familyName = $data['Family name'] ?? null;
+            $subFamily = $data['subfamily'] ?? null;
+            $family = $data['Family'] ?? null;
+            $ordre = $data['Ordre'] ?? null;
+            $tribe = $data['Tribe'] ?? null;
+    
+            if ($familyName && $family) {
+                $familyRepository = $entityManager->getRepository(BirdFamily::class);
+                $birdFamily = $familyRepository->findOneBy(['familyName' => $familyName, 'family' => $family]);
+    
+                if (!$birdFamily) {
+                    $birdFamily = new BirdFamily();
+                    $birdFamily->setOrdre($data['Ordre'] ?? null);
+                    $birdFamily->setFamilyName($data['Family name'] ?? null);
+                    $birdFamily->setFamily($data['Family'] ?? null);
+                    $birdFamily->setSubFamily($data['Subfamily'] ?? null);
+                    $birdFamily->setTribe($data['Tribe'] ?? null);
+                    $birdFamily->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+            
+                    $entityManager->persist($birdFamily);
+                }
+            }
         }
     
         $entityManager->flush();

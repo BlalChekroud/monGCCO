@@ -19,11 +19,11 @@ class CountingCampaign
     #[ORM\Column(length: 255)]
     private ?string $campaignName = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $startDate = null;
+    #[ORM\Column]
+    private ?\DateTimeImmutable $startDate = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $endDate = null;
+    #[ORM\Column]
+    private ?\DateTimeImmutable $endDate = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -50,28 +50,53 @@ class CountingCampaign
     #[ORM\JoinColumn(nullable: false)]
     private ?CampaignStatus $campaignStatus = null;
 
+    /**
+     * @var Collection<int, AgentsGroup>
+     */
+    #[ORM\ManyToMany(targetEntity: AgentsGroup::class, inversedBy: 'agents')]
+    private Collection $agentsGroups;
+
+    /**
+     * @var Collection<int, EnvironmentalConditions>
+     */
+    #[ORM\OneToMany(targetEntity: EnvironmentalConditions::class, mappedBy: 'countingCampaign', orphanRemoval: true)]
+    private Collection $environmentalConditions;
+
     public function __construct()
     {
         $this->siteCollection = new ArrayCollection();
         $this->collectedData = new ArrayCollection();
+        $this->agentsGroups = new ArrayCollection();
+        $this->environmentalConditions = new ArrayCollection();
     }
 
     public function generateCampaignName(): void
     {
         if ($this->getStartDate() === null || $this->getEndDate() === null) {
-            throw new InvalidArgumentException('Les dates de début et de fin doivent être définies pour générer le nom de la campagne.');
+            throw new \InvalidArgumentException('Les dates de début et de fin doivent être définies pour générer le nom de la campagne.');
+        }
+        if (!$this->getSiteCollection()) {
+            throw new \InvalidArgumentException('Les sites doivent être définies pour générer le nom de la campagne.');
         }
 
-        $regionNames = [];
+        $iso2Names = [];
         foreach ($this->getSiteCollection() as $site) {
-            $regionNames[] = $site->getRegion();
+            $iso2Names[] = $site->getCity()->getCountry()->getIso2();
         }
-        $uniqueRegionNames = array_unique($regionNames);
+        $uniqueIso2Names = array_unique($iso2Names);
+        
+        $cityNames = [];
+        foreach ($this->getSiteCollection() as $site) {
+            $cityNames[] = $site->getCity()->getName();
+        }
+        $uniqueCityNames = array_unique($cityNames);
 
-        $startDate = $this->getStartDate()->format('d-m-Y');
-        $endDate = $this->getEndDate()->format('d-m-Y');
+        $startYear = $this->getStartDate()->format('Y');
+        // $endDate = $this->getEndDate()->format('d-m-Y');
+        $campaignId = $this->getId();
 
-        $this->campaignName = sprintf('%s %s (%s - %s)','Campagne', implode(', ', $uniqueRegionNames), $startDate, $endDate);
+        $this->campaignName = sprintf('%s %s %s - %s', implode(',',$uniqueIso2Names), implode(',', $uniqueCityNames) ,$startYear ,$campaignId);
+        // $this->campaignName = sprintf('%s %s (%s - %s)','Campagne', implode(', ', $uniqueRegionNames), $startDate, $endDate);
     }
 
     public function getId(): ?int
@@ -213,6 +238,63 @@ class CountingCampaign
     public function setCampaignStatus(?CampaignStatus $campaignStatus): static
     {
         $this->campaignStatus = $campaignStatus;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AgentsGroup>
+     */
+    public function getAgentsGroups(): Collection
+    {
+        return $this->agentsGroups;
+    }
+
+    public function addAgentsGroup(AgentsGroup $agentsGroup): static
+    {
+        if (!$this->agentsGroups->contains($agentsGroup)) {
+            $this->agentsGroups->add($agentsGroup);
+            $agentsGroup->addAgent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAgentsGroup(AgentsGroup $agentsGroup): static
+    {
+        if ($this->agentsGroups->removeElement($agentsGroup)) {
+            $agentsGroup->removeAgent($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EnvironmentalConditions>
+     */
+    public function getEnvironmentalConditions(): Collection
+    {
+        return $this->environmentalConditions;
+    }
+
+    public function addEnvironmentalCondition(EnvironmentalConditions $environmentalCondition): static
+    {
+        if (!$this->environmentalConditions->contains($environmentalCondition)) {
+            $this->environmentalConditions->add($environmentalCondition);
+            $environmentalCondition->setCountingCampaign($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEnvironmentalCondition(EnvironmentalConditions $environmentalCondition): static
+    {
+        if ($this->environmentalConditions->removeElement($environmentalCondition)) {
+            // set the owning side to null (unless already changed)
+            if ($environmentalCondition->getCountingCampaign() === $this) {
+                $environmentalCondition->setCountingCampaign(null);
+            }
+        }
 
         return $this;
     }

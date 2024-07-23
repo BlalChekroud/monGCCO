@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Disturbed index{% endblock %}
+
+{% block body %}
+    <h1>Disturbed index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Label</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for disturbed in disturbeds %}
+            <tr>
+                <td>{{ disturbed.id }}</td>
+                <td>{{ disturbed.label }}</td>
+                <td>{{ disturbed.createdAt ? disturbed.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ disturbed.updatedAt ? disturbed.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_disturbed_show', {'id': disturbed.id}) }}">show</a>
+                    <a href="{{ path('app_disturbed_edit', {'id': disturbed.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_disturbed_new') }}">Create new</a>
+{% endblock %}

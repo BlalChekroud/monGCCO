@@ -1,0 +1,17 @@
+{# {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }} #}
+    <turbo-frame id="disturbed_new">
+        {{ form_start(form) }}
+            {{ form_widget(form, {action: path('app_disturbed_new')}) }}
+            <div class="row mb-3">
+                <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+                    <button type="reset" class="btn-action btn btn-outline-dark bi bi-x-square"> Annuler</button>
+                </div>
+                <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+                    <button class="btn-action btn btn-outline-primary bi bi-save"> Enregistrer</button>
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </turbo-frame>

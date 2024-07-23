@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Image index{% endblock %}
+
+{% block body %}
+    <h1>Image index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Image</th>
+                <th>Crée le</th>
+                <th>Dernière mise à jour le</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for image in images %}
+            <tr>
+                <td>{{ image.id }}</td>
+                <td>
+                    {# {{ image.imageFilename }} #}
+                    {% if image.imageFilename %}
+                        <img src="{{ vich_uploader_asset(image, 'imageFile') }}" alt="image" class="imgIndex rounded mx-auto d-block">
+                    {% else %}
+                        <p>Aucune image disponible</p>
+                    {% endif %}
+                </td>
+                <td>{{ image.createdAt ? image.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ image.updatedAt ? image.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_image_show', {'id': image.id}) }}">show</a>
+                    <a href="{{ path('app_image_edit', {'id': image.id}) }}">edit</a>
+                </td>
+
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_image_new') }}">Create new</a>
+{% endblock %}

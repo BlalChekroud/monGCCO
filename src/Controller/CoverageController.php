@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use DateTime;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\Coverage;
 use App\Form\CoverageType;
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/coverage')]
-#[IsGranted('ROLE_COLLECTOR')]
+#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class CoverageController extends AbstractController
 {
     #[Route('/', name: 'app_coverage_index', methods: ['GET'])]
@@ -33,6 +34,7 @@ class CoverageController extends AbstractController
         $form->handleRequest($request);
     
         if ($form->isSubmitted() && $form->isValid()) {
+            $coverage->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
             $entityManager->persist($coverage);
             $entityManager->flush();
     
@@ -65,6 +67,7 @@ class CoverageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $coverage->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
             $entityManager->persist($coverage);
             $entityManager->flush();
 
@@ -92,6 +95,7 @@ class CoverageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $coverage->setUpdatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
             $entityManager->flush();
 
             return $this->redirectToRoute('app_coverage_index', [], Response::HTTP_SEE_OTHER);

@@ -19,7 +19,7 @@
 
     <section class="section">
         <div class="row">
-            <div class="col-sm-12 col-lg-12">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
 
                 <div class="card">
                   <div id="printableArea">
@@ -29,7 +29,7 @@
                         <table class="table">
                             <tbody>
                                 <tr>
-                                    <th>Nome de la campagne</th>
+                                    <th>Nom de la campagne</th>
                                     <td>{{ counting_campaign.campaignName }}</td>
                                 </tr>
                                 <tr>
@@ -82,34 +82,141 @@
                                 </tr>
                                 <tr>
                                     <th>Date de début</th>
-                                    <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('Y-m-d') : '' }}</td>
+                                    <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Date de fin</th>
-                                    <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('Y-m-d') : '' }}</td>
+                                    <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Crée le</th>
-                                    <td>{{ counting_campaign.createdAt ? counting_campaign.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                                    <td>{{ counting_campaign.createdAt ? counting_campaign.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Dernière mise à jour le</th>
-                                    <td>{{ counting_campaign.updatedAt ? counting_campaign.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                                    <td>{{ counting_campaign.updatedAt ? counting_campaign.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Groupes</th>
+                                    <td>
+                                        <ol>
+                                            <div class="accordion accordion-flush" id="accordionFlushExample">
+                                                {% set sorted_groups = counting_campaign.agentsGroups|sort((a, b) => a.groupName <=> b.groupName) %}
+
+                                                {% for group in sorted_groups %}
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header" id="flush-heading{{ loop.index }}">
+                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse{{ loop.index }}" aria-expanded="false" aria-controls="flush-collapse{{ loop.index }}">
+                                                                {{ group.groupName }}
+                                                            </button>
+                                                        </h2>
+                                                        <div id="flush-collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="flush-heading{{ loop.index }}" data-bs-parent="#accordionFlushExample">
+                                                            <div class="accordion-body">
+                                                                <h6><b>Chef d'équipe:</b> {{ group.leader.name }} {{ group.leader.lastName }}</h6>
+                                                                <h6><b>Membres d'équipe:</b></h6>
+                                                                {% if group.groupMember|length > 0 %}
+                                                                    <ul>
+                                                                        {% for agent in group.groupMember %}
+                                                                            <li>{{ agent.name }} {{ agent.lastName }}</li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                {% else %}
+                                                                    <p>Aucun membre trouvé</p>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <p>Aucune enregistrement trouvé</p>
+                                                {% endfor %}
+                                            </div><!-- End Accordion without outline borders -->
+                                        </ol>
+
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Les sites du campagne</th>
                                     <td>
-                                        <ol>
+                                        <table class="table table-striped">
+                                            <thead>
                                             {% set sorted_sites = counting_campaign.siteCollection|sort((a, b) => a.siteName <=> b.siteName) %}
+                                            <tr>
+                                                <th scope="col">Site</th>
+                                                <th scope="col">Ville/Pays</th>
+                                                <th scope="col">Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for site in sorted_sites %}
+                                                    <tr>
+                                                        <td>{{ site.siteName }}</td>
+                                                        <td>{{ site.city.name }}/{{ site.city.country.name }}</td>
+                                                        <td>
+                                                            <div class="col text-end">
+                                                                {% set currentDate = "now"|date('d-m-Y H:i:s') %}
 
-                                            {% for site in sorted_sites %}
-                                                <li>
-                                                    {{ site.siteName }} ({{ site.region }})
-                                                </li>
-                                            {% else %}
-                                                <p colspan="7">Aucune enregistrement trouvé</p>
-                                            {% endfor %}
-                                        </ol>
+                                                                {% if counting_campaign.startDate|date('d-m-Y H:i:s') <= currentDate %}
+                                                                
+                                                                {% set sites = counting_campaign.siteCollection %}
+                                                                    {% if sites == counting_campaign.environmentalConditions %}
+                                                                        <a href="{{ path('app_collected_data_new') }}" class="btn btn-primary btn-lg">Collecter <i class="bi bi-arrow-bar-right"><div class="spinner-grow spinner-grow-sm text-light" role="status"></div></i></a>
+                                                                    {% else %}
+                                                                        <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-warning btn-lg">Ajouter Conditions Environnementales</a>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    <code>Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</code>
+                                                                {% endif %}
+                                                            </div>
+                                                        </td>
+{# <td>
+    <div class="col text-end">
+        {% set currentDate = "now"|date('d-m-Y H:i:s') %}
+        {% set startDate = counting_campaign.startDate|date('d-m-Y H:i:s') %}
+        
+        {% if startDate <= currentDate %}
+            {% for site in counting_campaign.siteCollection %}
+                {% set hasEnvironmentalConditions = site.getEnvironmentalConditions|length > 0 %}
+                
+                {% if hasEnvironmentalConditions %}
+                    <a href="{{ path('app_collected_data_new', {'siteId': site.id}) }}" class="btn btn-primary btn-lg">Collecter pour site {{ site.name }} <i class="bi bi-arrow-bar-right"><div class="spinner-grow spinner-grow-sm text-light" role="status"></div></i></a>
+                {% else %}
+                    <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-warning btn-lg">Ajouter Conditions Environnementales pour site {{ site.name }}</a>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <code>Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</code>
+        {% endif %}
+    </div>
+</td> #}
+
+
+
+                                                        
+                                                        {# <td>
+                                                            <div class="col text-end">
+                                                                {% set currentDate = "now"|date('d-m-Y H:i:s') %}
+                                                                {% set user = app.user %}
+                                                                {% set environmentalConditionsExist = environmental_conditions_repository.findOneBy({'user': user}) is not null %}
+
+                                                                {% if counting_campaign.startDate|date('d-m-Y H:i:s') <= currentDate %}
+                                                                    {% if environmentalConditionsExist %}
+                                                                        <a href="{{ path('app_collected_data_new', {'id': counting_campaign.id} {'siteId': site.id}) }}" class="btn btn-primary btn-lg">Collecter <i class="bi bi-arrow-bar-right"><div class="spinner-grow spinner-grow-sm text-light" role="status"></div></i></a>
+                                                                    {% else %}
+                                                                        <a href="{{ path('app_environmental_conditions_new') }}" class="btn btn-warning btn-lg">Ajouter Conditions Environnementales</a>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    <code>Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</code>
+                                                                {% endif %}
+                                                            </div>
+                                                        </td> #}
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        <td><p colspan="6">Aucune enregistrement trouvé</p></td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
                                     </td>
                                 </tr>
                             </tbody>
@@ -118,7 +225,18 @@
                   </div>
                     <div class="card-footer">
                         <div class="row">
-                            <div class="col-sm-12 col-lg-12 d-flex justtify-content-end">
+                            {# <div class="col text-end">
+                                {% set currentDate = "now"|date('d-m-Y H:i:s') %}
+
+                                {% if counting_campaign.startDate|date('d-m-Y H:i:s') <= currentDate %}
+                                    <a href="{{ path('app_collected_data_new') }}" class="btn btn-primary btn-lg">Collecter <i class="bi bi-arrow-bar-right"><div class="spinner-grow spinner-grow-sm text-light" role="status"></div></i></a>
+                                {% else %}
+                                    <code>Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</code>
+                                {% endif %}
+                            </div> #}
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justtify-content-end">
                                 <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
                                 <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une nouvelle campagne</a>
                                 <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>

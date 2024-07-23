@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Image{% endblock %}
+
+{% block body %}
+    <h1>Image</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ image.id }}</td>
+            </tr>
+            <tr>
+                <th>Image</th>
+                <td>
+                    {# {{ image.imageFilename }} #}
+                    {% if image.imageFilename %}
+                        <img src="{{ vich_uploader_asset(image, 'imageFile') }}" alt="image" class="imgShow rounded mx-auto d-block">
+                    {% else %}
+                        <p>Aucune image disponible</p>
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_image_index') }}">back to list</a>
+
+    <a href="{{ path('app_image_edit', {'id': image.id}) }}">edit</a>
+
+    {{ include('image/_delete_form.html.twig') }}
+{% endblock %}

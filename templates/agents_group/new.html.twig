@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau groupe d'agents{% endblock %}
+
+{% block body %}
+
+    
+
+    <a href="{{ path('app_agents_group_index') }}">back to list</a>
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Créer un nouveau groupe d'agents</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_agents_group_index') }}">Gestion des groupes</a></li>
+          <li class="breadcrumb-item active">Création</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Les informations du groupe</h5>
+
+              {{ include('agents_group/_form.html.twig') }}
+
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_agents_group_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{# <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const groupMemberField = document.getElementById('group_member');
+        const groupLeaderField = document.getElementById('group_leader');
+
+        if (groupMemberField && groupLeaderField) {
+            groupMemberField.addEventListener('change', function () {
+                const selectedMembers = Array.from(groupMemberField.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+
+                // Clear existing options
+                groupLeaderField.innerHTML = '<option value="">-- Choisir le chef du groupe --</option>';
+
+                // Add new options
+                selectedMembers.forEach(member => {
+                    const label = groupMemberField.querySelector(`label[for="group_member_${member}"]`);
+                    if (label) {
+                        const option = document.createElement('option');
+                        option.value = member;
+                        option.textContent = label.textContent.trim();
+                        groupLeaderField.appendChild(option);
+                    }
+                });
+            });
+        }
+    });
+</script> #}
+{% endblock %}

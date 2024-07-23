@@ -1,0 +1,77 @@
+{{ form_start(form) }}
+    {# {{ form_widget(form) }} #}
+    {# <div class="row mb-3">
+        {{ form_label(form.name, 'Nom') }}
+        <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+            {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div> #}
+    {# <div class="row mb-3">
+        <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11">
+            {{ form_row(form.siteCollection) }}
+        </div>
+    </div> #}
+    <div class="row mb-3">
+        {{ form_label(form.disturbed, 'Disturbé(e) (Indique si le comptage a été affecté par une perturbation):') }}
+        <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
+            {{ form_widget(form.disturbed, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
+            <turbo-frame id="disturbed_new">
+                <a href="{{ path('app_disturbed_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Ajouter</a>
+            <turbo-frame>
+        </div>
+    </div>
+    <div class="row mb-3">
+        {{ form_label(form.weather, 'Effets des conditions météorologiques (vent, pluie, brouillard) sur les comptages:') }}
+        <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
+            {{ form_widget(form.weather, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
+            <turbo-frame id="weather_new">
+                <a href="{{ path('app_weather_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Ajouter</a>
+            <turbo-frame>
+        </div>
+    </div>
+    <div class="row mb-3">
+        {{ form_label(form.water, 'L\'état des eaux lors du comptage:') }}
+        <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
+            {{ form_widget(form.water, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
+            <turbo-frame id="water_new">
+                <a href="{{ path('app_water_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Ajouter</a>
+            <turbo-frame>
+        </div>
+    </div>
+    <div class="row mb-3">
+        {{ form_label(form.ice, 'La couverture de glace lors du comptage:') }}
+        <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
+            {{ form_widget(form.ice, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
+            <turbo-frame id="ice_new">
+                <a href="{{ path('app_ice_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Ajouter</a>
+            <turbo-frame>
+        </div>
+    </div>
+    <div class="row mb-3">
+        {{ form_label(form.tidal, 'Marée cours (la plupart) du comptage:') }}
+        <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
+            {{ form_widget(form.tidal, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
+            <turbo-frame id="tidal_new">
+                <a href="{{ path('app_tidal_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Ajouter</a>
+            <turbo-frame>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+        <button type="reset" class="btn btn-outline-dark bi bi-x-square"> Annuler</button>
+        </div>
+        <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+        <button class="btn btn-outline-primary bi bi-save"> {{ button_label|default('Enregistrer') }}</button>
+        </div>
+    </div>
+{{ form_end(form) }}

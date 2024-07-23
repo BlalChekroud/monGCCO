@@ -8,9 +8,10 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>#</th>
                 <th>Label</th>
-                <th>actions</th>
+                <th>Crée le</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -18,6 +19,8 @@
             <tr>
                 <td>{{ coverage.id }}</td>
                 <td>{{ coverage.label }}</td>
+                <td>{{ coverage.createdAt ? coverage.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ coverage.updatedAt ? coverage.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                 <td>
                     <a href="{{ path('app_coverage_show', {'id': coverage.id}) }}">show</a>
                     <a href="{{ path('app_coverage_edit', {'id': coverage.id}) }}">edit</a>

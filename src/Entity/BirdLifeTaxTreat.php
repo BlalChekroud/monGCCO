@@ -27,6 +27,12 @@ class BirdLifeTaxTreat
     #[ORM\OneToMany(targetEntity: BirdSpecies::class, mappedBy: 'birdLifeTaxTreat')]
     private Collection $birdLifeTaxTreat;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     public function __construct()
     {
         $this->birdLifeTaxTreat = new ArrayCollection();
@@ -82,5 +88,29 @@ class BirdLifeTaxTreat
     public function __toString()
     {
         return $this->getLabel() ?: '';
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 }

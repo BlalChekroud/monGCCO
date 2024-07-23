@@ -6,6 +6,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use App\Entity\Country;
+use App\Entity\City;
 
 use App\Form\ImportCsvType;
 use App\Service\FileUploader;
@@ -21,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/site/collection')]
-#[IsGranted('ROLE_COLLECTOR')]
+#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class SiteCollectionController extends AbstractController
 {
     #[Route('/', name: 'app_site_collection_index', methods: ['GET'])]
@@ -107,21 +109,69 @@ class SiteCollectionController extends AbstractController
                 continue; // Skip rows where array_combine fails
             }
     
-            $siteCollection = new SiteCollection();
-            $siteCollection->setSiteName($data['Nom du site'] ?? null);
-            $siteCollection->setSiteCode($data['Code du site'] ?? null);
-            $siteCollection->setNationalSiteCode($data['Code national'] ?? null);
-            $siteCollection->setInternationalSiteCode($data['Code international'] ?? null);
-            $siteCollection->setLatDepart($data['Latitude de depart'] ?? null);
-            $siteCollection->setLongDepart($data['Longitude de depart'] ?? null);
-            $siteCollection->setLatFin($data['Latitude de fin'] ?? null);
-            $siteCollection->setLongFin($data['Longitude de fin'] ?? null);
-            $siteCollection->setRegion($data['Region'] ?? null);
-            $siteCollection->setParentSiteName($data['Nom du site parent'] ?? null);
-
-            $siteCollection->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+            // Fetch or create the Country entity
+            $countryName = $data['country'] ?? null;
+            $iso2 = $data['iso2'] ?? null;
     
-            $entityManager->persist($siteCollection);
+            if ($countryName && $iso2) {
+                $countryRepository = $entityManager->getRepository(Country::class);
+                $country = $countryRepository->findOneBy(['name' => $countryName, 'iso2' => $iso2]);
+    
+                if (!$country) {
+                    $country = new Country();
+                    $country->setName($countryName);
+                    $country->setIso2($data['iso2'] ?? ''); // Assuming the CSV has an iso2 column
+                    $country->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+    
+                    $entityManager->persist($country);
+                }
+            }
+    
+            // Check if the city already exists
+            $cityName = $data['city'] ?? null;
+            if ($cityName && $country) {
+                $cityRepository = $entityManager->getRepository(City::class);
+                $city = $cityRepository->findOneBy(['name' => $cityName, 'country' => $country,]);
+    
+                if (!$city) {
+                    // Create the City entity if it does not exist
+                    $city = new City();
+                    $city->setName($cityName);
+                    $city->setLatitude($data['lat'] ?? null);
+                    $city->setLongitude($data['lng'] ?? null);
+                    $city->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                    $city->setCountry($country ?? null); // Associate the city with the country if available
+    
+                    $entityManager->persist($city);
+                }
+            }
+
+            // Check if the siteCollection already exists
+            $siteName = $data['Nom du site'] ?? null;
+            if ($siteName) {
+                $siteCollectionRepository = $entityManager->getRepository(SiteCollection::class);
+                $siteCollection = $siteCollectionRepository->findOneBy(['siteName' => $siteName]);
+
+                if (!$siteCollection){
+                    // Create the siteCollection entity if it does not exist
+                    $siteCollection = new SiteCollection();
+                    $siteCollection->setSiteName($data['Nom du site'] ?? null);
+                    $siteCollection->setSiteCode($data['Code du site'] ?? null);
+                    $siteCollection->setNationalSiteCode($data['Code national'] ?? null);
+                    $siteCollection->setInternationalSiteCode($data['Code international'] ?? null);
+                    $siteCollection->setLatDepart($data['Latitude de depart'] ?? null);
+                    $siteCollection->setLongDepart($data['Longitude de depart'] ?? null);
+                    $siteCollection->setLatFin($data['Latitude de fin'] ?? null);
+                    $siteCollection->setLongFin($data['Longitude de fin'] ?? null);
+                    $siteCollection->setCity($city ?? null); // Associate the siteCollection with the city if available
+                    $siteCollection->setParentSiteName($data['Nom du site parent'] ?? null);
+                    $siteCollection->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                    
+                    $entityManager->persist($siteCollection);
+                }
+            }
+
+    
         }
     
         $entityManager->flush();

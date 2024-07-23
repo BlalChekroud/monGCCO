@@ -38,11 +38,11 @@
                                 </tr>
                                 <tr>
                                     <th>Crée le</th>
-                                    <td>{{ site_collection.createdAt ? site_collection.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                                    <td>{{ site_collection.createdAt ? site_collection.createdAt|date('D-m-y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Dernière mise à jour le</th>
-                                    <td>{{ site_collection.updatedAt ? site_collection.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                                    <td>{{ site_collection.updatedAt ? site_collection.updatedAt|date('D-m-y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Code national</th>
@@ -69,12 +69,12 @@
                                     <td>{{ site_collection.longFin }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Région</th>
-                                    <td>{{ site_collection.region }}</td>
+                                    <th>Ville</th>
+                                    <td>{{ site_collection.city.name }}</td>
                                 </tr>
                                 <tr>
                                     <th>Pays</th>
-                                    <td>{{ site_collection.country }}</td>
+                                    <td>{{ site_collection.city.country.name }}</td>
                                 </tr>
                                 <tr>
                                     <th>Nom du site parent</th>

@@ -49,7 +49,7 @@
                                   <p>Aucune image disponible</p>
                               {% endif %}
                             </td>
-                            <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                            <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>
                               <div class="d-flex justtify-content-end">
                                   <a href="{{ path('app_bird_species_show', {'id': bird_specy.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text"> Détail</a>

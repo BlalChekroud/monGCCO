@@ -93,6 +93,10 @@
                             <p>Aucune image disponible</p>
                             {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
                         {% endif %}
+                      {# {{ form_start(formImage) }}
+                        {{ form_row(formImage.imageFile) }}
+                        <button type="submit" class="btn btn-primary">Enregistrer l'image</button>
+                      {{ form_end(formImage) }} #}
                         {# <div class="pt-2"> #}
                           {# <div class="input-group">
                             <span class="input-group-text"><i class="text-primary bi bi-upload"></i></span>

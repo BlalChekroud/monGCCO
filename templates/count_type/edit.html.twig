@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit CountType{% endblock %}
+
+{% block body %}
+    <h1>Edit CountType</h1>
+
+    {{ include('count_type/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_count_type_index') }}">back to list</a>
+
+    {{ include('count_type/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Quality{% endblock %}
+
+{% block body %}
+    <h1>Edit Quality</h1>
+
+    {{ include('quality/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_quality_index') }}">back to list</a>
+
+    {{ include('quality/_delete_form.html.twig') }}
+{% endblock %}

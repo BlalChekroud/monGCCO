@@ -8,12 +8,20 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
+                <th>#</th>
                 <td>{{ bird_life_tax_treat.id }}</td>
             </tr>
             <tr>
                 <th>Label</th>
                 <td>{{ bird_life_tax_treat.label }}</td>
+            </tr>
+            <tr>
+                <th>Créé le</th>
+                <td>{{ bird_life_tax_treat.createdAt ? bird_life_tax_treat.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Dernière mise à jour le</th>
+                <td>{{ bird_life_tax_treat.updatedAt ? bird_life_tax_treat.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
             </tr>
         </tbody>
     </table>

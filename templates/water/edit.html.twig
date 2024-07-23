@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Water{% endblock %}
+
+{% block body %}
+    <h1>Edit Water</h1>
+
+    {{ include('water/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_water_index') }}">back to list</a>
+
+    {{ include('water/_delete_form.html.twig') }}
+{% endblock %}

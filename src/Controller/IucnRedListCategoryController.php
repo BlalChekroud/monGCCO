@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/iucn/red/list/category')]
-#[IsGranted('ROLE_COLLECTOR')]
+#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class IucnRedListCategoryController extends AbstractController
 {
     #[Route('/', name: 'app_iucn_red_list_category_index', methods: ['GET'])]

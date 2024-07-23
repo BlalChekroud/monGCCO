@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New CountType{% endblock %}
+
+{% block body %}
+    <h1>Create new CountType</h1>
+
+    {{ include('count_type/_form.html.twig') }}
+
+    <a href="{{ path('app_count_type_index') }}">back to list</a>
+{% endblock %}

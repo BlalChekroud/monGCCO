@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier groupe d'agents{% endblock %}
+
+{% block body %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Modifier ce groupe</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_agents_group_index') }}">Gestion des groupes</a></li>
+          <li class="breadcrumb-item active">Modification</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Les nouveaux informations du groupe</h5>
+
+              {{ include('agents_group/_form.html.twig', {'button_label': ' Mise à jour'}) }}
+
+            </div>
+            <div class="card-footer">
+              <div class="d-flex justtify-content-end">
+                <a href="{{ path('app_agents_group_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>
+                {{ include('agents_group/_delete_form.html.twig') }}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}

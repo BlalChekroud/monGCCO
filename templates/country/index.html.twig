@@ -27,6 +27,7 @@
                 <td>
                     <a href="{{ path('app_country_show', {'id': country.id}) }}">show</a>
                     <a href="{{ path('app_country_edit', {'id': country.id}) }}">edit</a>
+                    {{ include('country/_delete_form.html.twig') }}
                 </td>
             </tr>
         {% else %}

@@ -8,9 +8,10 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>#</th>
                 <th>Label</th>
-                <th>actions</th>
+                <th>Crée le</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -18,6 +19,8 @@
             <tr>
                 <td>{{ bird_life_tax_treat.id }}</td>
                 <td>{{ bird_life_tax_treat.label }}</td>
+                <td>{{ bird_life_tax_treat.createdAt ? bird_life_tax_treat.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ bird_life_tax_treat.updatedAt ? bird_life_tax_treat.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                 <td>
                     <a href="{{ path('app_bird_life_tax_treat_show', {'id': bird_life_tax_treat.id}) }}">show</a>
                     <a href="{{ path('app_bird_life_tax_treat_edit', {'id': bird_life_tax_treat.id}) }}">edit</a>

@@ -74,83 +74,69 @@
             </a>
           </li><!-- End Search Icon-->
 
-          <li>
-            <h6>{% include 'partials/flash.html.twig' %}</h6>
-          </li>
+          {% set notifications = app.flashes %}
           <li class="nav-item dropdown">
+              <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                  <i class="bi bi-bell"></i>
+                  {% if notifications %}
+                    {% for type, messages in notifications %}
+                      {% for message in messages %}
+                        {% if type == 'success' %}
+                          <span class="badge bg-success badge-number">{{ notifications|length }}</span>
+                        {% elseif type == 'warning' %}
+                          <span class="badge bg-warning badge-number">{{ notifications|length }}</span>
+                        {% elseif type == 'danger' %}
+                          <span class="badge bg-danger badge-number">{{ notifications|length }}</span>
+                        {% elseif type == 'error' %}
+                          <span class="badge bg-warning badge-number">{{ notifications|length }}</span>
+                        {% else %}
+                          <span class="badge bg-info badge-number">{{ notifications|length }}</span>
+                        {% endif %}
+                      {% endfor %}
+                    {% endfor %}
+                  {% endif %}
+              </a><!-- End Notification Icon -->
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+                  <li class="dropdown-header">
+                      Vous avez {{ notifications|length }} nouvelle notification.
+                      <a href="{{ path('all_notifications') }}"><span class="badge rounded-pill bg-primary p-2 ms-2">Voir tout.</span></a>
+                  </li>
+                  <li>
+                      <hr class="dropdown-divider">
+                  </li>
 
-            <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-              <i class="bi bi-bell"></i>
-              <span class="badge bg-primary badge-number">4</span>
-            </a><!-- End Notification Icon -->
-
-            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-              <li class="dropdown-header">
-                You have 4 new notifications
-                <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-              </li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-
-              <li class="notification-item">
-                <i class="bi bi-exclamation-circle text-warning"></i>
-                <div>
-                  <h4>Lorem Ipsum</h4>
-                  <p>Quae dolorem earum veritatis oditseno</p>
-                  <p>30 min. ago</p>
-                </div>
-              </li>
-
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-
-              <li class="notification-item">
-                <i class="bi bi-x-circle text-danger"></i>
-                <div>
-                  <h4>Atque rerum nesciunt</h4>
-                  <p>Quae dolorem earum veritatis oditseno</p>
-                  <p>1 hr. ago</p>
-                </div>
-              </li>
-
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-
-              <li class="notification-item">
-                <i class="bi bi-check-circle text-success"></i>
-                <div>
-                  <h4>Sit rerum fuga</h4>
-                  <p>Quae dolorem earum veritatis oditseno</p>
-                  <p>2 hrs. ago</p>
-                </div>
-              </li>
-
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-
-              <li class="notification-item">
-                <i class="bi bi-info-circle text-primary"></i>
-                <div>
-                  <h4>Dicta reprehenderit</h4>
-                  <p>Quae dolorem earum veritatis oditseno</p>
-                  <p>4 hrs. ago</p>
-                </div>
-              </li>
-
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li class="dropdown-footer">
-                <a href="#">Show all notifications</a>
-              </li>
-
-            </ul><!-- End Notification Dropdown Items -->
-
+                  {% for type, messages in notifications %}
+                      {% for message in messages %}
+                          <li class="notification-item">
+                              {% if type == 'warning' %}
+                                  <i class="bi bi-exclamation-circle text-warning"></i>
+                              {% elseif type == 'danger' %}
+                                  <i class="bi bi-x-circle text-danger"></i>
+                              {% elseif type == 'error' %}
+                                  <i class="bi bi-exclamation-circle text-warning"></i>
+                              {% elseif type == 'success' %}
+                                  <i class="bi bi-check-circle text-success"></i>
+                              {% elseif type == 'info' %}
+                                  <i class="bi bi-info-circle text-primary"></i>
+                              {% endif %}
+                              <div>
+                                  <h4>{{ type|capitalize }}</h4>
+                                  <p>{{ message }}</p>
+                                  <p>{{ 'now'|date_modify('-' ~ loop.index * 30 ~ ' minutes')|date('H:i') }}</p>
+                              </div>
+                          </li>
+                          <li>
+                              <hr class="dropdown-divider">
+                          </li>
+                      {% endfor %}
+                  {% endfor %}
+                  
+                  <li class="dropdown-footer">
+                      <a href="{{ path('all_notifications') }}">Afficher toutes les notifications</a>
+                  </li>
+              </ul><!-- End Notification Dropdown Items -->
           </li><!-- End Notification Nav -->
+
 
           <li class="nav-item dropdown">
 
@@ -221,14 +207,14 @@
           <li class="nav-item dropdown pe-3">
 
             <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                {% if app.user %}
               <img src="{{ vich_uploader_asset(app.user, 'imageFile') }}" alt="Profile" class="rounded-circle">
               <span class="d-none d-md-block dropdown-toggle ps-2">
-                {% if app.user %}
-                  {{ app.user.getName() }}</h6>
+                  {{ app.user.getName() }}
+              </span>
                 {% else %}
                   <a href="{{ path('app_login') }}">Se connecter</a>
                 {% endif %}
-              </span>
             </a><!-- End Profile Iamge Icon -->
 
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
@@ -305,7 +291,7 @@
           <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="{{ path('app_bird_family_new') }}">
-                <i class="bi bi-circle"></i><span>Création d'une famille</span>
+                <i class="bi bi-circle"></i><span>Créer une famille</span>
               </a>
             </li>
             <li>
@@ -323,12 +309,27 @@
           <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="{{ path('app_bird_species_new') }}">
-                <i class="bi bi-circle"></i><span>Création d'une espèce</span>
+                <i class="bi bi-circle"></i><span>Créer une espèce</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_bird_species_index') }}">
                 <i class="bi bi-circle"></i><span>Consultation des espèces</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_coverage_index') }}">
+                <i class="bi bi-circle"></i><span>Couvertures</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_bird_life_tax_treat_index') }}">
+                <i class="bi bi-circle"></i><span>Traitement taxonomique de BirdLife</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_iucn_red_list_category_index') }}">
+                <i class="bi bi-circle"></i><span>Catégorie de la liste rouge de l'UICN 2022</span>
               </a>
             </li>
           </ul>
@@ -341,12 +342,17 @@
           <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="{{ path('app_counting_campaign_new') }}">
-                <i class="bi bi-circle"></i><span>Création d'une campagne</span>
+                <i class="bi bi-circle"></i><span>Créer une campagne</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_counting_campaign_index') }}">
                 <i class="bi bi-circle"></i><span>Consultation des campagnes</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_campaign_status_index') }}">
+                <i class="bi bi-circle"></i><span>Statut des campagnes</span>
               </a>
             </li>
           </ul>
@@ -367,6 +373,16 @@
                 <i class="bi bi-circle"></i><span>Consultation des sites</span>
               </a>
             </li>
+            <li>
+              <a href="{{ path('app_country_index')}}">
+                <i class="bi bi-circle"></i><span>Pays</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_city_index')}}">
+                <i class="bi bi-circle"></i><span>Villes</span>
+              </a>
+            </li>
           </ul>
         </li><!-- End siteCollection Nav -->
         
@@ -385,8 +401,41 @@
                 <i class="bi bi-circle"></i><span>Consultation des collectes</span>
               </a>
             </li>
+            <li>
+              <a href="{{ path('app_environmental_conditions_new') }}">
+                <i class="bi bi-circle"></i><span>Créer conditions d'environnement</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_environmental_conditions_index') }}">
+                <i class="bi bi-circle"></i><span>Consultation des conditions d'environnement</span>
+              </a>
+            </li>
           </ul>
         </li><!-- End Charts Nav -->
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" data-bs-target="#users-nav" data-bs-toggle="collapse" href="#">
+            <i class="bi bi-people"></i><span>Utilisateurs</span><i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <ul id="users-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+            <li>
+              <a href="{{ path('app_agents_group_new') }}">
+                <i class="bi bi-circle"></i><span>Créer un groupe</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_agents_group_index') }}">
+                <i class="bi bi-circle"></i><span>Consultation des groupes</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_profile') }}">
+                <i class="bi bi-circle"></i><span>Consultation des utilisateurs</span>
+              </a>
+            </li>
+          </ul>
+        </li><!-- End users Nav -->
 
         <li class="nav-heading">Pages</li>
 

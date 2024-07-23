@@ -12,8 +12,16 @@
                 <td>{{ iucn_red_list_category.id }}</td>
             </tr>
             <tr>
-                <th>Name</th>
-                <td>{{ iucn_red_list_category.name }}</td>
+                <th>Label</th>
+                <td>{{ iucn_red_list_category.label }}</td>
+            </tr>
+            <tr>
+                <th>Créé le</th>
+                <td>{{ iucn_red_list_category.createdAt ? iucn_red_list_category.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Dernière mise à jour le</th>
+                <td>{{ iucn_red_list_category.updatedAt ? iucn_red_list_category.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
             </tr>
         </tbody>
     </table>
