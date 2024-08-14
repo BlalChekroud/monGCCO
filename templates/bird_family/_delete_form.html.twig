@@ -1,6 +1,49 @@
-{% if is_granted('ROLE_ADMIN') %}
+{# {% if is_granted('ROLE_ADMIN') %}
 <form method="post" action="{{ path('app_bird_family_delete', {'id': bird_family.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bird_family.id) }}">
     <button class="btn-action btn btn-outline-danger btn-sm bi bi-x-circle-fill mx-1"> Supprimer</button>
 </form>
-{% endif %}
+{% endif %} #}
+{# <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> #}
+{% if is_granted('ROLE_ADMIN') %}
+<form id="delete-form" method="post" action="{{ path('app_bird_family_delete', {'id': bird_family.id}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bird_family.id) }}">
+    <button type="button" class="btn-action btn btn-outline-danger btn-sm bi bi-x-circle-fill mx-1" onclick="confirmDelete()"> Supprimer</button>
+</form>
+{% endif %}<script>
+    function confirmDelete() {
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success swal2-button-space',
+                cancelButton: 'btn btn-danger swal2-button-space'
+            },
+            buttonsStyling: false
+        });
+
+        swalWithBootstrapButtons.fire({
+            title: 'Êtes-vous sûr ?',
+            text: 'Vous ne pourrez pas revenir en arrière !',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, supprimer !',
+            cancelButtonText: 'Non, annuler !',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Soumettre le formulaire si l'utilisateur confirme la suppression
+                document.getElementById('delete-form').submit();
+                swalWithBootstrapButtons.fire({
+                    title: 'Supprimé !',
+                    text: 'L\'élément a été supprimé.',
+                    icon: 'success'
+                });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire({
+                    title: 'Annulé',
+                    text: 'Votre élément est toujours en sécurité :)',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+</script>

@@ -2,11 +2,9 @@
 
 namespace App\Form;
 
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Entity\Coverage;
 use App\Entity\BirdLifeTaxTreat;
 use App\Entity\IucnRedListCategory;
@@ -26,9 +24,29 @@ class BirdSpeciesType extends AbstractType
         $builder
             ->add('scientificName')
             ->add('frenchName',TextType::class, [
-                'label' => 'Nom français'
+                'label' => 'Nom français',
+                'required' => false,
+                'empty_data' => '',
             ])
-            ->add('wispeciescode')
+            ->add('birdFamily', EntityType::class, [
+                'class' => BirdFamily::class,
+                'autocomplete' => true,
+                'choice_label' => function (BirdFamily $birdFamily) {
+                    return $birdFamily->getFamily() . ' (' . $birdFamily->getFamilyName() . ') \ ' .$birdFamily->getSubFamily() . ' \ ' .$birdFamily->getTribe(). ' \ ' .$birdFamily->getOrdre();
+                },
+                'label' => 'Famille (Nom de famille) \ Sous-famille \ Tribe \ Ordre d\'espèce<span class="requiredField">*</span>',
+                'label_html' => true,
+                'placeholder' => 'Choisir une Famille d\'Oiseaux',
+                'required' => true,
+                'query_builder' => function (BirdFamilyRepository $repository) {
+                    return $repository->createQueryBuilder('b')
+                        ->orderBy('b.family', 'ASC');
+                },
+            ])
+            ->add('wispeciescode',TextType::class, [
+                'required' => false,
+                'empty_data' => '',
+            ])
             ->add('imageFile', FileType::class, [
                 'label' => 'Image (JPG ou PNG)',
                 'mapped' => false,
@@ -44,24 +62,10 @@ class BirdSpeciesType extends AbstractType
                     ])
                 ],
             ])
-            ->add('authority')
-            // ->add('coverage', ChoiceType::class, [
-            //     'choices' => [
-            //         'U(inconnus)' => 'U',
-            //         'B(mauvaise) = <25%' => 'B',
-            //         'M(modérée)= 25-50%' => 'M',
-            //         'G(bonne) = 51-75%' => 'G',
-            //         'E(excellente) = 76-100%' => 'E',
-            //     ],
-            //     'label' => 'Couverture pour cette espèce',
-            // ])
-            // ->add('birdLifeTaxTreat', ChoiceType::class, [
-            //     'choices' => [
-            //         'R = Reconnu comme espèce' => 'R',
-            //         'NR = Non Reconnu comme espèce' => 'NR',
-            //     ],
-            //     'label' => 'Traitement taxonomique de BirdLife',
-            // ])
+            ->add('authority',TextType::class, [
+                'required' => false,
+                'empty_data' => '',
+            ])
             ->add('coverage', EntityType::class, [
                 'class' => Coverage::class,
                 'choice_label' => 'label',
@@ -108,19 +112,6 @@ class BirdSpeciesType extends AbstractType
             ->add('sisRecId')
             ->add('spcRecId')
             ->add('subsppId')
-            ->add('birdFamily', EntityType::class, [
-                'class' => BirdFamily::class,
-                'choice_label' => function (BirdFamily $birdFamily) {
-                    return $birdFamily->getFamily() . ' (' . $birdFamily->getFamilyName() . ') \ ' .$birdFamily->getSubFamily() . ' \ ' .$birdFamily->getTribe(). ' \ ' .$birdFamily->getOrdre();
-                },
-                'label' => "Famille (Nom de famille) \ Sous-famille \ Tribe \ Ordre d'espèce",
-                'placeholder' => '',
-                'required' => true,
-                'query_builder' => function (BirdFamilyRepository $repository) {
-                    return $repository->createQueryBuilder('b')
-                        ->orderBy('b.family', 'ASC'); // Or any other field you want to sort by
-                },
-            ])
             // ->add('save', SubmitType::class, [
             //     'label' => 'Enregistrer les modifications'
             // ])

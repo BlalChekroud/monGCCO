@@ -4,6 +4,9 @@ namespace App\Form;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Entity\Image;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormError;
 
 use Vich\UploaderBundle\Form\Type\VichImageType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -155,11 +158,21 @@ class UserType extends AbstractType
                     // )
                 ],
             ])
-            // ->add('save', SubmitType::class, [
-            //     'label' => ' Enregistrer les modifications',
-            //     'attr' => ['class' => 'form-control btn btn-outline-primary bi bi-save',]
-            // ])
         ;
+            // Ajouter un écouteur d'événement pour la validation après la soumission du formulaire
+            $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+                $form = $event->getForm();
+                $data = $form->getData();
+
+                // Obtiens les données des champs
+                $plainPassword = $form->get('plainPassword')->getData();
+                $passwordConfirm = $form->get('passwordConfirm')->getData();
+
+                // Vérifie si les mots de passe correspondent
+                if ($plainPassword !== $passwordConfirm) {
+                    $form->get('passwordConfirm')->addError(new FormError('Les mots de passe ne correspondent pas.'));
+                }
+            });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

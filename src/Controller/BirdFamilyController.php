@@ -266,12 +266,15 @@ class BirdFamilyController extends AbstractController
     #[Route('/{id}', name: 'app_bird_family_delete', methods: ['POST'])]
     public function delete(Request $request, BirdFamily $birdFamily, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$birdFamily->getId(), $request->getPayload()->get('_token'))) {
+        $csrfToken = $request->request->get('_token'); // Utilisation de `request->request` pour obtenir le payload
+    
+        if ($this->isCsrfTokenValid('delete' . $birdFamily->getId(), $csrfToken)) {
             $entityManager->remove($birdFamily);
             $entityManager->flush();
-            $this->addFlash('success', "Famille d'espèse a bien été supprimée");
+            $this->addFlash('success', "Famille d'espèce a bien été supprimée");
         }
-
+    
         return $this->redirectToRoute('app_bird_family_index', [], Response::HTTP_SEE_OTHER);
     }
+    
 }

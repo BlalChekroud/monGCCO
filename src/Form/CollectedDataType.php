@@ -2,14 +2,13 @@
 
 namespace App\Form;
 
-use App\Entity\EnvironmentalConditions;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-// use App\Entity\SiteCollection;
-use App\Entity\BirdSpecies;
+use App\Entity\CountType;
+use App\Entity\Method;
+use App\Entity\Quality;
 use App\Entity\CollectedData;
-use App\Entity\CountingCampaign;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -18,68 +17,47 @@ class CollectedDataType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            // ->add('environmentalConditions', EntityType::class, [
-            //     'class' => EnvironmentalConditions::class,
-            //     'choice_label' => function (EnvironmentalConditions $envCond) {
-            //         return $envCond->getSiteCollection()->getSiteName() .'/' . $envCond->getSiteCollection()->getCity()->getName() .' (' . $envCond->getCreatedAt()->format('d-m-Y') .')';
-            //     },
-            //     'label' => "Conditions d'environnement",
-            //     'placeholder' => '--Choisir les conditions d\'environnement--',
-            // ])
-            ->add('countNumber')
-            ->add('totalCount')
-            // ->add('countType', ChoiceType::class, [
-            //     'choices' => [
-            //         'U = Inconnu' => 'U',
-            //         'W = IWC (janvier)' => 'W',
-            //         'G = Oie' => 'G',
-            //         'X = Extra' => 'X',
-            //         'S = AfWC comptage juillet' => 'S',
-            //     ],
-            //     'label' => 'Type de comptage effectué lors de cette visite:',
-            // ])
-            // ->add('quality', ChoiceType::class, [
-            //     'choices' => [
-            //         '-3 Inconnus' => -3,
-            //         "0 Compte 'réel'" => 0,
-            //         '-1 Estimation approximative' => -1,
-            //         '-2 Valeur extrapolée' => -2,
-            //     ],
-            //     'label' => 'Qualité:',
-            // ])
-
-            // ->add('method', ChoiceType::class, [
-            //     'choices' => [
-            //         'A = Levé aérien' => 'A',
-            //         'B = Levé par bateau' => 'B',
-            //         'F = Levé à pieds ou voiture' => 'F',
-            //         'T = Télescope utilisé' => 'T',
-            //     ],
-            //     'label' => 'Méthode(s) utilisées pour le comptage:',
-            //     'expanded' => true,
-            //     'multiple' => true,
-
-            // ->add('siteCollection', EntityType::class, [
-            //     'class' => SiteCollection::class,
-            //     'choice_label' => function (SiteCollection $siteCollection) {
-            //         return $siteCollection->getSiteName() . ' (' . $siteCollection->getRegion() . ')';
-            //     },
-            // ])
-            // ->add('siteCollection', EntityType::class, [
-            //     'class' => SiteCollection::class,
-            //     'choice_label' => 'siteName',
-            //     'label' => "Collection de sites",
-            //     'placeholder' => '',
-            // ])
-            ->add('countingCampaign', EntityType::class, [
-                'class' => CountingCampaign::class,
-                'choice_label' => 'campaignName',
+            ->add('countType', EntityType::class, [
+                'class' => CountType::class,
+                'choice_label' => 'label',
+                'label' => "Type de comptage effectué lors de cette visite:<span class='requiredField'>*</span>",
+                'label_html' => true,
+                'placeholder' => '-- Choisir un type --',
+                'required' => true,
             ])
-            ->add('birdSpecies', EntityType::class, [
-                'class' => BirdSpecies::class,
-                'choice_label' => 'scientificName',
+            ->add('quality', EntityType::class, [
+                'class' => Quality::class,
+                'choice_label' => 'label',
+                'label' => 'Qualité:<span class="requiredField">*</span>',
+                'label_html' => true,
+                'required' => true,
+            ])
+            ->add('method', EntityType::class, [
+                'class' => Method::class,
+                'choice_label' => 'label',
+                'label' => 'Méthode(s) utilisées pour le comptage:',
                 'multiple' => true,
                 'expanded' => true,
+                'required' => true,
+            ])
+            // ->add('birdSpecies', EntityType::class, [
+            //     'class' => BirdSpecies::class,
+            //     'choice_label' => function(BirdSpecies $birdSpecy) {
+            //         return $birdSpecy->getScientificName() . ' ('. $birdSpecy->getBirdFamily()->getFamily() . ')' . $birdSpecy->getImageFile();
+            //     },
+            //     'label' => 'Espèce oiseau',
+            //     'multiple' => true,
+            //     'expanded' => true,
+            // ])
+            ->add('birdSpeciesCounts', CollectionType::class, [
+                'entry_type' => BirdSpeciesCountType::class,
+                'entry_options' => ['label' => false],
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+                // 'label' => 'Oiseaux comptées :',
+                'label' => false,
+                'required' => true,
             ])
         ;
     }

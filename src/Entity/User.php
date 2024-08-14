@@ -45,6 +45,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le mot de passe ne peut pas être vide.')]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
@@ -89,11 +90,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: EnvironmentalConditions::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $environmentalConditions;
 
+    /**
+     * @var Collection<int, CollectedData>
+     */
+    #[ORM\OneToMany(targetEntity: CollectedData::class, mappedBy: 'createdBy', orphanRemoval: true)]
+    private Collection $collectedData;
+
+    /**
+     * @var Collection<int, CountingCampaign>
+     */
+    #[ORM\OneToMany(targetEntity: CountingCampaign::class, mappedBy: 'createdBy')]
+    private Collection $countingCampaigns;
+
     public function __construct()
     {
         $this->agentsGroups = new ArrayCollection();
         $this->leader = new ArrayCollection();
         $this->environmentalConditions = new ArrayCollection();
+        $this->collectedData = new ArrayCollection();
+        $this->countingCampaigns = new ArrayCollection();
     }
 
     public function setImageFile(?File $imageFile = null): void
@@ -364,6 +379,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($environmentalCondition->getUser() === $this) {
                 $environmentalCondition->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CollectedData>
+     */
+    public function getCollectedData(): Collection
+    {
+        return $this->collectedData;
+    }
+
+    public function addCollectedData(CollectedData $collectedData): static
+    {
+        if (!$this->collectedData->contains($collectedData)) {
+            $this->collectedData->add($collectedData);
+            $collectedData->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCollectedData(CollectedData $collectedData): static
+    {
+        if ($this->collectedData->removeElement($collectedData)) {
+            // set the owning side to null (unless already changed)
+            if ($collectedData->getCreatedBy() === $this) {
+                $collectedData->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CountingCampaign>
+     */
+    public function getCountingCampaigns(): Collection
+    {
+        return $this->countingCampaigns;
+    }
+
+    public function addCountingCampaign(CountingCampaign $countingCampaign): static
+    {
+        if (!$this->countingCampaigns->contains($countingCampaign)) {
+            $this->countingCampaigns->add($countingCampaign);
+            $countingCampaign->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCountingCampaign(CountingCampaign $countingCampaign): static
+    {
+        if ($this->countingCampaigns->removeElement($countingCampaign)) {
+            // set the owning side to null (unless already changed)
+            if ($countingCampaign->getCreatedBy() === $this) {
+                $countingCampaign->setCreatedBy(null);
             }
         }
 

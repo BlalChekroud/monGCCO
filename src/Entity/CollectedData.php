@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\CollectedDataRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,12 +15,6 @@ class CollectedData
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $countNumber = null;
-    
-    #[ORM\Column(nullable: true)]
-    private ?int $totalCount = null;
 
     /**
      * @var Collection<int, BirdSpecies>
@@ -41,38 +35,56 @@ class CollectedData
     #[ORM\OneToOne(mappedBy: 'collectedData', cascade: ['persist', 'remove'])]
     private ?EnvironmentalConditions $environmentalConditions = null;
 
+    #[ORM\ManyToOne(inversedBy: 'collectedData')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?SiteCollection $siteCollection = null;
+
+    #[ORM\ManyToOne(inversedBy: 'collectedData')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $createdBy = null;
+
+    #[ORM\ManyToOne(inversedBy: 'collectedData')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?CountType $countType = null;
+
+    #[ORM\ManyToOne(inversedBy: 'collectedData')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Quality $quality = null;
+
+    /**
+     * @var Collection<int, Method>
+     */
+    #[ORM\ManyToMany(targetEntity: Method::class, inversedBy: 'collectedData')]
+    #[Assert\NotBlank(message: "Veuillez sélectionner au moins une méthode.")]
+    private Collection $method;
+
+    /**
+     * @var Collection<int, BirdSpeciesCount>
+     */
+    #[ORM\OneToMany(targetEntity: BirdSpeciesCount::class, mappedBy: 'collectedData', orphanRemoval: true)]
+    private Collection $birdSpeciesCounts;
+
     public function __construct()
     {
         $this->birdSpecies = new ArrayCollection();
+        $this->method = new ArrayCollection();
+        $this->birdSpeciesCounts = new ArrayCollection();
+    }
+
+    public function getTotalCount(): int
+    {
+        $totalCount = 0;
+        
+        foreach ($this->getBirdSpeciesCounts() as $birdSpeciesCount) {
+            $totalCount += $birdSpeciesCount->getCount();
+        }
+
+        return $totalCount;
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCountNumber(): ?int
-    {
-        return $this->countNumber;
-    }
-
-    public function setCountNumber(?int $countNumber): static
-    {
-        $this->countNumber = $countNumber;
-
-        return $this;
-    }
-
-    public function getTotalCount(): ?int
-    {
-        return $this->totalCount;
-    }
-
-    public function setTotalCount(?int $totalCount): static
-    {
-        $this->totalCount = $totalCount;
-
-        return $this;
     }
 
     /**
@@ -135,6 +147,18 @@ class CollectedData
         return $this;
     }
 
+    public function getSiteCollection(): ?SiteCollection
+    {
+        return $this->siteCollection;
+    }
+
+    public function setSiteCollection(?SiteCollection $siteCollection): static
+    {
+        $this->siteCollection = $siteCollection;
+
+        return $this;
+    }
+
     public function getEnvironmentalConditions(): ?EnvironmentalConditions
     {
         return $this->environmentalConditions;
@@ -148,6 +172,96 @@ class CollectedData
         }
 
         $this->environmentalConditions = $environmentalConditions;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getCountType(): ?CountType
+    {
+        return $this->countType;
+    }
+
+    public function setCountType(?CountType $countType): static
+    {
+        $this->countType = $countType;
+
+        return $this;
+    }
+
+    public function getQuality(): ?Quality
+    {
+        return $this->quality;
+    }
+
+    public function setQuality(?Quality $quality): static
+    {
+        $this->quality = $quality;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Method>
+     */
+    public function getMethod(): Collection
+    {
+        return $this->method;
+    }
+
+    public function addMethod(Method $method): static
+    {
+        if (!$this->method->contains($method)) {
+            $this->method->add($method);
+        }
+
+        return $this;
+    }
+
+    public function removeMethod(Method $method): static
+    {
+        $this->method->removeElement($method);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BirdSpeciesCount>
+     */
+    public function getBirdSpeciesCounts(): Collection
+    {
+        return $this->birdSpeciesCounts;
+    }
+
+    public function addBirdSpeciesCount(BirdSpeciesCount $birdSpeciesCount): static
+    {
+        if (!$this->birdSpeciesCounts->contains($birdSpeciesCount)) {
+            $this->birdSpeciesCounts->add($birdSpeciesCount);
+            $birdSpeciesCount->setCollectedData($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBirdSpeciesCount(BirdSpeciesCount $birdSpeciesCount): static
+    {
+        if ($this->birdSpeciesCounts->removeElement($birdSpeciesCount)) {
+            // set the owning side to null (unless already changed)
+            if ($birdSpeciesCount->getCollectedData() === $this) {
+                $birdSpeciesCount->setCollectedData(null);
+            }
+        }
 
         return $this;
     }

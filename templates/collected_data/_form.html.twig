@@ -1,11 +1,379 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
+    {{ form_errors(form) }}
+    
+    {{ form_row(form.countType) }}
+    {{ form_row(form.quality) }}
+    {{ form_row(form.method) }}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 mb-12">
+                <label>{{ form_label(form.birdSpeciesCounts) }}</label>
+                <div id="birdSpeciesCountsContainer" data-prototype="{{ form_widget(form.birdSpeciesCounts.vars.prototype)|e('html_attr') }}">
+                    {% for birdSpeciesCountForm in form.birdSpeciesCounts %}
+                        <div class="card">
+                            <div class="row">
+                                <div class="col-sm-5 col-md-5 col-lg-5 mb-5">
+                                    {{ form_row(birdSpeciesCountForm.birdSpecies) }}
+                                </div>
+                                <div class="col-sm-2 col-md-2 col-lg-2 mb-2">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-{{ loop.index }}">-</button>
+                                        </div>
+                                        {{ form_widget(birdSpeciesCountForm.count, {'attr': {'id': 'count-' ~ loop.index}}) }}
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-{{ loop.index }}">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                                    <button type="button" class="btn btn-danger remove-item">Supprimer</button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                <button type="button" class="btn btn-primary add-item">Ajouter un oiseau</button>
+            </div>
+        </div>
+    </div>
+
     <div class="row mb-3">
-      <div class="col-sm-3">
-        <button type="reset" class="btn btn-light bi bi-x-square"> Annuler</button>
-      </div>
-      <div class="col-sm-4">
-        <button class="btn btn-outline-primary bi bi-save"> {{ button_label|default('Enregistrer') }}</button>
-      </div>
+        <div class="col-sm-3">
+            <button type="reset" class="btn btn-light">Annuler</button>
+        </div>
+        <div class="col-sm-4">
+            <button class="btn btn-outline-primary">Enregistrer</button>
+        </div>
     </div>
 {{ form_end(form) }}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.querySelector('#birdSpeciesCountsContainer');
+        
+        if (container) {
+            const addButton = document.querySelector('.add-item');
+            const prototype = container.getAttribute('data-prototype');
+            let index = {{ form.birdSpeciesCounts|length }};
+
+            addButton.addEventListener('click', function () {
+                const newForm = prototype.replace(/__name__/g, index);
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(newForm, 'text/html');
+                
+                const birdSpeciesSelect = doc.querySelector('[name*="[birdSpecies]"]').outerHTML;
+                const birdSpeciesCountInput = doc.querySelector('[name*="[count]"]').outerHTML;
+
+                // Update the birdSpeciesCountInput to have a unique ID
+                const updatedBirdSpeciesCountInput = birdSpeciesCountInput.replace(/id="[^"]*"/, `id="count-${index}"`);
+
+                const newFormElement = document.createElement('div');
+                newFormElement.classList.add('col-sm-12', 'col-md-12', 'col-lg-12', 'mb-12');
+                newFormElement.innerHTML = `
+                    <div class="card">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12 mb-12">
+                                ${birdSpeciesSelect}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-md-3 col-lg-3 mb-2">
+                                {# {% if birdSpeciesSelect and birdSpeciesSelect.imageFilename %}
+                                    <img src="{{ vich_uploader_asset(birdSpeciesSelect, 'imageFile') }}" alt="{{ birdSpeciesSelect.frenchName }}" class="card-img-top img-fluid imgCollecte">
+                                {% else %}
+                                    <p>Aucune image disponible</p>
+                                {% endif %} #}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-md-3 col-lg-3 mb-2">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-${index}">-</button>
+                                    </div>
+                                    ${updatedBirdSpeciesCountInput}
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-${index}">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                                <button type="button" class="btn btn-danger remove-item">Supprimer</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(newFormElement);
+                index++;
+
+                // Attach event listener to the new remove button
+                newFormElement.querySelector('.remove-item').addEventListener('click', function () {
+                    newFormElement.remove();
+                });
+
+                // Attach event listeners to increase and decrease buttons
+                attachIncreaseDecreaseListeners(newFormElement);
+            });
+
+            // Initial attach of listeners to existing remove buttons
+            document.querySelectorAll('.remove-item').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    button.closest('.col-sm-12').remove();
+                });
+            });
+
+            // Attach event listeners to increase and decrease buttons
+            function attachIncreaseDecreaseListeners(element) {
+                element.querySelectorAll('.increaseButton').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        const targetId = button.getAttribute('data-target');
+                        const input = document.getElementById(targetId);
+                        if (input) {
+                            let value = parseInt(input.value, 10);
+                            if (isNaN(value)) {
+                                value = 0; // Initialize to 0 if NaN
+                            }
+                            input.value = value + 1;
+                        }
+                    });
+                });
+
+                element.querySelectorAll('.decreaseButton').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        const targetId = button.getAttribute('data-target');
+                        const input = document.getElementById(targetId);
+                        if (input) {
+                            let value = parseInt(input.value, 10);
+                            if (isNaN(value)) {
+                                value = 0; // Initialize to 0 if NaN
+                            }
+                            input.value = Math.max(value - 1, 0); // Ensure value doesn't go below 0
+                        }
+                    });
+                });
+            }
+
+            // Initial attach of listeners to existing elements
+            attachIncreaseDecreaseListeners(document);
+        }
+    });
+</script>
+{# {{ form_start(form) }}
+    {{ form_errors(form) }}
+    
+    {{ form_row(form.countType) }}
+    {{ form_row(form.quality) }}
+    {{ form_row(form.method) }}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 mb-12">
+                <label>{{ form_label(form.birdSpeciesCounts) }}</label>
+                <div id="birdSpeciesCountsContainer" data-prototype="{{ form_widget(form.birdSpeciesCounts.vars.prototype)|e('html_attr') }}">
+                    {% for birdSpeciesCountForm in form.birdSpeciesCounts %}
+                        <div class="card" data-index="{{ loop.index }}">
+                            <div class="row">
+                                <div class="col-sm-5 col-md-5 col-lg-5 mb-5">
+                                    {{ form_row(birdSpeciesCountForm.birdSpecies, {'attr': {'class': 'bird-species-select', 'data-index': loop.index}}) }}
+                                    <img id="image-{{ loop.index }}" class="card-img-top img-fluid imgCollecte" alt="" style="display: none;">
+                                    <img src="{{ vich_uploader_asset(bird_specy, 'imageFile') }}" alt="{{ bird_specy.frenchName }}" class="card-img-top img-fluid imgCollecte">
+                                    <img src="/images/bird_Specy/im1-66a17ca608017336419805.jpeg" alt="Test Image" />
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-2 col-md-2 col-lg-2 mb-2">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-{{ loop.index }}">-</button>
+                                        </div>
+                                        {{ form_widget(birdSpeciesCountForm.count, {'attr': {'id': 'count-' ~ loop.index}}) }}
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-{{ loop.index }}">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                                    <button type="button" class="btn btn-danger remove-item">Supprimer</button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                <button type="button" class="btn btn-primary add-item">Ajouter un oiseau</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-sm-3">
+            <button type="reset" class="btn btn-light">Annuler</button>
+        </div>
+        <div class="col-sm-4">
+            <button class="btn btn-outline-primary">Enregistrer</button>
+        </div>
+    </div>
+{{ form_end(form) }}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.querySelector('#birdSpeciesCountsContainer');
+
+        if (container) {
+            const addButton = document.querySelector('.add-item');
+            const prototype = container.getAttribute('data-prototype');
+            let index = {{ form.birdSpeciesCounts|length }};
+
+            if (addButton) {
+                addButton.addEventListener('click', function () {
+                    const newForm = prototype.replace(/__name__/g, index);
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(newForm, 'text/html');
+                    
+                    const birdSpeciesSelect = doc.querySelector('[name*="[birdSpecies]"]').outerHTML;
+                    const birdSpeciesCountInput = doc.querySelector('[name*="[count]"]').outerHTML;
+                    const birdSpeciesSelectId = `birdSpecies-${index}`;
+                    const birdSpeciesImageId = `image-${index}`;
+                    
+                    // Update the birdSpeciesCountInput to have a unique ID
+                    const updatedBirdSpeciesCountInput = birdSpeciesCountInput.replace(/id="[^"]*"/, `id="count-${index}"`);
+
+                    const newFormElement = document.createElement('div');
+                    newFormElement.classList.add('col-sm-12', 'col-md-12', 'col-lg-12', 'mb-12');
+                    newFormElement.innerHTML = `
+                        <div class="card" data-index="${index}">
+                            <div class="row">
+                                <div class="col-sm-5 col-md-5 col-lg-5 mb-5">
+                                    ${birdSpeciesSelect}
+                                    <img id="${birdSpeciesImageId}" class="card-img-top img-fluid imgCollecte" alt="" style="display: none;">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-2 col-md-2 col-lg-2 mb-2">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-${index}">-</button>
+                                        </div>
+                                        ${updatedBirdSpeciesCountInput}
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-${index}">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                                    <button type="button" class="btn btn-danger remove-item">Supprimer</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(newFormElement);
+                    index++;
+
+                    // Attach event listener to the new remove button
+                    const removeButton = newFormElement.querySelector('.remove-item');
+                    if (removeButton) {
+                        removeButton.addEventListener('click', function () {
+                            newFormElement.remove();
+                        });
+                    }
+
+                    // Attach event listeners to increase and decrease buttons
+                    attachIncreaseDecreaseListeners(newFormElement);
+
+                    // Attach event listener to the new bird species select
+                    const newSelect = newFormElement.querySelector('.bird-species-select');
+                    if (newSelect) {
+                        newSelect.addEventListener('change', function () {
+                            updateImage(newSelect);
+                        });
+                    }
+                });
+            }
+
+            // Initial attach of listeners to existing remove buttons
+            document.querySelectorAll('.remove-item').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    button.closest('.col-sm-12').remove();
+                });
+            });
+
+            // Attach event listeners to increase and decrease buttons
+            function attachIncreaseDecreaseListeners(element) {
+                element.querySelectorAll('.increaseButton').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        const targetId = button.getAttribute('data-target');
+                        const input = document.getElementById(targetId);
+                        if (input) {
+                            let value = parseInt(input.value, 10);
+                            if (isNaN(value)) {
+                                value = 0; // Initialize to 0 if NaN
+                            }
+                            input.value = value + 1;
+                        }
+                    });
+                });
+
+                element.querySelectorAll('.decreaseButton').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        const targetId = button.getAttribute('data-target');
+                        const input = document.getElementById(targetId);
+                        if (input) {
+                            let value = parseInt(input.value, 10);
+                            if (isNaN(value)) {
+                                value = 0; // Initialize to 0 if NaN
+                            }
+                            input.value = Math.max(value - 1, 0); // Ensure value doesn't go below 0
+                        }
+                    });
+                });
+            }
+
+            // Update the image based on selected bird species
+            function updateImage(selectElement) {
+                const index = selectElement.closest('.card').getAttribute('data-index');
+                const selectedValue = selectElement.value;
+                const imageElement = document.getElementById(`image-${index}`);
+                console.log('Updating image for index:', index); // Debugging statement
+
+                if (selectedValue) {
+                    fetch(`/bird/species/${selectedValue}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.imageFilename) {
+                                const imagePath = `/images/bird_Specy/${data.imageFilename}`;
+                                console.log('Setting image source to:', imagePath); // Debugging statement
+                                imageElement.src = imagePath;
+                                imageElement.alt = data.frenchName;
+                                imageElement.style.display = 'block';
+                            } else {
+                                imageElement.style.display = 'none';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching bird species data:', error);
+                        });
+                } else {
+                    imageElement.style.display = 'none';
+                }
+            }
+
+            // Initial attach of listeners to existing selects
+            document.querySelectorAll('.bird-species-select').forEach(function (select) {
+                select.addEventListener('change', function () {
+                    updateImage(select);
+                });
+            });
+        }
+    });
+
+</script> #}
+

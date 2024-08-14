@@ -1,38 +1,91 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Country{% endblock %}
+{% block title %}Pays{% endblock %}
 
 {% block body %}
-    <h1>Country</h1>
+<main id="main" class="main">
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ country.id }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ country.name }}</td>
-            </tr>
-            <tr>
-                <th>Iso2</th>
-                <td>{{ country.iso2 }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ country.createdAt ? country.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>UpdatedAt</th>
-                <td>{{ country.updatedAt ? country.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="pagetitle">
+      <h1>Détail du pays</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_country_index') }}">Gestion des pays</a></li>
+          <li class="breadcrumb-item active">Détail</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_country_index') }}">back to list</a>
+    <section class="section">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                     <div id="printableArea">
+                        <h5 class="card-title">Détail</h5>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Nom du pays :</th>
+                                    <td>{{ country.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Code ISO2 :</th>
+                                    <td>{{ country.iso2 }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Les villes :</th>
+                                    <td>
+                                        {% if country.city|length > 0 %}
+                                            {% set sorted_cities = country.city|sort((a, b) => a.name <=> b.name) %}
+                                            <ul>
+                                                {% for city in sorted_cities %}
+                                                    <li>{{ city.name }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p>Aucune ville</p>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Crée le</th>
+                                    <td>{{ country.createdAt ? country.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Dernière mise à jour le</th>
+                                    <td>{{ country.updatedAt ? country.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                     </div>
 
-    <a href="{{ path('app_country_edit', {'id': country.id}) }}">edit</a>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justtify-content-end">
+                                <a href="{{ path('app_country_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-1"> retour vers la liste</a>
+                                <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter un nouveau pays</a>
+                                <a href="{{ path('app_country_edit', {'id': country.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
+                                {{ include('country/_delete_form.html.twig') }}
+                            </div>
 
-    {{ include('country/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <div class="alert border-light alert-dismissible fade show" role="alert">
+      <!-- Card with header and footer -->
+      <div class="card">
+        <div class="card-footer">
+          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div><!-- End Card with header and footer -->
+    </div>
+</main>
 {% endblock %}

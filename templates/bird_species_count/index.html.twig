@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BirdSpeciesCount index{% endblock %}
+
+{% block body %}
+    <h1>BirdSpeciesCount index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Count</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for bird_species_count in bird_species_counts %}
+            <tr>
+                <td>{{ bird_species_count.id }}</td>
+                <td>{{ bird_species_count.count }}</td>
+                <td>
+                    <a href="{{ path('app_bird_species_count_show', {'id': bird_species_count.id}) }}">show</a>
+                    <a href="{{ path('app_bird_species_count_edit', {'id': bird_species_count.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_bird_species_count_new') }}">Create new</a>
+{% endblock %}

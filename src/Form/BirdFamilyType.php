@@ -16,8 +16,8 @@ class BirdFamilyType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('ordre')
             ->add('familyName')
+            ->add('ordre')
             ->add('family')
             ->add('subFamily')
             ->add('tribe')

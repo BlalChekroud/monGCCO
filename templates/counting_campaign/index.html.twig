@@ -46,42 +46,42 @@
                         <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y') : '' }}</td>
                         <td>
                           {% if counting_campaign.campaignStatus.label == 'En attente' %}
-                            <div class="btn-action btn btn-info" role="status">
+                            <div class="btn-status btn btn-info" role="status">
                               <i class="bi bi-circle-fill"></i>
                               {{ counting_campaign.campaignStatus.label }}
                             </div>
                             {% elseif counting_campaign.campaignStatus.label == 'En cours' %}
-                              <div class="btn btn-primary" role="status">
+                              <div class="btn-status btn btn-primary" role="status">
                                 <i class="bi bi-circle-fill"></i>
                                 {{ counting_campaign.campaignStatus.label }}
                               </div>
                             {% elseif counting_campaign.campaignStatus.label == 'Terminé' %}
-                              <div class="btn-action btn btn-success">
+                              <div class="btn-status btn btn-success">
                                 <i class="bi bi-check-circle"> </i>
                               </div>
                               {{ counting_campaign.campaignStatus.label }}
                             {% elseif counting_campaign.campaignStatus.label == 'Annulé' %}
-                              <div class="btn btn-dark">
+                              <div class="btn-status btn btn-dark">
                                 <i class="bi bi-x-lg"> </i>
                                 {{ counting_campaign.campaignStatus.label }}
                               </div>
                             {% elseif counting_campaign.campaignStatus.label == 'Erreur' %}
-                              <div class="btn btn-warning">
+                              <div class="btn-status btn btn-warning">
                                  <i class="bi bi-exclamation-triangle"> </i>
                                  {{ counting_campaign.campaignStatus.label }}
                               </div>
                             {% elseif counting_campaign.campaignStatus.label == 'Validé' %}
-                             <div class="btn btn-success">
+                             <div class="btn-status btn btn-success">
                                 <i class="bi bi-check-circle"> </i>
                                 {{ counting_campaign.campaignStatus.label }}
                               </div>
                             {% elseif counting_campaign.campaignStatus.label == 'Rejeté' %}
-                              <div class="btn btn-danger">
+                              <div class="btn-status btn btn-danger">
                                 <i class="bi bi-exclamation-triangle"> </i>
                                 {{ counting_campaign.campaignStatus.label }}
                               </div>
                             {% elseif counting_campaign.campaignStatus.label == 'Suspens' %}
-                              <div class="btn btn-secondary" role="status">
+                              <div class="btn-status btn btn-secondary" role="status">
                                 <i class="bi bi-circle-fill"></i>
                                 {{ counting_campaign.campaignStatus.label }}
                               </div>

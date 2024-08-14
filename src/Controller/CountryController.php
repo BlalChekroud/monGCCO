@@ -31,11 +31,21 @@ class CountryController extends AbstractController
         $form = $this->createForm(CountryType::class, $country);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($country);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                // Ajout de vérifications supplémentaires avant de persister l'entité
+                if (empty($country->getName()) || empty($country->getIso2())) {
+                    $this->addFlash('error', 'Le nom et le code ISO doivent être remplis.');
+                    return $this->redirectToRoute('app_country_new');
+                }
+                $country->setCreatedAt(new \DateTimeImmutable());
+                $entityManager->persist($country);
+                $entityManager->flush();
+                $this->addFlash('success', "Le pays a bien été crée");
+                return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error',"Une erreur s'est produite lors de la création du pays.");
+            }
         }
 
         return $this->render('country/new.html.twig', [
@@ -58,10 +68,15 @@ class CountryController extends AbstractController
         $form = $this->createForm(CountryType::class, $country);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $country->setUpdatedAt(new \DateTimeImmutable());
+                $entityManager->flush();
+                $this->addFlash('success', "Le pays a bien été modifié");
+                return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error',"Une erreur s'est produite lors de la modification du pays.");
+            }
         }
 
         return $this->render('country/edit.html.twig', [
@@ -76,6 +91,9 @@ class CountryController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$country->getId(), $request->getPayload()->get('_token'))) {
             $entityManager->remove($country);
             $entityManager->flush();
+            $this->addFlash('success', "Le pays a bien été supprimé");
+        } else {
+            $this->addFlash('error', "Une erreur est survenue");
         }
 
         return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);

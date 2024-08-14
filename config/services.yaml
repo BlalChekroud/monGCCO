@@ -11,6 +11,9 @@ services:
     App\Service\FileUploader:
         arguments:
             $targetDirectory: '%csvs_directory%'
+
+    App\Validator\PasswordMatchValidator:
+        tags: ['validator.constraint_validator']
             
     # Définir le service CsvUploader
     # App\Service\FileUploader\CsvUploader:

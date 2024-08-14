@@ -1,11 +1,45 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New City{% endblock %}
+{% block title %}Nouvelle ville{% endblock %}
 
 {% block body %}
-    <h1>Create new City</h1>
+  <main id="main" class="main">
 
-    {{ include('city/_form.html.twig') }}
+    <div class="pagetitle">
+      <h1>Ajouter une nouvelle ville</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_city_index') }}">Gestion des villes</a></li>
+          <li class="breadcrumb-item active">Création</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_city_index') }}">back to list</a>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Informations sur la nouvelle ville</h5>
+
+              {{ include('city/_form.html.twig') }}
+
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_city_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
+              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-3">
+                Ajouter un nouveau pays
+              </a>
+              <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Ajouter une nouvelle site de collection</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
 {% endblock %}

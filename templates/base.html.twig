@@ -35,7 +35,7 @@
       {% endblock %}
 
       {% block javascripts %}
-          {% block importmap %}{{ importmap('app') }}{% endblock %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
       {% endblock %}
   </head>
 
@@ -74,11 +74,92 @@
             </a>
           </li><!-- End Search Icon-->
 
-          {% set notifications = app.flashes %}
+          {% set notifications = app.flashes %}     
+          <script>
+            {% for type, messages in notifications %}
+                {% for message in messages %}
+                    {% if type == 'success' %}
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "success",
+                            title: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    {% elseif type == 'warning' %}
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Attention",
+                            text: "{{ message }}"
+                        });
+                    {% elseif type == 'danger' %}
+                        Swal.fire({
+                            icon: "danger",
+                            title: "Danger",
+                            text: "{{ message }}"
+                        });
+                    {% elseif type == 'error' %}
+                        Swal.fire({
+                            icon: "error",
+                            title: "Erreur",
+                            text: "{{ message }}"
+                        });
+                    {% else %}
+                        Swal.fire({
+                            icon: "info",
+                            title: "Info",
+                            text: "{{ message }}"
+                        });
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+          </script>
+          {# <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+              {% for type, messages in notifications %}
+                  {% for message in messages %}
+                      {% if type == 'success' %}
+                          Swal.fire({
+                              position: "top-end",
+                              icon: "success",
+                              title: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 3000
+                          });
+                      {% elseif type == 'warning' %}
+                          Swal.fire({
+                              icon: "warning",
+                              title: "Attention",
+                              text: "{{ message }}"
+                          });
+                      {% elseif type == 'danger' %}
+                          Swal.fire({
+                              icon: "danger",
+                              title: "Danger",
+                              text: "{{ message }}"
+                          });
+                      {% elseif type == 'error' %}
+                          Swal.fire({
+                              icon: "error",
+                              title: "Erreur",
+                              text: "{{ message }}"
+                          });
+                      {% else %}
+                          Swal.fire({
+                              icon: "info",
+                              title: "Info",
+                              text: "{{ message }}"
+                          });
+                      {% endif %}
+                  {% endfor %}
+              {% endfor %}
+            });
+          </script> #}
+          
           <li class="nav-item dropdown">
               <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                   <i class="bi bi-bell"></i>
-                  {% if notifications %}
+                  {# {% if notifications %}
                     {% for type, messages in notifications %}
                       {% for message in messages %}
                         {% if type == 'success' %}
@@ -94,7 +175,7 @@
                         {% endif %}
                       {% endfor %}
                     {% endfor %}
-                  {% endif %}
+                  {% endif %} #}
               </a><!-- End Notification Icon -->
               <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
                   <li class="dropdown-header">
@@ -105,7 +186,7 @@
                       <hr class="dropdown-divider">
                   </li>
 
-                  {% for type, messages in notifications %}
+                  {# {% for type, messages in notifications %}
                       {% for message in messages %}
                           <li class="notification-item">
                               {% if type == 'warning' %}
@@ -122,14 +203,14 @@
                               <div>
                                   <h4>{{ type|capitalize }}</h4>
                                   <p>{{ message }}</p>
-                                  <p>{{ 'now'|date_modify('-' ~ loop.index * 30 ~ ' minutes')|date('H:i') }}</p>
+                                  <p>{{ 'now'|date('H:i') }}</p>
                               </div>
                           </li>
                           <li>
                               <hr class="dropdown-divider">
                           </li>
                       {% endfor %}
-                  {% endfor %}
+                  {% endfor %} #}
                   
                   <li class="dropdown-footer">
                       <a href="{{ path('all_notifications') }}">Afficher toutes les notifications</a>
@@ -402,11 +483,6 @@
               </a>
             </li>
             <li>
-              <a href="{{ path('app_environmental_conditions_new') }}">
-                <i class="bi bi-circle"></i><span>Créer conditions d'environnement</span>
-              </a>
-            </li>
-            <li>
               <a href="{{ path('app_environmental_conditions_index') }}">
                 <i class="bi bi-circle"></i><span>Consultation des conditions d'environnement</span>
               </a>
@@ -488,7 +564,7 @@
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="{{ asset('./js/sweetalert2.all.js') }}"></script>
 
   </body>
 

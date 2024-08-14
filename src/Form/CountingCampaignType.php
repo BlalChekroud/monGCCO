@@ -24,21 +24,25 @@ class CountingCampaignType extends AbstractType
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control'],
                 'label' => 'Date de début',
+                'required' => true
             ])
             ->add('endDate', DateTimeType::class, [
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control'],
-                'label' => 'Date de fin'
+                'label' => 'Date de fin',
+                'required' => true
             ])
             ->add('agentsGroups', EntityType::class, [
                 'class' => AgentsGroup::class,
-                'label' => 'Groupe(s):',
+                'label' => 'Groupe(s):<span class="requiredField">*</span>',
+                'label_html' => true,
                 'required' => true,
                 'choice_label' => function (AgentsGroup $agentsGroup) {
                     return $agentsGroup->getGroupName() . ' / ' . $agentsGroup->getLeader()->getName() . ' ' . $agentsGroup->getLeader()->getLastName();
                 },
-                'expanded' => true,
+                // 'expanded' => true,
                 'multiple' => true,
+                'autocomplete' => true,
                 'query_builder' => function (AgentsGroupRepository $repository) {
                     return $repository->createQueryBuilder('b')
                         ->orderBy('b.groupName', 'ASC'); // Or any other field you want to sort by
@@ -46,12 +50,14 @@ class CountingCampaignType extends AbstractType
             ])
             ->add('siteCollection', EntityType::class, [
                 'class' => SiteCollection::class,
-                'label' => 'Sites de collection',
+                'label' => 'Sites de collection:<span class="requiredField">*</span>',
+                'label_html' => true,
+                'autocomplete' => true,
                 'required' => true,
                 'choice_label' => function (SiteCollection $siteCollection) {
                     return $siteCollection->getSiteName() . ' (' . $siteCollection->getCity()->getName() . ' / ' . $siteCollection->getCity()->getCountry()->getName() . ' )';
                 },
-                'expanded' => true,
+                // 'expanded' => true,
                 'multiple' => true,
                 'query_builder' => function (SiteCollectionRepository $repository) {
                     return $repository->createQueryBuilder('b')
@@ -62,6 +68,9 @@ class CountingCampaignType extends AbstractType
                 'class' => CampaignStatus::class,
                 'choice_label' => 'label',
                 'required' => true,
+                'attr' => [
+                    'readonly' => true,
+                ],
             ])
             ->add('description',TextareaType::class, [
                 'label' => 'Description',

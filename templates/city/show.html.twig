@@ -1,42 +1,80 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}City{% endblock %}
+{% block title %}Ville{% endblock %}
 
 {% block body %}
-    <h1>City</h1>
+<main id="main" class="main">
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ city.id }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ city.name }}</td>
-            </tr>
-            <tr>
-                <th>Latitude</th>
-                <td>{{ city.latitude }}</td>
-            </tr>
-            <tr>
-                <th>Longitude</th>
-                <td>{{ city.longitude }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ city.createdAt ? city.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>UpdatedAt</th>
-                <td>{{ city.updatedAt ? city.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="pagetitle">
+      <h1>Détails de la ville</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_city_index') }}">Gestion des villes</a></li>
+          <li class="breadcrumb-item active">Détail</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_city_index') }}">back to list</a>
+    <section class="section">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                     <div id="printableArea">
+                        <h5 class="card-title">Détail</h5>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th>Nom de la ville :</th>
+                                        <td>{{ city.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Latitude :</th>
+                                        <td>{{ city.latitude }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Longitude :</th>
+                                        <td>{{ city.longitude }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Crée le :</th>
+                                        <td>{{ city.createdAt ? city.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Dernière mise à jour le</th>
+                                        <td>{{ city.updatedAt ? city.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                     </div>
 
-    <a href="{{ path('app_city_edit', {'id': city.id}) }}">edit</a>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justtify-content-end">
+                                <a href="{{ path('app_city_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-1"> retour vers la liste</a>
+                                <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter un nouveau pays</a>
+                                <a href="{{ path('app_city_edit', {'id': city.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
+                                {{ include('city/_delete_form.html.twig') }}
+                            </div>
 
-    {{ include('city/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <div class="alert border-light alert-dismissible fade show" role="alert">
+      <!-- Card with header and footer -->
+      <div class="card">
+        <div class="card-footer">
+          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div><!-- End Card with header and footer -->
+    </div>
+</main>
 {% endblock %}

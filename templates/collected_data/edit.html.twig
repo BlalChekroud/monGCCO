@@ -3,22 +3,14 @@
 {% block title %}Modification de données collectées{% endblock %}
 
 {% block body %}
-    <h1>Modification de données collectées</h1>
-
-    {{ include('collected_data/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_collected_data_index') }}">back to list</a>
-
-    {{ include('collected_data/_delete_form.html.twig') }}
-
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Modification de la campagne</h1>
+      <h1>Modification de données collectées</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_collected_data_index') }}">Gestion des campagnes</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_collected_data_index') }}">Gestion des données collectées</a></li>
           <li class="breadcrumb-item active">Modification</li>
         </ol>
       </nav>
@@ -26,7 +18,7 @@
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-10">
+            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
 
                 <div class="card">
                     <div class="card-body">
@@ -37,13 +29,13 @@
                         {{ include('collected_data/_form.html.twig', {'button_label': ' Mise à jour'}) }}<br/>
                         
                         <div class="row">
-                            <div class="col-lg-4">
+                            <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
                                 <a href="{{ path('app_collected_data_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
                                 {{ include('collected_data/_delete_form.html.twig') }}
                             </div>
-                            <div class="col-lg-5">
+                            <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
                                 <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-fill">
                                     Créer une nouvelle campagne
                                 </a>

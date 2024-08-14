@@ -36,42 +36,42 @@
                                     <th>Etat de la campagne</th>
                                     <td>
                                         {% if counting_campaign.campaignStatus.label == 'En attente' %}
-                                            <div class="btn-action btn btn-info" role="status">
+                                            <div class="btn-status btn btn-info" role="status">
                                             <i class="bi bi-circle-fill"></i>
                                             {{ counting_campaign.campaignStatus.label }}
                                             </div>
                                             {% elseif counting_campaign.campaignStatus.label == 'En cours' %}
-                                            <div class="btn btn-primary" role="status">
+                                            <div class="btn-status btn btn-primary" role="status">
                                                 <i class="bi bi-circle-fill"></i>
                                                 {{ counting_campaign.campaignStatus.label }}
                                             </div>
                                             {% elseif counting_campaign.campaignStatus.label == 'Terminé' %}
-                                            <div class="btn btn-success">
+                                            <div class="btn-status btn btn-success">
                                                 <i class="bi bi-check-circle"> </i>
                                             </div>
                                             {{ counting_campaign.campaignStatus.label }}
                                             {% elseif counting_campaign.campaignStatus.label == 'Annulé' %}
-                                            <div class="btn btn-dark">
+                                            <div class="btn-status btn btn-dark">
                                                 <i class="bi bi-x-lg"> </i>
                                                 {{ counting_campaign.campaignStatus.label }}
                                             </div>
                                             {% elseif counting_campaign.campaignStatus.label == 'Erreur' %}
-                                            <div class="btn btn-warning">
+                                            <div class="btn-status btn btn-warning">
                                                 <i class="bi bi-exclamation-triangle"> </i>
                                                 {{ counting_campaign.campaignStatus.label }}
                                             </div>
                                             {% elseif counting_campaign.campaignStatus.label == 'Validé' %}
-                                            <div class="btn btn-success">
+                                            <div class="btn-status btn btn-success">
                                                 <i class="bi bi-check-circle"> </i>
                                                 {{ counting_campaign.campaignStatus.label }}
                                             </div>
                                             {% elseif counting_campaign.campaignStatus.label == 'Rejeté' %}
-                                            <div class="btn btn-danger">
+                                            <div class="btn-status btn btn-danger">
                                                 <i class="bi bi-exclamation-triangle"> </i>
                                                 {{ counting_campaign.campaignStatus.label }}
                                             </div>
                                             {% elseif counting_campaign.campaignStatus.label == 'Suspens' %}
-                                            <div class="btn btn-secondary" role="status">
+                                            <div class="btn-status btn btn-secondary" role="status">
                                                 <i class="bi bi-circle-fill"></i>
                                                 {{ counting_campaign.campaignStatus.label }}
                                             </div>
@@ -95,6 +95,14 @@
                                 <tr>
                                     <th>Dernière mise à jour le</th>
                                     <td>{{ counting_campaign.updatedAt ? counting_campaign.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Crée par</th>
+                                    <td>{{ counting_campaign.createdBy.name }} {{ counting_campaign.createdBy.lastName }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Description</th>
+                                    <td>{{ counting_campaign.description }}</td>
                                 </tr>
                                 <tr>
                                     <th>Groupes</th>
@@ -141,7 +149,7 @@
                                             <thead>
                                             {% set sorted_sites = counting_campaign.siteCollection|sort((a, b) => a.siteName <=> b.siteName) %}
                                             <tr>
-                                                <th scope="col">Site</th>
+                                                <th scope="col">Nom du site</th>
                                                 <th scope="col">Ville/Pays</th>
                                                 <th scope="col">Action</th>
                                             </tr>
@@ -156,59 +164,25 @@
                                                                 {% set currentDate = "now"|date('d-m-Y H:i:s') %}
 
                                                                 {% if counting_campaign.startDate|date('d-m-Y H:i:s') <= currentDate %}
-                                                                
-                                                                {% set sites = counting_campaign.siteCollection %}
-                                                                    {% if sites == counting_campaign.environmentalConditions %}
-                                                                        <a href="{{ path('app_collected_data_new') }}" class="btn btn-primary btn-lg">Collecter <i class="bi bi-arrow-bar-right"><div class="spinner-grow spinner-grow-sm text-light" role="status"></div></i></a>
+                                                                    {% if existingConditions[site.id] is not empty %}
+                                                                        <a href="{{ path('app_collected_data_new') }}" class="btn btn-primary btn-lg">
+                                                                            Collecter <i class="bi bi-arrow-bar-right">
+                                                                                <div class="spinner-grow spinner-grow-sm text-light" role="status"></div>
+                                                                            </i>
+                                                                        </a>
                                                                     {% else %}
-                                                                        <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-warning btn-lg">Ajouter Conditions Environnementales</a>
+                                                                        <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-warning btn-lg">
+                                                                            Ajouter Conditions Environnementales de collecte
+                                                                        </a>
                                                                     {% endif %}
-                                                                {% else %}
-                                                                    <code>Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</code>
+                                                                {# {% else %}
+                                                                    <code>
+                                                                        Vous ne pouvez pas commencer à collecter avant : 
+                                                                        {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}
+                                                                    </code> #}
                                                                 {% endif %}
                                                             </div>
                                                         </td>
-{# <td>
-    <div class="col text-end">
-        {% set currentDate = "now"|date('d-m-Y H:i:s') %}
-        {% set startDate = counting_campaign.startDate|date('d-m-Y H:i:s') %}
-        
-        {% if startDate <= currentDate %}
-            {% for site in counting_campaign.siteCollection %}
-                {% set hasEnvironmentalConditions = site.getEnvironmentalConditions|length > 0 %}
-                
-                {% if hasEnvironmentalConditions %}
-                    <a href="{{ path('app_collected_data_new', {'siteId': site.id}) }}" class="btn btn-primary btn-lg">Collecter pour site {{ site.name }} <i class="bi bi-arrow-bar-right"><div class="spinner-grow spinner-grow-sm text-light" role="status"></div></i></a>
-                {% else %}
-                    <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-warning btn-lg">Ajouter Conditions Environnementales pour site {{ site.name }}</a>
-                {% endif %}
-            {% endfor %}
-        {% else %}
-            <code>Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</code>
-        {% endif %}
-    </div>
-</td> #}
-
-
-
-                                                        
-                                                        {# <td>
-                                                            <div class="col text-end">
-                                                                {% set currentDate = "now"|date('d-m-Y H:i:s') %}
-                                                                {% set user = app.user %}
-                                                                {% set environmentalConditionsExist = environmental_conditions_repository.findOneBy({'user': user}) is not null %}
-
-                                                                {% if counting_campaign.startDate|date('d-m-Y H:i:s') <= currentDate %}
-                                                                    {% if environmentalConditionsExist %}
-                                                                        <a href="{{ path('app_collected_data_new', {'id': counting_campaign.id} {'siteId': site.id}) }}" class="btn btn-primary btn-lg">Collecter <i class="bi bi-arrow-bar-right"><div class="spinner-grow spinner-grow-sm text-light" role="status"></div></i></a>
-                                                                    {% else %}
-                                                                        <a href="{{ path('app_environmental_conditions_new') }}" class="btn btn-warning btn-lg">Ajouter Conditions Environnementales</a>
-                                                                    {% endif %}
-                                                                {% else %}
-                                                                    <code>Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</code>
-                                                                {% endif %}
-                                                            </div>
-                                                        </td> #}
                                                     </tr>
                                                 {% else %}
                                                     <tr>
@@ -220,20 +194,17 @@
                                     </td>
                                 </tr>
                             </tbody>
-                        </table>                        
+                        </table>
                     </div>
                   </div>
                     <div class="card-footer">
                         <div class="row">
-                            {# <div class="col text-end">
+                            <div class="col text-end my-4">
                                 {% set currentDate = "now"|date('d-m-Y H:i:s') %}
-
-                                {% if counting_campaign.startDate|date('d-m-Y H:i:s') <= currentDate %}
-                                    <a href="{{ path('app_collected_data_new') }}" class="btn btn-primary btn-lg">Collecter <i class="bi bi-arrow-bar-right"><div class="spinner-grow spinner-grow-sm text-light" role="status"></div></i></a>
-                                {% else %}
+                                {% if counting_campaign.startDate|date('d-m-Y H:i:s') > currentDate %}
                                     <code>Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</code>
                                 {% endif %}
-                            </div> #}
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justtify-content-end">

@@ -6,6 +6,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Repository\CountryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
@@ -18,9 +19,12 @@ class Country
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $name = null;
 
     #[ORM\Column(length: 2)]
+    #[Assert\Length(min: 2, max: 2, exactMessage: 'Le code ISO doit avoir exactement {{ limit }} caractères.')]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $iso2 = null;
 
     #[ORM\Column]

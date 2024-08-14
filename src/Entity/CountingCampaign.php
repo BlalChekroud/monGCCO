@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CountingCampaignRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -17,12 +18,15 @@ class CountingCampaign
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    // #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $campaignName = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?\DateTimeImmutable $endDate = null;
 
     #[ORM\Column]
@@ -62,6 +66,10 @@ class CountingCampaign
     #[ORM\OneToMany(targetEntity: EnvironmentalConditions::class, mappedBy: 'countingCampaign', orphanRemoval: true)]
     private Collection $environmentalConditions;
 
+    #[ORM\ManyToOne(inversedBy: 'countingCampaigns')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $createdBy = null;
+
     public function __construct()
     {
         $this->siteCollection = new ArrayCollection();
@@ -72,9 +80,17 @@ class CountingCampaign
 
     public function generateCampaignName(): void
     {
-        if ($this->getStartDate() === null || $this->getEndDate() === null) {
-            throw new \InvalidArgumentException('Les dates de début et de fin doivent être définies pour générer le nom de la campagne.');
+        $startDate = $this->getStartDate();
+        $endDate = $this->getEndDate();
+
+        if ($startDate === null || $endDate === null) {
+            throw new \InvalidArgumentException('Les dates de début et de fin ne peuvent pas être les mêmes.');
         }
+        
+        if ($startDate->format('Y-m-d H:i:s') === $endDate->format('Y-m-d H:i:s')) {
+            throw new \InvalidArgumentException('Les dates de début et de fin ne peuvent pas être les mêmes.');
+        }
+
         if (!$this->getSiteCollection()) {
             throw new \InvalidArgumentException('Les sites doivent être définies pour générer le nom de la campagne.');
         }
@@ -295,6 +311,18 @@ class CountingCampaign
                 $environmentalCondition->setCountingCampaign(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

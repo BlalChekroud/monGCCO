@@ -2,20 +2,13 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use App\Form\ImportCsvType;
-use App\Service\FileUploader;
-
-use Monolog\DateTimeImmutable;
 use DateTime;
-use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use App\Form\CoverageType;
 use App\Form\BirdLifeTaxTreatType;
 use App\Form\IucnRedListCategoryType;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-
 use App\Entity\BirdSpecies;
 use App\Entity\BirdFamily;
 use App\Entity\Coverage;
@@ -55,11 +48,7 @@ class BirdSpeciesController extends AbstractController
                     return $this->redirectToRoute('app_bird_species_index');
                 }
             } else {
-                // Log the errors for debugging
-                foreach ($form->getErrors(true) as $error) {
-                    error_log($error->getMessage());
-                }
-                $this->addFlash('error','Une erreur s\'est produite lors de l\'importation');
+                $this->addFlash('error','Le fichier CSV contient des erreurs de validation.');
             }
         }
         return $this->render('bird_species/index.html.twig', [
@@ -420,7 +409,7 @@ class BirdSpeciesController extends AbstractController
                         $birdFamily->setFamily($data['Family'] ?? null);
                         $birdFamily->setSubFamily($data['Subfamily'] ?? null);
                         $birdFamily->setTribe($data['Tribe'] ?? null);
-                        $birdFamily->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                        $birdFamily->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
                 
                         $entityManager->persist($birdFamily);
                     }
@@ -436,7 +425,7 @@ class BirdSpeciesController extends AbstractController
                     if (!$coverage) {
                         $coverage = new Coverage();
                         $coverage->setLabel($coverageName);
-                        $coverage->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                        $coverage->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
         
                         $entityManager->persist($coverage);
                     }
@@ -451,7 +440,7 @@ class BirdSpeciesController extends AbstractController
                     if (!$birdLifeTaxTreat) {
                         $birdLifeTaxTreat = new BirdLifeTaxTreat();
                         $birdLifeTaxTreat->setLabel($birdLifeTaxTreatName);
-                        $birdLifeTaxTreat->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                        $birdLifeTaxTreat->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
         
                         $entityManager->persist($birdLifeTaxTreat);
                     }
@@ -467,7 +456,7 @@ class BirdSpeciesController extends AbstractController
                     if (!$iucnRedListCategory) {
                         $iucnRedListCategory = new IucnRedListCategory();
                         $iucnRedListCategory->setLabel($iucnRedListCategoryName);
-                        $iucnRedListCategory->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                        $iucnRedListCategory->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
         
                         $entityManager->persist($iucnRedListCategory);
                     }
@@ -486,7 +475,7 @@ class BirdSpeciesController extends AbstractController
                         $birdSpecy->setFrenchName($data['French name'] ?? null);
                         $birdSpecy->setWispeciescode($data['Wispeciescode'] ?? null);
                         $birdSpecy->setAuthority($data['Authority'] ?? null);
-                        $birdSpecy->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                        $birdSpecy->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
                         $birdSpecy->setCommonName($data['Common name'] ?? null);
                         $birdSpecy->setCommonNameAlt($data['Alternative common names'] ?? null);
                         $birdSpecy->setSynonyms($data['Synonyms'] ?? null);
@@ -563,7 +552,7 @@ class BirdSpeciesController extends AbstractController
             if ($imageFile) {
                 $birdSpecy->setImageFile($imageFile);
             }
-            $birdSpecy->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+            $birdSpecy->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
             $entityManager->persist($birdSpecy);
             $entityManager->flush();
             $this->addFlash('success', "Espèse d'oiseau a bien été crée");
@@ -599,18 +588,24 @@ class BirdSpeciesController extends AbstractController
         $form = $this->createForm(BirdSpeciesType::class, $birdSpecy);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $imageFile */
-            $imageFile = $form->get('imageFile')->getData();
-
-            if ($imageFile) {
-                $birdSpecy->setImageFile($imageFile);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                /** @var UploadedFile $imageFile */
+                $imageFile = $form->get('imageFile')->getData();
+    
+                if ($imageFile) {
+                    $birdSpecy->setImageFile($imageFile);
+                    $this->addFlash('success', "Image d'espèse a bien été modifié");
+                }
+                $birdSpecy->setUpdatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
+                $entityManager->flush();
+                $this->addFlash('success', "L'espèse a bien été modifié");
+    
+                return $this->redirectToRoute('app_bird_species_index', [], Response::HTTP_SEE_OTHER);
+            
+            } else {
+                $this->addFlash('error','Une erreur s\'est produite lors de modification de l\'espèse.');
             }
-            $birdSpecy->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-            $entityManager->flush();
-            $this->addFlash('success', "L'espèse a bien été modifié");
-
-            return $this->redirectToRoute('app_bird_species_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('bird_species/edit.html.twig', [
@@ -626,6 +621,8 @@ class BirdSpeciesController extends AbstractController
             $entityManager->remove($birdSpecy);
             $entityManager->flush();
             $this->addFlash('success', "L'espèse a bien été supprimée");
+        } else {
+            $this->addFlash('error','Une erreur s\'est produite lors de la suppression d\'espèse');
         }
 
         return $this->redirectToRoute('app_bird_species_index', [], Response::HTTP_SEE_OTHER);

@@ -37,10 +37,30 @@
   h6 {
     font-family: "Nunito", sans-serif;
   }
+  
+.requiredField {
+  font-size: 0.75rem; /* Taille de l'étoile, ajustez selon vos besoins */
+  color: red; /* Couleur de l'étoile */
+  vertical-align: super; /* Positionne l'étoile en exposant */
+  margin-left: 0.25rem; /* Espacement entre le label et l'étoile */
+  margin-right: 0.25rem;
+  font-weight: bold;
+}
 
-  /*--------------------------------------------------------------
+.explanation {
+  font-size: 0.8rem; /* Taille de l'étoile, ajustez selon vos besoins */
+}
+
+/*--------------------------------------------------------------
+  # sweetalert2
+--------------------------------------------------------------*/
+.swal2-button-space {
+  margin: 0 5px; /* Ajustez la valeur selon vos besoins */
+}
+
+/*--------------------------------------------------------------
   # user image
-  --------------------------------------------------------------*/
+--------------------------------------------------------------*/
   .imageProfile {
     width: 50%;
     height: 50%;
@@ -52,6 +72,14 @@
 .btn-action {
   font-size: 0.75rem;
   font-weight: bold; 
+}
+
+.btn-status {
+  font-size: 0.75rem;
+  /* font-weight: bold; */
+  pointer-events: none; /* Désactive les événements de souris comme les clics */
+  /*opacity: 0.6; /* Change l'opacité pour indiquer que le bouton est désactivé */
+  cursor: default;  /* Change le curseur pour indiquer que l'élément n'est pas interactif */
 }
 
 /* Buttons Status */
@@ -67,46 +95,11 @@
   font-size: 0.8rem; 
   background: black;
 } */
-    /*--------------------------------------------------------------
-  # afflash alert
-  --------------------------------------------------------------*/
-.alert {
-    position: relative;
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    transition: opacity 0.5s ease-in-out;
-}
-
-.alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-}
-
-.alert-error {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-}
-
-.alert-warning {
-    color: #856404;
-    background-color: #fff3cd;
-    border-color: #ffeeba;
-}
-
-.alert-info {
-    color: #0c5460;
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
-}
 
     /*--------------------------------------------------------------
   # print
   --------------------------------------------------------------*/
-  @media print {
+  /* @media print {
     body * {
         visibility: hidden;
     }
@@ -122,52 +115,60 @@
     #printButton {
         display: none;
     }
+} */
+@media print {
+  /* Cacher tous les éléments sauf la zone imprimable */
+  body * {
+      visibility: hidden;
+  }
+  
+  /* Rendre visible uniquement la zone imprimable */
+  #printableArea, #printableArea * {
+      visibility: visible;
+  }
+  
+  /* Positionner la zone imprimable */
+  #printableArea {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+  }
+  
+  /* Cacher le bouton d'impression */
+  #printButton {
+      display: none;
+  }
+
+  /* Ajuster la taille des écritures */
+  #printableArea {
+      font-size: 10px; /* Réduit la taille de la police pour l'impression */
+  }
+  
+  /* Ajuster les marges pour l'impression */
+  @page {
+      margin: 20mm; /* Ajustez les marges selon vos besoins */
+  }
+  
+  /* Styles supplémentaires pour améliorer la présentation */
+  table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+  
+  /* th, td {
+      border: 1px solid #000;
+      padding: 5px;
+      text-align: left;
+  } */
+  
+  /* Assurer une meilleure disposition des titres et sous-titres */
+  h1, h2, h3, h4, h5, h6 {
+      font-size: 16px; /* Ajustez selon vos besoins */
+      margin: 0 0 10px 0;
+  }
 }
 
-
-  /*--------------------------------------------------------------
-  # eyes
-  --------------------------------------------------------------*/
-
-  /* label {
-    position: relative;
-  } */
-  
-  /* label input {
-    font-size: 1em;
-    color: #f9f9f9;
-    background: transparent;
-    padding: 1rem 1.2rem;
-    width: 350px;
-    border-radius: 5px;
-    border: 2px solid #7a7a7a;
-    transition: all 0.2s;
-  }
-
-  label input:focus {
-    border-color: #ff4754;
-  } */
-
-  /* .password-icon {
-    display: flex;
-    align-items: center;
-    position: absolute;
-    top: 50%;
-    left: 6px;
-    transform: translateY(-50%);
-    width: 15px;
-    color: #838080;
-    transition: all 0.2s;
-  }
-
-  .password-icon:hover {
-    cursor: pointer;
-    color: #ff4754;
-  }
-  
-  .password-icon .feather-eye-off {
-    display: none;
-  } */
 
   /*--------------------------------------------------------------
   # clock
@@ -203,6 +204,11 @@
   .imgShow {
     width: 80%;
     height: 30%;
+  }
+
+  .imgCollecte {
+    width: 100%;
+    height: 50%;
   }
 
   /*--------------------------------------------------------------

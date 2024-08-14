@@ -48,7 +48,7 @@
                                             <td>{{ city.updatedAt ? city.updatedAt|date('d-m-Y') : '' }}</td>
                                             <td>
                                                 <div class="d-flex justtify-content-end">
-                                                    <a href="{{ path('app_city_show', {'id': city.id}) }}">show</a>
+                                                    <a href="{{ path('app_city_show', {'id': city.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail</a>
                                                     <a href="{{ path('app_city_edit', {'id': city.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
                                                     {{ include('city/_delete_form.html.twig') }}
                                                 </div>
@@ -66,8 +66,11 @@
                         </div>
                         <div class="card-footer">
                             <div class="d-flex justtify-content-end">
-                                <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3"> Créer une nouvelle ville</a>
-                                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer nouvelle site de collection</a>
+                                <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une nouvelle ville</a>
+                                <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des pays</a>
+                                <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter un nouveau pays</a>
+                                <a href="{{ path('app_site_collection_index') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-1"> Liste des sites</a>
+                                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Ajouter nouvelle site de collection</a>
                             </div>
                         </div>
                     </div>
@@ -99,88 +102,4 @@
                 </div>
             </div><!-- End Card with header and footer -->
         </div>
-
-
-    {# <section class="section">
-        <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Importation CSV</h5>
-                        {{ form_start(form, {'attr': {'id': 'import-csv-form'}}) }}
-                        {{ form_row(form.csvFile) }}
-                        <button type="button" id="preview-button" class="btn btn-outline-primary btn-sm bi bi-upload">Aperçu CSV</button>
-                        {{ form_end(form) }}
-                    </div>
-                    <div class="card-footer">
-                        <div id="csv-preview" style="display: none;">
-                            <h5>Aperçu des données CSV</h5>
-                            <table class="table">
-                                <thead>
-                                    <tr id="csv-preview-headers"></tr>
-                                </thead>
-                                <tbody id="csv-preview-body"></tbody>
-                            </table>
-                            <button id="import-button" class="btn btn-outline-success btn-sm">Importer</button>
-                            <button id="cancel-button" class="btn btn-outline-danger btn-sm">Annuler</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    </main><!-- End #main -->
-<script>
-    document.getElementById('preview-button').addEventListener('click', function () {
-        let form = document.getElementById('import-csv-form');
-        let formData = new FormData(form);
-
-        fetch('{{ path('app_city_preview_csv') }}', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                    return;
-                }
-
-                let headers = data.headers;
-                let rows = data.rows;
-
-                let headersHtml = '';
-                headers.forEach(header => {
-                    headersHtml += `<th>${header}</th>`;
-                });
-                document.getElementById('csv-preview-headers').innerHTML = headersHtml;
-
-                let rowsHtml = '';
-                rows.forEach(row => {
-                    rowsHtml += '<tr>';
-                    row.forEach(cell => {
-                        rowsHtml += `<td>${cell}</td>`;
-                    });
-                    rowsHtml += '</tr>';
-                });
-                document.getElementById('csv-preview-body').innerHTML = rowsHtml;
-
-                document.getElementById('csv-preview').style.display = 'block';
-            })
-            .catch(error => {
-                alert('Une erreur s\'est produite lors du traitement du fichier CSV.');
-            });
-    });
-
-    document.getElementById('import-button').addEventListener('click', function () {
-        document.getElementById('import-csv-form').submit();
-    });
-
-    document.getElementById('cancel-button').addEventListener('click', function () {
-        document.getElementById('csv-preview').style.display = 'none';
-        document.getElementById('import-csv-form').reset();
-    });
-</script> #}
-
 {% endblock %}

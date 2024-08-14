@@ -4,8 +4,8 @@
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
-            "version": "2.12",
-            "ref": "7b1b0b637b337f6beb895589948cd119da705524"
+            "version": "2.10",
+            "ref": "c170ded8fc587d6bd670550c43dafcf093762245"
         },
         "files": [
             "./config/packages/doctrine.yaml",
@@ -123,7 +123,7 @@
         ]
     },
     "symfony/maker-bundle": {
-        "version": "1.59",
+        "version": "1.60",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -168,7 +168,7 @@
         ]
     },
     "symfony/phpunit-bridge": {
-        "version": "7.0",
+        "version": "7.1",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -209,7 +209,7 @@
         ]
     },
     "symfony/stimulus-bundle": {
-        "version": "2.17",
+        "version": "2.18",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -248,11 +248,23 @@
             "./templates/base.html.twig"
         ]
     },
+    "symfony/ux-autocomplete": {
+        "version": "2.18",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.6",
+            "ref": "07d9602b7231ba355f484305d6cea58310c01741"
+        },
+        "files": [
+            "./config/routes/ux_autocomplete.yaml"
+        ]
+    },
     "symfony/ux-toggle-password": {
         "version": "v2.18.0"
     },
     "symfony/ux-turbo": {
-        "version": "v2.17.0"
+        "version": "v2.18.0"
     },
     "symfony/validator": {
         "version": "7.0",
@@ -295,18 +307,15 @@
         "version": "v1.17.0"
     },
     "twig/extra-bundle": {
-        "version": "v3.10.0"
+        "version": "v3.11.0"
     },
     "vich/uploader-bundle": {
-        "version": "2.3",
+        "version": "2.4",
         "recipe": {
             "repo": "github.com/symfony/recipes-contrib",
             "branch": "main",
             "version": "1.13",
             "ref": "1b3064c2f6b255c2bc2f56461aaeb76b11e07e36"
-        },
-        "files": [
-            "./config/packages/vich_uploader.yaml"
-        ]
+        }
     }
 }

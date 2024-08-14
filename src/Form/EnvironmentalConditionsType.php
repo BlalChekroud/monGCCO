@@ -23,27 +23,37 @@ class EnvironmentalConditionsType extends AbstractType
             ->add('disturbed', EntityType::class, [
                 'class' => Disturbed::class,
                 'choice_label' => 'label',
-                'label' => 'Disturbé(e) (Indique si le comptage a été affecté par une perturbation):',
+                'placeholder' => '',
+                'label' => 'Disturbé(e):<span class="requiredField">*<span><p class="explanation">(Indique si le comptage a été affecté par une perturbation)</p>',
+                'label_html' => true,
             ])
             ->add('ice', EntityType::class, [
                 'class' => Ice::class,
                 'choice_label' => 'label',
+                'placeholder' => '',
                 'label' => 'La couverture de glace lors du comptage:',
+                'label_html' => true,
             ])
             ->add('tidal', EntityType::class, [
                 'class' => Tidal::class,
                 'choice_label' => 'label',
+                'placeholder' => '',
                 'label' => 'Marée cours (la plupart) du comptage:',
+                'label_html' => true,
             ])
             ->add('water', EntityType::class, [
                 'class' => Water::class,
                 'choice_label' => 'label',
+                'placeholder' => '',
                 'label' => "L'état des eaux lors du comptage:",
+                'label_html' => true,
             ])
             ->add('weather', EntityType::class, [
                 'class' => Weather::class,
                 'choice_label' => 'label',
+                'placeholder' => '',
                 'label' => 'Effets des conditions météorologiques (vent, pluie, brouillard) sur les comptages:',
+                'label_html' => true,
             ])
         ;
     }

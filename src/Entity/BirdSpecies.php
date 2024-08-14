@@ -24,7 +24,7 @@ class BirdSpecies
     #[ORM\Column(length: 255)]
     private ?string $scientificName = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $frenchName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -87,9 +87,16 @@ class BirdSpecies
     #[ORM\JoinColumn(nullable: true)]
     private ?IucnRedListCategory $iucnRedListCategory = null;
 
+    /**
+     * @var Collection<int, BirdSpeciesCount>
+     */
+    #[ORM\OneToMany(targetEntity: BirdSpeciesCount::class, mappedBy: 'birdSpecies')]
+    private Collection $birdSpeciesCounts;
+
     public function __construct()
     {
         $this->collectedData = new ArrayCollection();
+        $this->birdSpeciesCounts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -297,6 +304,12 @@ class BirdSpecies
         return $this->collectedData;
     }
 
+    public function getImageUrl(): ?string
+    {
+        return $this->imageFilename ? '/uploads/bird_images/' . $this->imageFilename : null;
+    }
+
+
     public function addCollectedData(CollectedData $collectedData): static
     {
         if (!$this->collectedData->contains($collectedData)) {
@@ -348,6 +361,36 @@ class BirdSpecies
     public function setIucnRedListCategory(?IucnRedListCategory $iucnRedListCategory): static
     {
         $this->iucnRedListCategory = $iucnRedListCategory;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BirdSpeciesCount>
+     */
+    public function getBirdSpeciesCounts(): Collection
+    {
+        return $this->birdSpeciesCounts;
+    }
+
+    public function addBirdSpeciesCount(BirdSpeciesCount $birdSpeciesCount): static
+    {
+        if (!$this->birdSpeciesCounts->contains($birdSpeciesCount)) {
+            $this->birdSpeciesCounts->add($birdSpeciesCount);
+            $birdSpeciesCount->setBirdSpecies($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBirdSpeciesCount(BirdSpeciesCount $birdSpeciesCount): static
+    {
+        if ($this->birdSpeciesCounts->removeElement($birdSpeciesCount)) {
+            // set the owning side to null (unless already changed)
+            if ($birdSpeciesCount->getBirdSpecies() === $this) {
+                $birdSpeciesCount->setBirdSpecies(null);
+            }
+        }
 
         return $this;
     }

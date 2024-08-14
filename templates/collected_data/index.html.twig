@@ -10,8 +10,8 @@
       <h1>Consultation de données collectées</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
-          <li class="breadcrumb-item active">Gestion de données collectées</li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item active">Gestion des données collectées</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -29,11 +29,10 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Type de comptage</th>
-                            <th>Qualité</th>
-                            <th>TotalCount</th>
+                            <th>Collecteur</th>
+                            <th>Site de collection</th>
+                            <th>Nombre total</th>
                             <th>Crée le</th>
-                            <th>Méthode(s)</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -41,14 +40,16 @@
                     {% for collected_datum in collected_datas %}
                         <tr>
                             <td>{{ collected_datum.id }}</td>
-                            <td>{{ collected_datum.countType }}</td>
-                            <td>{{ collected_datum.quality }}</td>
+                            <td>{{ collected_datum.createdBy.name }} {{ collected_datum.createdBy.lastName }}</td>
+                            <td>{{ collected_datum.siteCollection.siteName }}</td>
                             <td>{{ collected_datum.totalCount }}</td>
-                            <td>{{ collected_datum.createdAt ? collected_datum.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                            <td>{{ collected_datum.method|join(', ') }}</td>
+                            <td>{{ collected_datum.createdAt ? collected_datum.createdAt|date('d-m-Y') : '' }}</td>
                             <td>
-                                <a href="{{ path('app_collected_data_show', {'id': collected_datum.id}) }}" class="btn btn-outline-secondary btn-sm bi bi-card-text mx-2"> Détail</a>
-                                <a href="{{ path('app_collected_data_edit', {'id': collected_datum.id}) }}" class="bi bi-pencil-square btn btn-outline-warning btn-sm mx-2"> Modifier</a>
+                                <div class="d-flex justtify-content-end">
+                                  <a href="{{ path('app_collected_data_show', {'id': collected_datum.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-2"> Détail</a>
+                                  <a href="{{ path('app_collected_data_edit', {'id': collected_datum.id}) }}" class="bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
+                                  {{ include('collected_data/_delete_form.html.twig') }}
+                              </div>
                             </td>
                         </tr>
                     {% else %}
@@ -61,6 +62,9 @@
                 <!-- End Table with stripped rows -->              
               
                 <div>
+                    <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3">
+                        Liste des campagnes
+                    </a>
                     <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm ri-database-line">
                       Créer nouvelle données collectées
                     </a>

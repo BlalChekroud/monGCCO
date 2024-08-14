@@ -1,10 +1,14 @@
 <?php
 
 namespace App\Form;
+use App\Validator\PasswordMatch;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Validator\Constraints\IsFalse;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormError;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
@@ -29,7 +33,7 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('name',TextType::class, [
-                'label' => 'Nom',
+                'label' => false,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Veuillez saisir votre nom',
@@ -43,7 +47,7 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('lastName',TextType::class, [
-                'label' => 'Prénom',
+                'label' => false,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Veuillez saisir votre prénom',
@@ -57,7 +61,7 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('phone',TextType::class, [
-                'label' => 'Numéro de téléphone',
+                'label' => false,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Veuillez saisir votre Numéro de téléphone',
@@ -91,6 +95,7 @@ class RegistrationFormType extends AbstractType
                 'visible_label' => 'Afficher',
                 // 'visible_icon' => null,
                 // 'hidden_icon' => null,
+                'label' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank([
@@ -107,7 +112,33 @@ class RegistrationFormType extends AbstractType
                     // )
                 ],
             ])
+            ->add('passwordConfirm', PasswordType::class, [
+                'mapped' => false,
+                'label' => false,
+                'toggle' => true,
+                'hidden_label' => 'Masquer',
+                'visible_label' => 'Afficher',
+                'attr' => ['autocomplete' => 'new-password'],
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez confirmer votre mot de passe']),
+                    new PasswordMatch(),
+                ],
+            ])
         ;
+        // // Ajouter un écouteur d'événement pour la validation après la soumission du formulaire
+        // $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+        //     $form = $event->getForm();
+        //     $data = $form->getData();
+
+        //     // Obtiens les données des champs
+        //     $plainPassword = $form->get('plainPassword')->getData();
+        //     $passwordConfirm = $form->get('passwordConfirm')->getData();
+
+        //     // Vérifie si les mots de passe correspondent
+        //     if ($plainPassword !== $passwordConfirm) {
+        //         $form->get('passwordConfirm')->addError(new FormError('Les mots de passe ne correspondent pas.'));
+        //     }
+        // });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\AgentsGroup;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,6 +17,29 @@ class AgentsGroupRepository extends ServiceEntityRepository
         parent::__construct($registry, AgentsGroup::class);
     }
 
+    public function findByUser($user)
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * @return AgentsGroup[] Returns an array of AgentsGroup objects
+     */
+    public function findByUserMember(User $user)
+    {
+        return $this->createQueryBuilder('a')
+            ->innerJoin('a.groupMember', 'u')
+            ->andWhere('u.id = :userId')
+            ->setParameter('userId', $user->getId())
+            ->getQuery()
+            ->getResult();
+    }
+    
     //    /**
     //     * @return AgentsGroup[] Returns an array of AgentsGroup objects
     //     */

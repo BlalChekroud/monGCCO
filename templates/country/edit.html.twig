@@ -1,13 +1,44 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Country{% endblock %}
+{% block title %}Modifier le pays{% endblock %}
 
 {% block body %}
-    <h1>Edit Country</h1>
+  <main id="main" class="main">
 
-    {{ include('country/_form.html.twig', {'button_label': 'Update'}) }}
+    <div class="pagetitle">
+      <h1>Modifier le pays</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_country_index') }}">Gestion des pays</a></li>
+          <li class="breadcrumb-item active">Modification</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_country_index') }}">back to list</a>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
 
-    {{ include('country/_delete_form.html.twig') }}
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Les nouvelles informations sur le pays</h5>
+
+              {{ include('country/_form.html.twig', {'button_label': ' Mise à jour'}) }}
+
+            </div>
+            <div class="card-footer">
+              <div class="d-flex justtify-content-end">
+                <a href="{{ path('app_country_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>
+                {{ include('country/_delete_form.html.twig') }}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
 {% endblock %}

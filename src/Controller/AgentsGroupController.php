@@ -20,8 +20,16 @@ class AgentsGroupController extends AbstractController
     #[Route('/', name: 'app_agents_group_index', methods: ['GET'])]
     public function index(AgentsGroupRepository $agentsGroupRepository): Response
     {
+        $user = $this->getUser();
+        
+        // Vérifier si l'utilisateur a le rôle ADMIN
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $agentsGroups = $agentsGroupRepository->findAll();
+        } else {
+            $agentsGroups = $agentsGroupRepository->findByUserMember($user);
+        }
         return $this->render('agents_group/index.html.twig', [
-            'agents_groups' => $agentsGroupRepository->findAll(),
+            'agents_groups' => $agentsGroups,
         ]);
     }
 
@@ -82,6 +90,13 @@ class AgentsGroupController extends AbstractController
     #[Route('/{id}/edit', name: 'app_agents_group_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, AgentsGroup $agentsGroup, EntityManagerInterface $entityManager): Response
     {
+        $user = $this->getUser();
+        // Vérifiez si l'utilisateur est le leader du groupe ou un administrateur
+        if ($user != $agentsGroup->getLeader() && !$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('info', 'La modification est autorisée seulement au chef du groupe.');
+            return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);
+        }
+
         $form = $this->createForm(AgentsGroupType::class, $agentsGroup);
         $form->handleRequest($request);
 

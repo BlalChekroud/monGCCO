@@ -25,24 +25,20 @@ class AgentsGroupType extends AbstractType
                 'choice_label' => function (User $user) {
                     return $user->getName() . ' ' . $user->getLastName() . ' (' . $user->getEmail() . ')';
                 },
-                'label' => 'Choisir les membres du groupe :',
+                'label' => 'Choisir les membres du groupe<span class="requiredField">*</span>',
+                'label_html' => true, // This allows HTML in labels
                 'multiple' => true,
                 'required' => true,
                 'expanded' => true,
                 'attr' => ['id' => 'group_member']
             ])
-            // ->add('leader', ChoiceType::class, [
-            //     'label' => 'Chef du groupe',
-            //     'choices' => [],
-            //     // 'placeholder' => '-- Choisir le chef du groupe --',
-            //     'attr' => ['id' => 'group_leader']
-            // ])
             ->add('leader', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => function (User $user) {
                     return $user->getName() . ' ' . $user->getLastName() . ' (' . $user->getEmail() . ')';
                 },
-                'label' => 'Chef du groupe',
+                'label' => 'Chef du groupe<span class="requiredField">*</span>',
+                'label_html' => true,
                 'placeholder' => '-- Choisir le chef du groupe --',
             ])
             ->add('country', EntityType::class, [
@@ -50,8 +46,9 @@ class AgentsGroupType extends AbstractType
                 'choice_label' => function (Country $country) {
                     return $country->getName() . ' (' . $country->getIso2() . ')';
                 },
-                'label' => "Pays",
-                'placeholder' => '-- Choisir le pays du groupe',
+                'label' => 'Pays<span class="requiredField">*</span>',
+                'label_html' => true,
+                'placeholder' => '-- Choisir le pays du groupe --',
                 'required' => true,
                 'query_builder' => function (CountryRepository $repository) {
                     return $repository->createQueryBuilder('b')

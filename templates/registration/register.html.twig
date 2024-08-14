@@ -41,96 +41,97 @@
     {% block body %}
 
         <main>
-            <div class="container">
-
             <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
                 <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-6 col-md-8 d-flex flex-column align-items-center justify-content-center">
 
-                    <div class="d-flex justify-content-center py-4">
-                        <a href="{{ path('home') }}" class="logo d-flex align-items-center w-auto">
-                        <img src="{{ asset('/img/GCCO 1.png') }}" alt="">
-                        {# <span class="d-none d-lg-block">Gestion des Campagnes de Comptage des Oiseaux Marin</span> #}
-                        </a>
-                    </div><!-- End Logo -->
+                            <div class="d-flex justify-content-center py-4">
+                                <a href="{{ path('home') }}" class="logo d-flex align-items-center w-auto">
+                                <img src="{{ asset('/img/GCCO 1.png') }}" alt="">
+                                {# <span class="d-none d-lg-block">Gestion des Campagnes de Comptage des Oiseaux Marin</span> #}
+                                </a>
+                            </div><!-- End Logo -->
 
-                    <div class="card mb-3">
+                            <div class="card mb-3">
 
-                        <div class="card-body">
+                                <div class="card-body">
 
-                        <div class="pt-4 pb-2">
-                            <h5 class="card-title text-center pb-0 fs-4">Créer un Compte</h5>
-                            <p class="text-center small">Entrer vos informations personnelles pour créer un compte</p>
-                        </div>
+                                    <div class="pt-4 pb-2">
+                                        <h5 class="card-title text-center pb-0 fs-4">Créer un Compte</h5>
+                                        <p class="text-center small">Entrer vos informations personnelles pour créer un compte</p>
+                                        <p class="d-flex justify-content-end my-4"><span class="requiredField">*</span><span class="small">champs obligatoires</span></p>
+                                    </div>
 
-                        {% if form_errors(registrationForm) %}
-                            <div class="alert alert-danger">
-                                {{ form_errors(registrationForm) }}
+                                    {% if form_errors(registrationForm) %}
+                                        <div class="alert alert-danger">
+                                            {{ form_errors(registrationForm) }}
+                                        </div>
+                                    {% endif %}
+
+                                    {{ form_start(registrationForm) }}
+                                    <div class="col-12">
+                                        {{ form_label(registrationForm.name, 'Nom') }}<span class="requiredField">*</span>
+                                        {{ form_row(registrationForm.name) }}
+                                        <div class="invalid-feedback">Veuillez entrer votre nom !</div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        {{ form_label(registrationForm.lastName, 'Prénom') }}<span class="requiredField">*</span>
+                                        {{ form_row(registrationForm.lastName) }}
+                                        <div class="invalid-feedback">Veuillez entrer votre prénom !</div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        {{ form_label(registrationForm.phone, 'Numéro de téléphone') }}<span class="requiredField">*</span>
+                                        {{ form_row(registrationForm.phone) }}
+                                        <div class="invalid-feedback">Veuillez entrer votre numéro de téléphone !</div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label for="yourUsername" class="form-label">E-mail<span class="requiredField">*</span></label>
+                                        <div class="input-group has-validation mb-3">
+                                            <span class="input-group-text" id="inputGroupPrepend">@</span>
+                                            {{ form_widget(registrationForm.email) }}
+                                            <div class="invalid-feedback">S'il vous plaît, entrez une adresse e-mail valide !</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}<span class="requiredField">*</span>
+                                        {{ form_row(registrationForm.plainPassword) }}
+                                        <div class="invalid-feedback">S'il vous plaît, entrez votre mot de passe !</div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        {{ form_label(registrationForm.passwordConfirm, 'Confirmez votre mot de passe') }}<span class="requiredField">*</span>
+                                        {{ form_row(registrationForm.passwordConfirm) }}
+                                        <div class="invalid-feedback">S'il vous plaît, entrez votre mot de passe !</div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            {{ form_row(registrationForm.agreeTerms) }}
+                                            {# <label class="form-check-label" for="acceptTerms"> J'accepte <a href="#">les termes et conditions </a></label> #}
+                                            <div class="invalid-feedback">Il faut accepter avant de soumettre.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button class="btn btn-primary w-100" type="submit">Inscrire</button>
+                                    </div>
+                                    <div class="col-12">
+                                        <p class="small mb-0 my-4">Vous avez déjà un compte ? <a href="{{ path('app_login')}}">Se connecter</a></p>
+                                    </div>
+                                    {{ form_end(registrationForm) }}
+
+                                </div>
                             </div>
-                        {% endif %}
-
-                        {{ form_start(registrationForm) }}
-                        <div class="col-12">
-                            {{ form_row(registrationForm.name) }}
-                            <div class="invalid-feedback">Veuillez entrer votre nom !</div>
-                        </div>
-
-                       <div class="col-12">
-                            {{ form_row(registrationForm.lastName) }}
-                            <div class="invalid-feedback">Veuillez entrer votre prénom !</div>
-                        </div>
-
-                        {# <div class="col-12">
-                            {{ form_row(registrationForm.image) }}
-                            <div class="invalid-feedback">Veuillez choisir votre image !</div>
-                        </div> #}
-
-                        <div class="col-12">
-                            {{ form_row(registrationForm.phone) }}
-                            <div class="invalid-feedback">Veuillez entrer votre numéro de téléphone !</div>
-                        </div>
-
-                        <div class="col-12">
-                            <label for="yourUsername" class="form-label">E-mail</label>
-                            <div class="input-group has-validation mb-3">
-                                <span class="input-group-text" id="inputGroupPrepend">@</span>
-                                {{ form_widget(registrationForm.email) }}
-                                <div class="invalid-feedback">S'il vous plaît, entrez une adresse e-mail valide !</div>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            {{ form_row(registrationForm.plainPassword, { label: 'Mot de passe' }) }}
-                            <div class="invalid-feedback">S'il vous plaît, entrez votre mot de passe !</div>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="form-check">
-                                {{ form_row(registrationForm.agreeTerms) }}
-                                {# <label class="form-check-label" for="acceptTerms"> J'accepte <a href="#">les termes et conditions </a></label> #}
-                                <div class="invalid-feedback">Il faut accepter avant de soumettre.</div>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <button class="btn btn-primary w-100" type="submit">Inscrire</button>
-                        </div>
-                        <div class="col-12">
-                            <p class="small mb-0">Vous avez déjà un compte ? <a href="{{ path('app_login')}}">Se connecter</a></p>
-                        </div>
-                        {{ form_end(registrationForm) }}
 
                         </div>
                     </div>
-
-                    </div>
                 </div>
-                </div>
-
             </section>
-
-            </div>
         </main><!-- End #main -->
 
         <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

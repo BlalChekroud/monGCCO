@@ -13,9 +13,6 @@ class EnvironmentalConditions
     #[ORM\Column]
     private ?int $id = null;
 
-    // #[ORM\Column(length: 255)]
-    // private ?string $name = null;
-
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -42,7 +39,7 @@ class EnvironmentalConditions
     #[ORM\JoinColumn(nullable: false)]
     private ?Weather $weather = null;
 
-    #[ORM\OneToOne(inversedBy: 'environmentalConditions', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'environmentalConditions', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true)]
     private ?CollectedData $collectedData = null;
 
@@ -62,18 +59,6 @@ class EnvironmentalConditions
     {
         return $this->id;
     }
-
-    // public function getName(): ?string
-    // {
-    //     return $this->name;
-    // }
-
-    // public function setName(string $name): static
-    // {
-    //     $this->name = $name;
-
-    //     return $this;
-    // }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {

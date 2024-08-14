@@ -2,10 +2,11 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.scientificName, 'Nom Scientifique') }}
+      {{ form_label(form.scientificName, 'Nom Scientifique') }}<span class="requiredField">*</span>
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.scientificName, {'attr': {'class': 'form-control'}}) }}
+      {{ form_errors(form.scientificName) }}
     </div>
   </div>
   <div class="row mb-3">
@@ -15,6 +16,12 @@
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.frenchName, {'attr': {'class': 'form-control'}}) }}
     </div>
+  <div class="row mb-3">
+    <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11 mt-4 mx-3">
+      {{ form_row(form.birdFamily, {'attr': {'class': 'form-control'}}) }}
+      {{ form_errors(form.birdFamily) }}
+    </div>
+  </div>
   </div>
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
@@ -159,11 +166,6 @@
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.subsppId, {'attr': {'class': 'form-control'}}) }}
-    </div>
-  </div>
-  <div class="row mb-3">
-    <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11">
-      {{ form_row(form.birdFamily) }}
     </div>
   </div>
   <div class="row mb-3">

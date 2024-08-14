@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit BirdSpeciesCount{% endblock %}
+
+{% block body %}
+    <h1>Edit BirdSpeciesCount</h1>
+
+    {{ include('bird_species_count/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_bird_species_count_index') }}">back to list</a>
+
+    {{ include('bird_species_count/_delete_form.html.twig') }}
+{% endblock %}

@@ -3,10 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\EnvironmentalConditions;
-use App\Form\EnvironmentalConditionsType;
 use App\Repository\CampaignStatusRepository;
-use App\Repository\EnvironmentalConditionsRepository;
-use App\Repository\SiteCollectionRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Monolog\DateTimeImmutable;
 use DateTime;
@@ -40,9 +37,11 @@ class CountingCampaignController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_TEAMLEADER', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/new', name: 'app_counting_campaign_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, CampaignStatusRepository $statusRepository): Response
     {
+        $user = $this->getUser();
         $countingCampaign = new CountingCampaign();
         $form = $this->createForm(CountingCampaignType::class, $countingCampaign);
         $form->handleRequest($request);
@@ -63,6 +62,7 @@ class CountingCampaignController extends AbstractController
                     return $this->redirectToRoute('app_counting_campaign_new');
                 }
                 $countingCampaign->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                $countingCampaign->setCreatedBy($user);
                 // Générer et définir le nom de la campagne
                 $countingCampaign->generateCampaignName();
                 // Mettre à jour le statut de la campagne
@@ -78,11 +78,7 @@ class CountingCampaignController extends AbstractController
                 return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
                 
             } else {
-                // Log the errors for debugging
-                foreach ($form->getErrors(true) as $error) {
-                    error_log($error->getMessage());
-                }
-                $this->addFlash('error','Une erreur s\'est produite lors de la création de la campagne de comptage.');
+                $this->addFlash('error',"Une erreur s'est produite lors de la création de la campagne de comptage.");
             }
 
         }
@@ -94,19 +90,33 @@ class CountingCampaignController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_counting_campaign_show', methods: ['GET'])]
-    public function show(CountingCampaign $countingCampaign): Response
+    public function show(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
-        $sites = $countingCampaign->getSiteCollection()->toArray();
-    
-        // Tri par siteName
-        usort($sites, function($a, $b) {
-            return strcmp($a->getSiteName(), $b->getSiteName());
-        });
+        $user = $this->getUser();
 
+        // Récupérer les sites associés à la campagne
+        $sites = $countingCampaign->getSiteCollection();
+
+        // Tableau pour stocker les conditions environnementales existantes pour chaque site
+        $existingConditions = [];
+
+        // Parcourir chaque site et vérifier s'il y a des conditions environnementales existantes
+        foreach ($sites as $site) {
+            $conditions = $entityManager->getRepository(EnvironmentalConditions::class)->findOneBy([
+                'user' => $user,
+                'siteCollection' => $site,
+                'countingCampaign' => $countingCampaign,
+            ]);
+
+            $existingConditions[$site->getId()] = $conditions;
+        }
+// dd($existingConditions);
         return $this->render('counting_campaign/show.html.twig', [
             'counting_campaign' => $countingCampaign,
+            'existingConditions' => $existingConditions,
         ]);
     }
+
 
     #[Route('/{id}/edit', name: 'app_counting_campaign_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager, CampaignStatusRepository $statusRepository): Response
@@ -162,7 +172,7 @@ class CountingCampaignController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$countingCampaign->getId(), $request->getPayload()->get('_token'))) {
             $entityManager->remove($countingCampaign);
             $entityManager->flush();
-            $this->addFlash('success', "campagne de comptage a bien été supprimée");
+            $this->addFlash('success', "Campagne de comptage a bien été supprimée");
         }
 
         return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
@@ -196,32 +206,4 @@ class CountingCampaignController extends AbstractController
         }
     }
     
-    // #[Route('/{id}', name: 'app_counting_campaign_verifications', methods: ['GET', 'POST'])]
-    // public function verification(EnvironmentalConditionsRepository $environmentalConditionsRepository, SiteCollectionRepository $siteRepository, CountingCampaignRepository $campaignRepository, Request $request): Response
-    // {
-    //     $user = $this->getUser();
-    //     $siteId = $request->query->get('siteId');
-    //     $campaignId = $request->query->get('campaignId');
-
-    //     $site = $siteRepository->find($siteId);
-    //     $campaign = $campaignRepository->find($campaignId);
-
-    //     if (!$site || !$campaign) {
-    //         throw $this->createNotFoundException('Site or Campaign not found');
-    //     }
-
-    //     // Récupérer les conditions environnementales pour ce site et cette campagne
-    //     $environmentalConditions = $environmentalConditionsRepository->findOneBy([
-    //         'user' => $user,
-    //         'site' => $site,
-    //         'campaign' => $campaign
-    //     ]);
-
-    //     return $this->render('collected_data/new.html.twig', [
-    //         'site' => $site,
-    //         'campaign' => $campaign,
-    //         'environmentalConditions' => $environmentalConditions,
-    //         'currentDate' => new \DateTime(), // Passer la date actuelle
-    //     ]);
-    // }
 }

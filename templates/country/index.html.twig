@@ -1,42 +1,125 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Country index{% endblock %}
+{% block title %}Consultation des pays{% endblock %}
 
 {% block body %}
-    <h1>Country index</h1>
+  <main id="main" class="main">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Iso2</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for country in countries %}
-            <tr>
-                <td>{{ country.id }}</td>
-                <td>{{ country.name }}</td>
-                <td>{{ country.iso2 }}</td>
-                <td>{{ country.createdAt ? country.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ country.updatedAt ? country.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_country_show', {'id': country.id}) }}">show</a>
-                    <a href="{{ path('app_country_edit', {'id': country.id}) }}">edit</a>
-                    {{ include('country/_delete_form.html.twig') }}
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="pagetitle">
+      <h1>Les pays</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item active">Gestion des pays</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_country_new') }}">Create new</a>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Listes</h5>
+             <div id="printableArea">
+                <!-- Table with stripped rows -->
+                <table class="table datatable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nom du pays</th>
+                            <th>Iso2</th>
+                            <th>Les villes</th>
+                            <th>Crée le</th>
+                            <th>Dernière mise à jour le</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for country in countries %}
+                        <tr>
+                            <td>{{ country.id }}</td>
+                            <td>
+                                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ country.id }}" aria-expanded="false" aria-controls="collapse{{ country.id }}" title="Voir les villes">
+                                    {{ country.name }}
+                                </button>
+                            </td>
+                            <td>{{ country.iso2 }}</td>
+                            <td>
+                                <div class="collapse" id="collapse{{ country.id }}">
+                                    <div class="accordion-body">
+                                        {% if country.city|length > 0 %}
+                                            {% set sorted_cities = country.city|sort((a, b) => a.name <=> b.name) %}
+                                            <ul>
+                                                {% for city in sorted_cities %}
+                                                    <li>{{ city.name }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p>Aucune ville</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ country.createdAt ? country.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ country.updatedAt ? country.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>
+                                <div class="d-flex justtify-content-end">
+                                    <a href="{{ path('app_country_show', {'id': country.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail</a>
+                                    <a href="{{ path('app_country_edit', {'id': country.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
+                                    {{ include('country/_delete_form.html.twig') }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7">Aucun enregistrement trouvé</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+              <!-- End Table with stripped rows -->    
+             </div>          
+              
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
+                Créer un nouveau pays
+              </a>
+              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-3">
+                Créer une nouvelle ville
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <div class="alert border-light alert-dismissible fade show" role="alert">
+      <!-- Card with header and footer -->
+      <div class="card">
+        <div class="card-header">
+          {# {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+            {{ form_row(form.csvFile) }}
+            <button type="submit" formaction="{{ path('app_bird_family_preview') }}" class="btn btn-outline-primary btn-sm bi bi-eye"> Aperçu CSV</button>
+            <button type="submit" formaction="{{ path('app_bird_family_import') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
+            {% for error in form.csvFile.vars.errors %}
+              <div class="alert alert-danger">{{ error.message }}</div>
+            {% endfor %}
+              
+            {% for flash_error in app.flashes('error') %}
+              <div class="alert alert-danger">{{ flash_error }}</div>
+            {% endfor %}
+          {{ form_end(form) }} #}
+        </div>
+        <div class="card-footer">
+          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div><!-- End Card with header and footer -->
+    </div>
+
+  </main><!-- End #main -->
 {% endblock %}

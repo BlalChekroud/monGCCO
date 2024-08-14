@@ -6,6 +6,7 @@ use App\Repository\CoverageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CoverageRepository::class)]
 class Coverage
@@ -16,6 +17,7 @@ class Coverage
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $label = null;
 
     /**

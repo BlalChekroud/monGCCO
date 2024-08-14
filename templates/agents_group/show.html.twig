@@ -32,6 +32,10 @@
                                     <td>{{ agents_group.groupName }}</td>
                                 </tr>
                                 <tr>
+                                    <th>Pays</th>
+                                    <td>{{ agents_group.country.name }}</td>
+                                </tr>
+                                <tr>
                                     <th>Membres du groupe</th>
                                     <td>
                                         <ol>
@@ -50,15 +54,7 @@
                                 <tr>
                                     <th>Chef du groupe</th>
                                     <td>
-                                        <ul>
-                                            <li>
-                                                {{ agents_group.leader.name }}
-                                                {{ agents_group.leader.lastName }}<br/>
-                                            </li>
-                                            <li>
-                                                {{ agents_group.leader }}
-                                            </li>
-                                        </ul>
+                                        {{ agents_group.leader.name }} {{ agents_group.leader.lastName }} <h6>({{ agents_group.leader.email }})</h6>
                                     </td>
                                 </tr>
                                 <tr>

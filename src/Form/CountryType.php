@@ -2,10 +2,9 @@
 
 namespace App\Form;
 
-use App\Entity\City;
 use App\Entity\Country;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,21 +13,16 @@ class CountryType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
-            ->add('iso2')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('updatedAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('cities', EntityType::class, [
-                'class' => City::class,
-                'choice_label' => 'name',
-                'label' => 'Les villes',
-                'multiple' => true,
-                'expanded' => true,
-            ])
+            ->add('name',TextType::class, [
+                'label' => 'Nom du pays<span class="requiredField">*</span>',
+                'label_html' => true,
+                'required' => false,
+                ])
+            ->add('iso2',TextType::class, [
+                'label' => 'Iso2<span class="requiredField">*</span>',
+                'label_html' => true,
+                'required' => false,
+                ])
         ;
     }
 

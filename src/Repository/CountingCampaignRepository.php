@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\CountingCampaign;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,15 +17,33 @@ class CountingCampaignRepository extends ServiceEntityRepository
         parent::__construct($registry, CountingCampaign::class);
     }
 
-    public function findByUser($user)
+    // public function findByUser($user)
+    // {
+    //     return $this->createQueryBuilder('c')
+    //         ->join('c.agentsGroups', 'g')
+    //         ->join('g.groupMember', 'm')
+    //         ->where('m = :user')
+    //         ->setParameter('user', $user)
+    //         ->getQuery()
+    //         ->getResult();
+    // }
+
+    /**
+     * @param User $user
+     * @return CountingCampaign[]
+     */
+    public function findByUser(User $user): array
     {
-        return $this->createQueryBuilder('c')
-            ->join('c.agentsGroups', 'g')
-            ->join('g.groupMember', 'm')
-            ->where('m = :user')
-            ->setParameter('user', $user)
-            ->getQuery()
-            ->getResult();
+        $qb = $this->createQueryBuilder('c');
+
+        // Joindre les groupes d'agents et les membres des groupes
+        $qb->leftJoin('c.agentsGroups', 'g')
+           ->leftJoin('g.groupMember', 'm')
+           ->where('c.createdBy = :user')
+           ->orWhere('m = :user')
+           ->setParameter('user', $user);
+
+        return $qb->getQuery()->getResult();
     }
 
     //    /**

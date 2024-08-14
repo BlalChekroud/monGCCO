@@ -6,6 +6,7 @@ use App\Repository\BirdFamilyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BirdFamilyRepository::class)]
 class BirdFamily
@@ -16,6 +17,7 @@ class BirdFamily
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $familyName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -36,7 +38,8 @@ class BirdFamily
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $ordre = null;
 
     public function __construct()
@@ -44,7 +47,8 @@ class BirdFamily
         $this->birdSpecies = new ArrayCollection();
     }
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $family = null;
 
     public function getId(): ?int

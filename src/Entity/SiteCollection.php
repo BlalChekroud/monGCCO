@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\SiteCollectionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -17,9 +18,11 @@ class SiteCollection
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $siteName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $siteCode = null;
 
     #[ORM\Column]
@@ -35,19 +38,20 @@ class SiteCollection
     private ?string $internationalSiteCode = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $latDepart = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $longDepart = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $latFin = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $longFin = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $parentSiteName = null;
 
     /**
      * @var Collection<int, CountingCampaign>
@@ -68,14 +72,24 @@ class SiteCollection
     /**
      * @var Collection<int, CollectedData>
      */
-    // #[ORM\OneToMany(targetEntity: CollectedData::class, mappedBy: 'siteCollection')]
-    // private Collection $collectedData;
+    #[ORM\OneToMany(targetEntity: CollectedData::class, mappedBy: 'siteCollection')]
+    private Collection $collectedData;
+
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'siteCollections')]
+    private ?self $parentSite = null;
+
+    /**
+     * @var Collection<int, self>
+     */
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parentSite')]
+    private Collection $siteCollections;
 
     public function __construct()
     {
         $this->countingCampaigns = new ArrayCollection();
-        // $this->collectedData = new ArrayCollection();
+        $this->collectedData = new ArrayCollection();
         $this->environmentalConditions = new ArrayCollection();
+        $this->siteCollections = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -203,30 +217,6 @@ class SiteCollection
         return $this;
     }
 
-    // public function getRegion(): ?string
-    // {
-    //     return $this->region;
-    // }
-
-    // public function setRegion(?string $region): static
-    // {
-    //     $this->region = $region;
-
-    //     return $this;
-    // }
-
-    public function getParentSiteName(): ?string
-    {
-        return $this->parentSiteName;
-    }
-
-    public function setParentSiteName(?string $parentSiteName): static
-    {
-        $this->parentSiteName = $parentSiteName;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, CountingCampaign>
      */
@@ -254,35 +244,35 @@ class SiteCollection
         return $this;
     }
 
-    // /**
-    //  * @return Collection<int, CollectedData>
-    //  */
-    // public function getCollectedData(): Collection
-    // {
-    //     return $this->collectedData;
-    // }
+    /**
+     * @return Collection<int, CollectedData>
+     */
+    public function getCollectedData(): Collection
+    {
+        return $this->collectedData;
+    }
 
-    // public function addCollectedData(CollectedData $collectedData): static
-    // {
-    //     if (!$this->collectedData->contains($collectedData)) {
-    //         $this->collectedData->add($collectedData);
-    //         $collectedData->setSiteCollection($this);
-    //     }
+    public function addCollectedData(CollectedData $collectedData): static
+    {
+        if (!$this->collectedData->contains($collectedData)) {
+            $this->collectedData->add($collectedData);
+            $collectedData->setSiteCollection($this);
+        }
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
-    // public function removeCollectedData(CollectedData $collectedData): static
-    // {
-    //     if ($this->collectedData->removeElement($collectedData)) {
-    //         // set the owning side to null (unless already changed)
-    //         if ($collectedData->getSiteCollection() === $this) {
-    //             $collectedData->setSiteCollection(null);
-    //         }
-    //     }
+    public function removeCollectedData(CollectedData $collectedData): static
+    {
+        if ($this->collectedData->removeElement($collectedData)) {
+            // set the owning side to null (unless already changed)
+            if ($collectedData->getSiteCollection() === $this) {
+                $collectedData->setSiteCollection(null);
+            }
+        }
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
     public function getCity(): ?City
     {
@@ -326,4 +316,50 @@ class SiteCollection
         return $this;
     }
 
+    public function getParentSite(): ?self
+    {
+        return $this->parentSite;
+    }
+
+    public function setParentSite(?self $parentSite): static
+    {
+        $this->parentSite = $parentSite;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getSiteCollections(): Collection
+    {
+        return $this->siteCollections;
+    }
+
+    public function addSiteCollection(self $siteCollection): static
+    {
+        if (!$this->siteCollections->contains($siteCollection)) {
+            $this->siteCollections->add($siteCollection);
+            $siteCollection->setParentSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSiteCollection(self $siteCollection): static
+    {
+        if ($this->siteCollections->removeElement($siteCollection)) {
+            // set the owning side to null (unless already changed)
+            if ($siteCollection->getParentSite() === $this) {
+                $siteCollection->setParentSite(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getSiteName() ?: '';
+    }
 }

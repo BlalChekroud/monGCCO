@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\RolesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RolesRepository::class)]
 class Roles
@@ -14,6 +15,7 @@ class Roles
     private ?int $id = null;
 
     #[ORM\Column(length: 25)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $label = null;
 
     #[ORM\Column]

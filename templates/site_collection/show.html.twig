@@ -78,7 +78,21 @@
                                 </tr>
                                 <tr>
                                     <th>Nom du site parent</th>
-                                    <td>{{ site_collection.parentSiteName }}</td>
+                                    <td>{{ site_collection.parentSite ? site_collection.parentSite.siteName : 'Aucun' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Ce site est le parent de(s)</th>
+                                    <td>
+                                        {% if site_collection.siteCollections|length > 0 %}
+                                            <ul>
+                                                {% for subSite in site_collection.siteCollections %}
+                                                    <li>{{ subSite.siteName }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            Aucun
+                                        {% endif %}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

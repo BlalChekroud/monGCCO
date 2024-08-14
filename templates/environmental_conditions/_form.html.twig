@@ -12,7 +12,7 @@
         </div>
     </div> #}
     <div class="row mb-3">
-        {{ form_label(form.disturbed, 'Disturbé(e) (Indique si le comptage a été affecté par une perturbation):') }}
+        {{ form_label(form.disturbed, 'Disturbé(e):<span class="requiredField">*</span>') }}<p class="explanation">Indique si le comptage a été affecté par une perturbation</p>
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
             {{ form_widget(form.disturbed, {'attr': {'class': 'form-control'}}) }}
         </div>
@@ -23,7 +23,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        {{ form_label(form.weather, 'Effets des conditions météorologiques (vent, pluie, brouillard) sur les comptages:') }}
+        {{ form_label(form.weather, 'Effets des conditions météorologiques:<span class="requiredField">*</span>') }}<p class="explanation">(vent, pluie, brouillard) sur les comptages</p>
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
             {{ form_widget(form.weather, {'attr': {'class': 'form-control'}}) }}
         </div>
@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        {{ form_label(form.water, 'L\'état des eaux lors du comptage:') }}
+        {{ form_label(form.water, 'L\'état des eaux lors du comptage<span class="requiredField">*</span>') }}
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
             {{ form_widget(form.water, {'attr': {'class': 'form-control'}}) }}
         </div>
@@ -45,7 +45,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        {{ form_label(form.ice, 'La couverture de glace lors du comptage:') }}
+        {{ form_label(form.ice, 'La couverture de glace lors du comptage<span class="requiredField">*</span>') }}
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
             {{ form_widget(form.ice, {'attr': {'class': 'form-control'}}) }}
         </div>
@@ -56,7 +56,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        {{ form_label(form.tidal, 'Marée cours (la plupart) du comptage:') }}
+        {{ form_label(form.tidal, 'Marée cours (la plupart) du comptage<span class="requiredField">*</span>') }}
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
             {{ form_widget(form.tidal, {'attr': {'class': 'form-control'}}) }}
         </div>
