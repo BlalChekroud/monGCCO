@@ -41,16 +41,23 @@ class AgentsGroup
     #[ORM\JoinColumn(nullable: false)]
     private ?Country $country = null;
 
+    // /**
+    //  * @var Collection<int, CountingCampaign>
+    //  */
+    // #[ORM\ManyToMany(targetEntity: CountingCampaign::class, inversedBy: 'agentsGroups')]
+    // private Collection $agents;
+
     /**
-     * @var Collection<int, CountingCampaign>
+     * @var Collection<int, SiteAgentsGroup>
      */
-    #[ORM\ManyToMany(targetEntity: CountingCampaign::class, inversedBy: 'agentsGroups')]
-    private Collection $agents;
+    #[ORM\ManyToMany(targetEntity: SiteAgentsGroup::class, mappedBy: 'agentsGroup')]
+    private Collection $siteAgentsGroups;
 
     public function __construct()
     {
         $this->groupMember = new ArrayCollection();
         $this->agents = new ArrayCollection();
+        $this->siteAgentsGroups = new ArrayCollection();
     }
 
     
@@ -164,26 +171,53 @@ class AgentsGroup
         return $this;
     }
 
+    // /**
+    //  * @return Collection<int, CountingCampaign>
+    //  */
+    // public function getAgents(): Collection
+    // {
+    //     return $this->agents;
+    // }
+
+    // public function addAgent(CountingCampaign $agent): static
+    // {
+    //     if (!$this->agents->contains($agent)) {
+    //         $this->agents->add($agent);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removeAgent(CountingCampaign $agent): static
+    // {
+    //     $this->agents->removeElement($agent);
+
+    //     return $this;
+    // }
+
     /**
-     * @return Collection<int, CountingCampaign>
+     * @return Collection<int, SiteAgentsGroup>
      */
-    public function getAgents(): Collection
+    public function getSiteAgentsGroups(): Collection
     {
-        return $this->agents;
+        return $this->siteAgentsGroups;
     }
 
-    public function addAgent(CountingCampaign $agent): static
+    public function addSiteAgentsGroup(SiteAgentsGroup $siteAgentsGroup): static
     {
-        if (!$this->agents->contains($agent)) {
-            $this->agents->add($agent);
+        if (!$this->siteAgentsGroups->contains($siteAgentsGroup)) {
+            $this->siteAgentsGroups->add($siteAgentsGroup);
+            $siteAgentsGroup->addAgentsGroup($this);
         }
 
         return $this;
     }
 
-    public function removeAgent(CountingCampaign $agent): static
+    public function removeSiteAgentsGroup(SiteAgentsGroup $siteAgentsGroup): static
     {
-        $this->agents->removeElement($agent);
+        if ($this->siteAgentsGroups->removeElement($siteAgentsGroup)) {
+            $siteAgentsGroup->removeAgentsGroup($this);
+        }
 
         return $this;
     }

@@ -7,7 +7,7 @@
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Famille des oiseaux</h1>
+      <h1>Familles des oiseaux</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
@@ -63,12 +63,9 @@
               
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
-                Créer une nouvelle famille
-              </a>
-              <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-3">
-                Créer nouvelle espèce
-              </a>
+              <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer une nouvelle famille</a>
+              <a href="{{ path('app_bird_species_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-3"> Liste des espèces</a>
+              <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer nouvelle espèce</a>
             </div>
           </div>
 

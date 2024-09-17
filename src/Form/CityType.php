@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\City;
-use App\Entity\Country;
+use App\Entity\Region;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -30,11 +30,12 @@ class CityType extends AbstractType
                 'label_html' => true,
                 'required' => false,
             ])
-            ->add('country', EntityType::class, [
-                'class' => Country::class,
+            ->add('region', EntityType::class, [
+                'class' => Region::class,
                 'choice_label' => 'name',
-                'placeholder' => '-- Choisir le pays --',
-                'label' => 'Pays<span class="requiredField">*</span>',
+                'placeholder' => '-- Choisir la région --',
+                'autocomplete' => true,
+                'label' => 'Région<span class="requiredField">*</span>',
                 'label_html' => true,
             ])
         ;

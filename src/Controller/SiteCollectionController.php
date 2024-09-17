@@ -2,15 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Region;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\String\Slugger\SluggerInterface;
-use App\Entity\Country;
 use App\Entity\City;
 
 use App\Form\ImportCsvType;
-use App\Service\FileUploader;
 use Monolog\DateTimeImmutable;
 use DateTime;
 use App\Entity\SiteCollection;
@@ -26,198 +23,154 @@ use Symfony\Component\Routing\Attribute\Route;
 #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class SiteCollectionController extends AbstractController
 {
-    #[Route('/', name: 'app_site_collection_index', methods: ['GET'])]
-    public function index(Request $request, SiteCollectionRepository $siteCollectionRepository, EntityManagerInterface $entityManager): Response
+    #[Route('/', name: 'app_site_collection_index', methods: ['GET', 'POST'])]
+    public function index(SiteCollectionRepository $siteCollectionRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $csvFile */
             $csvFile = $form->get('csvFile')->getData();
-
+            
             if ($csvFile) {
-                try {
-                    $this->processCsv($csvFile, $entityManager);
-                    $this->addFlash('success', 'Les données ont été importées avec succès.');
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Une erreur s\'est produite lors de l\'importation du fichier CSV : ' . $e->getMessage());
-                }
-
-                return $this->redirectToRoute('app_site_collection_index');
+                $csvData = file_get_contents($csvFile->getPathname());
+                $rows = array_map(function($row) {
+                    return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
+                }, explode("\n", $csvData));
+                
+                $headers = array_shift($rows); // Enlever la première ligne qui contient les en-têtes
+    
+                return $this->render('site_collection/index.html.twig', [
+                    'site_collections' => $siteCollectionRepository->findAll(),
+                    'form' => $form->createView(),
+                    'headers' => $headers,
+                    'rows' => $rows,
+                    'csvData' => $csvData,
+                ]);
             }
         }
+    
+        if ($request->isMethod('POST') && $request->request->get('action') === 'import') {
+            $csvData = $request->request->get('csvData');
+            $rows = array_map(function($row) {
+                return str_getcsv($row, ';');
+            }, explode("\n", $csvData));
+    
+            $headers = array_shift($rows);
+    
+            $importedCount = 0; // Compteur de sites importées
+            $processedSites = []; // Tableau pour suivre les sites déjà traitées
+    
+            foreach ($rows as $row) {
+                // Ignorer les lignes vides
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+    
+                // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
+                if (count($row) !== count($headers)) {
+                    $this->addFlash('error', 'Ligne incorrecte : ' . implode(', ', $row));
+                    continue; // Ignorez cette ligne
+                }
+        
+                $data = array_combine($headers, $row);
+        
+                if ($data === false) {
+                    continue; // Ignorez les lignes où array_combine échoue
+                }
+    
+                $siteName = $data['siteName'];
+                $siteCode = $data['siteCode'];
+                $nationalSiteCode = $data['nationalSiteCode'] ?? null;
+                $internationalSiteCode = $data['internationalSiteCode'] ?? null;
+                $latDepart = $data['latDepart'];
+                $longDepart = $data['longDepart'];
+                $latFin = $data['latFin'];
+                $longFin = $data['longFin'];
+                // $parentSite = $data['parentSite'] ?? null;
+                $cityName = $data['city'] ?? null;
+                $lat = $data['lat'] ?? null;
+                $lng = $data['lng'] ?? null;
+                $regionName = $data['region'] ?? null;
+    
+                if (empty($siteName) || empty($siteCode) || empty($latDepart) || empty($longDepart) || empty($latFin) || empty($longFin)  || empty($cityName)) {
+                    continue;
+                }
+    
+                // Vérifier si le site a déjà été traitée dans ce fichier
+                if (isset($processedSites[$siteName])) {
+                    continue; // Si oui, ignorer cette entrée
+                }
+    
+                // Vérifier si le site existe déjà dans la base de données
+                $existingSite = $siteCollectionRepository->findOneBy(['siteName' => $siteName]);
+                if ($existingSite) {
+                    // $this->addFlash('info', 'Le site ' . $siteName . ' existe déjà dans la base de données.');
+                    $processedSites[$siteName] = true;
+                    continue; // Si oui, ignorer cette entrée
+                }
+    
+                // Récupérer ou créer la ville associée
+                $cityRepository = $entityManager->getRepository(City::class);
+                $existingCity = $cityRepository->findOneBy(['name' => $cityName]);
 
+                $regionRepository = $entityManager->getRepository(Region::class);
+                $existingRegion = $regionRepository->findOneBy(['name' => $regionName]);
+    
+                // if (!$existingRegion) {
+                //     $this->addFlash('info', 'Région n\'existe pas.');
+                //     continue;
+                // } 
+                if (!$existingCity) {
+                    $city = new City();
+                    $city->setName($cityName);
+                    $city->setLatitude($lat);
+                    $city->setLongitude($lng);
+                    $city->setCreatedAt(new \DateTimeImmutable());
+                    $city->setRegion($regionName);
+
+                    $entityManager->persist($city);
+                    $existingCity = $city; // Réassigner pour utiliser l'objet persisté
+                }
+    
+                // Créez et persistez un nouveau site
+                $site = new SiteCollection();
+                $site->setSiteName($siteName);
+                $site->setSiteCode($siteCode);
+                $site->setNationalSiteCode($nationalSiteCode);
+                $site->setInternationalSiteCode($internationalSiteCode);
+                $site->setLatDepart($latDepart);
+                $site->setLongDepart($longDepart);
+                $site->setLatFin($latFin);
+                $site->setLongFin($longFin);
+                // $site->setParentSite($parentSite);
+
+                $site->setCreatedAt(new \DateTimeImmutable());
+    
+                // Associer le site au ville
+                $site->setCity($existingCity);
+    
+                $entityManager->persist($site);
+                $importedCount++; // Incrémentez le compteur
+    
+                // Marquer cette ville comme traitée
+                $processedSites[$siteName] = true;
+            }
+    
+            $entityManager->flush();
+    
+            $this->addFlash('success', $importedCount . ' sites de collecte ont été importées avec succès.');
+    
+            return $this->redirectToRoute('app_site_collection_index');
+        }
+    
         return $this->render('site_collection/index.html.twig', [
             'site_collections' => $siteCollectionRepository->findAll(),
             'form' => $form->createView(),
         ]);
     }
-
-    #[Route('/import', name: 'app_site_collection_import', methods: ['POST'])]
-    public function import(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(ImportCsvType::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted()) {
-            if ($form->isValid()) {
-                $csvFile = $form->get('csvFile')->getData();
-                $extension = $csvFile->getClientOriginalExtension();
-
-                if (!in_array($extension, ['csv', 'txt'])) {
-                    $this->addFlash('error', 'Veuillez charger un fichier CSV ou TXT valide.');
-                    return $this->redirectToRoute('app_site_collection_import');
-                }
-
-                if ($csvFile) {
-                    try {
-                        $this->processCsv($csvFile, $entityManager);
-                        $this->addFlash('success', 'Les données ont été importées avec succès.');
-                        return $this->redirectToRoute('app_site_collection_index');
-                    } catch (\Exception $e) {
-                        $this->addFlash('error', 'Une erreur s\'est produite lors de l\'importation du fichier CSV : ' . $e->getMessage());
-                    }
-                }
-            } else {
-                $this->addFlash('error', 'Le fichier CSV contient des erreurs de validation.');
-            }
-        }
-
-        return $this->render('site_collection/import.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
-    private function processCsv(UploadedFile $csvFile, EntityManagerInterface $entityManager)
-    {
-        $csvData = file_get_contents($csvFile->getPathname());
-        $rows = array_map(function($row) {
-            return str_getcsv($row, ';');
-        }, explode("\n", $csvData));
-        
-        $headers = array_shift($rows);
-    
-        foreach ($rows as $row) {
-            if (count($row) !== count($headers)) {
-                continue; // Skip rows where the number of columns does not match the number of headers
-            }
-    
-            $data = array_combine($headers, $row);
-    
-            if ($data === false) {
-                continue; // Skip rows where array_combine fails
-            }
-    
-            // Fetch or create the Country entity
-            $countryName = $data['country'] ?? null;
-            $iso2 = $data['iso2'] ?? null;
-    
-            if ($countryName && $iso2) {
-                $countryRepository = $entityManager->getRepository(Country::class);
-                $country = $countryRepository->findOneBy(['name' => $countryName, 'iso2' => $iso2]);
-    
-                if (!$country) {
-                    $country = new Country();
-                    $country->setName($countryName);
-                    $country->setIso2($data['iso2'] ?? ''); // Assuming the CSV has an iso2 column
-                    $country->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-    
-                    $entityManager->persist($country);
-                }
-            }
-    
-            // Check if the city already exists
-            $cityName = $data['city'] ?? null;
-            if ($cityName && $country) {
-                $cityRepository = $entityManager->getRepository(City::class);
-                $city = $cityRepository->findOneBy(['name' => $cityName, 'country' => $country,]);
-    
-                if (!$city) {
-                    // Create the City entity if it does not exist
-                    $city = new City();
-                    $city->setName($cityName);
-                    $city->setLatitude($data['lat'] ?? null);
-                    $city->setLongitude($data['lng'] ?? null);
-                    $city->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-                    $city->setCountry($country ?? null); // Associate the city with the country if available
-    
-                    $entityManager->persist($city);
-                }
-            }
-
-            // Check if the siteCollection already exists
-            $siteName = $data['Nom du site'] ?? null;
-            if ($siteName) {
-                $siteCollectionRepository = $entityManager->getRepository(SiteCollection::class);
-                $siteCollection = $siteCollectionRepository->findOneBy(['siteName' => $siteName]);
-
-                if (!$siteCollection){
-                    // Create the siteCollection entity if it does not exist
-                    $siteCollection = new SiteCollection();
-                    $siteCollection->setSiteName($data['Nom du site'] ?? null);
-                    $siteCollection->setSiteCode($data['Code du site'] ?? null);
-                    $siteCollection->setNationalSiteCode($data['Code national'] ?? null);
-                    $siteCollection->setInternationalSiteCode($data['Code international'] ?? null);
-                    $siteCollection->setLatDepart($data['Latitude de depart'] ?? null);
-                    $siteCollection->setLongDepart($data['Longitude de depart'] ?? null);
-                    $siteCollection->setLatFin($data['Latitude de fin'] ?? null);
-                    $siteCollection->setLongFin($data['Longitude de fin'] ?? null);
-                    $siteCollection->setCity($city ?? null); // Associate the siteCollection with the city if available
-                    $siteCollection->setParentSiteName($data['Nom du site parent'] ?? null);
-                    $siteCollection->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-                    
-                    $entityManager->persist($siteCollection);
-                }
-            }
-
-    
-        }
-    
-        $entityManager->flush();
-    }
-
-    #[Route('/preview', name: 'app_site_collection_preview', methods: ['POST'])]
-    public function preview(Request $request): Response
-    {
-        $form = $this->createForm(ImportCsvType::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted()) {
-            if ($form->isValid()) {
-                /** @var UploadedFile $csvFile */
-                $csvFile = $form->get('csvFile')->getData();
-                if ($csvFile) {
-                    $csvData = file_get_contents($csvFile->getPathname());
-                    $rows = array_map(function($row) {
-                        return str_getcsv($row, ';');
-                    }, explode("\n", $csvData));
-
-                    $headers = array_shift($rows);
-
-                    return $this->render('site_collection/preview.html.twig', [
-                        'headers' => $headers,
-                        'rows' => $rows,
-                        'csvData' => $csvData, // Pass the raw CSV data to the template
-                    ]);
-                } else {
-                    // Add a flash message or log an error if the file is not provided
-                    $this->addFlash('error', 'No CSV file was provided.');
-                }
-            } else {
-                // Add a flash message or log an error if the form is invalid
-                $this->addFlash('error', 'The form is invalid.');
-            }
-        } else {
-            // Add a flash message or log an error if the form is not submitted
-            $this->addFlash('error', 'The form was not submitted.');
-        }
-
-        return $this->redirectToRoute('app_site_collection_index');
-    }
-    
-    // #[Route('/preview', name: 'app_site_collection_preview', methods: ['POST'])]
-    // public function preview(Request $request): Response
+    // public function index(Request $request, SiteCollectionRepository $siteCollectionRepository, EntityManagerInterface $entityManager): Response
     // {
     //     $form = $this->createForm(ImportCsvType::class);
     //     $form->handleRequest($request);
@@ -225,24 +178,25 @@ class SiteCollectionController extends AbstractController
     //     if ($form->isSubmitted() && $form->isValid()) {
     //         /** @var UploadedFile $csvFile */
     //         $csvFile = $form->get('csvFile')->getData();
-    //         if ($csvFile) {
-    //             $csvData = file_get_contents($csvFile->getPathname());
-    //             $rows = array_map(function($row) {
-    //                 return str_getcsv($row, ';');
-    //             }, explode("\n", $csvData));
-                
-    //             $headers = array_shift($rows);
 
-    //             return $this->render('site_collection/preview.html.twig', [
-    //                 'headers' => $headers,
-    //                 'rows' => $rows,
-    //                 'csvData' => $csvData, // Pass the raw CSV data to the template
-    //             ]);
+    //         if ($csvFile) {
+    //             try {
+    //                 $this->processCsv($csvFile, $entityManager);
+    //                 $this->addFlash('success', 'Les données ont été importées avec succès.');
+    //             } catch (\Exception $e) {
+    //                 $this->addFlash('error', 'Une erreur s\'est produite lors de l\'importation du fichier CSV : ' . $e->getMessage());
+    //             }
+
+    //             return $this->redirectToRoute('app_site_collection_index');
     //         }
     //     }
 
-    //     return $this->redirectToRoute('app_site_collection_index');
+    //     return $this->render('site_collection/index.html.twig', [
+    //         'site_collections' => $siteCollectionRepository->findAll(),
+    //         'form' => $form->createView(),
+    //     ]);
     // }
+
 
     #[Route('/new', name: 'app_site_collection_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -255,7 +209,7 @@ class SiteCollectionController extends AbstractController
             $siteCollection->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
             $entityManager->persist($siteCollection);
             $entityManager->flush();
-            $this->addFlash('success', "Site de collection a bien été crée");
+            $this->addFlash('success', "Site de collecte a bien été crée");
 
             return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -283,7 +237,7 @@ class SiteCollectionController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $siteCollection->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
             $entityManager->flush();
-            $this->addFlash('success', "Site de collection a bien été modifié");
+            $this->addFlash('success', "Site de collecte a bien été modifié");
 
             return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -300,7 +254,7 @@ class SiteCollectionController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$siteCollection->getId(), $request->getPayload()->get('_token'))) {
             $entityManager->remove($siteCollection);
             $entityManager->flush();
-            $this->addFlash('success', "Site de collection a bien été supprimée");
+            $this->addFlash('success', "Site de collecte a bien été supprimée");
         }
 
         return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);

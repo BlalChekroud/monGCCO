@@ -30,7 +30,7 @@
                         <tr>
                             <th>#</th>
                             <th>Collecteur</th>
-                            <th>Site de collection</th>
+                            <th>Site de collecte</th>
                             <th>Nombre total</th>
                             <th>Crée le</th>
                             <th>Actions</th>
@@ -54,7 +54,7 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="13">Aucun enregistrement trouvé</td>
+                            <td colspan="6">Aucun enregistrement trouvé</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -66,10 +66,10 @@
                         Liste des campagnes
                     </a>
                     <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm ri-database-line">
-                      Créer nouvelle données collectées
+                      Créer une collecte
                     </a>
                     <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3">
-                        Créer une nouvelle campagne
+                        Créer une campagne
                     </a>
                 </div>
             </div>

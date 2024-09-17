@@ -1,29 +1,113 @@
-{{ form_start(form) }}
-    {# {{ form_widget(form) }} #}
-    <div class="row mb-3">
-      <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
-        {{ form_label(form.startDate, 'Date de début') }}<span class="requiredField">*</span>
-        {{ form_widget(form.startDate, {'attr': {'class': 'form-control'}}) }}
-        {{ form_errors(form.startDate) }}
+{# {{ form_start(form) }} #}
+{{ form_start(form, {'attr': {'id': 'myForm'}}) }}
+  <div class="row mb-3">
+      <!-- Date de début -->
+      <div class="col-md-4">
+          <label for="{{ form.startDate.vars.id }}" class="form-label">{{ form_label(form.startDate) }}<span class="requiredField">*</span></label>
+          {{ form_widget(form.startDate, {'attr': {'class': 'form-control', 'placeholder': 'Sélectionnez la date de début'}}) }}
+          <div class="text-danger">{{ form_errors(form.startDate) }}</div>
       </div>
-      <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
-        {{ form_label(form.endDate, 'Date de fin') }}<span class="requiredField">*</span>
-        {{ form_widget(form.endDate, {'attr': {'class': 'form-control'}}) }}
-        {{ form_errors(form.endDate) }}
+
+      <!-- Date de fin -->
+      <div class="col-md-4">
+          <label for="{{ form.endDate.vars.id }}" class="form-label">{{ form_label(form.endDate) }}<span class="requiredField">*</span></label>
+          {{ form_widget(form.endDate, {'attr': {'class': 'form-control', 'placeholder': 'Sélectionnez la date de fin'}}) }}
+          <div class="text-danger">{{ form_errors(form.endDate) }}</div>
       </div>
-      <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3 mx-3">
-        {{ form_label(form.campaignStatus, 'Etat de la campagne') }}
-        {{ form_widget(form.campaignStatus, {'attr': {'class': 'form-control'}}) }}
-        {{ form_errors(form.campaignStatus) }}
+
+      <!-- Etat de la campagne -->
+      <div class="col-md-4">
+          <label for="{{ form.campaignStatus.vars.id }}" class="form-label">{{ form_label(form.campaignStatus) }}</label>
+          {{ form_widget(form.campaignStatus, {'attr': {'class': 'form-control', 'placeholder': 'Choisissez l\'état de la campagne'}}) }}
+          <div class="text-danger">{{ form_errors(form.campaignStatus) }}</div>
       </div>
+  </div>
+
+  <!-- Section des sites et groupes d'agents -->
+  <h5 class="mt-4">Sites et Groupes d'agents<span class="requiredField">*</span></h5>
+  <div id="site-agents-group-collection" data-prototype="{{ form_widget(form.siteAgentsGroups.vars.prototype)|e('html_attr') }}">
+      {% for siteAgentsGroup in form.siteAgentsGroups %}
+          <div class="row mb-3 site-agents-group-item">
+              <div class="col-md-10">
+                  {{ form_widget(siteAgentsGroup) }}
+              </div>
+              <div class="col-md-2">
+                  <button type="button" class="btn btn-danger btn-sm bi bi-trash btn-sm remove-site-agents-group" title="Supprimer"></button>
+              </div>
+          </div>
+      {% endfor %}
+  </div>
+
+  <!-- Bouton pour ajouter un site et groupe(s) d'agents -->
+  <div class="row mb-3">
+      <div class="col-md-12 text-end">
+        <button type="button" id="add-site-agents-group" class="btn btn-outline-primary btn-sm rounded-pill mt-3" title="Ajouter un site et son/ses groupe(s) d'agents">
+          <i class="ri-add-circle-line me-1"></i> 
+          Ajouter un site
+        </button>
+
+      </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-12">
+      {{form_rest(form) }}
     </div>
-    {{form_rest(form) }}
-    <div class="row mb-3">
-      <div class="col-sm-4 col-lg-4">
-        <button type="reset" class="btn btn-outline-dark bi bi-x-square"> Annuler</button>
+  </div>
+
+  <!-- Boutons de soumission et annulation -->
+  <div class="row mt-4">
+      <div class="col-md-3">
+          <button type="reset" class="btn btn-outline-dark"><i class="bi bi-x-square"></i> Annuler</button>
       </div>
-      <div class="col-sm-5 col-lg-5">
-        <button class="btn btn-outline-primary bi bi-save"> {{ button_label|default('Enregistrer') }}</button>
+      <div class="col-md-3">
+          <button type="submit" class="btn btn-outline-primary"><i class="bi bi-save"></i> Enregistrer</button>
       </div>
-    </div>
+  </div>
 {{ form_end(form) }}
+
+<!-- Script pour la gestion dynamique des collections et suppression -->
+<script>
+        var addButton = document.getElementById('add-site-agents-group');
+        var collectionHolder = document.getElementById('site-agents-group-collection');
+
+        // Compteur d'index pour chaque élément ajouté dynamiquement
+        var index = collectionHolder.children.length;
+
+        // Fonction pour ajouter un nouveau site et groupe(s) d'agents
+        addButton.addEventListener('click', function () {
+            var newForm = collectionHolder.dataset.prototype;
+            newForm = newForm.replace(/__name__/g, index);
+
+            var formDiv = document.createElement('div');
+            formDiv.classList.add('row', 'mb-3', 'site-agents-group-item');
+            formDiv.innerHTML = `
+                <div class="col-md-10 my-2">${newForm}</div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger bi bi-trash btn-sm remove-site-agents-group" title="Supprimer"></button>
+                </div>
+            `;
+            collectionHolder.appendChild(formDiv);
+
+            // Ajouter l'événement de suppression au nouveau bouton
+            formDiv.querySelector('.remove-site-agents-group').addEventListener('click', function() {
+                formDiv.remove();
+            });
+
+            index++;
+        });
+
+        // Ajout de la suppression pour les éléments existants
+        document.querySelectorAll('.remove-site-agents-group').forEach(function (button) {
+            button.addEventListener('click', function () {
+                button.closest('.site-agents-group-item').remove();
+            });
+        });
+</script>
+{# <script>
+    let form = document.getElementById("myForm");
+    form.addEventListener("reset", function(e){
+        // Pas besoin de preventDefault ici
+        window.location.href = '/'; // Si vous souhaitez rediriger après l'annulation
+    });
+</script> #}

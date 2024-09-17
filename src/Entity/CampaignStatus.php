@@ -26,11 +26,11 @@ class CampaignStatus
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    /**
-     * @var Collection<int, CountingCampaign>
-     */
-    #[ORM\OneToMany(targetEntity: CountingCampaign::class, mappedBy: 'campaignStatus')]
-    private Collection $status;
+    // /**
+    //  * @var Collection<int, CountingCampaign>
+    //  */
+    // #[ORM\OneToMany(targetEntity: CountingCampaign::class, mappedBy: 'campaignStatus')]
+    // private Collection $status;
 
     public function __construct()
     {
@@ -78,33 +78,33 @@ class CampaignStatus
         return $this;
     }
 
-    /**
-     * @return Collection<int, CountingCampaign>
-     */
-    public function getStatus(): Collection
-    {
-        return $this->status;
-    }
+    // /**
+    //  * @return Collection<int, CountingCampaign>
+    //  */
+    // public function getStatus(): Collection
+    // {
+    //     return $this->status;
+    // }
 
-    public function addStatus(CountingCampaign $status): static
-    {
-        if (!$this->status->contains($status)) {
-            $this->status->add($status);
-            $status->setCampaignStatus($this);
-        }
+    // public function addStatus(CountingCampaign $status): static
+    // {
+    //     if (!$this->status->contains($status)) {
+    //         $this->status->add($status);
+    //         $status->setCampaignStatus($this);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function removeStatus(CountingCampaign $status): static
-    {
-        if ($this->status->removeElement($status)) {
-            // set the owning side to null (unless already changed)
-            if ($status->getCampaignStatus() === $this) {
-                $status->setCampaignStatus(null);
-            }
-        }
+    // public function removeStatus(CountingCampaign $status): static
+    // {
+    //     if ($this->status->removeElement($status)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($status->getCampaignStatus() === $this) {
+    //             $status->setCampaignStatus(null);
+    //         }
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 }

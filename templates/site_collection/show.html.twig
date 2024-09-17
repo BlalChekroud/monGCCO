@@ -6,7 +6,7 @@
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Détail d'une site de collection</h1>
+      <h1>Détail d'un site de collecte</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
@@ -69,12 +69,29 @@
                                     <td>{{ site_collection.longFin }}</td>
                                 </tr>
                                 <tr>
+                                    {% set city = site_collection.city %}
                                     <th>Ville</th>
-                                    <td>{{ site_collection.city.name }}</td>
+                                    <td>{{ city.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Région</th>
+                                    <td>{{ city.region.name }}
+                                        {% if city.region.name %}
+                                            {{ city.region.name }}
+                                        {% else %}
+                                            <span>Aucune</span>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Pays</th>
-                                    <td>{{ site_collection.city.country.name }}</td>
+                                    <td>
+                                        {% if city.region.country %}
+                                            {{ city.region.country.name }}
+                                        {% else %}
+                                            <span>Aucun</span>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Nom du site parent</th>
@@ -100,7 +117,7 @@
                     <div class="card-footer">
                         <div class="d-flex justtify-content-end">
                             <a href="{{ path('app_site_collection_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
-                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Créer nouvelle site de collection</a>
+                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Créer un site de collecte</a>
                             <a href="{{ path('app_site_collection_edit', {'id': site_collection.id}) }}" class="bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
                             {{ include('site_collection/_delete_form.html.twig') }}
                         </div>

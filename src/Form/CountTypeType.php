@@ -13,12 +13,6 @@ class CountTypeType extends AbstractType
     {
         $builder
             ->add('label')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('updatedAt', null, [
-                'widget' => 'single_text',
-            ])
         ;
     }
 

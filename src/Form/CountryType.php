@@ -13,12 +13,12 @@ class CountryType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name',TextType::class, [
+            ->add('name', TextType::class, [
                 'label' => 'Nom du pays<span class="requiredField">*</span>',
                 'label_html' => true,
                 'required' => false,
                 ])
-            ->add('iso2',TextType::class, [
+            ->add('iso2', TextType::class, [
                 'label' => 'Iso2<span class="requiredField">*</span>',
                 'label_html' => true,
                 'required' => false,

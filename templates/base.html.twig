@@ -159,7 +159,7 @@
           <li class="nav-item dropdown">
               <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                   <i class="bi bi-bell"></i>
-                  {# {% if notifications %}
+                  {% if notifications %}
                     {% for type, messages in notifications %}
                       {% for message in messages %}
                         {% if type == 'success' %}
@@ -175,7 +175,7 @@
                         {% endif %}
                       {% endfor %}
                     {% endfor %}
-                  {% endif %} #}
+                  {% endif %}
               </a><!-- End Notification Icon -->
               <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
                   <li class="dropdown-header">
@@ -186,7 +186,7 @@
                       <hr class="dropdown-divider">
                   </li>
 
-                  {# {% for type, messages in notifications %}
+                  {% for type, messages in notifications %}
                       {% for message in messages %}
                           <li class="notification-item">
                               {% if type == 'warning' %}
@@ -210,7 +210,7 @@
                               <hr class="dropdown-divider">
                           </li>
                       {% endfor %}
-                  {% endfor %} #}
+                  {% endfor %}
                   
                   <li class="dropdown-footer">
                       <a href="{{ path('all_notifications') }}">Afficher toutes les notifications</a>
@@ -288,14 +288,14 @@
           <li class="nav-item dropdown pe-3">
 
             <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                {% if app.user %}
-              <img src="{{ vich_uploader_asset(app.user, 'imageFile') }}" alt="Profile" class="rounded-circle">
-              <span class="d-none d-md-block dropdown-toggle ps-2">
+              {% if app.user %}
+                <img src="{{ vich_uploader_asset(app.user, 'imageFile') }}" alt="Profile" class="rounded-circle">
+                <span class="d-none d-md-block dropdown-toggle ps-2">
                   {{ app.user.getName() }}
-              </span>
-                {% else %}
-                  <a href="{{ path('app_login') }}">Se connecter</a>
-                {% endif %}
+                </span>
+              {% else %}
+                <a href="{{ path('app_login') }}">Se connecter</a>
+              {% endif %}
             </a><!-- End Profile Iamge Icon -->
 
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
@@ -446,7 +446,7 @@
           <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="{{ path('app_site_collection_new')}}">
-                <i class="bi bi-circle"></i><span>Créer une site</span>
+                <i class="bi bi-circle"></i><span>Ajouter un site</span>
               </a>
             </li>
             <li>
@@ -455,13 +455,33 @@
               </a>
             </li>
             <li>
-              <a href="{{ path('app_country_index')}}">
-                <i class="bi bi-circle"></i><span>Pays</span>
+              <a href="{{ path('app_city_new')}}">
+                <i class="bi bi-circle"></i><span>Ajouter une ville</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_city_index')}}">
-                <i class="bi bi-circle"></i><span>Villes</span>
+                <i class="bi bi-circle"></i><span>Consultation des villes</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_region_new')}}">
+                <i class="bi bi-circle"></i><span>Ajouter une région</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_region_index')}}">
+                <i class="bi bi-circle"></i><span>Consultation des régions</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_country_new')}}">
+                <i class="bi bi-circle"></i><span>Ajouter un pays</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_country_index')}}">
+                <i class="bi bi-circle"></i><span>Consultation des pays</span>
               </a>
             </li>
           </ul>
@@ -485,6 +505,46 @@
             <li>
               <a href="{{ path('app_environmental_conditions_index') }}">
                 <i class="bi bi-circle"></i><span>Consultation des conditions d'environnement</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_count_type_new') }}">
+                <i class="bi bi-circle"></i><span>Type de comptage</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_quality_new') }}">
+                <i class="bi bi-circle"></i><span>Qualité</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_method_new') }}">
+                <i class="bi bi-circle"></i><span>Méthode</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_disturbed_new') }}">
+                <i class="bi bi-circle"></i><span>Disturbé</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_ice_new') }}">
+                <i class="bi bi-circle"></i><span>La couverture de glace</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_tidal_new') }}">
+                <i class="bi bi-circle"></i><span>Marée</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_water_new') }}">
+                <i class="bi bi-circle"></i><span>Etat des eaux</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_weather_new') }}">
+                <i class="bi bi-circle"></i><span>Condition météorologique</span>
               </a>
             </li>
           </ul>

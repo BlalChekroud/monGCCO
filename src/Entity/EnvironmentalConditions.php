@@ -39,7 +39,7 @@ class EnvironmentalConditions
     #[ORM\JoinColumn(nullable: false)]
     private ?Weather $weather = null;
 
-    #[ORM\OneToOne(inversedBy: 'environmentalConditions', cascade: ['persist'])]
+    #[ORM\OneToOne(inversedBy: 'environmentalConditions', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true)]
     private ?CollectedData $collectedData = null;
 

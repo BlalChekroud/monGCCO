@@ -35,11 +35,11 @@ class CountingCampaign
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    /**
-     * @var Collection<int, SiteCollection>
-     */
-    #[ORM\ManyToMany(targetEntity: SiteCollection::class, inversedBy: 'countingCampaigns')]
-    private Collection $siteCollection;
+    // /**
+    //  * @var Collection<int, SiteCollection>
+    //  */
+    // #[ORM\ManyToMany(targetEntity: SiteCollection::class, inversedBy: 'countingCampaigns')]
+    // private Collection $siteCollection;
 
     /**
      * @var Collection<int, CollectedData>
@@ -50,15 +50,15 @@ class CountingCampaign
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: 'status')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?CampaignStatus $campaignStatus = null;
+    // #[ORM\ManyToOne(inversedBy: 'status')]
+    // #[ORM\JoinColumn(nullable: false)]
+    // private ?CampaignStatus $campaignStatus = null;
 
-    /**
-     * @var Collection<int, AgentsGroup>
-     */
-    #[ORM\ManyToMany(targetEntity: AgentsGroup::class, inversedBy: 'agents')]
-    private Collection $agentsGroups;
+    // /**
+    //  * @var Collection<int, AgentsGroup>
+    //  */
+    // #[ORM\ManyToMany(targetEntity: AgentsGroup::class, inversedBy: 'agents')]
+    // private Collection $agentsGroups;
 
     /**
      * @var Collection<int, EnvironmentalConditions>
@@ -70,12 +70,22 @@ class CountingCampaign
     #[ORM\JoinColumn(nullable: false)]
     private ?User $createdBy = null;
 
+    #[ORM\Column(length: 10)]
+    private ?string $campaignStatus = null;
+
+    /**
+     * @var Collection<int, SiteAgentsGroup>
+     */
+    #[ORM\OneToMany(targetEntity: SiteAgentsGroup::class, mappedBy: 'countingCampaign', orphanRemoval: true)]
+    private Collection $siteAgentsGroups;
+
     public function __construct()
     {
-        $this->siteCollection = new ArrayCollection();
+        // $this->siteCollection = new ArrayCollection();
         $this->collectedData = new ArrayCollection();
-        $this->agentsGroups = new ArrayCollection();
+        // $this->agentsGroups = new ArrayCollection();
         $this->environmentalConditions = new ArrayCollection();
+        $this->siteAgentsGroups = new ArrayCollection();
     }
 
     public function generateCampaignName(): void
@@ -91,28 +101,21 @@ class CountingCampaign
             throw new \InvalidArgumentException('Les dates de début et de fin ne peuvent pas être les mêmes.');
         }
 
-        if (!$this->getSiteCollection()) {
-            throw new \InvalidArgumentException('Les sites doivent être définies pour générer le nom de la campagne.');
+        if (!$this->getSiteAgentsGroups()) {
+            throw new \InvalidArgumentException('Les sites et leurs groupes doivent être définies pour générer le nom de la campagne.');
         }
 
-        $iso2Names = [];
-        foreach ($this->getSiteCollection() as $site) {
-            $iso2Names[] = $site->getCity()->getCountry()->getIso2();
+        $regionCode = [];
+        foreach ($this->getSiteAgentsGroups() as $sag) {
+            $regionCode[] = $sag->getSiteCollection()->getCity()->getRegion()->getRegionCode();
         }
-        $uniqueIso2Names = array_unique($iso2Names);
-        
-        $cityNames = [];
-        foreach ($this->getSiteCollection() as $site) {
-            $cityNames[] = $site->getCity()->getName();
-        }
-        $uniqueCityNames = array_unique($cityNames);
+        $uniqueregionCode = array_unique($regionCode);
 
         $startYear = $this->getStartDate()->format('Y');
-        // $endDate = $this->getEndDate()->format('d-m-Y');
         $campaignId = $this->getId();
 
-        $this->campaignName = sprintf('%s %s %s - %s', implode(',',$uniqueIso2Names), implode(',', $uniqueCityNames) ,$startYear ,$campaignId);
-        // $this->campaignName = sprintf('%s %s (%s - %s)','Campagne', implode(', ', $uniqueRegionNames), $startDate, $endDate);
+        // $this->campaignName = sprintf('%s %s %s - %s', implode(',',$uniqueregionCode), implode(',', $uniqueCityNames) ,$startYear ,$campaignId);
+        $this->campaignName = sprintf('%s %s - %s', implode(',',$uniqueregionCode) ,$startYear ,$campaignId);
     }
 
     public function getId(): ?int
@@ -180,29 +183,29 @@ class CountingCampaign
         return $this;
     }
 
-    /**
-     * @return Collection<int, SiteCollection>
-     */
-    public function getSiteCollection(): Collection
-    {
-        return $this->siteCollection;
-    }
+    // /**
+    //  * @return Collection<int, SiteCollection>
+    //  */
+    // public function getSiteCollection(): Collection
+    // {
+    //     return $this->siteCollection;
+    // }
 
-    public function addSiteCollection(SiteCollection $siteCollection): static
-    {
-        if (!$this->siteCollection->contains($siteCollection)) {
-            $this->siteCollection->add($siteCollection);
-        }
+    // public function addSiteCollection(SiteCollection $siteCollection): static
+    // {
+    //     if (!$this->siteCollection->contains($siteCollection)) {
+    //         $this->siteCollection->add($siteCollection);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function removeSiteCollection(SiteCollection $siteCollection): static
-    {
-        $this->siteCollection->removeElement($siteCollection);
+    // public function removeSiteCollection(SiteCollection $siteCollection): static
+    // {
+    //     $this->siteCollection->removeElement($siteCollection);
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * @return Collection<int, CollectedData>
@@ -246,44 +249,45 @@ class CountingCampaign
         return $this;
     }
 
-    public function getCampaignStatus(): ?CampaignStatus
-    {
-        return $this->campaignStatus;
-    }
+    // public function getCampaignStatus(): ?CampaignStatus
+    // {
+    //     return $this->campaignStatus;
+    // }
 
-    public function setCampaignStatus(?CampaignStatus $campaignStatus): static
-    {
-        $this->campaignStatus = $campaignStatus;
+    // public function setCampaignStatus(?CampaignStatus $campaignStatus): static
+    // {
+    //     $this->campaignStatus = $campaignStatus;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    /**
-     * @return Collection<int, AgentsGroup>
-     */
-    public function getAgentsGroups(): Collection
-    {
-        return $this->agentsGroups;
-    }
 
-    public function addAgentsGroup(AgentsGroup $agentsGroup): static
-    {
-        if (!$this->agentsGroups->contains($agentsGroup)) {
-            $this->agentsGroups->add($agentsGroup);
-            $agentsGroup->addAgent($this);
-        }
+    // /**
+    //  * @return Collection<int, AgentsGroup>
+    //  */
+    // public function getAgentsGroups(): Collection
+    // {
+    //     return $this->agentsGroups;
+    // }
 
-        return $this;
-    }
+    // public function addAgentsGroup(AgentsGroup $agentsGroup): static
+    // {
+    //     if (!$this->agentsGroups->contains($agentsGroup)) {
+    //         $this->agentsGroups->add($agentsGroup);
+    //         $agentsGroup->addAgent($this);
+    //     }
 
-    public function removeAgentsGroup(AgentsGroup $agentsGroup): static
-    {
-        if ($this->agentsGroups->removeElement($agentsGroup)) {
-            $agentsGroup->removeAgent($this);
-        }
+    //     return $this;
+    // }
 
-        return $this;
-    }
+    // public function removeAgentsGroup(AgentsGroup $agentsGroup): static
+    // {
+    //     if ($this->agentsGroups->removeElement($agentsGroup)) {
+    //         $agentsGroup->removeAgent($this);
+    //     }
+
+    //     return $this;
+    // }
 
     /**
      * @return Collection<int, EnvironmentalConditions>
@@ -323,6 +327,48 @@ class CountingCampaign
     public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getCampaignStatus(): ?string
+    {
+        return $this->campaignStatus;
+    }
+
+    public function setCampaignStatus(string $campaignStatus): static
+    {
+        $this->campaignStatus = $campaignStatus;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SiteAgentsGroup>
+     */
+    public function getSiteAgentsGroups(): Collection
+    {
+        return $this->siteAgentsGroups;
+    }
+
+    public function addSiteAgentsGroup(SiteAgentsGroup $siteAgentsGroup): static
+    {
+        if (!$this->siteAgentsGroups->contains($siteAgentsGroup)) {
+            $this->siteAgentsGroups->add($siteAgentsGroup);
+            $siteAgentsGroup->setCountingCampaign($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSiteAgentsGroup(SiteAgentsGroup $siteAgentsGroup): static
+    {
+        if ($this->siteAgentsGroups->removeElement($siteAgentsGroup)) {
+            // set the owning side to null (unless already changed)
+            if ($siteAgentsGroup->getCountingCampaign() === $this) {
+                $siteAgentsGroup->setCountingCampaign(null);
+            }
+        }
 
         return $this;
     }

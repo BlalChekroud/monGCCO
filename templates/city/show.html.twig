@@ -38,6 +38,27 @@
                                         <td>{{ city.longitude }}</td>
                                     </tr>
                                     <tr>
+                                        <th>Pays :</th>
+                                        <td>{{ city.region.country.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Région :</th>
+                                        <td>{{ city.region.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Sites de collectes :</th>
+                                        {% if city.siteCollections|length > 0 %}
+                                            {% set sorted_sites = city.siteCollections|sort((a, b) => a.siteName <=> b.siteName) %}
+                                            <ul>
+                                                {% for site in sorted_sites %}
+                                                    <li>{{ site.siteName }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                        <td>Aucun site</td>
+                                        {% endif %}
+                                    </tr>
+                                    <tr>
                                         <th>Crée le :</th>
                                         <td>{{ city.createdAt ? city.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                                     </tr>

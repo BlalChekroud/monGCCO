@@ -159,20 +159,20 @@ class UserType extends AbstractType
                 ],
             ])
         ;
-            // Ajouter un écouteur d'événement pour la validation après la soumission du formulaire
-            $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-                $form = $event->getForm();
-                $data = $form->getData();
+            // // Ajouter un écouteur d'événement pour la validation après la soumission du formulaire
+            // $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            //     $form = $event->getForm();
+            //     $data = $form->getData();
 
-                // Obtiens les données des champs
-                $plainPassword = $form->get('plainPassword')->getData();
-                $passwordConfirm = $form->get('passwordConfirm')->getData();
+            //     // Obtiens les données des champs
+            //     $plainPassword = $form->get('plainPassword')->getData();
+            //     $passwordConfirm = $form->get('passwordConfirm')->getData();
 
-                // Vérifie si les mots de passe correspondent
-                if ($plainPassword !== $passwordConfirm) {
-                    $form->get('passwordConfirm')->addError(new FormError('Les mots de passe ne correspondent pas.'));
-                }
-            });
+            //     // Vérifie si les mots de passe correspondent
+            //     if ($plainPassword !== $passwordConfirm) {
+            //         $form->get('passwordConfirm')->addError(new FormError('Les mots de passe ne correspondent pas.'));
+            //     }
+            // });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

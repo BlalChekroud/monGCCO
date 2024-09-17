@@ -25,7 +25,12 @@
                   <div id="printableArea">
                     <div class="card-body">
                         <h5 class="card-title">Détail</h5>
-
+                        <div class="text-end my-4">
+                            {% set currentDate = "now"|date('Y-m-d H:i:s') %}
+                            {% if counting_campaign.startDate|date('Y-m-d H:i:s') > currentDate %}
+                                <code>Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</code>
+                            {% endif %}
+                        </div>
                         <table class="table">
                             <tbody>
                                 <tr>
@@ -34,50 +39,60 @@
                                 </tr>
                                 <tr>
                                     <th>Etat de la campagne</th>
-                                    <td>
-                                        {% if counting_campaign.campaignStatus.label == 'En attente' %}
+                                    {# <td>
+                                        {% if counting_campaign.campaignStatus == 'En attente' %}
                                             <div class="btn-status btn btn-info" role="status">
                                             <i class="bi bi-circle-fill"></i>
-                                            {{ counting_campaign.campaignStatus.label }}
+                                            {{ counting_campaign.campaignStatus }}
                                             </div>
-                                            {% elseif counting_campaign.campaignStatus.label == 'En cours' %}
+                                            {% elseif counting_campaign.campaignStatus == 'En cours' %}
                                             <div class="btn-status btn btn-primary" role="status">
                                                 <i class="bi bi-circle-fill"></i>
-                                                {{ counting_campaign.campaignStatus.label }}
+                                                {{ counting_campaign.campaignStatus }}
                                             </div>
-                                            {% elseif counting_campaign.campaignStatus.label == 'Terminé' %}
+                                            {% elseif counting_campaign.campaignStatus == 'Terminé' %}
                                             <div class="btn-status btn btn-success">
                                                 <i class="bi bi-check-circle"> </i>
                                             </div>
-                                            {{ counting_campaign.campaignStatus.label }}
-                                            {% elseif counting_campaign.campaignStatus.label == 'Annulé' %}
+                                            {{ counting_campaign.campaignStatus }}
+                                            {% elseif counting_campaign.campaignStatus == 'Annulé' %}
                                             <div class="btn-status btn btn-dark">
                                                 <i class="bi bi-x-lg"> </i>
-                                                {{ counting_campaign.campaignStatus.label }}
+                                                {{ counting_campaign.campaignStatus }}
                                             </div>
-                                            {% elseif counting_campaign.campaignStatus.label == 'Erreur' %}
+                                            {% elseif counting_campaign.campaignStatus == 'Erreur' %}
                                             <div class="btn-status btn btn-warning">
                                                 <i class="bi bi-exclamation-triangle"> </i>
-                                                {{ counting_campaign.campaignStatus.label }}
+                                                {{ counting_campaign.campaignStatus }}
                                             </div>
-                                            {% elseif counting_campaign.campaignStatus.label == 'Validé' %}
+                                            {% elseif counting_campaign.campaignStatus == 'Validé' %}
                                             <div class="btn-status btn btn-success">
                                                 <i class="bi bi-check-circle"> </i>
-                                                {{ counting_campaign.campaignStatus.label }}
+                                                {{ counting_campaign.campaignStatus }}
                                             </div>
-                                            {% elseif counting_campaign.campaignStatus.label == 'Rejeté' %}
-                                            <div class="btn-status btn btn-danger">
-                                                <i class="bi bi-exclamation-triangle"> </i>
-                                                {{ counting_campaign.campaignStatus.label }}
-                                            </div>
-                                            {% elseif counting_campaign.campaignStatus.label == 'Suspens' %}
+                                            {% elseif counting_campaign.campaignStatus == 'Suspens' %}
                                             <div class="btn-status btn btn-secondary" role="status">
                                                 <i class="bi bi-circle-fill"></i>
-                                                {{ counting_campaign.campaignStatus.label }}
+                                                {{ counting_campaign.campaignStatus }}
                                             </div>
                                             {% else %} 
-                                            {{ counting_campaign.campaignStatus.label }}
+                                            {{ counting_campaign.campaignStatus }}
                                         {% endif %}
+                                    </td> #}
+                                    <td>
+                                        {% set status_classes = {
+                                            'En attente': 'info',
+                                            'En cours': 'primary',
+                                            'Terminé': 'light',
+                                            'Annulé': 'dark',
+                                            'Erreur': 'warning',
+                                            'Validé': 'success',
+                                            'Suspens': 'secondary'
+                                        } %}
+                                        <div class="btn-status btn btn-{{ status_classes[counting_campaign.campaignStatus] ?? 'secondary' }}">
+                                            <i class="bi bi-circle-fill"></i>
+                                            {{ counting_campaign.campaignStatus }}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -105,114 +120,99 @@
                                     <td>{{ counting_campaign.description }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Groupes</th>
+                                    <th>Sites et Equipes</th>
                                     <td>
-                                        <ol>
-                                            <div class="accordion accordion-flush" id="accordionFlushExample">
-                                                {% set sorted_groups = counting_campaign.agentsGroups|sort((a, b) => a.groupName <=> b.groupName) %}
+                                        {% if counting_campaign.siteAgentsGroups|length > 0 %}
+                                            <div class="accordion" id="accordionGroups">
+                                                {% for siteAgentsGroup in counting_campaign.siteAgentsGroups %}
+                                                    {% set site = siteAgentsGroup.siteCollection %}
 
-                                                {% for group in sorted_groups %}
                                                     <div class="accordion-item">
-                                                        <h2 class="accordion-header" id="flush-heading{{ loop.index }}">
-                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse{{ loop.index }}" aria-expanded="false" aria-controls="flush-collapse{{ loop.index }}">
-                                                                {{ group.groupName }}
+                                                        <h2 class="accordion-header" id="heading-{{ loop.index }}">
+                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="false" aria-controls="collapse-{{ loop.index }}">
+                                                                {{ site.siteName }} ({{ site.city.name }} / {{ site.city.region.name }})
                                                             </button>
                                                         </h2>
-                                                        <div id="flush-collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="flush-heading{{ loop.index }}" data-bs-parent="#accordionFlushExample">
+                                                        <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ loop.index }}" data-bs-parent="#accordionGroups">
                                                             <div class="accordion-body">
-                                                                <h6><b>Chef d'équipe:</b> {{ group.leader.name }} {{ group.leader.lastName }}</h6>
-                                                                <h6><b>Membres d'équipe:</b></h6>
-                                                                {% if group.groupMember|length > 0 %}
-                                                                    <ul>
-                                                                        {% for agent in group.groupMember %}
-                                                                            <li>{{ agent.name }} {{ agent.lastName }}</li>
-                                                                        {% endfor %}
-                                                                    </ul>
+                                                                <div class="col text-end">
+                                                                    {% set currentDate = "now"|date('Y-m-d H:i:s') %}
+
+                                                                    {% if counting_campaign.startDate|date('Y-m-d H:i:s') <= currentDate %}
+                                                                        {% if existingConditions[site.id] is not empty %}
+
+                                                                            {% if existingConditions[site.id].collectedData is empty %}
+                                                                                {# {% set agentsGroups = siteAgentsGroup.agentsGroup %}
+                                                                                {% if app.user.getEmail in agentsGroups %}
+                                                                                    <p>SAG is not empty</p>
+                                                                                {% else %}<p>SAG is empty</p>
+                                                                                {% endif %} #}
+
+                                                                                <a href="{{ path('app_collected_data_new', {'campaignId': counting_campaign.id, 'siteId': site.id}) }}" class="btn btn-success btn-lg" title="Commentcez a collecter"> Collecter des données 
+                                                                                    <i class="bi bi-arrow-bar-right">
+                                                                                        <div class="spinner-grow spinner-grow-sm text-light" role="status"></div>
+                                                                                    </i>
+                                                                                </a>
+                                                                            {% else %}
+                                                                                <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-outline-success btn-sm my-2" title="Ajouter les conditions environnementales puis commencer à collecter">
+                                                                                    Ajouter Conditions Environnementales de collecte
+                                                                                </a>
+                                                                            {% endif %}
+                                                                            
+                                                                        {% else %}
+                                                                            <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-outline-success btn-sm my-2" title="Ajouter les conditions environnementales puis commencer à collecter">
+                                                                                Ajouter Conditions Environnementales de collecte
+                                                                            </a>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        <code>
+                                                                            Vous ne pouvez pas commencer à collecter avant : 
+                                                                            {{ counting_campaign.startDate ? counting_campaign.startDate|date('Y-m-d H:i:s') : '' }}
+                                                                        </code>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <h6>Groupes d'agents associés :</h6>
+                                                                {% if siteAgentsGroup.agentsGroup|length > 0 %}
+                                                                    {% for group in siteAgentsGroup.agentsGroup %}
+                                                                        <ul>
+                                                                            <li>
+                                                                                <h6>{{ group.groupName }} (Chef : {{ group.leader.name }} {{ group.leader.lastName }})</h6>
+                                                                                <ul>
+                                                                                    {% for agent in group.groupMember %}
+                                                                                        <li>{{ agent.name }} {{ agent.lastName }}</li>
+                                                                                    {% endfor %}
+                                                                                </ul>
+                                                                            </li>
+                                                                        </ul>
+                                                                    {% endfor %}
                                                                 {% else %}
-                                                                    <p>Aucun membre trouvé</p>
+                                                                    <span>Aucun groupe trouvé</span>
                                                                 {% endif %}
                                                             </div>
                                                         </div>
                                                     </div>
-                                                {% else %}
-                                                    <p>Aucune enregistrement trouvé</p>
                                                 {% endfor %}
-                                            </div><!-- End Accordion without outline borders -->
-                                        </ol>
-
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Les sites du campagne</th>
-                                    <td>
-                                        <table class="table table-striped">
-                                            <thead>
-                                            {% set sorted_sites = counting_campaign.siteCollection|sort((a, b) => a.siteName <=> b.siteName) %}
-                                            <tr>
-                                                <th scope="col">Nom du site</th>
-                                                <th scope="col">Ville/Pays</th>
-                                                <th scope="col">Action</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for site in sorted_sites %}
-                                                    <tr>
-                                                        <td>{{ site.siteName }}</td>
-                                                        <td>{{ site.city.name }}/{{ site.city.country.name }}</td>
-                                                        <td>
-                                                            <div class="col text-end">
-                                                                {% set currentDate = "now"|date('d-m-Y H:i:s') %}
-
-                                                                {% if counting_campaign.startDate|date('d-m-Y H:i:s') <= currentDate %}
-                                                                    {% if existingConditions[site.id] is not empty %}
-                                                                        <a href="{{ path('app_collected_data_new') }}" class="btn btn-primary btn-lg">
-                                                                            Collecter <i class="bi bi-arrow-bar-right">
-                                                                                <div class="spinner-grow spinner-grow-sm text-light" role="status"></div>
-                                                                            </i>
-                                                                        </a>
-                                                                    {% else %}
-                                                                        <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-warning btn-lg">
-                                                                            Ajouter Conditions Environnementales de collecte
-                                                                        </a>
-                                                                    {% endif %}
-                                                                {# {% else %}
-                                                                    <code>
-                                                                        Vous ne pouvez pas commencer à collecter avant : 
-                                                                        {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}
-                                                                    </code> #}
-                                                                {% endif %}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                {% else %}
-                                                    <tr>
-                                                        <td><p colspan="6">Aucune enregistrement trouvé</p></td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
+                                            </div>
+                                        {% else %}
+                                            <span>Aucun site trouvé</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                   </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col text-end my-4">
-                                {% set currentDate = "now"|date('d-m-Y H:i:s') %}
-                                {% if counting_campaign.startDate|date('d-m-Y H:i:s') > currentDate %}
-                                    <code>Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</code>
-                                {% endif %}
-                            </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <div class="d-flex justtify-content-end">
+                            <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation des campagnes">Retour</a>
+                            <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-outline-primary bi bi-pencil-square mx-1"> Modifier</a>
+                            {# <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a> #}
+                            <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Consultation des collectes</a>
+                             {{ include('counting_campaign/_delete_form.html.twig') }}
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justtify-content-end">
-                                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
-                                <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une nouvelle campagne</a>
-                                <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
-                                 {{ include('counting_campaign/_delete_form.html.twig') }}
-                            </div>
+                        <div>
+                            <button id="printButton" class="btn btn-sm btn-outline-success bi bi-printer"> Imprimer</button>
+                            <a href="#" class="btn btn-sm btn-outline-info bi bi-folder"> Exporter CSV</a>
                         </div>
                     </div>
                     
@@ -220,15 +220,5 @@
             </div>
         </div>
     </section>
-    <div class="alert border-light alert-dismissible fade show" role="alert">
-      <!-- Card with header and footer -->
-      <div class="card">
-        <div class="card-footer">
-          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      </div><!-- End Card with header and footer -->
-    </div>
 </main>
 {% endblock %}

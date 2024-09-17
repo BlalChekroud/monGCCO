@@ -53,11 +53,11 @@ class SiteCollection
     #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $longFin = null;
 
-    /**
-     * @var Collection<int, CountingCampaign>
-     */
-    #[ORM\ManyToMany(targetEntity: CountingCampaign::class, mappedBy: 'siteCollection')]
-    private Collection $countingCampaigns;
+    // /**
+    //  * @var Collection<int, CountingCampaign>
+    //  */
+    // #[ORM\ManyToMany(targetEntity: CountingCampaign::class, mappedBy: 'siteCollection')]
+    // private Collection $countingCampaigns;
 
     #[ORM\ManyToOne(inversedBy: 'siteCollections')]
     #[ORM\JoinColumn(nullable: false)]
@@ -84,12 +84,19 @@ class SiteCollection
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parentSite')]
     private Collection $siteCollections;
 
+    /**
+     * @var Collection<int, SiteAgentsGroup>
+     */
+    #[ORM\OneToMany(targetEntity: SiteAgentsGroup::class, mappedBy: 'siteCollection', orphanRemoval: true)]
+    private Collection $siteAgentsGroups;
+
     public function __construct()
     {
-        $this->countingCampaigns = new ArrayCollection();
+        // $this->countingCampaigns = new ArrayCollection();
         $this->collectedData = new ArrayCollection();
         $this->environmentalConditions = new ArrayCollection();
         $this->siteCollections = new ArrayCollection();
+        $this->siteAgentsGroups = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -217,32 +224,32 @@ class SiteCollection
         return $this;
     }
 
-    /**
-     * @return Collection<int, CountingCampaign>
-     */
-    public function getCountingCampaigns(): Collection
-    {
-        return $this->countingCampaigns;
-    }
+    // /**
+    //  * @return Collection<int, CountingCampaign>
+    //  */
+    // public function getCountingCampaigns(): Collection
+    // {
+    //     return $this->countingCampaigns;
+    // }
 
-    public function addCountingCampaign(CountingCampaign $countingCampaign): static
-    {
-        if (!$this->countingCampaigns->contains($countingCampaign)) {
-            $this->countingCampaigns->add($countingCampaign);
-            $countingCampaign->addSiteCollection($this);
-        }
+    // public function addCountingCampaign(CountingCampaign $countingCampaign): static
+    // {
+    //     if (!$this->countingCampaigns->contains($countingCampaign)) {
+    //         $this->countingCampaigns->add($countingCampaign);
+    //         $countingCampaign->addSiteCollection($this);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function removeCountingCampaign(CountingCampaign $countingCampaign): static
-    {
-        if ($this->countingCampaigns->removeElement($countingCampaign)) {
-            $countingCampaign->removeSiteCollection($this);
-        }
+    // public function removeCountingCampaign(CountingCampaign $countingCampaign): static
+    // {
+    //     if ($this->countingCampaigns->removeElement($countingCampaign)) {
+    //         $countingCampaign->removeSiteCollection($this);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * @return Collection<int, CollectedData>
@@ -362,4 +369,35 @@ class SiteCollection
     {
         return $this->getSiteName() ?: '';
     }
+
+    /**
+     * @return Collection<int, SiteAgentsGroup>
+     */
+    public function getSiteAgentsGroups(): Collection
+    {
+        return $this->siteAgentsGroups;
+    }
+
+    public function addSiteAgentsGroup(SiteAgentsGroup $siteAgentsGroup): static
+    {
+        if (!$this->siteAgentsGroups->contains($siteAgentsGroup)) {
+            $this->siteAgentsGroups->add($siteAgentsGroup);
+            $siteAgentsGroup->setSiteCollection($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSiteAgentsGroup(SiteAgentsGroup $siteAgentsGroup): static
+    {
+        if ($this->siteAgentsGroups->removeElement($siteAgentsGroup)) {
+            // set the owning side to null (unless already changed)
+            if ($siteAgentsGroup->getSiteCollection() === $this) {
+                $siteAgentsGroup->setSiteCollection(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

@@ -9,10 +9,9 @@ use App\Repository\CountryRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-// use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-// use Symfony\Component\Form\FormEvent;
-// use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AgentsGroupType extends AbstractType
@@ -26,10 +25,11 @@ class AgentsGroupType extends AbstractType
                     return $user->getName() . ' ' . $user->getLastName() . ' (' . $user->getEmail() . ')';
                 },
                 'label' => 'Choisir les membres du groupe<span class="requiredField">*</span>',
-                'label_html' => true, // This allows HTML in labels
+                'label_html' => true,
                 'multiple' => true,
                 'required' => true,
-                'expanded' => true,
+                'autocomplete' => true,
+                'placeholder' => true,
                 'attr' => ['id' => 'group_member']
             ])
             ->add('leader', EntityType::class, [
@@ -40,6 +40,7 @@ class AgentsGroupType extends AbstractType
                 'label' => 'Chef du groupe<span class="requiredField">*</span>',
                 'label_html' => true,
                 'placeholder' => '-- Choisir le chef du groupe --',
+                'autocomplete' => true,
             ])
             ->add('country', EntityType::class, [
                 'class' => Country::class,
@@ -50,29 +51,13 @@ class AgentsGroupType extends AbstractType
                 'label_html' => true,
                 'placeholder' => '-- Choisir le pays du groupe --',
                 'required' => true,
+                'autocomplete' => true,
                 'query_builder' => function (CountryRepository $repository) {
                     return $repository->createQueryBuilder('b')
                         ->orderBy('b.name', 'ASC');
                 },
             ])
         ;
-        
-        // // Add an event listener to populate the leader choices based on group members
-        // $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-        //     $form = $event->getForm();
-        //     $data = $event->getData();
-
-        //     $members = $data->getGroupMember()->toArray();
-
-        //     $form->add('leader', ChoiceType::class, [
-        //         'label' => 'Chef du groupe',
-        //         'choices' => $members,
-        //         'choice_label' => function ($user) {
-        //             return $user->getEmail();
-        //         },
-        //         'placeholder' => '-- Choisir le chef du groupe --',
-        //     ]);
-        // });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

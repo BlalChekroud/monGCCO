@@ -23,19 +23,20 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Informations sur la nouvelle collection</h5>
+                        <div class="d-flex justify-content-between">
+                            <div class="card-title">Informations sur la nouvelle collection</div>
+                            <div class="card-title">
+                                <div class="explanation">{{ siteCollection.siteName }}</div>
+                            </div>
+                        </div>
+                        {{ include('collected_data/_form.html.twig') }}
 
-                        {{ include('collected_data/_form.html.twig') }}<br/>
-
-                        <a href="{{ path('app_collected_data_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-2"> 
+                        <a href="{{ path('app_collected_data_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-1"> 
                             retour vers la liste
                         </a>
-                        <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2">
-                            Créer nouvelle campagne
-                        </a>
-                        <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2">
-                            Créer nouvelle espèce
-                        </a>
+                        <a href="{{ path('app_counting_campaign_show', {'id': campaign_id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail de la campagne</a>
+                        <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
+                        <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une espèce</a>
                     </div>
                 </div>
 

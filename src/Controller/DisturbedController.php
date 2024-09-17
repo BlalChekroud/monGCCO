@@ -75,7 +75,7 @@ class DisturbedController extends AbstractController
             $entityManager->flush();
 
             if ($request->headers->get('Turbo-Frame')) {
-                return $this->render('disturbed/_form.html.twig', [
+                return $this->render('disturbed/new.html.twig', [
                     'disturbed' => $disturbed,
                     'form' => $form->createView(),
                 ]);

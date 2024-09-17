@@ -34,17 +34,31 @@
                                     <td>{{ country.iso2 }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Les villes :</th>
+                                    <th>Les régions :<h6 class="explanation mx-4">Ville(s)</h6></th>
                                     <td>
-                                        {% if country.city|length > 0 %}
-                                            {% set sorted_cities = country.city|sort((a, b) => a.name <=> b.name) %}
+                                        {% if country.regions|length > 0 %}
+                                            {% set sorted_regions = country.regions|sort((a, b) => a.name <=> b.name) %}
                                             <ul>
-                                                {% for city in sorted_cities %}
-                                                    <li>{{ city.name }}</li>
+                                                {% for region in sorted_regions %}
+                                                    <li>
+                                                        {{ region.name }}
+                                                        {% if region.cities|length > 0 %}
+                                                            {% set sorted_cities = region.cities|sort((a, b) => a.name <=> b.name) %}
+                                                            <ul>
+                                                                {% for city in sorted_cities %}
+                                                                    <li>
+                                                                        <i>{{ city.name}}</i>
+                                                                    </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        {% else %}
+                                                            <p>Aucune ville</p>
+                                                        {% endif %}
+                                                    </li>
                                                 {% endfor %}
                                             </ul>
                                         {% else %}
-                                            <p>Aucune ville</p>
+                                            <p>Aucune région</p>
                                         {% endif %}
                                     </td>
                                 </tr>

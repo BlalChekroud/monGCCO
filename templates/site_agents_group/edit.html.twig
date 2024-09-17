@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit SiteAgentsGroup{% endblock %}
+
+{% block body %}
+    <h1>Edit SiteAgentsGroup</h1>
+
+    {{ include('site_agents_group/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_site_agents_group_index') }}">back to list</a>
+
+    {{ include('site_agents_group/_delete_form.html.twig') }}
+{% endblock %}

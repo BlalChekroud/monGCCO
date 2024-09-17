@@ -1,5 +1,62 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
+    <div class="row mb-3">
+      <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+        {{ form_label(form.groupMember, 'Les membres du groupe:') }}<span class="requiredField">*</span>
+      </div>
+      <div class="col-sm-9 col-md-9 col-lg-9 col-xl-9">
+        {{ form_widget(form.groupMember, { 'attr': {'id': 'group_member', 'class': 'form-control' } }) }}
+      </div>
+        {{ form_errors(form.groupMember) }}
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+        {{ form_label(form.leader, 'Chef du groupe:') }}<span class="requiredField">*</span>
+      </div>
+      <div id="leader-field" class="col-sm-9 col-md-9 col-lg-9 col-xl-9">
+        {{ form_widget(form.leader, { 'attr': {'id': 'leader', 'class': 'form-control' } }) }}
+      </div>
+        {{ form_errors(form.leader) }}
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+        {{ form_label(form.country, 'Pays:') }}<span class="requiredField">*</span>
+      </div>
+      <div class="col-sm-9 col-md-9 col-lg-9 col-xl-9">
+        {{ form_widget(form.country, { 'attr': {'class': 'form-control' } }) }}
+      </div>
+        {{ form_errors(form.country) }}
+    </div>
     <button type="reset" class="btn btn-outline-dark bi bi-x-square"> Annuler</button>
     <button class="btn btn-outline-primary bi bi-save mx-4"> {{ button_label|default('Enregistrer') }}</button>
 {{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const groupMemberSelect = $('#group_member'); // Utilisation de jQuery pour interagir avec Select2
+    
+    if (groupMemberSelect.length) {
+        console.log('Elements found:', groupMemberSelect);
+
+        groupMemberSelect.select2().on('change', function() {
+            const selectedOptions = $(this).val();
+            console.log('Selected options:', selectedOptions);
+            
+            const leaderSelect = $('#leader');
+            leaderSelect.empty(); // Vide le select
+
+            leaderSelect.append(new Option('-- Choisir le chef du groupe --', '')); // Option par défaut
+
+            selectedOptions.forEach(option => {
+                leaderSelect.append(new Option(option.text, option.value)); // Ajouter les nouvelles options
+            });
+
+            console.log('Leader options:', leaderSelect.children());
+        });
+    } else {
+        console.error('Elements not found: groupMemberSelect or leaderSelect');
+    }
+});
+
+</script>

@@ -35,7 +35,8 @@ class CollectedDataType extends AbstractType
             ->add('method', EntityType::class, [
                 'class' => Method::class,
                 'choice_label' => 'label',
-                'label' => 'Méthode(s) utilisées pour le comptage:',
+                'label' => 'Méthode(s) utilisées pour le comptage:<span class="requiredField">*</span>',
+                'label_html' => true,
                 'multiple' => true,
                 'expanded' => true,
                 'required' => true,

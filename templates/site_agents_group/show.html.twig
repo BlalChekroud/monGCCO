@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SiteAgentsGroup{% endblock %}
+
+{% block body %}
+    <h1>SiteAgentsGroup</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ site_agents_group.id }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ site_agents_group.createdAt ? site_agents_group.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ site_agents_group.updatedAt ? site_agents_group.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_site_agents_group_index') }}">back to list</a>
+
+    <a href="{{ path('app_site_agents_group_edit', {'id': site_agents_group.id}) }}">edit</a>
+
+    {{ include('site_agents_group/_delete_form.html.twig') }}
+{% endblock %}

@@ -6,7 +6,7 @@
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Sites de Collection</h1>
+      <h1>Sites de collecte</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
@@ -27,10 +27,9 @@
                 <table class="table datatable">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Nom du site</th>
                             <th>Ville</th>
-                            <th>Pays</th>
+                            <th>Région</th>
                             <th>Nom du site parent</th>
                             <th>Actions</th>
                         </tr>
@@ -38,10 +37,9 @@
                     <tbody>
                     {% for site_collection in site_collections %}
                         <tr>
-                            <td>{{ site_collection.id }}</td>
                             <td>{{ site_collection.siteName }}</td>
                             <td>{{ site_collection.city.name }}</td>
-                            <td>{{ site_collection.city.country.name }}</td>
+                            <td>{{ site_collection.city.region.name }}</td>
                             <td>{{ site_collection.parentSite }}</td>
                             <td>
                                 <div class="d-flex justtify-content-end">
@@ -62,8 +60,9 @@
               
               <div class="card-footer">
                 <div class="d-flex justtify-content-end">
-                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer nouvelle site de collection</a>
-                  <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-3"> Créer une nouvelle campagne</a>
+                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer un site de collecte</a>
+                  <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des campagnes</a>
+                  <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
                 </div>
               </div>
 
@@ -72,37 +71,78 @@
         </div>
       </div>
     </section>
-
-    <div class="alert border-light alert-dismissible fade show" role="alert">
-      <!-- Card with header and footer -->
-      <div class="card">
-        <div class="card-header">
-          {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-            {{ form_row(form.csvFile) }}
-            <button type="submit" formaction="{{ path('app_site_collection_preview') }}" class="btn btn-outline-primary btn-sm bi bi-eye"> Aperçu CSV</button>
-            <button type="submit" formaction="{{ path('app_site_collection_import') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
-            {% for error in form.csvFile.vars.errors %}
-              <div class="alert alert-danger">{{ error.message }}</div>
-            {% endfor %}
-              
-            {% for flash_error in app.flashes('error') %}
-              <div class="alert alert-danger">{{ flash_error }}</div>
-            {% endfor %}
-          {{ form_end(form) }}
-          {# {{ form_start(form) }}
-            {{ form_row(form.csvFile) }}
-            <button type="submit" class="btn btn-outline-primary bi bi-upload"> Importer</button>
-            {{ form_row(form.preview) }}
-        {{ form_end(form) }} #}
-
+{# {% include 'import/csv.html.twig' %} #}
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
+                            {{ form_row(form.csvFile, {
+                                'attr': {
+                                    'onchange': 'document.getElementById("csvForm").submit();'
+                                }
+                            }) }}
+                        {{ form_end(form) }}
+                    </div>
+                    <div class="card-body">
+                      <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+                      <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-footer">
-          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </section>
+
+    {% if headers is defined and rows is defined %}
+        <!-- Modal -->
+        <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title" id="csvPreviewModalLabel"><b>NB:</b> Les colonnes <code>siteName</code>, <code>siteCode</code>, <code>latDepart</code>, <code>longDepart</code>, <code>latFin</code>, <code>longFin</code> et <code>city</code> sont obligatoires.</h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <h5 class="text-center">Aperçu du fichier CSV</h5>
+                    <div class="modal-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    {% for header in headers %}
+                                        <th>{{ header }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in rows %}
+                                    <tr>
+                                        {% for cell in row %}
+                                            <td>{{ cell }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="post" action="{{ path('app_site_collection_index') }}">
+                            <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
+                            <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
+                            <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div><!-- End Card with header and footer -->
-    </div>
+
+        <!-- Script to auto-show the modal after form submission -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
+                myModal.show();
+            });
+        </script>
+    {% endif %}
 
   </main><!-- End #main -->
 {% endblock %}

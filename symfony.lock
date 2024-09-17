@@ -291,6 +291,9 @@
             "./config/routes/web_profiler.yaml"
         ]
     },
+    "symfony/webpack-encore-bundle": {
+        "version": "v2.1.1"
+    },
     "symfonycasts/reset-password-bundle": {
         "version": "1.22",
         "recipe": {

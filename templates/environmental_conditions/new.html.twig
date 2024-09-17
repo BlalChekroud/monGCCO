@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelles conditions d'environnement{% endblock %}
+{% block title %}Nouvelle conditions environnementales{% endblock %}
 
 {% block body %}
     <main id="main" class="main">
 
         <div class="pagetitle">
-        <h1>Création de conditions d'environnement</h1>
+        <h1>Création de conditions environnementales</h1>
         <nav>
             <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
@@ -22,7 +22,7 @@
 
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Informations sur les conditions d'environnement</h5>
+                            <h5 class="card-title">Informations sur les conditions environnementales de: {{ siteCollection.siteName }}</h5>
 
                             {{ include('environmental_conditions/_form.html.twig') }}
 

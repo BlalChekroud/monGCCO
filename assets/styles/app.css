@@ -50,6 +50,18 @@
 .explanation {
   font-size: 0.8rem; /* Taille de l'étoile, ajustez selon vos besoins */
 }
+h6.explanation {
+  color: #636464;
+}
+
+/*--------------------------------------------------------------
+  # site-agents-group-collection
+--------------------------------------------------------------*/
+#site-agents-group-collection {
+  border: 2px solid rgb(231, 228, 228);
+  border-radius: 15px;
+  padding: 15px 15px;
+}
 
 /*--------------------------------------------------------------
   # sweetalert2

@@ -105,10 +105,10 @@ class EnvironmentalConditionsController extends AbstractController
             'countingCampaign' => $campaign
         ]);
 
-        if ($existingCondition) {
-            $this->addFlash('info', "L'utilisateur a déjà créé des conditions d'environnement pour ce site.");
-            return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
-        }
+        // if ($existingCondition) {
+        //     $this->addFlash('info', "L'utilisateur a déjà créé des conditions d'environnement pour ce site.");
+        //     return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
+        // }
 
         // if ($user not in $campaign->getAgentsGroups()) {
         //     $this->addFlash('info','Vous etes pas membre pour creer condition d\'environnement');
@@ -130,7 +130,7 @@ class EnvironmentalConditionsController extends AbstractController
                 $entityManager->flush();
     
                 $this->addFlash('success', "Conditions d'environnement ont bien été créées");
-                return $this->redirectToRoute('app_collected_data_new', [], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute('app_collected_data_new', ['campaignId' => $campaignId, 'siteId' => $siteId  ], Response::HTTP_SEE_OTHER);
             } else {
                 $this->addFlash('error','Une erreur s\'est produite lors de la création de conditions d\'environnement.');
             }
@@ -139,6 +139,7 @@ class EnvironmentalConditionsController extends AbstractController
         return $this->render('environmental_conditions/new.html.twig', [
             'environmental_condition' => $environmentalCondition,
             'form' => $form,
+            'siteCollection' => $site,
         ]);
     }
 

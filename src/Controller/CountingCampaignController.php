@@ -6,7 +6,6 @@ use App\Entity\EnvironmentalConditions;
 use App\Repository\CampaignStatusRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Monolog\DateTimeImmutable;
-use DateTime;
 use App\Entity\CountingCampaign;
 use App\Form\CountingCampaignType;
 use App\Repository\CountingCampaignRepository;
@@ -52,21 +51,24 @@ class CountingCampaignController extends AbstractController
                     $this->addFlash('danger', 'Date de début ne peut pas être supérieure à la date de fin.');
                     return $this->redirectToRoute('app_counting_campaign_new');
                 }
-                if ($countingCampaign->getAgentsGroups()->isEmpty()) {
-                    $this->addFlash('error', 'Vous devez sélectionner au moins un groupe pour créer une campagne de comptage.');
+
+                foreach ($countingCampaign->getSiteAgentsGroups() as $siteAgentsGroup) {
+                    $siteAgentsGroup->setCountingCampaign($countingCampaign);
+                    $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
+                    $entityManager->persist($siteAgentsGroup);
+                }
+
+                if ($countingCampaign->getSiteAgentsGroups()->isEmpty()) {
+                    $this->addFlash('error', 'Vous devez sélectionner au moins un site et un groupe.');
                     return $this->redirectToRoute('app_counting_campaign_new');
                 }
-                // Vérifier si la collection de sites est définie
-                if ($countingCampaign->getSiteCollection()->isEmpty()) {
-                    $this->addFlash('error', 'Vous devez sélectionner au moins un site pour créer une campagne de comptage.');
-                    return $this->redirectToRoute('app_counting_campaign_new');
-                }
-                $countingCampaign->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+
+                $countingCampaign->setCreatedAt(new \DateTimeImmutable());
                 $countingCampaign->setCreatedBy($user);
                 // Générer et définir le nom de la campagne
                 $countingCampaign->generateCampaignName();
                 // Mettre à jour le statut de la campagne
-                $this->updateCampaignStatus($countingCampaign, $statusRepository);
+                $this->updateCampaignStatus($countingCampaign);
                 $entityManager->persist($countingCampaign);
                 $entityManager->flush();
                 
@@ -92,28 +94,42 @@ class CountingCampaignController extends AbstractController
     #[Route('/{id}', name: 'app_counting_campaign_show', methods: ['GET'])]
     public function show(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
-        $user = $this->getUser();
+        $user = $this->getUser();  // Utilisateur actuel
 
-        // Récupérer les sites associés à la campagne
-        $sites = $countingCampaign->getSiteCollection();
+        // Récupérer les SiteAgentsGroups associés à la campagne
+        $siteAgentsGroups = $countingCampaign->getSiteAgentsGroups();
 
-        // Tableau pour stocker les conditions environnementales existantes pour chaque site
+        // Tableau pour stocker les SiteCollection et les conditions environnementales
+        $sites = [];
         $existingConditions = [];
 
-        // Parcourir chaque site et vérifier s'il y a des conditions environnementales existantes
-        foreach ($sites as $site) {
-            $conditions = $entityManager->getRepository(EnvironmentalConditions::class)->findOneBy([
-                'user' => $user,
-                'siteCollection' => $site,
-                'countingCampaign' => $countingCampaign,
-            ]);
+        // Parcourir chaque SiteAgentsGroup et récupérer les SiteCollection associés
+        foreach ($siteAgentsGroups as $siteAgentsGroup) {
+            $siteCollection = $siteAgentsGroup->getSiteCollection();
 
-            $existingConditions[$site->getId()] = $conditions;
+            if ($siteCollection) {
+                // Ajouter le site à la liste des sites
+                $sites[] = $siteCollection;
+
+                // Vérifier s'il existe des conditions environnementales créées par l'utilisateur actuel pour ce site
+                $conditions = $entityManager->getRepository(EnvironmentalConditions::class)->findOneBy(
+                    [
+                        'user' => $user,  // Conditions créées par l'utilisateur actuel
+                        'siteCollection' => $siteCollection,
+                        'countingCampaign' => $countingCampaign,
+                    ],
+                    ['createdAt' => 'DESC']
+            );
+
+                // Stocker les conditions environnementales pour ce site, si elles existent
+                $existingConditions[$siteCollection->getId()] = $conditions;
+            }
         }
-// dd($existingConditions);
+
         return $this->render('counting_campaign/show.html.twig', [
             'counting_campaign' => $countingCampaign,
-            'existingConditions' => $existingConditions,
+            // 'sites' => $sites,  // Transmettre les SiteCollection à la vue
+            'existingConditions' => $existingConditions,  // Transmettre les conditions environnementales
         ]);
     }
 
@@ -141,22 +157,30 @@ class CountingCampaignController extends AbstractController
                     $this->addFlash('danger', 'Date de début ne peut pas être supérieure à la date de fin.');
                     return $this->redirectToRoute('app_counting_campaign_edit', ['id' => $countingCampaign->getId()]);
                 }
-                // Vérifier si la collection de sites est définie
-                if ($countingCampaign->getSiteCollection()->isEmpty()) {
-                    $this->addFlash('error', 'Vous devez sélectionner au moins un site pour créer une campagne de comptage.');
+                // Vérification si la collection de SiteAgentsGroup est vide
+                if ($countingCampaign->getSiteAgentsGroups()->isEmpty()) {
+                    $this->addFlash('error', 'Vous devez sélectionner au moins un site et un groupe d\'agents.');
                     return $this->redirectToRoute('app_counting_campaign_edit', ['id' => $countingCampaign->getId()]);
                 }
-                $countingCampaign->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                // Persister chaque SiteAgentsGroup si ce n'est pas déjà fait
+                foreach ($countingCampaign->getSiteAgentsGroups() as $siteAgentsGroup) {
+                    $siteAgentsGroup->setCountingCampaign($countingCampaign);
+                    $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
+                    $entityManager->persist($siteAgentsGroup);
+                }
+
+                $countingCampaign->setUpdatedAt(new \DateTimeImmutable());
                 // Générer et définir le nom de la campagne
                 $countingCampaign->generateCampaignName();
     
+                // Enregistrer les changements
                 $entityManager->flush();
-                $this->addFlash('success', "Campagne de comptage a bien été modifié");
+                $this->addFlash('success', "La campagne de comptage a bien été modifiée.");
     
                 return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
 
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de la modification de la campagne de comptage.');
+                $this->addFlash('error','Une erreur s\'est produite lors de la modification de la campagne.');
             }
         }
 
@@ -178,7 +202,7 @@ class CountingCampaignController extends AbstractController
         return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    private function updateCampaignStatus(CountingCampaign $countingCampaign, CampaignStatusRepository $statusRepository)
+    private function updateCampaignStatus(CountingCampaign $countingCampaign)
     {
         $now = new \DateTimeImmutable();
         
@@ -187,11 +211,16 @@ class CountingCampaignController extends AbstractController
     
         if ($startDate <= $endDate) {
             if ($startDate > $now) {
-                $status = $statusRepository->findOneBy(['label' => 'En attente']);
+            //     $status = $statusRepository->findOneBy(['label' => 'En attente']);
+            // } elseif ($startDate <= $now && $endDate >= $now) {
+            //     $status = $statusRepository->findOneBy(['label' => 'En cours']);
+            // } elseif ($endDate < $now) {
+            //     $status = $statusRepository->findOneBy(['label' => 'Terminé']);
+            $status = 'En attente';
             } elseif ($startDate <= $now && $endDate >= $now) {
-                $status = $statusRepository->findOneBy(['label' => 'En cours']);
+                $status = 'En cours';
             } elseif ($endDate < $now) {
-                $status = $statusRepository->findOneBy(['label' => 'Terminé']);
+                $status = 'Terminé';
             } else {
                 throw new \Exception('Statut non trouvé dans la base de données.');
             }

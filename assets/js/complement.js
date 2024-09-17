@@ -192,26 +192,49 @@
             .catch(error => console.error('Error updating IUCN Red List Category list:', error));
         }
 
-        const groupMemberField = document.getElementById('agents_group_groupMember');
-        const groupLeaderField = document.getElementById('agents_group_leader');
+        // const groupMemberField = document.getElementById('agents_group_groupMember');
+        // const groupLeaderField = document.getElementById('agents_group_leader');
     
-        if (groupMemberField && groupLeaderField) {
-            groupMemberField.addEventListener('change', function () {
-                const selectedMembers = Array.from(groupMemberField.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+        // if (groupMemberField && groupLeaderField) {
+        //     groupMemberField.addEventListener('change', function () {
+        //         const selectedMembers = Array.from(groupMemberField.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
     
-                // Clear existing options
-                groupLeaderField.innerHTML = '<option value="">-- Choisir le chef du groupe --</option>';
+        //         // Clear existing options
+        //         groupLeaderField.innerHTML = '<option value="">-- Choisir le chef du groupe --</option>';
     
-                // Add new options
-                selectedMembers.forEach(member => {
-                    const option = document.createElement('option');
-                    option.value = member;
-                    option.textContent = groupMemberField.querySelector(`label[for="agents_group_groupMember_${member}"]`).textContent.trim();
-                    groupLeaderField.appendChild(option);
-                });
-            });
-        }
+        //         // Add new options
+        //         selectedMembers.forEach(member => {
+        //             const option = document.createElement('option');
+        //             option.value = member;
+        //             option.textContent = groupMemberField.querySelector(`label[for="agents_group_groupMember_${member}"]`).textContent.trim();
+        //             groupLeaderField.appendChild(option);
+        //         });
+        //     });
+        // }
 
+        /* Site agents group */
+        // var addButton = document.getElementById('add-site-agents-group');
+        // var collectionHolder = document.getElementById('site-agents-group-collection');
+
+        // // Initial index for the new items (based on the current number of elements)
+        // var index = collectionHolder.children.length;
+
+        // addButton.addEventListener('click', function () {
+        //     // Get the data-prototype stored in the collection holder
+        //     var prototype = collectionHolder.getAttribute('data-prototype');
+
+        //     // Replace __name__ with the index in the prototype's HTML to make it unique
+        //     var newForm = prototype.replace(/__name__/g, index);
+
+        //     // Create a new div to contain the form and insert it into the collection holder
+        //     var formDiv = document.createElement('div');
+        //     formDiv.innerHTML = newForm;
+        //     collectionHolder.appendChild(formDiv);
+
+        //     // Increment the index for the next item
+        //     index++;
+        // });
+        /* End Site agents group */
 
     });
 })();

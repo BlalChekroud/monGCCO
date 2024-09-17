@@ -5,9 +5,7 @@ namespace App\Form;
 use App\Repository\CityRepository;
 use App\Entity\City;
 use App\Repository\SiteCollectionRepository;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use App\Entity\CountingCampaign;
 use App\Entity\SiteCollection;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -28,8 +26,9 @@ class SiteCollectionType extends AbstractType
                 'label_html' => true
             ])
             ->add('nationalSiteCode',TextType::class, [
-                'label' => 'Code national',
+                'label' => 'Code national<h6 class="explanation">Un code de site désigné et utilisé par l\'association du coordination nationale, Institut ou un individu, le cas échéant</h6>',
                 'required' => false,
+                'label_html' => true
             ])
             ->add('internationalSiteCode',TextType::class, [
                 'label' => 'Code international',
@@ -54,7 +53,7 @@ class SiteCollectionType extends AbstractType
             ->add('city', EntityType::class, [
                 'class' => City::class,
                 'choice_label' => function (City $city) {
-                    return $city->getName() . ' - ' . $city->getCountry()->getName() . ' (' . $city->getCountry()->getIso2() . ')';
+                    return $city->getName() . ' - ' . $city->getRegion()->getName() . ' (' . $city->getRegion()->getRegionCode() . ')';
                 },
                 'label' => 'Ville<span class="requiredField">*</span>',
                 'label_html' => true,
@@ -67,15 +66,10 @@ class SiteCollectionType extends AbstractType
                 },
                 'attr' => ['class' => 'form-control']
             ])
-            // ->add('parentSiteName',TextType::class, [
-            //     'label' => 'Nom du site parent<p>Si le site est un sous-site d\'un grand site ou une zone, ce vaste site est le site parent</p>',
-            //     'label_html' => true,
-            //     'required' => false,
-            // ])
             ->add('parentSite', EntityType::class, [
                 'class' => SiteCollection::class, // Assurez-vous que l'entité est correcte
                 'choice_label' => 'siteName', // Le champ à afficher dans la liste
-                'label' => 'Nom du site parent<p class="explanation">Si le site est un sous-site d\'un grand site ou une zone, ce vaste site est le site parent</p>',
+                'label' => 'Nom du site parent<h6 class="explanation">Si le site est un sous-site d\'un grand site ou une zone, ce vaste site est le site parent</h6>',
                 'label_html' => true,
                 'required' => false,
                 'autocomplete' => true,

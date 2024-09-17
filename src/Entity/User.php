@@ -45,7 +45,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank(message: 'Le mot de passe ne peut pas être vide.')]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]

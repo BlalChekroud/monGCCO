@@ -22,15 +22,17 @@
             <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Modifier</h5>
+                        <h5 class="card-title">Modifier: {{ counting_campaign.campaignName }}</h5>
 
                         {{ include('counting_campaign/_form.html.twig', {'button_label': ' Mise à jour'}) }}<br/>
                         
                     </div>
                     <div class="card-footer">
                         <div class="d-flex justtify-content-end">
-                            <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
-                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Créer nouvelle site de collection</a>
+                            <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation des campagnes">Retour</a>
+                            <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
+                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-1"> Créer un site de collecte</a>
+                            <a href="{{ path('app_agents_group_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer un groupe</a>
                             {{ include('counting_campaign/_delete_form.html.twig') }}
                         </div>
                     </div>

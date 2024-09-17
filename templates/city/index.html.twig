@@ -28,24 +28,22 @@
                                 <table class="table datatable">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
                                             <th>Ville</th>
                                             <th>Latitude</th>
                                             <th>Longitude</th>
+                                            <th>Région</th>
                                             <th>Crée le</th>
-                                            <th>Dernière mise à jour le</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                     {% for city in cities %}
                                         <tr>
-                                            <td>{{ city.id }}</td>
                                             <td>{{ city.name }}</td>
                                             <td>{{ city.latitude }}</td>
                                             <td>{{ city.longitude }}</td>
+                                            <td>{{ city.region.name }}</td>
                                             <td>{{ city.createdAt ? city.createdAt|date('d-m-Y') : '' }}</td>
-                                            <td>{{ city.updatedAt ? city.updatedAt|date('d-m-Y') : '' }}</td>
                                             <td>
                                                 <div class="d-flex justtify-content-end">
                                                     <a href="{{ path('app_city_show', {'id': city.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail</a>
@@ -66,11 +64,13 @@
                         </div>
                         <div class="card-footer">
                             <div class="d-flex justtify-content-end">
-                                <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une nouvelle ville</a>
-                                <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des pays</a>
-                                <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter un nouveau pays</a>
+                                <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une ville</a>
                                 <a href="{{ path('app_site_collection_index') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-1"> Liste des sites</a>
-                                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Ajouter nouvelle site de collection</a>
+                                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Ajouter un site</a>
+                                <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des régions</a>
+                                <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une région</a>
+                                <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des pays</a>
+                                <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter un pays</a>
                             </div>
                         </div>
                     </div>
@@ -79,27 +79,77 @@
             </div>
         </section>
         
-        <div class="alert border-light alert-dismissible fade show" role="alert">
-            <!-- Card with header and footer -->
-            <div class="card">
-                <div class="card-header">
-                {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-                    {{ form_row(form.csvFile) }}
-                        <button type="submit" formaction="{{ path('app_city_index') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
-                    {% for error in form.csvFile.vars.errors %}
-                        <div class="alert alert-danger">{{ error.message }}</div>
-                    {% endfor %}
-                    
-                    {% for flash_error in app.flashes('error') %}
-                        <div class="alert alert-danger">{{ flash_error }}</div>
-                    {% endfor %}
-                {{ form_end(form) }}
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
+                                {{ form_row(form.csvFile, {
+                                    'attr': {
+                                        'onchange': 'document.getElementById("csvForm").submit();'
+                                    }
+                                }) }}
+                            {{ form_end(form) }}
+                        </div>
+                        <div class="card-body">
+                        <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+                        <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-footer">
-                    <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-                    <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </section>
+
+        {% if headers is defined and rows is defined %}
+            <!-- Modal -->
+            <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="csvPreviewModalLabel"><b>NB:</b> Les colonnes <code>city</code>,<code> lat</code>, <code>lng</code>, <code>region</code> et <code>regionCode</code> sont obligatoires.</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <h5 class="text-center">Aperçu du fichier CSV</h5>
+                        <div class="modal-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        {% for header in headers %}
+                                            <th>{{ header }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in rows %}
+                                        <tr>
+                                            {% for cell in row %}
+                                                <td>{{ cell }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <form method="post" action="{{ path('app_city_index') }}">
+                                <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
+                                <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
+                                <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </div><!-- End Card with header and footer -->
-        </div>
+            </div>
+
+            <!-- Script to auto-show the modal after form submission -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
+                    myModal.show();
+                });
+            </script>
+        {% endif %}
+
+    </main><!-- End #main -->
 {% endblock %}

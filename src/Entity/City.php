@@ -36,15 +36,19 @@ class City
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'city')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Country $country = null;
+    // #[ORM\ManyToOne(inversedBy: 'city')]
+    // #[ORM\JoinColumn(nullable: false)]
+    // private ?Country $country = null;
 
     /**
      * @var Collection<int, SiteCollection>
      */
     #[ORM\OneToMany(targetEntity: SiteCollection::class, mappedBy: 'city')]
     private Collection $siteCollections;
+
+    #[ORM\ManyToOne(inversedBy: 'cities')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Region $region = null;
 
     public function __construct()
     {
@@ -116,17 +120,17 @@ class City
         return $this;
     }
 
-    public function getCountry(): ?Country
-    {
-        return $this->country;
-    }
+    // public function getCountry(): ?Country
+    // {
+    //     return $this->country;
+    // }
 
-    public function setCountry(?Country $country): static
-    {
-        $this->country = $country;
+    // public function setCountry(?Country $country): static
+    // {
+    //     $this->country = $country;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * @return Collection<int, SiteCollection>
@@ -154,6 +158,18 @@ class City
                 $siteCollection->setCity(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRegion(): ?Region
+    {
+        return $this->region;
+    }
+
+    public function setRegion(?Region $region): static
+    {
+        $this->region = $region;
 
         return $this;
     }

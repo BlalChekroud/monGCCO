@@ -33,23 +33,29 @@ class Country
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    /**
-     * @var Collection<int, City>
-     */
-    #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'country')]
-    private Collection $city;
+    // /**
+    //  * @var Collection<int, City>
+    //  */
+    // #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'country')]
+    // private Collection $city;
 
     /**
      * @var Collection<int, AgentsGroup>
      */
     #[ORM\OneToMany(targetEntity: AgentsGroup::class, mappedBy: 'country')]
     private Collection $agentsGroups;
-    // , orphanRemoval: false
+
+    /**
+     * @var Collection<int, Region>
+     */
+    #[ORM\OneToMany(targetEntity: Region::class, mappedBy: 'country', orphanRemoval: true)]
+    private Collection $regions;
 
     public function __construct()
     {
-        $this->city = new ArrayCollection();
+        // $this->city = new ArrayCollection();
         $this->agentsGroups = new ArrayCollection();
+        $this->regions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -105,35 +111,35 @@ class Country
         return $this;
     }
 
-    /**
-     * @return Collection<int, City>
-     */
-    public function getCity(): Collection
-    {
-        return $this->city;
-    }
+    // /**
+    //  * @return Collection<int, City>
+    //  */
+    // public function getCity(): Collection
+    // {
+    //     return $this->city;
+    // }
 
-    public function addCity(City $city): static
-    {
-        if (!$this->city->contains($city)) {
-            $this->city->add($city);
-            $city->setCountry($this);
-        }
+    // public function addCity(City $city): static
+    // {
+    //     if (!$this->city->contains($city)) {
+    //         $this->city->add($city);
+    //         $city->setCountry($this);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function removeCity(City $city): static
-    {
-        if ($this->city->removeElement($city)) {
-            // set the owning side to null (unless already changed)
-            if ($city->getCountry() === $this) {
-                $city->setCountry(null);
-            }
-        }
+    // public function removeCity(City $city): static
+    // {
+    //     if ($this->city->removeElement($city)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($city->getCountry() === $this) {
+    //             $city->setCountry(null);
+    //         }
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * @return Collection<int, AgentsGroup>
@@ -164,4 +170,35 @@ class Country
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Region>
+     */
+    public function getRegions(): Collection
+    {
+        return $this->regions;
+    }
+
+    public function addRegion(Region $region): static
+    {
+        if (!$this->regions->contains($region)) {
+            $this->regions->add($region);
+            $region->setCountry($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegion(Region $region): static
+    {
+        if ($this->regions->removeElement($region)) {
+            // set the owning side to null (unless already changed)
+            if ($region->getCountry() === $this) {
+                $region->setCountry(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

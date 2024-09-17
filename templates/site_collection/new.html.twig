@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle site de collection{% endblock %}
+{% block title %}Nouveau site de collecte{% endblock %}
 
 {% block body %}
 
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Créer une nouvelle site de collection</h1>
+      <h1>Créer une nouvelle Site de collecte</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
@@ -23,7 +23,7 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Informations de la nouvelle site de collection</h5>
+                        <h5 class="card-title">Informations sur le nouveau site de collecte</h5>
 
                         {{ include('site_collection/_form.html.twig') }}
 

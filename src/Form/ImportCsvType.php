@@ -16,7 +16,7 @@ class ImportCsvType extends AbstractType
     {
         $builder
         ->add('csvFile', FileType::class, [
-            'label' => 'Importer CSV ou TXT',
+            'label' => 'Importer un fichier CSV ou TXT',
             'mapped' => false,
             'required' => true,
             'constraints' => [
@@ -37,12 +37,7 @@ class ImportCsvType extends AbstractType
             'attr' => [
                     'accept' => '.csv,.txt'
             ],
-        ])
-        // ->add('preview', SubmitType::class, [
-        //     'label' => 'Prévisualiser',
-        //     'attr' => ['class' => 'btn-secondary'],
-        // ])
-        ;
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

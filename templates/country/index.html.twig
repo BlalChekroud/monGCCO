@@ -26,19 +26,16 @@
                 <table class="table datatable">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Nom du pays</th>
+                            <th>Pays</th>
                             <th>Iso2</th>
-                            <th>Les villes</th>
+                            <th>Les régions</th>
                             <th>Crée le</th>
-                            <th>Dernière mise à jour le</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for country in countries %}
                         <tr>
-                            <td>{{ country.id }}</td>
                             <td>
                                 <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ country.id }}" aria-expanded="false" aria-controls="collapse{{ country.id }}" title="Voir les villes">
                                     {{ country.name }}
@@ -48,7 +45,18 @@
                             <td>
                                 <div class="collapse" id="collapse{{ country.id }}">
                                     <div class="accordion-body">
-                                        {% if country.city|length > 0 %}
+                                        {% if country.regions|length > 0 %}
+                                            {% set sorted_regions = country.regions|sort((a, b) => a.name <=> b.name) %}
+                                            <ul>
+                                                {% for region in sorted_regions %}
+                                                    <li>{{ region.name }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p>Aucune région</p>
+                                        {% endif %}
+
+                                        {# {% if country.city|length > 0 %}
                                             {% set sorted_cities = country.city|sort((a, b) => a.name <=> b.name) %}
                                             <ul>
                                                 {% for city in sorted_cities %}
@@ -57,12 +65,11 @@
                                             </ul>
                                         {% else %}
                                             <p>Aucune ville</p>
-                                        {% endif %}
+                                        {% endif %} #}
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ country.createdAt ? country.createdAt|date('d-m-Y H:i:s') : '' }}</td>
-                            <td>{{ country.updatedAt ? country.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ country.createdAt ? country.createdAt|date('d-m-Y') : '' }}</td>
                             <td>
                                 <div class="d-flex justtify-content-end">
                                     <a href="{{ path('app_country_show', {'id': country.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail</a>
@@ -83,43 +90,89 @@
               
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted">
-                Créer un nouveau pays
-              </a>
-              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-3">
-                Créer une nouvelle ville
-              </a>
+              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer un nouveau pays</a>
+              <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des régions</a>
+              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une nouvelle région</a>
+              <a href="{{ path('app_city_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des villes</a>
+              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une nouvelle ville</a>
             </div>
           </div>
 
         </div>
       </div>
     </section>
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        {# <h5 class="card-title">Importer un fichier CSV</h5> #}
+                        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
+                            {{ form_row(form.csvFile, {
+                                'attr': {
+                                    'onchange': 'document.getElementById("csvForm").submit();'
+                                }
+                            }) }}
+                        {{ form_end(form) }}
+                    </div>
+                    <div class="card-body">
+                      <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
+                      <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="alert border-light alert-dismissible fade show" role="alert">
-      <!-- Card with header and footer -->
-      <div class="card">
-        <div class="card-header">
-          {# {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-            {{ form_row(form.csvFile) }}
-            <button type="submit" formaction="{{ path('app_bird_family_preview') }}" class="btn btn-outline-primary btn-sm bi bi-eye"> Aperçu CSV</button>
-            <button type="submit" formaction="{{ path('app_bird_family_import') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
-            {% for error in form.csvFile.vars.errors %}
-              <div class="alert alert-danger">{{ error.message }}</div>
-            {% endfor %}
-              
-            {% for flash_error in app.flashes('error') %}
-              <div class="alert alert-danger">{{ flash_error }}</div>
-            {% endfor %}
-          {{ form_end(form) }} #}
+    {% if headers is defined and rows is defined %}
+        <!-- Modal -->
+        <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="csvPreviewModalLabel">Aperçu du fichier CSV</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <h5 class="text-center"><b>NB:</b> Les colonnes <code>country</code> et <code>iso2</code> sont obligatoires.</h5>
+                    <div class="modal-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    {% for header in headers %}
+                                        <th>{{ header }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in rows %}
+                                    <tr>
+                                        {% for cell in row %}
+                                            <td>{{ cell }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="post" action="{{ path('app_country_index') }}">
+                            <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
+                            <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
+                            <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-footer">
-          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      </div><!-- End Card with header and footer -->
-    </div>
+
+        <!-- Script to auto-show the modal after form submission -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
+                myModal.show();
+            });
+        </script>
+    {% endif %}
 
   </main><!-- End #main -->
 {% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SiteAgentsGroup index{% endblock %}
+
+{% block body %}
+    <h1>SiteAgentsGroup index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for site_agents_group in site_agents_groups %}
+            <tr>
+                <td>{{ site_agents_group.id }}</td>
+                <td>{{ site_agents_group.createdAt ? site_agents_group.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ site_agents_group.updatedAt ? site_agents_group.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_site_agents_group_show', {'id': site_agents_group.id}) }}">show</a>
+                    <a href="{{ path('app_site_agents_group_edit', {'id': site_agents_group.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_site_agents_group_new') }}">Create new</a>
+{% endblock %}

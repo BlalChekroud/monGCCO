@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Form\ImportCsvType;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\Country;
 use App\Form\CountryType;
@@ -16,13 +18,108 @@ use Symfony\Component\Routing\Attribute\Route;
 #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class CountryController extends AbstractController
 {
-    #[Route('/', name: 'app_country_index', methods: ['GET'])]
-    public function index(CountryRepository $countryRepository): Response
+    #[Route('/', name: 'app_country_index', methods: ['GET', 'POST'])]
+    public function index(CountryRepository $countryRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
+        $form = $this->createForm(ImportCsvType::class);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $csvFile */
+            $csvFile = $form->get('csvFile')->getData();
+            
+            if ($csvFile) {
+                $csvData = file_get_contents($csvFile->getPathname());
+                $rows = array_map(function($row) {
+                    return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
+                }, explode("\n", $csvData));
+                
+                $headers = array_shift($rows); // Enlever la première ligne qui contient les en-têtes
+    
+                return $this->render('country/index.html.twig', [
+                    'countries' => $countryRepository->findAll(),
+                    'form' => $form->createView(),
+                    'headers' => $headers,
+                    'rows' => $rows,
+                    'csvData' => $csvData,
+                ]);
+            }
+        }
+    
+        if ($request->isMethod('POST') && $request->request->get('action') === 'import') {
+            $csvData = $request->request->get('csvData');
+            $rows = array_map(function($row) {
+                return str_getcsv($row, ';');
+            }, explode("\n", $csvData));
+    
+            $headers = array_shift($rows);
+    
+            $importedCount = 0; // Compteur de pays importés
+            $processedCountries = []; // Tableau pour suivre les pays déjà traités
+    
+            foreach ($rows as $row) {
+                // Ignorer les lignes vides
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+    
+                // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
+                if (count($row) !== count($headers)) {
+                    $this->addFlash('error', 'Ligne incorrecte : ' . implode(', ', $row));
+                    continue; // Ignorez cette ligne
+                }
+        
+                $data = array_combine($headers, $row);
+        
+                if ($data === false) {
+                    continue; // Ignorez les lignes où array_combine échoue
+                }
+    
+                $countryName = $data['country'];
+                $iso2 = $data['iso2'];
+    
+                if (empty($countryName) || empty($iso2)) {
+                    continue;
+                }
+
+                // Vérifier si le pays a déjà été traité dans ce fichier
+                if (isset($processedCountries[$countryName])) {
+                    continue; // Si oui, ignorer cette entrée
+                }
+    
+                // Vérifier si le pays existe déjà dans la base de données
+                $existingCountry = $countryRepository->findOneBy(['name' => $countryName]);
+                if ($existingCountry) {
+                    $processedCountries[$countryName] = true;
+                    continue; // Si oui, ignorer cette entrée
+                }
+    
+                // Créez et persistez un nouveau pays
+                $country = new Country();
+                $country->setName($countryName);
+                $country->setIso2($data['iso2']);
+                $country->setCreatedAt(new \DateTimeImmutable());
+    
+                $entityManager->persist($country);
+                $importedCount++; // Incrémentez le compteur
+    
+                // Marquer ce pays comme traité
+                $processedCountries[$countryName] = true;
+            }
+    
+            $entityManager->flush();
+    
+            $this->addFlash('success', $importedCount . ' pays ont été importés avec succès.');
+    
+            return $this->redirectToRoute('app_country_index');
+        }
+    
         return $this->render('country/index.html.twig', [
             'countries' => $countryRepository->findAll(),
+            'form' => $form->createView(),
         ]);
     }
+      
 
     #[Route('/new', name: 'app_country_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -35,7 +132,7 @@ class CountryController extends AbstractController
             if ($form->isValid()) {
                 // Ajout de vérifications supplémentaires avant de persister l'entité
                 if (empty($country->getName()) || empty($country->getIso2())) {
-                    $this->addFlash('error', 'Le nom et le code ISO doivent être remplis.');
+                    $this->addFlash('error', 'Le nom et le code ISO2 doivent être remplis.');
                     return $this->redirectToRoute('app_country_new');
                 }
                 $country->setCreatedAt(new \DateTimeImmutable());

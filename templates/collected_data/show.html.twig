@@ -42,12 +42,12 @@
                                     <td style="width: 70%;">{{ collected_datum.createdBy.name }} {{ collected_datum.createdBy.lastName }}</td>
                                 </tr>
                                 <tr>
-                                    <th style="width: 30%; white-space: nowrap;">Site de collection:<h6>(Ville)</h6></th>
+                                    <th style="width: 30%; white-space: nowrap;">Site de collecte:<h6>(Ville)</h6></th>
                                     <td style="width: 70%;">
                                         {% if collected_datum.siteCollection %}
                                             {{ collected_datum.siteCollection.siteName }}<h6>({{ collected_datum.siteCollection.city.name }})</h6>
                                         {% else %}
-                                            <p>Aucune site trouvée</p>
+                                            <p>Aucun site trouvé</p>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -123,7 +123,7 @@
                             <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justtify-content-end">
                                 <a href="{{ path('app_collected_data_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-1"> retour vers la liste</a>
                                 <a href="{{ path('app_collected_data_edit', {id: collected_datum.id}) }}" class="bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
-                                <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1">Créer nouvelle collection des données</a>
+                                {# <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1">Créer nouvelle collection des données</a> #}
                                 {{ include('collected_data/_delete_form.html.twig') }}
                             </div>
 

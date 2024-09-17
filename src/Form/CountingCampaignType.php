@@ -3,7 +3,10 @@
 namespace App\Form;
 
 use App\Entity\AgentsGroup;
+use App\Entity\SiteAgentsGroup;
 use App\Repository\AgentsGroupRepository;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use App\Repository\SiteCollectionRepository;
@@ -32,45 +35,27 @@ class CountingCampaignType extends AbstractType
                 'label' => 'Date de fin',
                 'required' => true
             ])
-            ->add('agentsGroups', EntityType::class, [
-                'class' => AgentsGroup::class,
-                'label' => 'Groupe(s):<span class="requiredField">*</span>',
-                'label_html' => true,
-                'required' => true,
-                'choice_label' => function (AgentsGroup $agentsGroup) {
-                    return $agentsGroup->getGroupName() . ' / ' . $agentsGroup->getLeader()->getName() . ' ' . $agentsGroup->getLeader()->getLastName();
-                },
-                // 'expanded' => true,
-                'multiple' => true,
-                'autocomplete' => true,
-                'query_builder' => function (AgentsGroupRepository $repository) {
-                    return $repository->createQueryBuilder('b')
-                        ->orderBy('b.groupName', 'ASC'); // Or any other field you want to sort by
-                },
+            ->add('siteAgentsGroups', CollectionType::class, [
+                'entry_type' => SiteAgentsGroupType::class,
+                'entry_options' => ['label' => false],
+                'allow_add' => true,   // Permet l'ajout dynamique
+                'allow_delete' => true, // Permet la suppression dynamique
+                'by_reference' => false,
+                'label' => false,
             ])
-            ->add('siteCollection', EntityType::class, [
-                'class' => SiteCollection::class,
-                'label' => 'Sites de collection:<span class="requiredField">*</span>',
-                'label_html' => true,
-                'autocomplete' => true,
-                'required' => true,
-                'choice_label' => function (SiteCollection $siteCollection) {
-                    return $siteCollection->getSiteName() . ' (' . $siteCollection->getCity()->getName() . ' / ' . $siteCollection->getCity()->getCountry()->getName() . ' )';
-                },
-                // 'expanded' => true,
-                'multiple' => true,
-                'query_builder' => function (SiteCollectionRepository $repository) {
-                    return $repository->createQueryBuilder('b')
-                        ->orderBy('b.siteName', 'ASC'); // Or any other field you want to sort by
-                },
-            ])
-            ->add('campaignStatus', EntityType::class, [
-                'class' => CampaignStatus::class,
-                'choice_label' => 'label',
-                'required' => true,
-                'attr' => [
-                    'readonly' => true,
+            ->add('campaignStatus', ChoiceType::class, [
+                'choices' => [
+                    '' => 'NULL',
+                    'En attente' => 'En attente',
+                    'En cours' => 'En cours',
+                    'Terminé' => 'Terminé',
+                    'Annulé' => 'Annulé',
+                    'Erreur' => 'Erreur',
+                    'Validé' => 'Validé',
+                    'Suspens' => 'Suspens',
                 ],
+                'label' => "Etat de la campagne",
+                'required' => true,
             ])
             ->add('description',TextareaType::class, [
                 'label' => 'Description',

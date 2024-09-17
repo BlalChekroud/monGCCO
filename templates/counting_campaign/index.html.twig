@@ -30,7 +30,7 @@
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Nom de la campagne</th>
+                      <th>Campagne</th>
                       <th>Date de début</th>
                       <th>Date de fin</th>
                       <th>Etat</th>
@@ -45,49 +45,19 @@
                         <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y') : '' }}</td>
                         <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y') : '' }}</td>
                         <td>
-                          {% if counting_campaign.campaignStatus.label == 'En attente' %}
-                            <div class="btn-status btn btn-info" role="status">
-                              <i class="bi bi-circle-fill"></i>
-                              {{ counting_campaign.campaignStatus.label }}
-                            </div>
-                            {% elseif counting_campaign.campaignStatus.label == 'En cours' %}
-                              <div class="btn-status btn btn-primary" role="status">
-                                <i class="bi bi-circle-fill"></i>
-                                {{ counting_campaign.campaignStatus.label }}
-                              </div>
-                            {% elseif counting_campaign.campaignStatus.label == 'Terminé' %}
-                              <div class="btn-status btn btn-success">
-                                <i class="bi bi-check-circle"> </i>
-                              </div>
-                              {{ counting_campaign.campaignStatus.label }}
-                            {% elseif counting_campaign.campaignStatus.label == 'Annulé' %}
-                              <div class="btn-status btn btn-dark">
-                                <i class="bi bi-x-lg"> </i>
-                                {{ counting_campaign.campaignStatus.label }}
-                              </div>
-                            {% elseif counting_campaign.campaignStatus.label == 'Erreur' %}
-                              <div class="btn-status btn btn-warning">
-                                 <i class="bi bi-exclamation-triangle"> </i>
-                                 {{ counting_campaign.campaignStatus.label }}
-                              </div>
-                            {% elseif counting_campaign.campaignStatus.label == 'Validé' %}
-                             <div class="btn-status btn btn-success">
-                                <i class="bi bi-check-circle"> </i>
-                                {{ counting_campaign.campaignStatus.label }}
-                              </div>
-                            {% elseif counting_campaign.campaignStatus.label == 'Rejeté' %}
-                              <div class="btn-status btn btn-danger">
-                                <i class="bi bi-exclamation-triangle"> </i>
-                                {{ counting_campaign.campaignStatus.label }}
-                              </div>
-                            {% elseif counting_campaign.campaignStatus.label == 'Suspens' %}
-                              <div class="btn-status btn btn-secondary" role="status">
-                                <i class="bi bi-circle-fill"></i>
-                                {{ counting_campaign.campaignStatus.label }}
-                              </div>
-                            {% else %} 
-                              {{ counting_campaign.campaignStatus.label }}
-                          {% endif %}
+                          {% set status_classes = {
+                            'En attente': 'info',
+                            'En cours': 'primary',
+                            'Terminé': 'light',
+                            'Annulé': 'dark',
+                            'Erreur': 'warning',
+                            'Validé': 'success',
+                            'Suspens': 'secondary'
+                          } %}
+                          <div class="btn-status btn btn-{{ status_classes[counting_campaign.campaignStatus] ?? 'secondary' }}">
+                            <i class="bi bi-circle-fill"></i>
+                            {{ counting_campaign.campaignStatus }}
+                          </div>
                         </td>
                         <td>
                           <div class="d-flex justtify-content-end">
@@ -107,28 +77,21 @@
                 <!-- End Table with stripped rows -->
               </div>
             </div>
-            <div class="card-footer">
+            <div class="card-footer d-flex justify-content-between">
               <div class="d-flex justtify-content-end">
-                <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3"> Créer une nouvelle campagne</a>
-                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer nouvelle site de collection</a>
+                  <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
+                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer un site de collecte</a>
+              </div>
+              <div>
+                <button id="printButton" class="btn btn-sm btn-outline-success bi bi-printer"> Imprimer</button>
+                <a href="#" class="btn btn-sm btn-outline-info bi bi-folder"> Exporter CSV</a>
               </div>
             </div>
+
           </div>
 
         </div>
       </div>
     </section>
-    
-    <div class="alert border-light alert-dismissible fade show" role="alert">
-      <!-- Card with header and footer -->
-      <div class="card">
-        <div class="card-footer">
-          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      </div><!-- End Card with header and footer -->
-    </div>
-
 </main><!-- End #main -->
 {% endblock %}

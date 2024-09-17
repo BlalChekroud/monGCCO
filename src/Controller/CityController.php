@@ -2,15 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\Country;
+use App\Repository\CountryRepository;
+use App\Repository\RegionRepository;
+use App\Service\CsvImportService;
+
+use App\Entity\Region;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ImportCsvType;
-use App\Service\FileUploader;
 use Monolog\DateTimeImmutable;
 use DateTime;
 
-use App\Entity\Country;
 use App\Entity\City;
 use App\Form\CityType;
 use App\Repository\CityRepository;
@@ -25,95 +28,204 @@ use Symfony\Component\Routing\Attribute\Route;
 class CityController extends AbstractController
 {
 
+    // #[Route('/', name: 'app_city_index', methods: ['GET', 'POST'])]
+    // public function index(
+    //     CityRepository $cityRepository,
+    //     RegionRepository $regionRepository,
+    //     CountryRepository $countryRepository,
+    //     Request $request,
+    //     CsvImportService $csvImportService,
+    //     EntityManagerInterface $entityManager
+    // ): Response {
+    //     $form = $this->createForm(ImportCsvType::class);
+    //     $form->handleRequest($request);
+
+    //     if ($form->isSubmitted() && $form->isValid()) {
+    //         /** @var UploadedFile $csvFile */
+    //         $csvFile = $form->get('csvFile')->getData();
+
+    //         $importedCount = $csvImportService->importCsv(
+    //             $csvFile,
+    //             City::class,
+    //             [
+    //                 'city' => 'name',
+    //                 'lat' => 'latitude',
+    //                 'lng' => 'longitude',
+    //                 'region' => 'regionName',
+    //                 'regionCode' => 'regionCode',
+    //                 'country' => 'countryName',
+    //                 'iso2' => 'iso2',
+    //             ],
+    //             function($uniqueValues) use ($cityRepository) {
+    //                 return $cityRepository->findOneBy(['name' => $uniqueValues['city']]);
+    //             },
+    //             function($data) use ($regionRepository, $countryRepository, $entityManager) {
+    //                 // Récupérer ou créer le pays associé
+    //                 $country = $countryRepository->findOneBy(['name' => $data['country']]);
+    //                 if (!$country) {
+    //                     $country = new Country();
+    //                     $country->setName($data['country']);
+    //                     $country->setIso2($data['iso2'] ?? ''); // Ajoutez l'ISO si disponible
+    //                     $country->setCreatedAt(new \DateTimeImmutable());
+    //                     $entityManager->persist($country);
+    //                 }
+
+    //                 // Récupérer ou créer la région associée
+    //                 $region = $regionRepository->findOneBy(['name' => $data['region'], 'country' => $country]);
+    //                 if (!$region) {
+    //                     $region = new Region();
+    //                     $region->setName($data['region']);
+    //                     $region->setRegionCode($data['regionCode']);
+    //                     $region->setCountry($country); // Associer la région au pays
+    //                     $region->setCreatedAt(new \DateTimeImmutable());
+    //                     $entityManager->persist($region);
+    //                 }
+
+    //                 // Créez et persistez une nouvelle ville
+    //                 $city = new City();
+    //                 $city->setName($data['city']);
+    //                 $city->setLatitude($data['lat']);
+    //                 $city->setLongitude($data['lng']);
+    //                 $city->setRegion($region); // Associer la ville à la région
+    //                 $city->setCreatedAt(new \DateTimeImmutable());
+
+    //                 return $city;
+    //             },
+    //             ['city']
+    //         );
+
+    //         $this->addFlash('success', "$importedCount villes ont été importées avec succès.");
+    //         return $this->redirectToRoute('app_city_index');
+    //     }
+
+    //     return $this->render('city/index.html.twig', [
+    //         'cities' => $cityRepository->findAll(),
+    //         'form' => $form->createView(),
+    //     ]);
+    // }
+
     #[Route('/', name: 'app_city_index', methods: ['GET', 'POST'])]
     public function index(CityRepository $cityRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $csvFile */
             $csvFile = $form->get('csvFile')->getData();
-
+            
             if ($csvFile) {
-                try {
-                    $this->processCsv($csvFile, $entityManager);
-                    $this->addFlash('success', 'Les données ont été importées avec succès.');
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Une erreur s\'est produite lors de l\'importation du fichier CSV : ' . $e->getMessage());
-                }
-
-                return $this->redirectToRoute('app_city_index');
+                $csvData = file_get_contents($csvFile->getPathname());
+                $rows = array_map(function($row) {
+                    return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
+                }, explode("\n", $csvData));
+                
+                $headers = array_shift($rows); // Enlever la première ligne qui contient les en-têtes
+    
+                return $this->render('city/index.html.twig', [
+                    'cities' => $cityRepository->findAll(),
+                    'form' => $form->createView(),
+                    'headers' => $headers,
+                    'rows' => $rows,
+                    'csvData' => $csvData,
+                ]);
             }
         }
+    
+        if ($request->isMethod('POST') && $request->request->get('action') === 'import') {
+            $csvData = $request->request->get('csvData');
+            $rows = array_map(function($row) {
+                return str_getcsv($row, ';');
+            }, explode("\n", $csvData));
+    
+            $headers = array_shift($rows);
+    
+            $importedCount = 0; // Compteur de régions importées
+            $processedCities = []; // Tableau pour suivre les régions déjà traitées
+    
+            foreach ($rows as $row) {
+                // Ignorer les lignes vides
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+    
+                // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
+                if (count($row) !== count($headers)) {
+                    $this->addFlash('error', 'Ligne incorrecte : ' . implode(', ', $row));
+                    continue; // Ignorez cette ligne
+                }
+        
+                $data = array_combine($headers, $row);
+        
+                if ($data === false) {
+                    continue; // Ignorez les lignes où array_combine échoue
+                }
+    
+                $cityName = $data['city'];
+                $latitude = $data['lat'];
+                $longitude = $data['lng'];
+                $regionName = $data['region'] ?? null;
+                $regionCode = $data['regionCode'] ?? null;
+    
+                if (empty($cityName) || empty($latitude) || empty($longitude) || empty($regionName) || empty($regionCode)) {
+                    continue;
+                }
+    
+                // Vérifier si la ville a déjà été traitée dans ce fichier
+                if (isset($processedCities[$regionName])) {
+                    continue; // Si oui, ignorer cette entrée
+                }
+    
+                // Vérifier si la ville existe déjà dans la base de données
+                $existingCity = $cityRepository->findOneBy(['name' => $cityName]);
+                if ($existingCity) {
+                    $processedCities[$cityName] = true;
+                    continue; // Si oui, ignorer cette entrée
+                }
+    
+                // Récupérer ou créer la région associée
+                $regionRepository = $entityManager->getRepository(Region::class);
+                $existingRegion = $regionRepository->findOneBy(['name' => $regionName]);
+    
+                if (!$existingRegion) {
+                    $region = new Region();
+                    $region->setName($regionName);
+                    $region->setRegionCode($regionCode);
+                    $region->setCreatedAt(new \DateTimeImmutable());
+    
+                    $entityManager->persist($region);
+                    $existingRegion = $region; // Réassigner pour utiliser l'objet persisté
+                }
+    
+                // Créez et persistez une nouvelle ville
+                $city = new City();
+                $city->setName($cityName);
+                $city->setLongitude($longitude);
+                $city->setLatitude($latitude);
+                $city->setCreatedAt(new \DateTimeImmutable());
+    
+                // Associer la ville au région
+                $city->setRegion($existingRegion);
+    
+                $entityManager->persist($city);
+                $importedCount++; // Incrémentez le compteur
+    
+                // Marquer cette ville comme traitée
+                $processedCities[$cityName] = true;
+            }
+    
+            $entityManager->flush();
+    
+            $this->addFlash('success', $importedCount . ' villes ont été importées avec succès.');
+    
+            return $this->redirectToRoute('app_city_index');
+        }
+    
         return $this->render('city/index.html.twig', [
             'cities' => $cityRepository->findAll(),
             'form' => $form->createView(),
         ]);
     }
-
-    private function processCsv(UploadedFile $csvFile, EntityManagerInterface $entityManager)
-    {
-        $csvData = file_get_contents($csvFile->getPathname());
-        $rows = array_map(function($row) {
-            return str_getcsv($row, ';');
-        }, explode("\n", $csvData));
-        
-        $headers = array_shift($rows);
-    
-        foreach ($rows as $row) {
-            if (count($row) !== count($headers)) {
-                continue; // Skip rows where the number of columns does not match the number of headers
-            }
-    
-            $data = array_combine($headers, $row);
-    
-            if ($data === false) {
-                continue; // Skip rows where array_combine fails
-            }
-    
-            // Fetch or create the Country entity
-            $countryName = $data['country'] ?? null;
-            $iso2 = $data['iso2'] ?? null;
-    
-            if ($countryName && $iso2) {
-                $countryRepository = $entityManager->getRepository(Country::class);
-                $country = $countryRepository->findOneBy(['name' => $countryName, 'iso2' => $iso2]);
-    
-                if (!$country) {
-                    $country = new Country();
-                    $country->setName($countryName);
-                    $country->setIso2($data['iso2'] ?? ''); // Assuming the CSV has an iso2 column
-                    $country->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-    
-                    $entityManager->persist($country);
-                }
-            }
-    
-            // Check if the city already exists
-            $cityName = $data['city'] ?? null;
-            if ($cityName) {
-                $cityRepository = $entityManager->getRepository(City::class);
-                $city = $cityRepository->findOneBy(['name' => $cityName]);
-    
-                if (!$city) {
-                    // Create the City entity if it does not exist
-                    $city = new City();
-                    $city->setName($cityName);
-                    $city->setLatitude($data['lat'] ?? null);
-                    $city->setLongitude($data['lng'] ?? null);
-                    $city->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-                    $city->setCountry($country ?? null); // Associate the city with the country if available
-    
-                    $entityManager->persist($city);
-                }
-            }
-        }
-    
-        $entityManager->flush();
-    }
-       
-
 
     #[Route('/new', name: 'app_city_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

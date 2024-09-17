@@ -112,9 +112,6 @@ class BirdSpeciesType extends AbstractType
             ->add('sisRecId')
             ->add('spcRecId')
             ->add('subsppId')
-            // ->add('save', SubmitType::class, [
-            //     'label' => 'Enregistrer les modifications'
-            // ])
         ;
     }
 

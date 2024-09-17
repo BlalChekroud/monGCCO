@@ -31,11 +31,17 @@ class CountTypeController extends AbstractController
         $form = $this->createForm(CountTypeType::class, $countType);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($countType);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $countType->setCreatedAt(new \DateTimeImmutable());
+                $entityManager->persist($countType);
+                $entityManager->flush();
+                $this->addFlash('success', 'Type de conptage a bien été crée.');
+    
+                return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error', 'Une erreur s\'est produite lors de la création de la type de comptage.');
+            }
         }
 
         return $this->render('count_type/new.html.twig', [
@@ -58,10 +64,16 @@ class CountTypeController extends AbstractController
         $form = $this->createForm(CountTypeType::class, $countType);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $countType->setUpdatedAt(new \DateTimeImmutable());
+                $entityManager->flush();
+                $this->addFlash('success', 'Le type de comptage a bien été modifié');
+    
+                return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error', 'Une erreur s\'est produite lors de la modification de latype de comptage.');
+            }
         }
 
         return $this->render('count_type/edit.html.twig', [
@@ -76,6 +88,9 @@ class CountTypeController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$countType->getId(), $request->getPayload()->get('_token'))) {
             $entityManager->remove($countType);
             $entityManager->flush();
+            $this->addFlash('success', "La type de comptage a bien été supprimée");
+        } else {
+            $this->addFlash('error','Une erreur s\'est produite lors de la suppression de type de comptage.');
         }
 
         return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);

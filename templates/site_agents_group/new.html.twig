@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New SiteAgentsGroup{% endblock %}
+
+{% block body %}
+    <h1>Create new SiteAgentsGroup</h1>
+
+    {{ include('site_agents_group/_form.html.twig') }}
+
+    <a href="{{ path('app_site_agents_group_index') }}">back to list</a>
+{% endblock %}
