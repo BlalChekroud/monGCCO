@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use DateTime;
 use App\Entity\Image;
 use App\Form\ImageType;
 use App\Repository\ImageRepository;
@@ -39,7 +38,7 @@ class ImageController extends AbstractController
             if ($imageFile) {
                 $image->setImageFile($imageFile);
             }
-            $image->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
+            $image->setCreatedAt(new \DateTimeImmutable());
             $entityManager->persist($image);
             $entityManager->flush();
             $this->addFlash('success', "L'image a bien été ajoutée.");
@@ -74,7 +73,7 @@ class ImageController extends AbstractController
             if ($imageFile) {
                 $image->setImageFile($imageFile);
             }
-            $image->setUpdatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
+            $image->setUpdatedAt(new \DateTimeImmutable());
             $entityManager->flush();
             $this->addFlash('success', "L'image a bien été modifiée.");
 

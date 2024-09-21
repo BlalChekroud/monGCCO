@@ -8,6 +8,7 @@ use DateTime;
 use App\Form\CoverageType;
 use App\Form\BirdLifeTaxTreatType;
 use App\Form\IucnRedListCategoryType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\BirdSpecies;
 use App\Entity\BirdFamily;
@@ -91,272 +92,6 @@ class BirdSpeciesController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
-    // private function processCsv(UploadedFile $csvFile, EntityManagerInterface $entityManager)
-    // {
-    //     $csvData = file_get_contents($csvFile->getPathname());
-    //     $rows = array_map(function($row) {
-    //         return str_getcsv($row, ';');
-    //     }, explode("\n", $csvData));
-        
-    //     $headers = array_shift($rows);
-    
-    //     foreach ($rows as $row) {
-    //         if (count($row) !== count($headers)) {
-    //             continue; // Skip rows where the number of columns does not match the number of headers
-    //         }
-    
-    //         $data = array_combine($headers, $row);
-    
-    //         if ($data === false) {
-    //             continue; // Skip rows where array_combine fails
-    //         }
-    
-    //         // Fetch or create the Birdfamily entity
-    //         $familyName = $data['Family name'] ?? null;
-    //         $family = $data['Family'] ?? null;
-    
-    //         if ($familyName && $family) {
-    //             $familyRepository = $entityManager->getRepository(BirdFamily::class);
-    //             $birdFamily = $familyRepository->findOneBy(['familyName' => $familyName, 'family' => $family]);
-    
-    //             if (!$birdFamily) {
-    //                 $birdFamily = new BirdFamily();
-    //                 $birdFamily->setOrdre($data['Ordre'] ?? null);
-    //                 $birdFamily->setFamilyName($data['Family name'] ?? null);
-    //                 $birdFamily->setFamily($data['Family'] ?? null);
-    //                 $birdFamily->setSubFamily($data['Subfamily'] ?? null);
-    //                 $birdFamily->setTribe($data['Tribe'] ?? null);
-    //                 $birdFamily->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-            
-    //                 $entityManager->persist($birdFamily);
-    //             }
-    //         }
-
-    //         // Fetch or create the Coverage entity
-    //         $coveragName = $data['Coverage'] ?? null;
-    
-    //         if ($coveragName) {
-    //             $coverageRepository = $entityManager->getRepository(Coverage::class);
-    //             $coverage = $coverageRepository->findOneBy(['label' => $coveragName]);
-    
-    //             if (!$coverage) {
-    //                 $coverage = new Coverage();
-    //                 $coverage->setLabel($data['Coverage'] ?? '');
-    //                 $coverage->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-    
-    //                 $entityManager->persist($coverage);
-    //             }
-    //         }
-
-    //         // Fetch or create the BirdLifeTaxTreat entity
-    //         $birdLifeTaxTreatName = $data['BirdLife taxonomic treatment'] ?? null;
-    //         if ($birdLifeTaxTreatName) {
-    //             $birdLifeTaxTreatRepository = $entityManager->getRepository(BirdLifeTaxTreat::class);
-    //             $birdLifeTaxTreat = $birdLifeTaxTreatRepository->findOneBy(['label' => $birdLifeTaxTreatName]);
-    
-    //             if (!$birdLifeTaxTreat) {
-    //                 $birdLifeTaxTreat = new BirdLifeTaxTreat();
-    //                 $birdLifeTaxTreat->setLabel($data['BirdLife taxonomic treatment'] ?? '');
-    //                 $birdLifeTaxTreat->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-    
-    //                 $entityManager->persist($birdLifeTaxTreat);
-    //             }
-    //         }
-
-    //         // Fetch or create the IucnRedListCategory entity
-    //         $iucnRedListCategoryName = $data['2022 IUCN Red List category'] ?? null;
-    
-    //         if ($iucnRedListCategoryName) {
-    //             $iucnRedListCategoryRepository = $entityManager->getRepository(IucnRedListCategory::class);
-    //             $iucnRedListCategory = $iucnRedListCategoryRepository->findOneBy(['label' => $iucnRedListCategoryName]);
-    
-    //             if (!$iucnRedListCategory) {
-    //                 $iucnRedListCategory = new IucnRedListCategory();
-    //                 $iucnRedListCategory->setLabel($data['2022 IUCN Red List category'] ?? '');
-    //                 $iucnRedListCategory->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-    
-    //                 $entityManager->persist($iucnRedListCategory);
-    //             }
-    //         }
-
-    //         // Check if the BirdSpecies already exists
-    //         $scientificName = $data['Scientific name'] ?? null;
-    //         if ($scientificName) {
-    //             $birdSpecyRepository = $entityManager->getRepository(BirdSpecies::class);
-    //             $birdSpecy = $birdSpecyRepository->findOneBy(['scientificName' => $scientificName]);
-
-    //             if (!$scientificName){
-    //                 // Create the BirdSpecies entity if it does not exist
-    //                 $birdSpecy = new BirdSpecies();
-    //                 $birdSpecy->setScientificName($data['Scientific name'] ?? null);
-    //                 $birdSpecy->setFrenchName($data['French name'] ?? null);
-    //                 $birdSpecy->setWispeciescode($data['Wispeciescode'] ?? null);
-    //                 $birdSpecy->setAuthority($data['Authority'] ?? null);
-    //                 $birdSpecy->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-    //                 $birdSpecy->setCommonName($data['Common name'] ?? null);
-    //                 $birdSpecy->setCommonNameAlt($data['Alternative common names'] ?? null);
-    //                 $birdSpecy->setSynonyms($data['Synonyms'] ?? null);
-    //                 $birdSpecy->setTaxonomicSources($data['Taxonomic source'] ?? null);
-    //                 $birdSpecy->setSisRecId($data['SISRecID'] ?? null);
-    //                 $birdSpecy->setSpcRecId($data['SpcRecID'] ?? null);
-    //                 $birdSpecy->setSubsppId($data['SubsppID'] ?? null);
-
-    //                 $birdSpecy->setBirdFamily($birdFamily ?? null);
-    //                 $birdSpecy->setCoverage($coverage ?? null);
-    //                 $birdSpecy->setBirdLifeTaxTreat($birdLifeTaxTreat ?? null);
-    //                 $birdSpecy->setIucnRedListCategory($iucnRedListCategory ?? null);
-            
-    //                 $entityManager->persist($birdSpecy);
-                    
-    //             }
-    //         }
-            
-    //     }
-    
-    //     $entityManager->flush();
-    // }
-
-
-    /* Meilleur*/
-    // private function processCsv(UploadedFile $csvFile, EntityManagerInterface $entityManager)
-    // {
-    //     $csvData = file_get_contents($csvFile->getPathname());
-    //     if (!$csvData) {
-    //         error_log("Failed to read CSV file.");
-    //         throw new \Exception("Failed to read CSV file.");
-    //     }
-
-    //     $rows = array_map(function($row) {
-    //         return str_getcsv($row, ';');
-    //     }, explode("\n", $csvData));
-
-    //     $headers = array_shift($rows);
-    //     if (!$headers) {
-    //         error_log("No headers found in CSV file.");
-    //         throw new \Exception("No headers found in CSV file.");
-    //     }
-
-    //     foreach ($rows as $row) {
-    //         if (count($row) !== count($headers)) {
-    //             error_log("Row column count does not match header count: " . implode(";", $row));
-    //             continue; // Skip rows where the number of columns does not match the number of headers
-    //         }
-
-    //         $data = array_combine($headers, $row);
-    //         if ($data === false) {
-    //             error_log("Failed to combine headers and row: " . implode(";", $row));
-    //             continue; // Skip rows where array_combine fails
-    //         }
-
-    //         try {
-    //             // Fetch or create the BirdFamily entity
-    //             $familyName = $data['Family name'] ?? null;
-    //             $family = $data['Family'] ?? null;
-        
-    //             if ($familyName && $family) {
-    //                 $familyRepository = $entityManager->getRepository(BirdFamily::class);
-    //                 $birdFamily = $familyRepository->findOneBy(['familyName' => $familyName, 'family' => $family]);
-        
-    //                 if (!$birdFamily) {
-    //                     $birdFamily = new BirdFamily();
-    //                     $birdFamily->setOrdre($data['Ordre'] ?? null);
-    //                     $birdFamily->setFamilyName($data['Family name'] ?? null);
-    //                     $birdFamily->setFamily($data['Family'] ?? null);
-    //                     $birdFamily->setSubFamily($data['Subfamily'] ?? null);
-    //                     $birdFamily->setTribe($data['Tribe'] ?? null);
-    //                     $birdFamily->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-                
-    //                     $entityManager->persist($birdFamily);
-    //                 }
-    //             }
-
-    //             // Fetch or create the Coverage entity
-    //             $coverageName = $data['Coverage'] ?? null;
-        
-    //             if ($coverageName) {
-    //                 $coverageRepository = $entityManager->getRepository(Coverage::class);
-    //                 $coverage = $coverageRepository->findOneBy(['label' => $coverageName]);
-        
-    //                 if (!$coverage) {
-    //                     $coverage = new Coverage();
-    //                     $coverage->setLabel($coverageName);
-    //                     $coverage->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-        
-    //                     $entityManager->persist($coverage);
-    //                 }
-    //             }
-
-    //             // Fetch or create the BirdLifeTaxTreat entity
-    //             $birdLifeTaxTreatName = $data['BirdLife taxonomic treatment'] ?? null;
-    //             if ($birdLifeTaxTreatName) {
-    //                 $birdLifeTaxTreatRepository = $entityManager->getRepository(BirdLifeTaxTreat::class);
-    //                 $birdLifeTaxTreat = $birdLifeTaxTreatRepository->findOneBy(['label' => $birdLifeTaxTreatName]);
-        
-    //                 if (!$birdLifeTaxTreat) {
-    //                     $birdLifeTaxTreat = new BirdLifeTaxTreat();
-    //                     $birdLifeTaxTreat->setLabel($birdLifeTaxTreatName);
-    //                     $birdLifeTaxTreat->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-        
-    //                     $entityManager->persist($birdLifeTaxTreat);
-    //                 }
-    //             }
-
-    //             // Fetch or create the IucnRedListCategory entity
-    //             $iucnRedListCategoryName = $data['2022 IUCN Red List category'] ?? null;
-        
-    //             if ($iucnRedListCategoryName) {
-    //                 $iucnRedListCategoryRepository = $entityManager->getRepository(IucnRedListCategory::class);
-    //                 $iucnRedListCategory = $iucnRedListCategoryRepository->findOneBy(['label' => $iucnRedListCategoryName]);
-        
-    //                 if (!$iucnRedListCategory) {
-    //                     $iucnRedListCategory = new IucnRedListCategory();
-    //                     $iucnRedListCategory->setLabel($iucnRedListCategoryName);
-    //                     $iucnRedListCategory->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-        
-    //                     $entityManager->persist($iucnRedListCategory);
-    //                 }
-    //             }
-
-    //             // Check if the BirdSpecies already exists
-    //             $scientificName = $data['Scientific name'] ?? null;
-    //             if ($scientificName) {
-    //                 $birdSpeciesRepository = $entityManager->getRepository(BirdSpecies::class);
-    //                 $birdSpecy = $birdSpeciesRepository->findOneBy(['scientificName' => $scientificName]);
-
-    //                 if (!$birdSpecy) {
-    //                     // Create the BirdSpecies entity if it does not exist
-    //                     $birdSpecy = new BirdSpecies();
-    //                     $birdSpecy->setScientificName($scientificName);
-    //                     $birdSpecy->setFrenchName($data['French name'] ?? null);
-    //                     $birdSpecy->setWispeciescode($data['Wispeciescode'] ?? null);
-    //                     $birdSpecy->setAuthority($data['Authority'] ?? null);
-    //                     $birdSpecy->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-    //                     $birdSpecy->setCommonName($data['Common name'] ?? null);
-    //                     $birdSpecy->setCommonNameAlt($data['Alternative common names'] ?? null);
-    //                     $birdSpecy->setSynonyms($data['Synonyms'] ?? null);
-    //                     $birdSpecy->setTaxonomicSources($data['Taxonomic source'] ?? null);
-    //                     $birdSpecy->setSisRecId($data['SISRecID'] ?? null);
-    //                     $birdSpecy->setSpcRecId($data['SpcRecID'] ?? null);
-    //                     $birdSpecy->setSubsppId($data['SubsppID'] ?? null);
-
-    //                     $birdSpecy->setBirdFamily($birdFamily ?? null);
-    //                     $birdSpecy->setCoverage($coverage ?? null);
-    //                     $birdSpecy->setBirdLifeTaxTreat($birdLifeTaxTreat ?? null);
-    //                     $birdSpecy->setIucnRedListCategory($iucnRedListCategory ?? null);
-                
-    //                     $entityManager->persist($birdSpecy);
-    //                 }
-    //             }
-                
-    //         } catch (\Exception $e) {
-    //             error_log("Failed to process row: " . implode(";", $row) . " - Error: " . $e->getMessage());
-    //         }
-    //     }
-
-    //     $entityManager->flush();
-    // }
-
 
     private function processCsv(UploadedFile $csvFile, EntityManagerInterface $entityManager)
     {
@@ -572,6 +307,16 @@ class BirdSpeciesController extends AbstractController
             'iucnRedListCategoryForm' => $iucnRedListCategoryForm->createView(),
         ]);
     }
+
+    #[Route('/get-bird-image/{id}', name: 'get_bird_image', methods: ['GET'])]
+    public function getBirdImage(BirdSpecies $birdSpecies): JsonResponse
+    {
+        // Utiliser la méthode `getImageUrl` ou une méthode similaire pour obtenir l'URL de l'image
+        $imageUrl = $birdSpecies->getImageUrl();
+
+        return new JsonResponse(['imageUrl' => $imageUrl]);
+    }
+
 
     #[Route('/{id}', name: 'app_bird_species_show', methods: ['GET'])]
     public function show(BirdSpecies $birdSpecy): Response

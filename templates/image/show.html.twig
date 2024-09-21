@@ -16,7 +16,7 @@
                 <td>
                     {# {{ image.imageFilename }} #}
                     {% if image.imageFilename %}
-                        <img src="{{ vich_uploader_asset(image, 'imageFile') }}" alt="image" class="imgShow rounded mx-auto d-block">
+                        <img src="{{ vich_uploader_asset(image, 'imageFile') }}" alt="image" class="imgShow rounded mx-auto d-block" style="display:none; width:200px; heigth:100px;">
                     {% else %}
                         <p>Aucune image disponible</p>
                     {% endif %}

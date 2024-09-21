@@ -206,7 +206,6 @@
                         <div class="d-flex justtify-content-end">
                             <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation des campagnes">Retour</a>
                             <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-outline-primary bi bi-pencil-square mx-1"> Modifier</a>
-                            {# <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a> #}
                             <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Consultation des collectes</a>
                              {{ include('counting_campaign/_delete_form.html.twig') }}
                         </div>

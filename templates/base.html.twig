@@ -45,12 +45,23 @@
     <header id="header" class="header fixed-top d-flex align-items-center">
 
       <div class="d-flex align-items-center justify-content-between">
-        <a href="{{ path('home') }}" class="logo d-flex align-items-center">
-          <img src="{{ asset('/img/GCCO 1.png') }}" alt="">
-          <span class="d-none d-lg-block" style="font-size: 15px;">
-                <h3>G.C.C.O.M</h3>
+        <div class="logo d-flex align-items-center">
+        <a href="{{ path('home') }}">
+          {% if logo and logo.image and logo.image.imageFilename %}
+              <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgLogo">
+          {% else %}
+              <p>Aucune image disponible</p>
+          {% endif %}
+        </a>
+        <a href="{{ path('app_counting_campaign_index') }}">
+          <span class="d-none d-lg-block" style="font-size: 15px; margin-top: 15px;">
+            Gestion des campagnes
+            <p style="font-size: 11px;">
+              de comptage des oiseaux marins
+            </p>
           </span>
         </a>
+        </div>
         <i class="bi bi-list toggle-sidebar-btn"></i>
       </div><!-- End Logo -->
 
@@ -320,7 +331,7 @@
 
                 <li>
                   <a class="dropdown-item d-flex align-items-center" href="{{ path('app_profile') }}">
-                    <i class="bi bi-gear"></i>
+                    <i class="bi bi-people"></i>
                     <span>Utilisateurs</span>
                   </a>
                 </li>
@@ -572,6 +583,29 @@
             </li>
           </ul>
         </li><!-- End users Nav -->
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" data-bs-target="#parameters-nav" data-bs-toggle="collapse" href="#">
+            <i class="bi bi-gear"></i><span>Paramètres</span><i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <ul id="parameters-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+            <li>
+              <a href="{{ path('app_logo_index') }}">
+                <i class="bi bi-circle"></i><span>Logo</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_agents_group_index') }}">
+                <i class="bi bi-circle"></i><span>Consultation des groupes</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_profile') }}">
+                <i class="bi bi-circle"></i><span>Consultation des utilisateurs</span>
+              </a>
+            </li>
+          </ul>
+        </li><!-- End parameters Nav -->
 
         <li class="nav-heading">Pages</li>
 

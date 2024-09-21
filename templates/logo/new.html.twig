@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Logo{% endblock %}
+
+{% block body %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Ajouter un logo</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_logo_index') }}">Gestion du logo</a></li>
+          <li class="breadcrumb-item active">Insertion</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Informations sur le logo</h5>
+
+              {{ include('logo/_form.html.twig') }}
+
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_logo_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation du logo">Retour</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}

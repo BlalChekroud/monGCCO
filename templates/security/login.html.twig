@@ -48,8 +48,12 @@
 
                   <div class="d-flex justify-content-center py-4">
                     <a href="{{ path('home')}}" class="logo d-flex align-items-center w-auto">
-                      <img src="{{ asset('/img/GCCO 1.png') }}" alt="">
-                      {# <span class="d-none d-lg-block">Gestion des Campagnes de Comptage des Oiseaux Marin</span> #}
+                      {% if logo and logo.image and logo.image.imageFilename %}
+                          <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgLogo">
+                      {% else %}
+                          <p>Aucune image disponible</p>
+                      {% endif %}                      
+                      {# <span class="d-none d-lg-block">Gestion des Campagnes de Comptage des Oiseaux Marins</span> #}
                     </a>
                   </div><!-- End Logo -->
 

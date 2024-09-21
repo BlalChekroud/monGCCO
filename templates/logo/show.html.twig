@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Logo{% endblock %}
+
+{% block body %}
+    <h1>Logo</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ logo.id }}</td>
+                <th>Logo</th>
+                <td>
+                    {% if logo.image and logo.image.imageFilename %}
+                        <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgShow rounded mx-auto d-block">
+                    {% else %}
+                        <p>Aucune image disponible</p>
+                    {% endif %}
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_logo_index') }}">back to list</a>
+
+    <a href="{{ path('app_logo_edit', {'id': logo.id}) }}">edit</a>
+
+    {{ include('logo/_delete_form.html.twig') }}
+{% endblock %}
+

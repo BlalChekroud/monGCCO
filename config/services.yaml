@@ -16,6 +16,10 @@ services:
     App\Validator\PasswordMatchValidator:
         tags: ['validator.constraint_validator']
             
+    App\EventSubscriber\LogoSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+    
     # Définir le service CsvUploader
     # App\Service\FileUploader\CsvUploader:
     #     class: App\Service\FileUploader

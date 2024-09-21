@@ -278,6 +278,8 @@ class CollectedDataController extends AbstractController
             'form' => $form,
             'siteCollection' => $site,
             'campaign_id' => $campaignId,
+            'environmentalConditions' => $environmentalConditions,
+            // 'birdSpecies' => $birdSpecies,
         ]);
     }
 

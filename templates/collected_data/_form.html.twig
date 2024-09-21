@@ -1,4 +1,4 @@
-{{ form_start(form) }}
+{# {{ form_start(form) }}
     {{ form_errors(form) }}
     
     {{ form_row(form.countType) }}
@@ -56,10 +56,8 @@
         </div>
     </div>
 {{ form_end(form) }}
-
-
 <script>
-    {# document.addEventListener('DOMContentLoaded', function () { #}
+    document.addEventListener('DOMContentLoaded', function () {
         var addButton = document.getElementById('add-bird-specy');
         var collectionHolder = document.getElementById('birdSpeciesCountsContainer');
 
@@ -136,5 +134,171 @@
         document.querySelectorAll('.birdSpeciesCountsContainer-item').forEach(function (element) {
             attachIncreaseDecreaseListeners(element);
         });
-    {# }); #}
+    });
+</script> #}
+
+{{ form_start(form) }} 
+    {{ form_errors(form) }}
+    
+    {{ form_row(form.countType) }}
+    {{ form_row(form.quality) }}
+    {{ form_row(form.method) }}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 mb-12">
+                <label>{{ form_label(form.birdSpeciesCounts) }}</label>
+                <div id="birdSpeciesCountsContainer" data-prototype="{{ form_widget(form.birdSpeciesCounts.vars.prototype)|e('html_attr') }}">
+                    {% for birdSpeciesCountForm in form.birdSpeciesCounts %}
+                        <div class="card">
+                            <div class="row">
+                                <div class="col-sm-5 col-md-5 col-lg-5 mb-5">
+                                    {{ form_row(birdSpeciesCountForm.birdSpecies) }}
+                                    <img class="bird-image img-fluid" style="display:none;" />
+                                </div>
+                                <div class="col-sm-2 col-md-2 col-lg-2 mb-2">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-{{ loop.index }}">-</button>
+                                        </div>
+                                        {{ form_widget(birdSpeciesCountForm.count, {'attr': {'id': 'count-' ~ loop.index}}) }}
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-{{ loop.index }}">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                                    <button type="button" class="btn btn-danger remove-item">Supprimer</button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                <button type="button" class="btn btn-primary add-item">Ajouter un oiseau</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-sm-3">
+            <button type="reset" class="btn btn-light">Annuler</button>
+        </div>
+        <div class="col-sm-4">
+            <button class="btn btn-outline-primary">Enregistrer</button>
+        </div>
+    </div>
+{{ form_end(form) }}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.querySelector('#birdSpeciesCountsContainer');
+        
+        if (container) {
+            const addButton = document.querySelector('.add-item');
+            const prototype = container.getAttribute('data-prototype');
+            let index = {{ form.birdSpeciesCounts|length }};
+
+            addButton.addEventListener('click', function () {
+                const newForm = prototype.replace(/__name__/g, index);
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(newForm, 'text/html');
+                
+                const birdSpeciesSelect = doc.querySelector('[name*="[birdSpecies]"]').outerHTML;
+                const birdSpeciesCountInput = doc.querySelector('[name*="[count]"]').outerHTML;
+
+                // Update the birdSpeciesCountInput to have a unique ID
+                const updatedBirdSpeciesCountInput = birdSpeciesCountInput.replace(/id="[^"]*"/, `id="count-${index}"`);
+
+                const newFormElement = document.createElement('div');
+                newFormElement.classList.add('col-sm-12', 'col-md-12', 'col-lg-12', 'mb-12');
+                newFormElement.innerHTML = `
+                    <div class="card">
+                        <div class="row">
+                            <div class="col-sm-5 col-md-5 col-lg-5 mb-5">
+                                ${birdSpeciesSelect}
+                                <img class="bird-image img-fluid" style="display:none;" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3 col-md-3 col-lg-3 mb-2">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-${index}">-</button>
+                                    </div>
+                                    ${updatedBirdSpeciesCountInput}
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-${index}">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                                <button type="button" class="btn btn-danger remove-item">Supprimer</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(newFormElement);
+                index++;
+
+                attachImageUpdateListener(newFormElement);
+                attachIncreaseDecreaseListeners(newFormElement);
+            });
+
+            function attachImageUpdateListener(element) {
+                const select = element.querySelector('[name*="[birdSpecies]"]');
+                const img = element.querySelector('.bird-image');
+
+                select.addEventListener('change', function () {
+                    const birdId = select.value;
+                    if (birdId) {
+                        fetch(`/bird/species/get-bird-image/${birdId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.imageUrl) {
+                                    img.src = data.imageUrl;
+                                    img.style.display = 'block';
+                                } else {
+                                    img.style.display = 'none';
+                                }
+                            })
+                            .catch(error => console.error('Erreur lors du chargement de l\'image :', error));
+                    }
+                });
+            }
+
+            document.querySelectorAll('.birdSpeciesCountsContainer-item').forEach(function (element) {
+                attachImageUpdateListener(element);
+            });
+
+            function attachIncreaseDecreaseListeners(element) {
+                element.querySelectorAll('.increaseButton').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        const targetId = button.getAttribute('data-target');
+                        const input = document.getElementById(targetId);
+                        if (input) {
+                            let value = parseInt(input.value, 10);
+                            input.value = isNaN(value) ? 1 : value + 1;
+                        }
+                    });
+                });
+
+                element.querySelectorAll('.decreaseButton').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        const targetId = button.getAttribute('data-target');
+                        const input = document.getElementById(targetId);
+                        if (input) {
+                            let value = parseInt(input.value, 10);
+                            input.value = Math.max(value - 1, 0);
+                        }
+                    });
+                });
+            }
+
+            attachIncreaseDecreaseListeners(document);
+        }
+    });
 </script>
