@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/bird/life/tax/treat')]
-#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class BirdLifeTaxTreatController extends AbstractController
 {
     #[Route('/', name: 'app_bird_life_tax_treat_index', methods: ['GET'])]
@@ -26,6 +25,7 @@ class BirdLifeTaxTreatController extends AbstractController
     }
 
     #[Route('/new/ajax', name: 'app_bird_life_tax_treat_new_ajax', methods: ['POST'])]
+    #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
     public function newAjax(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $birdLifeTaxTreat = new BirdLifeTaxTreat();
@@ -56,6 +56,7 @@ class BirdLifeTaxTreatController extends AbstractController
     }
 
     #[Route('/new', name: 'app_bird_life_tax_treat_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $birdLifeTaxTreat = new BirdLifeTaxTreat();
@@ -84,6 +85,7 @@ class BirdLifeTaxTreatController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_bird_life_tax_treat_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     public function edit(Request $request, BirdLifeTaxTreat $birdLifeTaxTreat, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(BirdLifeTaxTreatType::class, $birdLifeTaxTreat);
@@ -102,6 +104,7 @@ class BirdLifeTaxTreatController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_bird_life_tax_treat_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     public function delete(Request $request, BirdLifeTaxTreat $birdLifeTaxTreat, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$birdLifeTaxTreat->getId(), $request->getPayload()->get('_token'))) {

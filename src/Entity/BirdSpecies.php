@@ -394,4 +394,10 @@ class BirdSpecies
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->getScientificName() ?: 'Unknown Specy';
+    }
+
 }

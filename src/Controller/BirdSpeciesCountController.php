@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\BirdSpeciesCount;
 use App\Form\BirdSpeciesCountType;
 use App\Repository\BirdSpeciesCountRepository;
@@ -22,6 +23,7 @@ class BirdSpeciesCountController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/new', name: 'app_bird_species_count_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -50,6 +52,7 @@ class BirdSpeciesCountController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}/edit', name: 'app_bird_species_count_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, BirdSpeciesCount $birdSpeciesCount, EntityManagerInterface $entityManager): Response
     {
@@ -68,6 +71,7 @@ class BirdSpeciesCountController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_bird_species_count_delete', methods: ['POST'])]
     public function delete(Request $request, BirdSpeciesCount $birdSpeciesCount, EntityManagerInterface $entityManager): Response
     {

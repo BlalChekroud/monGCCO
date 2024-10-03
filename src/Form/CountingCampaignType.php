@@ -43,20 +43,20 @@ class CountingCampaignType extends AbstractType
                 'by_reference' => false,
                 'label' => false,
             ])
-            ->add('campaignStatus', ChoiceType::class, [
-                'choices' => [
-                    '' => 'NULL',
-                    'En attente' => 'En attente',
-                    'En cours' => 'En cours',
-                    'Terminé' => 'Terminé',
-                    'Annulé' => 'Annulé',
-                    'Erreur' => 'Erreur',
-                    'Validé' => 'Validé',
-                    'Suspens' => 'Suspens',
-                ],
-                'label' => "Etat de la campagne",
-                'required' => true,
-            ])
+            // ->add('campaignStatus', ChoiceType::class, [
+            //     'choices' => [
+            //         '' => 'NULL',
+            //         'En attente' => 'En attente',
+            //         'En cours' => 'En cours',
+            //         'Terminé' => 'Terminé',
+            //         'Annulé' => 'Annulé',
+            //         'Erreur' => 'Erreur',
+            //         'Validé' => 'Validé',
+            //         'Suspens' => 'Suspens',
+            //     ],
+            //     'label' => "Etat de la campagne",
+            //     'required' => true,
+            // ])
             ->add('description',TextareaType::class, [
                 'label' => 'Description',
                 'required' => false,

@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/site/agents/group')]
+#[Route('/user/site/agents/group')]
 class SiteAgentsGroupController extends AbstractController
 {
     #[Route('/', name: 'app_site_agents_group_index', methods: ['GET'])]

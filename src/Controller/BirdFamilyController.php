@@ -23,10 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/bird/family')]
-#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class BirdFamilyController extends AbstractController
 {
-    #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/', name: 'app_bird_family_index', methods: ['GET', 'POST'])]
     public function index(Request $request, BirdFamilyRepository $birdFamilyRepository, EntityManagerInterface $entityManager): Response
     {
@@ -37,7 +35,7 @@ class BirdFamilyController extends AbstractController
             /** @var UploadedFile $csvFile */
             $csvFile = $form->get('csvFile')->getData();
 
-            if ($csvFile) {
+            if ($csvFile && $this->IsGranted('ROLE_IMPORT')) {
                 try {
                     $this->processCsv($csvFile, $entityManager);
                     $this->addFlash('success', 'Les données ont été importées avec succès.');
@@ -56,8 +54,8 @@ class BirdFamilyController extends AbstractController
     }
 
 
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/new', name: 'app_bird_family_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $birdFamily = new BirdFamily();
@@ -232,7 +230,6 @@ class BirdFamilyController extends AbstractController
         return $this->redirectToRoute('app_bird_family_index');
     }
 
-    #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_bird_family_show', methods: ['GET'])]
     public function show(BirdFamily $birdFamily): Response
     {
@@ -241,8 +238,8 @@ class BirdFamilyController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}/edit', name: 'app_bird_family_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     public function edit(Request $request, BirdFamily $birdFamily, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(BirdFamilyType::class, $birdFamily);
@@ -262,8 +259,8 @@ class BirdFamilyController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_bird_family_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     public function delete(Request $request, BirdFamily $birdFamily, EntityManagerInterface $entityManager): Response
     {
         $csrfToken = $request->request->get('_token'); // Utilisation de `request->request` pour obtenir le payload

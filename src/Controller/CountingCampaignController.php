@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\EnvironmentalConditions;
-use App\Repository\CampaignStatusRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Monolog\DateTimeImmutable;
 use App\Entity\CountingCampaign;
@@ -16,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/counting/campaign')]
-#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class CountingCampaignController extends AbstractController
 {
     #[Route('/', name: 'app_counting_campaign_index', methods: ['GET'])]
@@ -36,9 +34,9 @@ class CountingCampaignController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_TEAMLEADER', message: 'Vous n\'avez pas l\'accès.')]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/new', name: 'app_counting_campaign_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, CampaignStatusRepository $statusRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         $countingCampaign = new CountingCampaign();
@@ -92,6 +90,7 @@ class CountingCampaignController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_counting_campaign_show', methods: ['GET'])]
+    #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
     public function show(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();  // Utilisateur actuel
@@ -102,6 +101,10 @@ class CountingCampaignController extends AbstractController
         // Tableau pour stocker les SiteCollection et les conditions environnementales
         $sites = [];
         $existingConditions = [];
+
+        // Mettre à jour le statut de la campagne avant l'affichage
+        $this->updateCampaignStatus($countingCampaign);
+        $entityManager->flush();
 
         // Parcourir chaque SiteAgentsGroup et récupérer les SiteCollection associés
         foreach ($siteAgentsGroups as $siteAgentsGroup) {
@@ -123,36 +126,30 @@ class CountingCampaignController extends AbstractController
 
                 // Stocker les conditions environnementales pour ce site, si elles existent
                 $existingConditions[$siteCollection->getId()] = $conditions;
+
             }
         }
 
         return $this->render('counting_campaign/show.html.twig', [
             'counting_campaign' => $countingCampaign,
-            // 'sites' => $sites,  // Transmettre les SiteCollection à la vue
             'existingConditions' => $existingConditions,  // Transmettre les conditions environnementales
         ]);
     }
 
 
+    #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}/edit', name: 'app_counting_campaign_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager, CampaignStatusRepository $statusRepository): Response
+    public function edit(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
+        if ($countingCampaign->getCampaignStatus() == 'Clôturé') {
+            throw $this->createNotFoundException('Impossible de modifier une campagne clôturée.');
+        }
+
         $form = $this->createForm(CountingCampaignType::class, $countingCampaign);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                // $status = $countingCampaign->getCampaignStatus()->getLabel();
-
-                // if($status == 'Validé') {
-                //     $this->addFlash('info', 'Le modification n\'est pas autorisé.');
-                //     return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()], Response::HTTP_SEE_OTHER);
-
-                // } elseif ($status == 'Annulé') {
-                //     $this->addFlash('info', 'Le modification n\'est pas autorisé.');
-                //     return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
-                // }
-
                 if ($countingCampaign->getStartDate() > $countingCampaign->getEndDate()) {
                     $this->addFlash('danger', 'Date de début ne peut pas être supérieure à la date de fin.');
                     return $this->redirectToRoute('app_counting_campaign_edit', ['id' => $countingCampaign->getId()]);
@@ -172,6 +169,7 @@ class CountingCampaignController extends AbstractController
                 $countingCampaign->setUpdatedAt(new \DateTimeImmutable());
                 // Générer et définir le nom de la campagne
                 $countingCampaign->generateCampaignName();
+                $this->updateCampaignStatus($countingCampaign);
     
                 // Enregistrer les changements
                 $entityManager->flush();
@@ -190,6 +188,7 @@ class CountingCampaignController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_counting_campaign_delete', methods: ['POST'])]
     public function delete(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
@@ -202,37 +201,169 @@ class CountingCampaignController extends AbstractController
         return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    private function updateCampaignStatus(CountingCampaign $countingCampaign)
+    #[Route('/{id}/suspend', name: 'app_counting_campaign_suspend', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas accès à cette fonction.')]
+    public function suspendCampaign(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
+    {
+        // Si la campagne n'est ni "Clôturé" ni déjà en "Suspens"
+        if ($countingCampaign->getCampaignStatus() != 'Clôturé' && $countingCampaign->getCampaignStatus() != 'Suspens') {
+            $countingCampaign->setCampaignStatus('Suspens');
+            $entityManager->flush();
+            $this->addFlash('success', 'La campagne a été mise en suspens.');
+        } 
+        // Si la campagne est déjà en "Suspens", on la reprend
+        elseif ($countingCampaign->getCampaignStatus() == 'Suspens') {
+            // Enlever le statut "Suspens" avant de recalculer le nouveau statut
+            $countingCampaign->setCampaignStatus(''); // Supprimer l'état suspens pour forcer la mise à jour
+            $this->updateCampaignStatus($countingCampaign);
+            $entityManager->flush();
+            $this->addFlash('success', 'La campagne a été reprise.');
+        } 
+        // Sinon, la campagne est clôturée, et ne peut pas être mise en suspens
+        else {
+            $this->addFlash('warning', 'Cette campagne ne peut pas être mise en suspens car elle est déjà clôturée.');
+        }
+    
+        return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()]);
+    }
+    
+
+
+    #[Route('/{id}/close', name: 'app_counting_campaign_close', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas accès à cette fonction.')]
+    public function close(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
+    {
+        return $this->closeCampaign($countingCampaign, $entityManager);
+    }
+
+    /**
+     * Clôture la campagne si toutes les conditions sont remplies
+     */
+    public function closeCampaign(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager)
+    {
+        try {
+            // Valider la campagne avant de la clôturer
+            if ($this->validateCampaignClosure($countingCampaign)) {
+                $countingCampaign->setCampaignStatus('Clôturé');
+                $entityManager->flush();
+                $this->addFlash('success', 'La campagne a été clôturée avec succès.');
+            } 
+
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue lors de la clôture de la campagne : ' . $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()]);
+    }
+    
+    /**
+     * Valide si la campagne peut être clôturée
+     *
+     * @param CountingCampaign $countingCampaign
+     * @return bool
+     */
+    private function validateCampaignClosure(CountingCampaign $countingCampaign): bool
+    {
+        // Vérification des dates de début et de fin de la campagne
+        $now = new \DateTimeImmutable();
+        if ($countingCampaign->getEndDate() > $now) {
+            $this->addFlash('warning', "La campagne ne peut pas être clôturée avant sa date de fin.");
+            return false;
+        }
+        // Vérifier si la campagne a des sites associés
+        if ($countingCampaign->getSiteAgentsGroups()->isEmpty()) {
+            $this->addFlash('warning', "Aucun site n'est associé à la campagne.");
+            return false;
+        }
+
+        // Parcourir tous les groupes de sites associés à la campagne
+        foreach ($countingCampaign->getSiteAgentsGroups() as $siteAgentsGroup) {
+            $site = $siteAgentsGroup->getSiteCollection();
+            $agentsGroup = $siteAgentsGroup->getAgentsGroup();
+
+            // Vérification de l'existence des groupes d'agents pour ce site
+            if ($agentsGroup->isEmpty()) {
+                $this->addFlash('warning', "Aucun groupe d'agents n'est assigné au site: " . $site->getSiteName());
+                return false;
+            }
+            
+            // Vérifier si le site existe
+            if (!$site) {
+                $this->addFlash('warning', "Le site associé est manquant.");
+                return false;
+            }
+
+            // Vérifier si les conditions environnementales sont présentes pour le site
+            if ($site->getEnvironmentalConditions()->isEmpty()) {
+                $this->addFlash('warning', "Le site {$site->getSiteName()} n'a pas de conditions environnementales.");
+                return false;
+            }
+
+            foreach ($site->getEnvironmentalConditions() as $condition) {
+                // Vérifier si les collectes sont présentes
+                if ($condition->getCollectedData() == null) {
+                    $this->addFlash('warning', "Conditions environnementales {$condition->getId()} du site {$site->getSiteName()} est sans collecte de données");
+                    return false;
+                }
+            }
+
+            // Parcourir toutes les collectes associées au site
+            foreach ($site->getCollectedData() as $collectedData) {
+
+                // Vérifier si les conditions environnementales sont associées à chaque collecte
+                if ($collectedData->getEnvironmentalConditions() == null) {
+                    $this->addFlash('warning', "Une collecte de données pour le site {$site->getSiteName()} n'a pas de conditions environnementales.");
+                    return false;
+                }
+
+                // Vérifier si des comptages d'espèces sont présents pour chaque collecte
+                if ($collectedData->getBirdSpeciesCounts()->isEmpty()) {
+                    $this->addFlash('warning', "La collecte de données pour le site {$site->getSiteName()} n'a pas de comptage d'espèces d'oiseaux.");
+                    return false;
+                }
+            }
+        }
+
+        // Vérification supplémentaire pour s'assurer que la campagne est dans un état pouvant être clôturé
+        if ($countingCampaign->getCampaignStatus() == 'Clôturé') {
+            $this->addFlash('warning', "Cette campagne est déjà clôturée.");
+            return false;
+        }
+
+        // Si toutes les vérifications passent, la campagne peut être clôturée
+        return true;
+    }
+
+
+
+    /**
+     * Met à jour automatiquement le statut d'une campagne en fonction des dates de début et de fin.
+     */
+    private function updateCampaignStatus(CountingCampaign $countingCampaign): void
     {
         $now = new \DateTimeImmutable();
-        
         $startDate = $countingCampaign->getStartDate();
         $endDate = $countingCampaign->getEndDate();
-    
-        if ($startDate <= $endDate) {
-            if ($startDate > $now) {
-            //     $status = $statusRepository->findOneBy(['label' => 'En attente']);
-            // } elseif ($startDate <= $now && $endDate >= $now) {
-            //     $status = $statusRepository->findOneBy(['label' => 'En cours']);
-            // } elseif ($endDate < $now) {
-            //     $status = $statusRepository->findOneBy(['label' => 'Terminé']);
-            $status = 'En attente';
-            } elseif ($startDate <= $now && $endDate >= $now) {
-                $status = 'En cours';
-            } elseif ($endDate < $now) {
-                $status = 'Terminé';
-            } else {
-                throw new \Exception('Statut non trouvé dans la base de données.');
-            }
-    
-            if ($status) {
-                $countingCampaign->setCampaignStatus($status);
-            } else {
-                throw new \Exception('Statut non trouvé dans la base de données.');
-            }
-        } else {
-            throw new \Exception('Vérifiez les dates de début et de fin.');
+        $status = $countingCampaign->getCampaignStatus();
+
+        // Ne pas changer l'état si la campagne est en suspens
+        if ($status === 'Suspens') {
+            return;  // Quitter la fonction pour préserver l'état "Suspens"
         }
+
+        if (!$status || $status === 'En attente' || $status === 'En cours') {
+            if ($startDate > $now) {
+                $countingCampaign->setCampaignStatus('En attente');
+            } elseif ($startDate <= $now && $endDate >= $now) {
+                $countingCampaign->setCampaignStatus('En cours');
+            } elseif ($endDate < $now) {
+                $countingCampaign->setCampaignStatus('Terminé');
+            } else {
+                $countingCampaign->setCampaignStatus('Erreur');
+            }
+        }
+
+        // return $countingCampaign;
     }
     
 }

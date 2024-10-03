@@ -54,6 +54,10 @@ h6.explanation {
   color: #636464;
 }
 
+.bg-light {
+  color: black !important;
+}
+
 /*--------------------------------------------------------------
   # site-agents-group-collection
 --------------------------------------------------------------*/
@@ -82,10 +86,9 @@ h6.explanation {
   # user image
 --------------------------------------------------------------*/
 .imgLogo {
-  width: 100px;
-  height: 80px;
+  width: 55px;
+  height: 55px;
   border-radius: 50%;
-  margin-top: 15px;
 }
 
 .imgReg {
@@ -107,23 +110,23 @@ h6.explanation {
   font-weight: bold; 
 }
 
-.btn-status {
+/* .btn-status {
   font-size: 0.75rem;
   /* font-weight: bold; */
-  pointer-events: none; /* Désactive les événements de souris comme les clics */
+  /* pointer-events: none; Désactive les événements de souris comme les clics */
   /*opacity: 0.6; /* Change l'opacité pour indiquer que le bouton est désactivé */
-  cursor: default;  /* Change le curseur pour indiquer que l'élément n'est pas interactif */
-}
+  /* cursor: default;  Change le curseur pour indiquer que l'élément n'est pas interactif */
+/* } */ 
 
 /* Buttons Status */
-.btn-success,
+/* .btn-success,
 .btn-primary,
 .btn-secondary,
 .btn-warning,
 .btn-danger,
 .btn-dark {
   font-size: 0.8rem; 
-}
+} */
 /* .text-dark {
   font-size: 0.8rem; 
   background: black;
@@ -132,62 +135,46 @@ h6.explanation {
     /*--------------------------------------------------------------
   # print
   --------------------------------------------------------------*/
-  /* @media print {
-    body * {
-        visibility: hidden;
-    }
-    #printableArea, #printableArea * {
-        visibility: visible;
-    }
-    #printableArea {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-    }
-    #printButton {
-        display: none;
-    }
-} */
-@media print {
+
+/* @media print { */
   /* Cacher tous les éléments sauf la zone imprimable */
-  body * {
+  /* body * {
       visibility: hidden;
-  }
+  } */
   
   /* Rendre visible uniquement la zone imprimable */
-  #printableArea, #printableArea * {
+  /* #printableArea, #printableArea * {
       visibility: visible;
-  }
+  } */
   
   /* Positionner la zone imprimable */
-  #printableArea {
+  /* #printableArea {
       position: absolute;
       left: 0;
       top: 0;
       width: 100%;
-  }
+  } */
   
   /* Cacher le bouton d'impression */
-  #printButton {
+  /* #printButton {
       display: none;
-  }
+  } */
 
   /* Ajuster la taille des écritures */
-  #printableArea {
-      font-size: 10px; /* Réduit la taille de la police pour l'impression */
-  }
+  /* #printableArea { */
+      /* font-size: 10px; Réduit la taille de la police pour l'impression */
+  /* } */
   
   /* Ajuster les marges pour l'impression */
-  @page {
-      margin: 20mm; /* Ajustez les marges selon vos besoins */
-  }
+  /* @page { */
+      /* margin: 20mm; Ajustez les marges selon vos besoins */
+  /* } */
   
   /* Styles supplémentaires pour améliorer la présentation */
-  table {
+  /* table {
       width: 100%;
       border-collapse: collapse;
-  }
+  } */
   
   /* th, td {
       border: 1px solid #000;
@@ -196,10 +183,72 @@ h6.explanation {
   } */
   
   /* Assurer une meilleure disposition des titres et sous-titres */
-  h1, h2, h3, h4, h5, h6 {
-      font-size: 16px; /* Ajustez selon vos besoins */
+  /* h1, h2, h3, h4, h5, h6 {
+      font-size: 16px; 
       margin: 0 0 10px 0;
   }
+} */
+
+
+/* Page Detail*/
+@media print {
+  body {
+    font-family: "Arial", sans-serif;
+    color: #333;
+    background: none;
+  }
+
+  h6, h5 {
+    color: #000;
+    page-break-after: avoid; /* Évite les sauts de page après les titres */
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #000;
+    margin-bottom: 20px;
+  }
+
+  th, td {
+    border: 1px solid #000;
+    padding: 8px;
+    text-align: left;
+    font-size: 12pt;
+  }
+
+  .modal-body {
+    margin-top: 20px;
+  }
+
+  /* Masquer les éléments inutiles comme les boutons et les sections non imprimables */
+  .modal-footer, .btn, nav, .no-print {
+    display: none;
+  }
+
+  /* Ajouter des en-têtes et pieds de page pour chaque page imprimée */
+  @page {
+    margin: 20mm;
+    counter-increment: page;
+  }
+
+  footer {
+    position: fixed;
+    bottom: 0;
+    text-align: center;
+    width: 100%;
+    font-size: 10pt;
+    color: #777;
+  }
+
+  footer:after {
+    content: "Page " counter(page) " sur " counter(pages);
+  }
+  
+  table, h5, h6 {
+    page-break-inside: avoid;
+  }
+  
 }
 
 

@@ -61,7 +61,7 @@ class CollectedData
     /**
      * @var Collection<int, BirdSpeciesCount>
      */
-    #[ORM\OneToMany(targetEntity: BirdSpeciesCount::class, mappedBy: 'collectedData', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: BirdSpeciesCount::class, mappedBy: 'collectedData', orphanRemoval: true, cascade: ['persist'])]
     private Collection $birdSpeciesCounts;
 
     public function __construct()
@@ -81,6 +81,25 @@ class CollectedData
 
         return $totalCount;
     }
+
+    public function getCountBySpecies(): array
+    {
+        $specyCounts = [];
+
+        foreach ($this->getBirdSpeciesCounts() as $birdSpeciesCount) {
+            $speciesName = $birdSpeciesCount->getBirdSpecies()->getScientificName();
+            $count = $birdSpeciesCount->getCount();
+
+            // Ajouter ou incrémenter le nombre pour chaque espèce
+            if (!isset($specyCounts[$speciesName])) {
+                $specyCounts[$speciesName] = 0;
+            }
+            $specyCounts[$speciesName] += $count;
+        }
+
+        return $specyCounts;  // Retourne un tableau associatif avec le nom de l'espèce et le total compté
+    }
+
 
     public function getId(): ?int
     {

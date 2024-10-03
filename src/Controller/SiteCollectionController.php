@@ -8,8 +8,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Entity\City;
 
 use App\Form\ImportCsvType;
-use Monolog\DateTimeImmutable;
-use DateTime;
 use App\Entity\SiteCollection;
 use App\Form\SiteCollectionType;
 use App\Repository\SiteCollectionRepository;
@@ -20,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/site/collection')]
-#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
+#[IsGranted('ROLE_USER', message: 'Vous n\'avez pas l\'accès.')]
 class SiteCollectionController extends AbstractController
 {
     #[Route('/', name: 'app_site_collection_index', methods: ['GET', 'POST'])]
@@ -33,7 +31,7 @@ class SiteCollectionController extends AbstractController
             /** @var UploadedFile $csvFile */
             $csvFile = $form->get('csvFile')->getData();
             
-            if ($csvFile) {
+            if ($csvFile && $this->IsGranted('ROLE_IMPORT')) {
                 $csvData = file_get_contents($csvFile->getPathname());
                 $rows = array_map(function($row) {
                     return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
@@ -48,6 +46,9 @@ class SiteCollectionController extends AbstractController
                     'rows' => $rows,
                     'csvData' => $csvData,
                 ]);
+            } else {
+                $this->addFlash('warning' ,"Vous n'avez pas le droit.");
+                return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);
             }
         }
     
@@ -170,48 +171,32 @@ class SiteCollectionController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-    // public function index(Request $request, SiteCollectionRepository $siteCollectionRepository, EntityManagerInterface $entityManager): Response
-    // {
-    //     $form = $this->createForm(ImportCsvType::class);
-    //     $form->handleRequest($request);
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         /** @var UploadedFile $csvFile */
-    //         $csvFile = $form->get('csvFile')->getData();
-
-    //         if ($csvFile) {
-    //             try {
-    //                 $this->processCsv($csvFile, $entityManager);
-    //                 $this->addFlash('success', 'Les données ont été importées avec succès.');
-    //             } catch (\Exception $e) {
-    //                 $this->addFlash('error', 'Une erreur s\'est produite lors de l\'importation du fichier CSV : ' . $e->getMessage());
-    //             }
-
-    //             return $this->redirectToRoute('app_site_collection_index');
-    //         }
-    //     }
-
-    //     return $this->render('site_collection/index.html.twig', [
-    //         'site_collections' => $siteCollectionRepository->findAll(),
-    //         'form' => $form->createView(),
-    //     ]);
-    // }
-
 
     #[Route('/new', name: 'app_site_collection_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $siteCollection = new SiteCollection();
         $form = $this->createForm(SiteCollectionType::class, $siteCollection);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $siteCollection->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-            $entityManager->persist($siteCollection);
-            $entityManager->flush();
-            $this->addFlash('success', "Site de collecte a bien été crée");
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                if ($this->IsGranted('ROLE_CREAT')) {
 
-            return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);
+                    $siteCollection->setCreatedAt(new \DateTimeImmutable());
+                    $entityManager->persist($siteCollection);
+                    $entityManager->flush();
+                    $this->addFlash('success', "Site de collecte a bien été crée");
+        
+                    return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);
+                } else {
+                    $this->addFlash('warning',"Vous n'avez pas le droit.");
+                    return $this->redirectToRoute('app_site_collection_new', [], Response::HTTP_SEE_OTHER);
+                }
+            } else {
+                $this->addFlash('error','Une erreur s\'est produite lors de l\'ajout du site.');
+            }
         }
 
         return $this->render('site_collection/new.html.twig', [
@@ -229,13 +214,14 @@ class SiteCollectionController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_site_collection_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     public function edit(Request $request, SiteCollection $siteCollection, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(SiteCollectionType::class, $siteCollection);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $siteCollection->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+            $siteCollection->setUpdatedAt(new \DateTimeImmutable());
             $entityManager->flush();
             $this->addFlash('success', "Site de collecte a bien été modifié");
 
@@ -249,6 +235,7 @@ class SiteCollectionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_site_collection_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     public function delete(Request $request, SiteCollection $siteCollection, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$siteCollection->getId(), $request->getPayload()->get('_token'))) {

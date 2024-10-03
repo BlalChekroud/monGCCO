@@ -6,13 +6,13 @@
     <main id="main" class="main">
 
         <div class="pagetitle">
-        <h1>Consultation de logo</h1>
-        <nav>
-            <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
-            <li class="breadcrumb-item active">Gestion du logo</li>
-            </ol>
-        </nav>
+            <h1>Consultation de logo</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+                    <li class="breadcrumb-item active">Gestion du logo</li>
+                </ol>
+            </nav>
         </div><!-- End Page Title -->
 
         <section class="section">
@@ -20,44 +20,36 @@
                 <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
 
                     <div class="card">
+                        <div class="card-header">
+                            Logo
+                        </div>
+
                         <div class="card-body">
-                            <h5 class="card-title">Détail</h5>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Logo</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <div>
                                 {% for logo in logos %}
-                                    <tr>
-                                        <td>
-                                            {% if logo.image and logo.image.imageFilename %}
-                                                <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgLogoShow rounded mx-auto d-block">
-                                            {% else %}
-                                                <p>Aucune image disponible</p>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <div class="d-flex justtify-content-end">
-                                                <a href="{{ path('app_logo_edit', {'id': logo.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
-                                                {{ include('logo/_delete_form.html.twig') }}
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    {% if logo.image and logo.image.imageFilename %}
+                                        <turbo-frame id="logo_{{ logo.id }}">
+                                            <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgLogoShow rounded mx-auto d-block">
+                                            <a href="{{ path('app_logo_edit', {'id': logo.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
+                                        </turbo-frame>
+                                    {% else %}
+                                        <p>Aucune image disponible</p>
+                                    {% endif %}
+
                                 {% else %}
-                                    <tr>
-                                        <td colspan="2">Logo manquant</td>
-                                    </tr>
+                                    <p>Logo manquant</p>
                                 {% endfor %}
-                                </tbody>
-                            </table>
+                            </div>
+
                         </div>
                         <div class="card-footer">
-                            <div class="d-flex justtify-content-end">
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex justify-content-end">
+                                    <a href="{{ path('app_logo_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation du logo">Retour</a>
+                                    <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm mx-1"> Consultation des campagnes</a>
+                                    {{ include('logo/_delete_form.html.twig') }}
+                                </div>
                                 <a href="{{ path('home') }}" class="btn btn-light btn-sm ri-home-4-line mx-1"> Page d'accueil</a>
-                                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm mx-1"> Consultation des campagnes</a>
                             </div>
                         </div>
                     </div>

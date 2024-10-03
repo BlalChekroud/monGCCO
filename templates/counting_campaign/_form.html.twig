@@ -16,16 +16,17 @@
       </div>
 
       <!-- Etat de la campagne -->
-      <div class="col-md-4">
+      {# <div class="col-md-4">
           <label for="{{ form.campaignStatus.vars.id }}" class="form-label">{{ form_label(form.campaignStatus) }}</label>
           {{ form_widget(form.campaignStatus, {'attr': {'class': 'form-control', 'placeholder': 'Choisissez l\'état de la campagne'}}) }}
           <div class="text-danger">{{ form_errors(form.campaignStatus) }}</div>
-      </div>
+      </div> #}
   </div>
 
   <!-- Section des sites et groupes d'agents -->
   <h5 class="mt-4">Sites et Groupes d'agents<span class="requiredField">*</span></h5>
   <div id="site-agents-group-collection" data-prototype="{{ form_widget(form.siteAgentsGroups.vars.prototype)|e('html_attr') }}">
+    <p class="explanation">Pour un site vous devez choisir le(s) groupe(s) qui vas compter et collecter</p>
       {% for siteAgentsGroup in form.siteAgentsGroups %}
           <div class="row mb-3 site-agents-group-item">
               <div class="col-md-10">
@@ -40,7 +41,7 @@
 
   <!-- Bouton pour ajouter un site et groupe(s) d'agents -->
   <div class="row mb-3">
-      <div class="col-md-12 text-end">
+      <div class="col-md-12">
         <button type="button" id="add-site-agents-group" class="btn btn-outline-primary btn-sm rounded-pill mt-3" title="Ajouter un site et son/ses groupe(s) d'agents">
           <i class="ri-add-circle-line me-1"></i> 
           Ajouter un site

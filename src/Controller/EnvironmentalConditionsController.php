@@ -94,8 +94,15 @@ class EnvironmentalConditionsController extends AbstractController
         $site = $entityManager->getRepository(SiteCollection::class)->find($siteId);
         $campaign = $entityManager->getRepository(CountingCampaign::class)->find($campaignId);
         
-        if (!$site || !$campaign) {
-            throw $this->createNotFoundException('Site or Campaign not found');
+        if (!$campaign) {
+            throw $this->createNotFoundException('Aucune campagne trouvée');
+        }
+        if (!$site) {
+            throw $this->createNotFoundException('Aucun site trouvé');
+        }
+
+        if ($campaign->getCampaignStatus() === 'Clôturé') {
+            throw $this->createNotFoundException('Une campagne clôturée ne peut pas être modifiée.');
         }
 
         // Vérifiez si l'utilisateur a déjà créé une condition environnementale pour ce site et cette campagne
@@ -106,8 +113,7 @@ class EnvironmentalConditionsController extends AbstractController
         ]);
 
         // if ($existingCondition) {
-        //     $this->addFlash('info', "L'utilisateur a déjà créé des conditions d'environnement pour ce site.");
-        //     return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
+        //     $this->addFlash('info', "L'utilisateur a déjà créé des conditions environnementales pour ce site.");
         // }
 
         // if ($user not in $campaign->getAgentsGroups()) {
@@ -156,12 +162,18 @@ class EnvironmentalConditionsController extends AbstractController
     public function edit(Request $request, EnvironmentalConditions $environmentalCondition, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser(); // Récupérer l'utilisateur actuel
-
+        $campaign = $environmentalCondition->getCountingCampaign();
+        
         if ($user != $environmentalCondition->getUser() && !$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error', "Vous n'avez pas l'autorisation pour faire la modification");
             return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
         }
+        
+        if ($campaign->getCampaignStatus() === 'Clôturé') {
+            throw $this->createNotFoundException('Une campagne clôturée ne peut pas être modifiée.');
+        }
 
+        
         $form = $this->createForm(EnvironmentalConditionsType::class, $environmentalCondition);
         $form->handleRequest($request);
 

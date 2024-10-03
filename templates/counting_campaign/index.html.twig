@@ -41,28 +41,28 @@
                     {% for counting_campaign in counting_campaigns %}
                       <tr>
                         <td>{{ counting_campaign.id }}</td>
-                        <td>{{ counting_campaign.campaignName }}</td>
+                        <td><a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" title="Détail">{{ counting_campaign.campaignName }}</a></td>
                         <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y') : '' }}</td>
                         <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y') : '' }}</td>
                         <td>
                           {% set status_classes = {
                             'En attente': 'info',
                             'En cours': 'primary',
-                            'Terminé': 'light',
+                            'Terminé': 'success',
+                            'Clôturé': 'light',
                             'Annulé': 'dark',
                             'Erreur': 'warning',
-                            'Validé': 'success',
                             'Suspens': 'secondary'
                           } %}
-                          <div class="btn-status btn btn-{{ status_classes[counting_campaign.campaignStatus] ?? 'secondary' }}">
+                          <div class="badge bg-{{ status_classes[counting_campaign.campaignStatus] ?? 'secondary' }}">
                             <i class="bi bi-circle-fill"></i>
                             {{ counting_campaign.campaignStatus }}
                           </div>
                         </td>
                         <td>
                           <div class="d-flex justtify-content-end">
-                            <a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-2"> Détail</a>
-                            <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
+                            <a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
+                            <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
                             {{ include('counting_campaign/_delete_form.html.twig') }}
                           </div>
                         </td>
@@ -83,8 +83,8 @@
                   <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer un site de collecte</a>
               </div>
               <div>
-                <button id="printButton" class="btn btn-sm btn-outline-success bi bi-printer"> Imprimer</button>
-                <a href="#" class="btn btn-sm btn-outline-info bi bi-folder"> Exporter CSV</a>
+                <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer" title="Imprimer"></button>
+                <a href="#" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
               </div>
             </div>
 

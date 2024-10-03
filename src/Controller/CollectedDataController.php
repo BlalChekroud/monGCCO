@@ -8,8 +8,6 @@ use App\Repository\BirdSpeciesRepository;
 use App\Repository\EnvironmentalConditionsRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-use Monolog\DateTimeImmutable;
-use DateTime;
 use App\Entity\CollectedData;
 use App\Form\CollectedDataType;
 use App\Repository\CollectedDataRepository;
@@ -140,6 +138,7 @@ class CollectedDataController extends AbstractController
     //     ]);
     // }
     
+
     #[Route('/new', name: 'app_collected_data_new', methods: ['GET', 'POST'])]
     public function new(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager, EnvironmentalConditionsRepository $environmentalConditionsRepository): Response
     {
@@ -150,16 +149,13 @@ class CollectedDataController extends AbstractController
         $campaignId = $request->query->get('campaignId');
         $siteId = $request->query->get('siteId');
 
-        // Vérification des paramètres de la requête
-        // if (!$campaignId || !$siteId) {
-        //     $this->addFlash('error', 'La campagne ou le site est manquant.');
-        //     return $this->redirectToRoute('app_collected_data_index');
-        // }
-        // Redirection par défaut pour tester si les valeurs existent
-
         $campaign = $entityManager->getRepository(CountingCampaign::class)->find($campaignId);
         $site = $entityManager->getRepository(SiteCollection::class)->find($siteId);
 
+        if ($campaign->getCampaignStatus() === 'Clôturé') {
+            throw $this->createNotFoundException('Une campagne clôturée ne peut pas être modifiée.');
+        }
+        
         // Vérifier si la campagne et le site existent
         if (!$campaign) {
             $this->addFlash('error', 'La campagne spécifiée est introuvable.');
@@ -170,7 +166,7 @@ class CollectedDataController extends AbstractController
             $this->addFlash('error', 'Le site spécifié est introuvable.');
             return $this->redirectToRoute('app_collected_data_index');
         }
-        
+
         // Vérifier si les conditions environnementales existent pour cet utilisateur, ce site et cette campagne
         $environmentalConditions = $environmentalConditionsRepository->findOneBy(
             [
@@ -179,7 +175,7 @@ class CollectedDataController extends AbstractController
                 'countingCampaign' => $campaign
             ],
             ['createdAt' => 'DESC'] // Trier par date de création pour obtenir la plus récente
-    );
+        );
 
         // Récupérer toutes les espèces d'oiseaux
         $birdSpecies = $birdSpeciesRepository->findAll();
@@ -294,12 +290,16 @@ class CollectedDataController extends AbstractController
     #[Route('/{id}/edit', name: 'app_collected_data_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, CollectedData $collectedDatum, EntityManagerInterface $entityManager): Response
     {
+        $campaign = $collectedDatum->getCountingCampaign();
+        if ($campaign->getCampaignStatus() === 'Clôturé') {
+            throw $this->createNotFoundException('Une campagne clôturée ne peut pas être modifiée.');
+        }
         $form = $this->createForm(CollectedDataType::class, $collectedDatum);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $collectedDatum->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                $collectedDatum->setUpdatedAt(new \DateTimeImmutable);
                 $entityManager->flush();
                 $this->addFlash('success', "Les données ont été mises à jour avec succès.");
     

@@ -18,7 +18,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Form\EditPasswordType;
 use App\Form\UserType;
 use App\Entity\User;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
+// use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -41,13 +41,12 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/logout', name: 'app_logout')]
+    #[Route(path: '/user/logout', name: 'app_logout')]
     public function logout(): void
     {
         throw new \LogicException('Ce champ de méthode peut être vide - il sera intercepté par la clé de déconnexion de votre pare-feu.');
     }
 
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas le droit d\'accès.')]
     #[Route('/profile', name: 'app_profile', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
@@ -58,7 +57,7 @@ class SecurityController extends AbstractController
 
 
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    #[Route('/profile/{id}/edit', name: 'app_profile_edit', methods: ['GET', 'POST'])]
+    #[Route('/user/profile/{id}/edit', name: 'app_profile_edit', methods: ['GET', 'POST'])]
     public function edit(User $user, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $hasher): Response
     {
         if (!$this->getUser()) {

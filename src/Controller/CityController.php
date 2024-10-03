@@ -27,83 +27,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class CityController extends AbstractController
 {
-
-    // #[Route('/', name: 'app_city_index', methods: ['GET', 'POST'])]
-    // public function index(
-    //     CityRepository $cityRepository,
-    //     RegionRepository $regionRepository,
-    //     CountryRepository $countryRepository,
-    //     Request $request,
-    //     CsvImportService $csvImportService,
-    //     EntityManagerInterface $entityManager
-    // ): Response {
-    //     $form = $this->createForm(ImportCsvType::class);
-    //     $form->handleRequest($request);
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         /** @var UploadedFile $csvFile */
-    //         $csvFile = $form->get('csvFile')->getData();
-
-    //         $importedCount = $csvImportService->importCsv(
-    //             $csvFile,
-    //             City::class,
-    //             [
-    //                 'city' => 'name',
-    //                 'lat' => 'latitude',
-    //                 'lng' => 'longitude',
-    //                 'region' => 'regionName',
-    //                 'regionCode' => 'regionCode',
-    //                 'country' => 'countryName',
-    //                 'iso2' => 'iso2',
-    //             ],
-    //             function($uniqueValues) use ($cityRepository) {
-    //                 return $cityRepository->findOneBy(['name' => $uniqueValues['city']]);
-    //             },
-    //             function($data) use ($regionRepository, $countryRepository, $entityManager) {
-    //                 // Récupérer ou créer le pays associé
-    //                 $country = $countryRepository->findOneBy(['name' => $data['country']]);
-    //                 if (!$country) {
-    //                     $country = new Country();
-    //                     $country->setName($data['country']);
-    //                     $country->setIso2($data['iso2'] ?? ''); // Ajoutez l'ISO si disponible
-    //                     $country->setCreatedAt(new \DateTimeImmutable());
-    //                     $entityManager->persist($country);
-    //                 }
-
-    //                 // Récupérer ou créer la région associée
-    //                 $region = $regionRepository->findOneBy(['name' => $data['region'], 'country' => $country]);
-    //                 if (!$region) {
-    //                     $region = new Region();
-    //                     $region->setName($data['region']);
-    //                     $region->setRegionCode($data['regionCode']);
-    //                     $region->setCountry($country); // Associer la région au pays
-    //                     $region->setCreatedAt(new \DateTimeImmutable());
-    //                     $entityManager->persist($region);
-    //                 }
-
-    //                 // Créez et persistez une nouvelle ville
-    //                 $city = new City();
-    //                 $city->setName($data['city']);
-    //                 $city->setLatitude($data['lat']);
-    //                 $city->setLongitude($data['lng']);
-    //                 $city->setRegion($region); // Associer la ville à la région
-    //                 $city->setCreatedAt(new \DateTimeImmutable());
-
-    //                 return $city;
-    //             },
-    //             ['city']
-    //         );
-
-    //         $this->addFlash('success', "$importedCount villes ont été importées avec succès.");
-    //         return $this->redirectToRoute('app_city_index');
-    //     }
-
-    //     return $this->render('city/index.html.twig', [
-    //         'cities' => $cityRepository->findAll(),
-    //         'form' => $form->createView(),
-    //     ]);
-    // }
-
     #[Route('/', name: 'app_city_index', methods: ['GET', 'POST'])]
     public function index(CityRepository $cityRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -114,7 +37,7 @@ class CityController extends AbstractController
             /** @var UploadedFile $csvFile */
             $csvFile = $form->get('csvFile')->getData();
             
-            if ($csvFile) {
+            if ($csvFile && $this->IsGranted('ROLE_IMPORT')) {
                 $csvData = file_get_contents($csvFile->getPathname());
                 $rows = array_map(function($row) {
                     return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV

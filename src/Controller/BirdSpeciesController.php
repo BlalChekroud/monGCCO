@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/bird/species')]
-#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class BirdSpeciesController extends AbstractController
 {
     #[Route('/', name: 'app_bird_species_index', methods: ['GET'])]
@@ -274,6 +273,7 @@ class BirdSpeciesController extends AbstractController
     }
 
     #[Route('/new', name: 'app_bird_species_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $birdSpecy = new BirdSpecies();
@@ -327,6 +327,7 @@ class BirdSpeciesController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_bird_species_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     public function edit(Request $request, BirdSpecies $birdSpecy, EntityManagerInterface $entityManager): Response
     {
         
@@ -360,6 +361,7 @@ class BirdSpeciesController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_bird_species_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     public function delete(Request $request, BirdSpecies $birdSpecy, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$birdSpecy->getId(), $request->getPayload()->get('_token'))) {
