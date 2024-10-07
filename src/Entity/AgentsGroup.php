@@ -53,6 +53,10 @@ class AgentsGroup
     #[ORM\ManyToMany(targetEntity: SiteAgentsGroup::class, mappedBy: 'agentsGroup')]
     private Collection $siteAgentsGroups;
 
+    #[ORM\ManyToOne(inversedBy: 'groupCreatedBy')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $createdBy = null;
+
     public function __construct()
     {
         $this->groupMember = new ArrayCollection();
@@ -79,7 +83,7 @@ class AgentsGroup
     
     public function validateLeader(): bool
     {
-        return $this->groupMember->contains($this->leader);
+        return $this->getGroupMember()->contains($this->leader);
     }
 
     public function getId(): ?int
@@ -110,6 +114,25 @@ class AgentsGroup
 
         return $this;
     }
+    // public function setLeader(?User $leader): self
+    // {
+    //     if ($this->leader !== $leader) {
+    //         // Retirer l'ancien leader
+    //         if ($this->leader) {
+    //             $this->leader->removeLeader($this);
+    //         }
+
+    //         // Définir le nouveau leader
+    //         $this->leader = $leader;
+
+    //         // Ajouter ce groupe au nouveau leader
+    //         if ($leader) {
+    //             $leader->addLeader($this);
+    //         }
+    //     }
+
+    //     return $this;
+    // }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
@@ -218,6 +241,18 @@ class AgentsGroup
         if ($this->siteAgentsGroups->removeElement($siteAgentsGroup)) {
             $siteAgentsGroup->removeAgentsGroup($this);
         }
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

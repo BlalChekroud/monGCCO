@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\EnvironmentalConditions;
+use App\Security\Voter\CountingCampaignVoter;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Monolog\DateTimeImmutable;
 use App\Entity\CountingCampaign;
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/counting/campaign')]
+#[Route('/user/counting/campaign')]
 class CountingCampaignController extends AbstractController
 {
     #[Route('/', name: 'app_counting_campaign_index', methods: ['GET'])]
@@ -34,7 +35,7 @@ class CountingCampaignController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
+    #[IsGranted(CountingCampaignVoter::CREATE)]
     #[Route('/new', name: 'app_counting_campaign_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -89,8 +90,8 @@ class CountingCampaignController extends AbstractController
         ]);
     }
 
+    #[IsGranted(CountingCampaignVoter::VIEW, 'countingCampaign')]
     #[Route('/{id}', name: 'app_counting_campaign_show', methods: ['GET'])]
-    #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
     public function show(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();  // Utilisateur actuel
@@ -137,7 +138,8 @@ class CountingCampaignController extends AbstractController
     }
 
 
-    #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
+    // #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
+    #[IsGranted(CountingCampaignVoter::EDIT, 'countingCampaign')]
     #[Route('/{id}/edit', name: 'app_counting_campaign_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
@@ -188,7 +190,7 @@ class CountingCampaignController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
+    #[IsGranted('ROLE_SUPER_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_counting_campaign_delete', methods: ['POST'])]
     public function delete(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
@@ -279,10 +281,10 @@ class CountingCampaignController extends AbstractController
         // Parcourir tous les groupes de sites associés à la campagne
         foreach ($countingCampaign->getSiteAgentsGroups() as $siteAgentsGroup) {
             $site = $siteAgentsGroup->getSiteCollection();
-            $agentsGroup = $siteAgentsGroup->getAgentsGroup();
 
-            // Vérification de l'existence des groupes d'agents pour ce site
-            if ($agentsGroup->isEmpty()) {
+            // Vérification de l'existence des groupes d'agents pour chaque site
+            $agentsGroup = $siteAgentsGroup->getAgentsGroup();
+            if ($agentsGroup === null || $agentsGroup->isEmpty()) {
                 $this->addFlash('warning', "Aucun groupe d'agents n'est assigné au site: " . $site->getSiteName());
                 return false;
             }
@@ -351,7 +353,7 @@ class CountingCampaignController extends AbstractController
             return;  // Quitter la fonction pour préserver l'état "Suspens"
         }
 
-        if (!$status || $status === 'En attente' || $status === 'En cours') {
+        if (!$status || $status === 'En attente' || $status === 'En cours' || $status === 'En attente') {
             if ($startDate > $now) {
                 $countingCampaign->setCampaignStatus('En attente');
             } elseif ($startDate <= $now && $endDate >= $now) {
@@ -363,7 +365,6 @@ class CountingCampaignController extends AbstractController
             }
         }
 
-        // return $countingCampaign;
     }
     
 }

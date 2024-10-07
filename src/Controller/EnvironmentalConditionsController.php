@@ -105,6 +105,24 @@ class EnvironmentalConditionsController extends AbstractController
             throw $this->createNotFoundException('Une campagne clôturée ne peut pas être modifiée.');
         }
 
+        // Vérifier si l'utilisateur est membre d'un groupe d'agents assigné à ce site
+        $isMember = false;
+        foreach ($site->getSiteAgentsGroups() as $siteAgentsGroup) {
+            foreach ($siteAgentsGroup->getAgentsGroup() as $group) {
+                if ($group->getGroupMember()->contains($user)) {
+                    $isMember = true;
+                    break;
+                }
+            }
+            if ($isMember) break;
+        }
+
+        // Si l'utilisateur n'est pas membre d'un groupe, interdire l'accès
+        if (!$isMember) {
+            $this->addFlash('warning', 'Vous ne pouvez pas ajouter de conditions car vous n\'êtes pas membre d\'un groupe assigné à ce site.');
+            return $this->redirectToRoute('app_counting_campaign_show', ['id' => $campaign->getId()]);
+        }
+
         // Vérifiez si l'utilisateur a déjà créé une condition environnementale pour ce site et cette campagne
         $existingCondition = $entityManager->getRepository(EnvironmentalConditions::class)->findOneBy([
             'user' => $user,
@@ -112,15 +130,7 @@ class EnvironmentalConditionsController extends AbstractController
             'countingCampaign' => $campaign
         ]);
 
-        // if ($existingCondition) {
-        //     $this->addFlash('info', "L'utilisateur a déjà créé des conditions environnementales pour ce site.");
-        // }
-
-        // if ($user not in $campaign->getAgentsGroups()) {
-        //     $this->addFlash('info','Vous etes pas membre pour creer condition d\'environnement');
-        //     throw $this->createNotFoundException('Vous etes pas membre pour creer condition d\'environnement');
-        // }
-
+        
         $environmentalCondition = new EnvironmentalConditions();
         $form = $this->createForm(EnvironmentalConditionsType::class, $environmentalCondition);
         $form->handleRequest($request);

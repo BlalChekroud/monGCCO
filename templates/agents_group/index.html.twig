@@ -54,7 +54,7 @@
                             <td>{{ agents_group.leader.name }} {{ agents_group.leader.lastName }}</td>
                             <td>{{ agents_group.createdAt ? agents_group.createdAt|date('d-m-Y') : '' }}</td>
                             <td>
-                                <div class="d-flex justtify-content-end">
+                                <div class="d-flex justify-content-end">
                                     <a href="{{ path('app_agents_group_show', {'id': agents_group.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail</a>
                                     <a href="{{ path('app_agents_group_edit', {'id': agents_group.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
                                     {{ include('agents_group/_delete_form.html.twig') }}
@@ -74,7 +74,7 @@
             </div>
             <div class="card-footer">
               <a href="{{ path('app_agents_group_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer un groupe</a>
-              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des campagnes</a>
+              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des campagnes</a>
             </div>
           </div>
 

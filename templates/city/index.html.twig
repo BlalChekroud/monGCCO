@@ -45,9 +45,9 @@
                                             <td>{{ city.region.name }}</td>
                                             <td>{{ city.createdAt ? city.createdAt|date('d-m-Y') : '' }}</td>
                                             <td>
-                                                <div class="d-flex justtify-content-end">
-                                                    <a href="{{ path('app_city_show', {'id': city.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail</a>
-                                                    <a href="{{ path('app_city_edit', {'id': city.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
+                                                <div class="d-flex justify-content-end">
+                                                    <a href="{{ path('app_city_show', {'id': city.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
+                                                    <a href="{{ path('app_city_edit', {'id': city.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
                                                     {{ include('city/_delete_form.html.twig') }}
                                                 </div>
                                             </td>
@@ -63,13 +63,13 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <div class="d-flex justtify-content-end">
+                            <div class="d-flex justify-content-end">
                                 <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une ville</a>
-                                <a href="{{ path('app_site_collection_index') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-1"> Liste des sites</a>
+                                <a href="{{ path('app_site_collection_index') }}" class="btn btn-outline-info btn-sm bi bi bi-list-task mx-1"> Consultation des sites</a>
                                 <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Ajouter un site</a>
-                                <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des régions</a>
+                                <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des régions</a>
                                 <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une région</a>
-                                <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des pays</a>
+                                <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des pays</a>
                                 <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter un pays</a>
                             </div>
                         </div>
@@ -83,7 +83,11 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-end">
+                            <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer" title="Imprimer"></button>
+                            <a href="#" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
+                        </div>
+                        <div class="card-body">
                             {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
                                 {{ form_row(form.csvFile, {
                                     'attr': {
@@ -92,10 +96,7 @@
                                 }) }}
                             {{ form_end(form) }}
                         </div>
-                        <div class="card-body">
-                        <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-                        <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-                        </div>
+                        
                     </div>
                 </div>
             </div>

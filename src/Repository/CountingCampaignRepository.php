@@ -28,23 +28,19 @@ class CountingCampaignRepository extends ServiceEntityRepository
     //         ->getResult();
     // }
 
-    /**
-     * @param User $user
-     * @return CountingCampaign[]
-     */
     public function findByUser(User $user): array
     {
-        $qb = $this->createQueryBuilder('c');
-
-        // Joindre les groupes d'agents et les membres des groupes
-        $qb->leftJoin('c.agentsGroups', 'g')
-           ->leftJoin('g.groupMember', 'm')
-           ->where('c.createdBy = :user')
-           ->orWhere('m = :user')
-           ->setParameter('user', $user);
-
-        return $qb->getQuery()->getResult();
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.siteAgentsGroups', 'sag') // Jointure avec les SiteAgentsGroups (ou agentsGroups si relation directe)
+            ->leftJoin('sag.agentsGroup', 'g') // Jointure avec les groupes d'agents
+            ->leftJoin('g.groupMember', 'm') // Jointure avec les membres des groupes
+            ->where('c.createdBy = :user') // Soit l'utilisateur est le créateur de la campagne
+            ->orWhere('m = :user') // Soit l'utilisateur est un membre d'un groupe assigné
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
     }
+    
 
     //    /**
     //     * @return CountingCampaign[] Returns an array of CountingCampaign objects

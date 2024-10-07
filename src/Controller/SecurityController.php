@@ -18,7 +18,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Form\EditPasswordType;
 use App\Form\UserType;
 use App\Entity\User;
-// use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -65,6 +65,7 @@ class SecurityController extends AbstractController
         }
     
         if ($this->getUser() !== $user && !$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('info', "Vous n'avez pas le droit de modifier ce compte.");
             return $this->redirectToRoute('home');
         }
     

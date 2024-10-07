@@ -51,7 +51,7 @@
                             </td>
                             <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>
-                              <div class="d-flex justtify-content-end">
+                              <div class="d-flex justify-content-end">
                                   <a href="{{ path('app_bird_species_show', {'id': bird_specy.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text"> Détail</a>
                                   <a href="{{ path('app_bird_species_edit', {'id': bird_specy.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
                                   {{ include('bird_species/_delete_form.html.twig') }}

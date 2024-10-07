@@ -101,6 +101,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: CountingCampaign::class, mappedBy: 'createdBy')]
     private Collection $countingCampaigns;
 
+    /**
+     * @var Collection<int, AgentsGroup>
+     */
+    #[ORM\OneToMany(targetEntity: AgentsGroup::class, mappedBy: 'createdBy')]
+    private Collection $groupCreatedBy;
+
     public function __construct()
     {
         $this->agentsGroups = new ArrayCollection();
@@ -108,6 +114,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->environmentalConditions = new ArrayCollection();
         $this->collectedData = new ArrayCollection();
         $this->countingCampaigns = new ArrayCollection();
+        $this->groupCreatedBy = new ArrayCollection();
     }
 
     public function setImageFile(?File $imageFile = null): void
@@ -172,6 +179,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
+
+        // // Ajouter le rôle TEAMLEADER si l'utilisateur est leader d'au moins un groupe
+        // if (!$this->leader->isEmpty()) {
+        //     $roles[] = 'ROLE_TEAMLEADER';
+        // }
 
         return array_unique($roles);
     }
@@ -438,6 +450,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($countingCampaign->getCreatedBy() === $this) {
                 $countingCampaign->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AgentsGroup>
+     */
+    public function getGroupCreatedBy(): Collection
+    {
+        return $this->groupCreatedBy;
+    }
+
+    public function addGroupCreatedBy(AgentsGroup $groupCreatedBy): static
+    {
+        if (!$this->groupCreatedBy->contains($groupCreatedBy)) {
+            $this->groupCreatedBy->add($groupCreatedBy);
+            $groupCreatedBy->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupCreatedBy(AgentsGroup $groupCreatedBy): static
+    {
+        if ($this->groupCreatedBy->removeElement($groupCreatedBy)) {
+            // set the owning side to null (unless already changed)
+            if ($groupCreatedBy->getCreatedBy() === $this) {
+                $groupCreatedBy->setCreatedBy(null);
             }
         }
 

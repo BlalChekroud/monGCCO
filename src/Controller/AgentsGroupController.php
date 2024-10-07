@@ -6,7 +6,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\AgentsGroup;
 use App\Form\AgentsGroupType;
 use App\Repository\AgentsGroupRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,8 +31,8 @@ class AgentsGroupController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_agents_group_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
+    #[Route('/new', name: 'app_agents_group_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $agentsGroup = new AgentsGroup();
@@ -51,7 +50,8 @@ class AgentsGroupController extends AbstractController
                     return $this->redirectToRoute('app_agents_group_new');
                 }
                 
-                $agentsGroup->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
+                $agentsGroup->setCreatedAt(new \DateTimeImmutable());
+                $agentsGroup->setCreatedBy($this->getUser());
                  // Initialisez group_name avec une valeur temporaire
                 $agentsGroup->setGroupName('Temp Name');
                 // Persist the entity to get the ID
@@ -78,19 +78,28 @@ class AgentsGroupController extends AbstractController
     #[Route('/{id}', name: 'app_agents_group_show', methods: ['GET'])]
     public function show(AgentsGroup $agentsGroup): Response
     {
-        return $this->render('agents_group/show.html.twig', [
-            'agents_group' => $agentsGroup,
-        ]);
+        $user = $this->getUser();
+
+        // Vérifiez si l'utilisateur est admin, créateur ou membre du groupe
+        if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_VIEW') || $agentsGroup->getCreatedBy() === $user || $agentsGroup->getLeader() === $user || $agentsGroup->getGroupMember()->contains($user)) {
+            return $this->render('agents_group/show.html.twig', [
+                'agents_group' => $agentsGroup,
+            ]);
+            
+        } else {
+            $this->addFlash('info', 'Vous n\'avez pas accès à ce groupe.');
+            return $this->redirectToRoute('app_agents_group_index');
+        }
     }
 
-    #[Route('/{id}/edit', name: 'app_agents_group_edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
+    #[Route('/{id}/edit', name: 'app_agents_group_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, AgentsGroup $agentsGroup, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         // Vérifiez si l'utilisateur est le leader du groupe ou un administrateur
-        if ($user != $agentsGroup->getLeader() && !$this->isGranted('ROLE_ADMIN')) {
-            $this->addFlash('info', 'La modification est autorisée seulement au chef du groupe.');
+        if ($user !== $agentsGroup->getLeader() && !$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('info', 'Vous n\'avez pas l\'autorisation de modifier.');
             return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -107,7 +116,7 @@ class AgentsGroupController extends AbstractController
                     $this->addFlash('error', 'Le chef du groupe doit être parmi les membres sélectionnés.');
                     return $this->redirectToRoute('app_agents_group_edit', ['id'=> $agentsGroup->getId()], Response::HTTP_SEE_OTHER);
                 }
-                $agentsGroup->setUpdatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
+                $agentsGroup->setUpdatedAt(new \DateTimeImmutable());
                 $agentsGroup->generateAgentsGroup();
                 $entityManager->flush();
                 $this->addFlash('success', "Le groupe a bien été modifié");
@@ -125,8 +134,8 @@ class AgentsGroupController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_agents_group_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     public function delete(Request $request, AgentsGroup $agentsGroup, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$agentsGroup->getId(), $request->getPayload()->get('_token'))) {

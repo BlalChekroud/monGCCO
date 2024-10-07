@@ -35,8 +35,9 @@ class UserType extends AbstractType
             ->add('roles', ChoiceType::class, [
                 'choices' => [
                     'Utilisateur' => 'ROLE_USER',
-                    'ROLE_WRITE' => 'ROLE_WRITE',
+                    'ROLE_VIEW' => 'ROLE_VIEW',
                     'ROLE_EDIT' => 'ROLE_EDIT',
+                    'ROLE_CREAT' => 'ROLE_CREAT',
                     'ROLE_DELETE' => 'ROLE_DELETE',
                     'Collecteur' => 'ROLE_COLLECTOR',
                     'Chef d\'équipe' => 'ROLE_TEAMLEADER',

@@ -17,128 +17,30 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/collected/data')]
-#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
+#[Route('/user/collected/data')]
 class CollectedDataController extends AbstractController
 {
     #[Route('/', name: 'app_collected_data_index', methods: ['GET'])]
     public function index(CollectedDataRepository $collectedDataRepository): Response
     {
-        // $this->denyAccessUnlessGranted('ROLE_USER', null,'Access Denied.');
+        $user = $this->getUser();
+
+        // Vérifiez si l'utilisateur a l'un des rôles
+        if (!$this->isGranted('ROLE_VIEW') && !$this->isGranted('ROLE_COLLECTOR')) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas l\'accès.');
+        }
+
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $collectedDatas = $collectedDataRepository->findAll();
+        } else {
+            $collectedDatas = $collectedDataRepository->findBy(['createdBy' => $user]);
+        }
         return $this->render('collected_data/index.html.twig', [
-            'collected_datas' => $collectedDataRepository->findAll(),
+            'collected_datas' => $collectedDatas,
         ]);
     }
 
-    // #[Route('/new', name: 'app_collected_data_new', methods: ['GET', 'POST'])]
-    // public function new(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager, EnvironmentalConditionsRepository $environmentalConditionsRepository): Response
-    // {
-    //     // Vérifier si les conditions environnementales existent pour l'utilisateur actuel
-    //     $user = $this->getUser();
-    //     $environmentalConditions = $environmentalConditionsRepository->findOneBy(['user' => $user]);
-
-    //     // Récupérer toutes les espèces d'oiseaux
-    //     $birdSpecies = $birdSpeciesRepository->findAll();
-    //     if (!$environmentalConditions) {
-    //         // Rediriger vers la page de création des conditions environnementales si elles n'existent pas
-    //         $this->addFlash('warning', 'Veuillez d\'abord créer les conditions environnementales.');
-    //         return $this->redirectToRoute('app_environmental_conditions_new');
-    //     }
-
-    //     // Récupérer la campagne et le site associés aux conditions environnementales
-    //     $campaign = $environmentalConditions->getCountingCampaign();
-    //     $site = $environmentalConditions->getSiteCollection();
-
-    //     // Créer une nouvelle entité CollectedData
-    //     $collectedDatum = new CollectedData();
-
-    //     // Assigner directement la campagne et le site de la collecte à partir des conditions environnementales
-    //     $collectedDatum->setCountingCampaign($campaign);
-    //     $collectedDatum->setSiteCollection($site);
-
-    //     // Créer le formulaire pour les données collectées
-    //     $form = $this->createForm(CollectedDataType::class, $collectedDatum);
-    //     $form->handleRequest($request);
-
-    //     if ($form->isSubmitted()) {
-    //         if ($form->isValid()) {
-    //              // Vérifiez les propriétés nécessaires
-    //             $hasErrors = false;
-    //             $errorMessage = "";
-
-    //             // Vérifiez la présence des espèces d'oiseaux
-    //             if ($collectedDatum->getBirdSpeciesCounts()->isEmpty()) {
-    //                 $hasErrors = true;
-    //                 $errorMessage .= "Aucune espèce d'oiseau sélectionnée. ";
-    //             }
-
-    //             // Vérifiez la présence de méthodes
-    //             if ($collectedDatum->getMethod()->isEmpty()) {
-    //                 $hasErrors = true;
-    //                 $errorMessage .= "Aucune méthode sélectionnée. ";
-    //             }
-
-    //             // Vérifiez la présence de qualité et de type de comptage si nécessaire
-    //             if ($collectedDatum->getQuality() === null) {
-    //                 $hasErrors = true;
-    //                 $errorMessage .= "La qualité est requise. ";
-    //             }
-
-    //             if ($collectedDatum->getCountType() === null) {
-    //                 $hasErrors = true;
-    //                 $errorMessage .= "Le type de comptage est requis. ";
-    //             }
-
-    //             // Vérifiez les données d'environnement
-    //             if (!$campaign) {
-    //                 $hasErrors = true;
-    //                 $errorMessage .= "La campagne de comptage est manquante. ";
-    //             }
-
-    //             if (!$site) {
-    //                 $hasErrors = true;
-    //                 $errorMessage .= "Le site de collecte est manquant. ";
-    //             }
-
-    //             // Vérifier si le `SiteCollection` de `CollectedData` correspond à celui de `EnvironmentalConditions`
-    //             if ($collectedDatum->getSiteCollection() !== $environmentalConditions->getSiteCollection()) {
-    //                 $hasErrors = true;
-    //                 $errorMessage .= "Le site de collecte ne correspond pas aux conditions environnementales.";
-    //             }
-
-    //             // Si des erreurs sont présentes, affichez un message d'erreur et redirigez
-    //             if ($hasErrors) {
-    //                 $this->addFlash('error', $errorMessage);
-    //                 return $this->redirectToRoute('app_collected_data_new', [], Response::HTTP_SEE_OTHER);
-    //             }
-
-    //             // Enregistrez les données
-    //             $collectedDatum->setCreatedAt(new \DateTimeImmutable());
-    //             $collectedDatum->setEnvironmentalConditions($environmentalConditions);
-    //             $collectedDatum->setCreatedBy($user);
-    //             $entityManager->persist($collectedDatum);
-
-    //             foreach ($collectedDatum->getBirdSpeciesCounts() as $birdSpeciesCount) {
-    //                 $birdSpeciesCount->setCollectedData($collectedDatum);
-    //                 $entityManager->persist($birdSpeciesCount);
-    //             }
-    //             $entityManager->flush();
-    //             $this->addFlash('success', "Les données collectées ont été créées avec succès.");
-    
-    //             return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
-    //         } else {
-    //             $this->addFlash('error','Une erreur s\'est produite lors de la création de la collection de données.');
-    //         }
-    //     }
-
-    //     return $this->render('collected_data/new.html.twig', [
-    //         'collected_datum' => $collectedDatum,
-    //         'form' => $form,
-    //         'siteCollection' => $site,
-    //     ]);
-    // }
-    
-
+    #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/new', name: 'app_collected_data_new', methods: ['GET', 'POST'])]
     public function new(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager, EnvironmentalConditionsRepository $environmentalConditionsRepository): Response
     {
@@ -187,6 +89,11 @@ class CollectedDataController extends AbstractController
                 'siteId' => $siteId
             ]);
         }
+
+        
+        // if ($environmentalConditions && !$environmentalConditions->getCollectedData()) {
+        //     $this->addFlash('info', "Vous avez déjà créé des conditions environnementales pour ce site.");
+        // }
 
         // Créer une nouvelle entité CollectedData
         $collectedDatum = new CollectedData();
@@ -282,9 +189,18 @@ class CollectedDataController extends AbstractController
     #[Route('/{id}', name: 'app_collected_data_show', methods: ['GET'])]
     public function show(CollectedData $collectedDatum): Response
     {
-        return $this->render('collected_data/show.html.twig', [
-            'collected_datum' => $collectedDatum,
-        ]);
+        $user = $this->getUser();
+
+        // Vérifiez si l'utilisateur est admin, créateur ou membre du groupe
+        if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_VIEW') || $collectedDatum->getCreatedBy() === $user) {
+            return $this->render('collected_data/show.html.twig', [
+                'collected_datum' => $collectedDatum,
+            ]);
+            
+        } else {
+            $this->addFlash('info', 'Vous n\'avez pas accès à cette collecte.');
+            return $this->redirectToRoute('app_collected_data_index');
+        }
     }
 
     #[Route('/{id}/edit', name: 'app_collected_data_edit', methods: ['GET', 'POST'])]

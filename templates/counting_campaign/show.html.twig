@@ -109,7 +109,7 @@
                                                                                         {% else %}<p>SAG is empty</p>
                                                                                         {% endif %} #}
 
-                                                                                        <a href="{{ path('app_collected_data_new', {'campaignId': counting_campaign.id, 'siteId': site.id}) }}" class="btn btn-success btn-lg" title="Commentcez a collecter"> Collecter des données 
+                                                                                        <a href="{{ path('app_collected_data_new', {'campaignId': counting_campaign.id, 'siteId': site.id}) }}" class="btn btn-success btn-sm" title="Commentcez a collecter"> Collecter des données 
                                                                                             <i class="bi bi-arrow-bar-right">
                                                                                                 <div class="spinner-grow spinner-grow-sm text-light" role="status"></div>
                                                                                             </i>
@@ -191,17 +191,17 @@
                     </div>
 
                     <div class="card-footer d-flex justify-content-between">
-                        <div class="d-flex justtify-content-end">
+                        <div>
                             <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers consultation des campagnes">Retour</a>
-                            <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Consultation des collectes</a>
+                            <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task"> Consultation des collectes</a>
                             {% if counting_campaign.campaignStatus == 'Clôturé' %}
                                 <button type="button" class="btn btn-success btn-sm bi bi-check-circle mx-2" data-bs-toggle="modal" data-bs-target="#fullscreenModal"> Les détails de la campagne</button>
                             {% endif %}
-                            <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-1" title="Modifier"></a>
-                             {{ include('counting_campaign/_delete_form.html.twig') }}
                         </div>
-                        <div>
-                            <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer" title="Imprimer"></button>
+                        <div class="d-flex justify-content-end">
+                             {{ include('counting_campaign/_delete_form.html.twig') }}
+                            <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-1" title="Modifier"></a>
+                            <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer mx-1" title="Imprimer"></button>
                             <a href="#" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
                         </div>
                     </div>

@@ -1,39 +1,149 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Method index{% endblock %}
+{% block title %}Consultation des méthodes{% endblock %}
 
 {% block body %}
-    <h1>Method index</h1>
+    <main id="main" class="main">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Label</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for method in methods %}
-            <tr>
-                <td>{{ method.id }}</td>
-                <td>{{ method.label }}</td>
-                <td>{{ method.createdAt ? method.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ method.updatedAt ? method.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_method_show', {'id': method.id}) }}">show</a>
-                    <a href="{{ path('app_method_edit', {'id': method.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <div class="pagetitle">
+        <h1>Consultation des méthodes de comptage</h1>
+        <nav>
+            <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+            <li class="breadcrumb-item active">Gestion des méthodes de comptage</li>
+            </ol>
+        </nav>
+        </div><!-- End Page Title -->
 
-    <a href="{{ path('app_method_new') }}">Create new</a>
+        <section class="section">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Listes</h5>
+
+                            <div id="printableArea">
+                                <table class="table datatable">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Méthode</th>
+                                            <th>Crée le</th>
+                                            <th>Dernière mise à jour le</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for method in methods %}
+                                        <tr>
+                                            <td>{{ method.id }}</td>
+                                            <td>{{ method.label }}</td>
+                                            <td>{{ method.createdAt ? method.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                                            <td>{{ method.updatedAt ? method.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                                            <td>
+                                                <div class="d-flex justify-content-end">
+                                                    <a href="{{ path('app_method_show', {'id': method.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
+                                                    <a href="{{ path('app_method_edit', {'id': method.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
+                                                    {{ include('method/_delete_form.html.twig') }}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5">Aucun enregistrement trouvé</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <div>
+                                <a href="{{ path('app_method_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une méthode</a>
+                                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="Voir la liste des campagnes de comptage"> Consultation des campagnes</a>
+                            </div>
+                            <div>
+                                <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer" title="Imprimer"></button>
+                                <a href="#" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+        {# <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-end">
+                            <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer" title="Imprimer"></button>
+                            <a href="#" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
+                        </div>
+                        <div class="card-body">
+                            {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
+                                {{ form_row(form.csvFile, {
+                                    'attr': {
+                                        'onchange': 'document.getElementById("csvForm").submit();'
+                                    }
+                                }) }}
+                            {{ form_end(form) }}
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% if headers is defined and rows is defined %}
+            <!-- Modal -->
+            <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="csvPreviewModalLabel"><b>NB:</b> Le colonne <code>method</code> est obligatoire.</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <h5 class="text-center">Aperçu du fichier CSV</h5>
+                        <div class="modal-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        {% for header in headers %}
+                                            <th>{{ header }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in rows %}
+                                        <tr>
+                                            {% for cell in row %}
+                                                <td>{{ cell }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <form method="post" action="{{ path('app_method_index') }}">
+                                <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
+                                <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
+                                <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Script to auto-show the modal after form submission -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
+                    myModal.show();
+                });
+            </script>
+        {% endif %} #}
+    </main>
 {% endblock %}

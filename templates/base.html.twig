@@ -85,7 +85,7 @@
             </a>
           </li><!-- End Search Icon-->
 
-          {% set notifications = app.flashes %}     
+          {% set notifications = app.flashes() %}
           <script>
             {% for type, messages in notifications %}
                 {% for message in messages %}
@@ -514,42 +514,42 @@
               </a>
             </li>
             <li>
-              <a href="{{ path('app_count_type_new') }}">
+              <a href="{{ path('app_count_type_index') }}">
                 <i class="bi bi-circle"></i><span>Type de comptage</span>
               </a>
             </li>
             <li>
-              <a href="{{ path('app_quality_new') }}">
+              <a href="{{ path('app_quality_index') }}">
                 <i class="bi bi-circle"></i><span>Qualité</span>
               </a>
             </li>
             <li>
-              <a href="{{ path('app_method_new') }}">
+              <a href="{{ path('app_method_index') }}">
                 <i class="bi bi-circle"></i><span>Méthode</span>
               </a>
             </li>
             <li>
-              <a href="{{ path('app_disturbed_new') }}">
+              <a href="{{ path('app_disturbed_index') }}">
                 <i class="bi bi-circle"></i><span>Disturbé</span>
               </a>
             </li>
             <li>
-              <a href="{{ path('app_ice_new') }}">
+              <a href="{{ path('app_ice_index') }}">
                 <i class="bi bi-circle"></i><span>La couverture de glace</span>
               </a>
             </li>
             <li>
-              <a href="{{ path('app_tidal_new') }}">
+              <a href="{{ path('app_tidal_index') }}">
                 <i class="bi bi-circle"></i><span>Marée</span>
               </a>
             </li>
             <li>
-              <a href="{{ path('app_water_new') }}">
+              <a href="{{ path('app_water_index') }}">
                 <i class="bi bi-circle"></i><span>Etat des eaux</span>
               </a>
             </li>
             <li>
-              <a href="{{ path('app_weather_new') }}">
+              <a href="{{ path('app_weather_index') }}">
                 <i class="bi bi-circle"></i><span>Condition météorologique</span>
               </a>
             </li>
@@ -592,11 +592,6 @@
             <li>
               <a href="{{ path('app_image_index') }}">
                 <i class="bi bi-circle"></i><span>Consultation des images</span>
-              </a>
-            </li>
-            <li>
-              <a href="{{ path('app_profile') }}">
-                <i class="bi bi-circle"></i><span>Consultation des utilisateurs</span>
               </a>
             </li>
           </ul>

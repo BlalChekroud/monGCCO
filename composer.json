@@ -41,6 +41,7 @@
         "symfony/string": "7.1.*",
         "symfony/translation": "7.1.*",
         "symfony/twig-bundle": "7.1.*",
+        "symfony/twig-pack": "*",
         "symfony/ux-autocomplete": "^2.18",
         "symfony/ux-toggle-password": "^2.18",
         "symfony/ux-turbo": "^2.18",

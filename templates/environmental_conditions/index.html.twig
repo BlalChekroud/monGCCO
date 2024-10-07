@@ -51,7 +51,7 @@
                             <td>{{ environmental_condition.createdAt ? environmental_condition.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>{{ environmental_condition.updatedAt ? environmental_condition.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>
-                                <div class="d-flex justtify-content-end">
+                                <div class="d-flex justify-content-end">
                                     <a href="{{ path('app_environmental_conditions_show', {'id': environmental_condition.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-2"> Détail</a>
                                     <a href="{{ path('app_environmental_conditions_edit', {'id': environmental_condition.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
                                     {{ include('environmental_conditions/_delete_form.html.twig') }}
@@ -70,7 +70,7 @@
               
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Liste des campagnes</a>
+              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task"> Consultation des campagnes</a>
               <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des collectes</a>
               <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une collecte</a>
             </div>

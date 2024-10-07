@@ -32,13 +32,16 @@ class AgentsGroupRepository extends ServiceEntityRepository
      */
     public function findByUserMember(User $user)
     {
-        return $this->createQueryBuilder('a')
-            ->innerJoin('a.groupMember', 'u')
-            ->andWhere('u.id = :userId')
-            ->setParameter('userId', $user->getId())
+        return $this->createQueryBuilder('g')
+            ->leftJoin('g.groupMember', 'm') // Joindre les membres du groupe
+            ->where('m = :user')             // Vérifier si l'utilisateur est membre
+            ->orWhere('g.leader = :user')    // Ou si l'utilisateur est leader
+            ->orWhere('g.createdBy = :user') // Ou si l'utilisateur est créateur
+            ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
     }
+    
     
     //    /**
     //     * @return AgentsGroup[] Returns an array of AgentsGroup objects

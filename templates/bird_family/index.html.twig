@@ -43,7 +43,7 @@
                     <td>{{ bird_family.getSubFamily() }}</td>
                     <td>{{ bird_family.getCreatedAt()| date('d-m-Y') }}</td>
                     <td>
-                      <div class="d-flex justtify-content-end">
+                      <div class="d-flex justify-content-end">
                         <a href="{{ path('app_bird_family_show', {'id': bird_family.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail</a>
                         <a href="{{ path('app_bird_family_edit', {'id': bird_family.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
                         {{ include('bird_family/_delete_form.html.twig') }}

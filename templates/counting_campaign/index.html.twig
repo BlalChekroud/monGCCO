@@ -60,7 +60,7 @@
                           </div>
                         </td>
                         <td>
-                          <div class="d-flex justtify-content-end">
+                          <div class="d-flex justify-content-end">
                             <a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
                             <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
                             {{ include('counting_campaign/_delete_form.html.twig') }}
@@ -78,7 +78,7 @@
               </div>
             </div>
             <div class="card-footer d-flex justify-content-between">
-              <div class="d-flex justtify-content-end">
+              <div class="d-flex justify-content-end">
                   <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
                   <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer un site de collecte</a>
               </div>

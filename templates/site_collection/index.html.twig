@@ -42,7 +42,7 @@
                             <td>{{ site_collection.city.region.name }}</td>
                             <td>{{ site_collection.parentSite }}</td>
                             <td>
-                                <div class="d-flex justtify-content-end">
+                                <div class="d-flex justify-content-end">
                                       <a href="{{ path('app_site_collection_show', {'id': site_collection.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-2"> Détail</a>
                                       <a href="{{ path('app_site_collection_edit', {'id': site_collection.id}) }}" class="bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
                                       {{ include('site_collection/_delete_form.html.twig') }}
@@ -59,9 +59,9 @@
               </div>
               
               <div class="card-footer">
-                <div class="d-flex justtify-content-end">
+                <div class="d-flex justify-content-end">
                   <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer un site de collecte</a>
-                  <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des campagnes</a>
+                  <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des campagnes</a>
                   <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
                 </div>
               </div>

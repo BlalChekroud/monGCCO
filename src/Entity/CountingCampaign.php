@@ -231,7 +231,8 @@ class CountingCampaign
     //     ];
     // }
 
-    // Calcul de la moyenne des conditions environnementales
+
+
     public function getAverageEnvironmentalConditions(): array
     {
         $conditionsSummary = [
@@ -243,31 +244,67 @@ class CountingCampaign
         ];
         $totalConditions = 0;
 
-        foreach ($this->getSiteAgentsGroups() as $siteAgentsGroup) {
-            $site = $siteAgentsGroup->getSiteCollection();
-            if ($site) {
-                foreach ($site->getCollectedData() as $collect) {
-                    $environmentalConditions = $collect->getEnvironmentalConditions();
-                    if ($environmentalConditions) {
-                        $totalConditions++;
-                        $conditionsSummary['disturbed'] += $environmentalConditions->getDisturbed() ? 1 : 0;
-                        $conditionsSummary['weather'][] = $environmentalConditions->getWeather()->getLabel();
-                        $conditionsSummary['ice'][] = $environmentalConditions->getIce()->getLabel();
-                        $conditionsSummary['tidal'][] = $environmentalConditions->getTidal()->getLabel();
-                        $conditionsSummary['water'][] = $environmentalConditions->getWater()->getLabel();
-                    }
-                }
+        foreach ($this->getCollectedData() as $collect) {
+            $environmentalConditions = $collect->getEnvironmentalConditions();
+            if ($environmentalConditions) {
+                $totalConditions++;
+                $conditionsSummary['disturbed'] += $environmentalConditions->getDisturbed() ? 1 : 0;
+                $conditionsSummary['weather'][] = $environmentalConditions->getWeather()->getLabel();
+                $conditionsSummary['ice'][] = $environmentalConditions->getIce()->getLabel();
+                $conditionsSummary['tidal'][] = $environmentalConditions->getTidal()->getLabel();
+                $conditionsSummary['water'][] = $environmentalConditions->getWater()->getLabel();
             }
         }
 
-        return [
+        // Calcul des moyennes et des pourcentages
+        $averageConditions = [
             'disturbed_percentage' => $totalConditions > 0 ? ($conditionsSummary['disturbed'] / $totalConditions) * 100 : 0,
             'most_common_weather' => $this->getMostCommonCondition($conditionsSummary['weather']),
             'most_common_ice' => $this->getMostCommonCondition($conditionsSummary['ice']),
             'most_common_tidal' => $this->getMostCommonCondition($conditionsSummary['tidal']),
             'most_common_water' => $this->getMostCommonCondition($conditionsSummary['water']),
         ];
+
+        return $averageConditions;
     }
+
+    // // Calcul de la moyenne des conditions environnementales
+    // public function getAverageEnvironmentalConditions(): array
+    // {
+    //     $conditionsSummary = [
+    //         'disturbed' => 0,
+    //         'weather' => [],
+    //         'ice' => [],
+    //         'tidal' => [],
+    //         'water' => []
+    //     ];
+    //     $totalConditions = 0;
+
+    //     foreach ($this->getSiteAgentsGroups() as $siteAgentsGroup) {
+    //         $site = $siteAgentsGroup->getSiteCollection();
+    //         if ($site) {
+    //             foreach ($site->getCollectedData() as $collect) {
+    //                 $environmentalConditions = $collect->getEnvironmentalConditions();
+    //                 if ($environmentalConditions) {
+    //                     $totalConditions++;
+    //                     $conditionsSummary['disturbed'] += $environmentalConditions->getDisturbed() ? 1 : 0;
+    //                     $conditionsSummary['weather'][] = $environmentalConditions->getWeather()->getLabel();
+    //                     $conditionsSummary['ice'][] = $environmentalConditions->getIce()->getLabel();
+    //                     $conditionsSummary['tidal'][] = $environmentalConditions->getTidal()->getLabel();
+    //                     $conditionsSummary['water'][] = $environmentalConditions->getWater()->getLabel();
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return [
+    //         'disturbed_percentage' => $totalConditions > 0 ? ($conditionsSummary['disturbed'] / $totalConditions) * 100 : 0,
+    //         'most_common_weather' => $this->getMostCommonCondition($conditionsSummary['weather']),
+    //         'most_common_ice' => $this->getMostCommonCondition($conditionsSummary['ice']),
+    //         'most_common_tidal' => $this->getMostCommonCondition($conditionsSummary['tidal']),
+    //         'most_common_water' => $this->getMostCommonCondition($conditionsSummary['water']),
+    //     ];
+    // }
 
     private function getMostCommonCondition(array $conditions): ?string
     {

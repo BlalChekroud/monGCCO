@@ -12,13 +12,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/method')]
-#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
+#[Route('/user/method')]
+// #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class MethodController extends AbstractController
 {
-    #[Route('/', name: 'app_method_index', methods: ['GET'])]
-    public function index(MethodRepository $methodRepository): Response
+    #[Route('/', name: 'app_method_index', methods: ['GET', 'POST'])]
+    public function index(Request $request, EntityManagerInterface $entityManager, MethodRepository $methodRepository): Response
     {
+
         return $this->render('method/index.html.twig', [
             'methods' => $methodRepository->findAll(),
         ]);

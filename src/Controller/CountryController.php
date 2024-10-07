@@ -14,8 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/country')]
-#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
+#[Route('/user/country')]
+// #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class CountryController extends AbstractController
 {
     #[Route('/', name: 'app_country_index', methods: ['GET', 'POST'])]
@@ -29,6 +29,10 @@ class CountryController extends AbstractController
             $csvFile = $form->get('csvFile')->getData();
             
             if ($csvFile) {
+                if (!$this->isGranted('ROLE_IMPORT')) {
+                    throw $this->createNotFoundException('Vous n\'avez pas l\'autorisation d\'importer des données.');
+                }
+
                 $csvData = file_get_contents($csvFile->getPathname());
                 $rows = array_map(function($row) {
                     return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV

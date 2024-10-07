@@ -24,7 +24,6 @@
             <div class="card-body">
               <h5 class="card-title">Listes</h5>
 
-              <!-- Table with stripped rows -->
                 <table class="table datatable">
                     <thead>
                         <tr>
@@ -45,7 +44,7 @@
                             <td>{{ collected_datum.totalCount }}</td>
                             <td>{{ collected_datum.createdAt ? collected_datum.createdAt|date('d-m-Y') : '' }}</td>
                             <td>
-                                <div class="d-flex justtify-content-end">
+                                <div class="d-flex justify-content-end">
                                   <a href="{{ path('app_collected_data_show', {'id': collected_datum.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-2"> Détail</a>
                                   <a href="{{ path('app_collected_data_edit', {'id': collected_datum.id}) }}" class="bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
                                   {{ include('collected_data/_delete_form.html.twig') }}
@@ -59,19 +58,12 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <!-- End Table with stripped rows -->              
-              
-                <div>
-                    <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3">
-                        Liste des campagnes
-                    </a>
-                    <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm ri-database-line">
-                      Créer une collecte
-                    </a>
-                    <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted  mx-3">
-                        Créer une campagne
-                    </a>
-                </div>
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="Voir la liste des campagnes de comptage"> Consultation des campagnes</a>
+              <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="Voir la liste des conditions environnementales"> Consultation des conditions</a>
+              {# <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm ri-database-line"> Créer une collecte</a> #}
+              <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
             </div>
           </div>
 
