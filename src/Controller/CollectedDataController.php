@@ -69,6 +69,24 @@ class CollectedDataController extends AbstractController
             return $this->redirectToRoute('app_collected_data_index');
         }
 
+            // Vérifier si l'utilisateur est membre d'un groupe d'agents assigné à ce site
+        $isMember = false;
+        foreach ($site->getSiteAgentsGroups() as $siteAgentsGroup) {
+            foreach ($siteAgentsGroup->getAgentsGroup() as $group) {
+                if ($group->getGroupMember()->contains($user)) {
+                    $isMember = true;
+                    break;
+                }
+            }
+            if ($isMember) break;
+        }
+
+        // Si l'utilisateur n'est pas membre d'un groupe, interdire l'accès
+        if (!$isMember) {
+            $this->addFlash('warning', 'Vous ne pouvez pas collecter des données car vous n\'êtes pas membre d\'un groupe assigné à ce site.');
+            return $this->redirectToRoute('app_collected_data_index');
+        }
+
         // Vérifier si les conditions environnementales existent pour cet utilisateur, ce site et cette campagne
         $environmentalConditions = $environmentalConditionsRepository->findOneBy(
             [
@@ -152,6 +170,12 @@ class CollectedDataController extends AbstractController
                     $errorMessage .= "Le site de collecte ne correspond pas aux conditions environnementales.";
                 }
 
+                // Vérifiez que le total des comptages d'oiseaux est positif
+                if ($collectedDatum->getTotalCount() <= 0) {
+                    $hasErrors = true;
+                    $errorMessage .= "La collecte ne peut pas être nulle.";
+                }
+
                 // Si des erreurs sont présentes, affichez un message d'erreur et redirigez
                 if ($hasErrors) {
                     $this->addFlash('error', $errorMessage);
@@ -215,6 +239,11 @@ class CollectedDataController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
+                // Vérifiez que le total des comptages d'oiseaux est positif
+                if ($collectedDatum->getTotalCount() <= 0) {
+                    $this->addFlash('error', "La collecte ne peut pas être nulle.");
+                    return $this->redirectToRoute('app_collected_data_new', [], Response::HTTP_SEE_OTHER);
+                }
                 $collectedDatum->setUpdatedAt(new \DateTimeImmutable);
                 $entityManager->flush();
                 $this->addFlash('success', "Les données ont été mises à jour avec succès.");

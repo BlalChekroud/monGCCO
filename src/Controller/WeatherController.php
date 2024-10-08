@@ -16,6 +16,12 @@ use Symfony\Component\Routing\Attribute\Route;
 #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class WeatherController extends AbstractController
 {
+    private function addFlashMessage(string $type, string $message): void {
+        $this->addFlash($type, $message);
+    }
+
+
+    
     #[Route('/', name: 'app_weather_index', methods: ['GET'])]
     public function index(WeatherRepository $weatherRepository): Response
     {

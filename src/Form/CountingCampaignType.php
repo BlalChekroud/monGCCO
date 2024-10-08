@@ -9,6 +9,9 @@ use App\Entity\CountingCampaign;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormError;
 
 class CountingCampaignType extends AbstractType
 {
@@ -40,6 +43,22 @@ class CountingCampaignType extends AbstractType
                 'required' => false,
             ])
         ;
+        
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+            $form = $event->getForm();
+            $campaign = $event->getData();
+
+            if ($campaign instanceof CountingCampaign) {
+                $sites = [];
+                foreach ($campaign->getSiteAgentsGroups() as $siteAgentGroup) {
+                    $site = $siteAgentGroup->getSiteCollection();
+                    if (in_array($site, $sites, true)) {
+                        $form->get('siteAgentsGroups')->addError(new FormError('Chaque site ne peut être sélectionné qu\'une seule fois.'));
+                    }
+                    $sites[] = $site;
+                }
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

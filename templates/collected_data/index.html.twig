@@ -41,7 +41,13 @@
                             <td>{{ collected_datum.id }}</td>
                             <td>{{ collected_datum.createdBy.name }} {{ collected_datum.createdBy.lastName }}</td>
                             <td>{{ collected_datum.siteCollection.siteName }}</td>
-                            <td>{{ collected_datum.totalCount }}</td>
+                            <td>
+                              {% if collected_datum.totalCount > 0 %}
+                                  {{ collected_datum.totalCount }}
+                              {% else %}
+                                  0  {# Ou afficher un message comme "Aucune collecte" #}
+                              {% endif %}
+                            </td>
                             <td>{{ collected_datum.createdAt ? collected_datum.createdAt|date('d-m-Y') : '' }}</td>
                             <td>
                                 <div class="d-flex justify-content-end">

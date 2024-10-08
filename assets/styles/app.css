@@ -58,6 +58,16 @@ h6.explanation {
   color: black !important;
 }
 
+/* Style pour l'élément de texte */
+#dynamic-text {
+  font-family: 'Playfair Display', serif; /* Appliquez la police ici */
+  font-size: 2.5em; /* Taille de la police */
+  color: #4A4A4A; /* Couleur du texte */
+  text-align: center; /* Centrer le texte */
+  margin-top: 50px; /* Espacement supérieur */
+  letter-spacing: 2px; /* Espacement des lettres */
+}
+
 /*--------------------------------------------------------------
   # site-agents-group-collection
 --------------------------------------------------------------*/

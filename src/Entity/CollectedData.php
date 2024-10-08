@@ -74,13 +74,25 @@ class CollectedData
     public function getTotalCount(): int
     {
         $totalCount = 0;
-        
+
+        // Itérer sur chaque compte d'espèces d'oiseaux pour calculer le total
         foreach ($this->getBirdSpeciesCounts() as $birdSpeciesCount) {
-            $totalCount += $birdSpeciesCount->getCount();
+            // Assurez-vous que getCount() retourne un entier valide
+            $count = $birdSpeciesCount->getCount();
+            if (!is_int($count) || $count < 0) {
+                throw new \InvalidArgumentException('Le comptage doit être un nombre positif.');
+            }
+            $totalCount += $count;
         }
 
-        return $totalCount;
+        if ($totalCount <= 0) {
+            throw new \InvalidArgumentException('Le total des comptages doit être positif.');
+        }
+
+        // Retourne 0 si le total est négatif ou nul
+        return max($totalCount, 0);
     }
+
 
     public function getCountBySpecies(): array
     {

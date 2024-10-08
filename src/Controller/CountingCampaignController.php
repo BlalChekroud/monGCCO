@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class CountingCampaignController extends AbstractController
 {
     #[Route('/', name: 'app_counting_campaign_index', methods: ['GET'])]
-    public function index(CountingCampaignRepository $countingCampaignRepository): Response
+    public function index(CountingCampaignRepository $countingCampaignRepository, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         
@@ -30,6 +30,28 @@ class CountingCampaignController extends AbstractController
             $countingCampaigns = $countingCampaignRepository->findByUser($user);
         }
         
+        $needsFlush = false; // Variable pour suivre si flush est nécessaire
+    
+        foreach ($countingCampaigns as $countingCampaign) {
+            // Vérifier si la campagne n'est ni clôturée ni en suspens avant de mettre à jour le statut
+            if ($countingCampaign->getCampaignStatus() !== 'Clôturé' && $countingCampaign->getCampaignStatus() !== 'Suspens') {
+                $previousStatus = $countingCampaign->getCampaignStatus(); // Sauvegarder le statut précédent
+                
+                // Mettre à jour le statut
+                $this->updateCampaignStatus($countingCampaign);
+                
+                // Si le statut a changé, indiquer qu'il faut flusher
+                if ($countingCampaign->getCampaignStatus() !== $previousStatus) {
+                    $needsFlush = true;
+                }
+            }
+        }
+    
+        // Flusher les changements uniquement si nécessaire
+        if ($needsFlush) {
+            $entityManager->flush();
+        }
+
         return $this->render('counting_campaign/index.html.twig', [
             'counting_campaigns' => $countingCampaigns,
         ]);
@@ -46,11 +68,6 @@ class CountingCampaignController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                if ($countingCampaign->getStartDate() > $countingCampaign->getEndDate()) {
-                    $this->addFlash('danger', 'Date de début ne peut pas être supérieure à la date de fin.');
-                    return $this->redirectToRoute('app_counting_campaign_new');
-                }
-
                 foreach ($countingCampaign->getSiteAgentsGroups() as $siteAgentsGroup) {
                     $siteAgentsGroup->setCountingCampaign($countingCampaign);
                     $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
@@ -95,50 +112,57 @@ class CountingCampaignController extends AbstractController
     public function show(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();  // Utilisateur actuel
-
+    
         // Récupérer les SiteAgentsGroups associés à la campagne
         $siteAgentsGroups = $countingCampaign->getSiteAgentsGroups();
-
+    
         // Tableau pour stocker les SiteCollection et les conditions environnementales
         $sites = [];
         $existingConditions = [];
-
-        // Mettre à jour le statut de la campagne avant l'affichage
-        $this->updateCampaignStatus($countingCampaign);
-        $entityManager->flush();
-
-        // Parcourir chaque SiteAgentsGroup et récupérer les SiteCollection associés
+    
+        // Mettre à jour le statut de la campagne avant l'affichage uniquement si cela est nécessaire
+        if ($countingCampaign->getCampaignStatus() !== 'Clôturé' && $countingCampaign->getCampaignStatus() !== 'Suspens') {
+            $previousStatus = $countingCampaign->getCampaignStatus(); // Sauvegarder le statut précédent
+            $this->updateCampaignStatus($countingCampaign);
+    
+            // Si le statut a changé, flusher les modifications
+            if ($countingCampaign->getCampaignStatus() !== $previousStatus) {
+                $entityManager->flush();
+            }
+        }
+    
+        // Récupérer tous les SiteCollection associés aux groupes d'agents
         foreach ($siteAgentsGroups as $siteAgentsGroup) {
             $siteCollection = $siteAgentsGroup->getSiteCollection();
-
+    
             if ($siteCollection) {
                 // Ajouter le site à la liste des sites
                 $sites[] = $siteCollection;
-
-                // Vérifier s'il existe des conditions environnementales créées par l'utilisateur actuel pour ce site
-                $conditions = $entityManager->getRepository(EnvironmentalConditions::class)->findOneBy(
-                    [
-                        'user' => $user,  // Conditions créées par l'utilisateur actuel
-                        'siteCollection' => $siteCollection,
-                        'countingCampaign' => $countingCampaign,
-                    ],
-                    ['createdAt' => 'DESC']
-            );
-
-                // Stocker les conditions environnementales pour ce site, si elles existent
-                $existingConditions[$siteCollection->getId()] = $conditions;
-
             }
         }
-
+    
+        // Récupérer toutes les conditions environnementales pour les sites de la campagne en une seule requête
+        if (!empty($sites)) {
+            $conditions = $entityManager->getRepository(EnvironmentalConditions::class)->findBy([
+                'user' => $user,
+                'siteCollection' => $sites,
+                'countingCampaign' => $countingCampaign,
+            ], ['createdAt' => 'DESC']);
+    
+            // Stocker les conditions par ID de SiteCollection
+            foreach ($conditions as $condition) {
+                $existingConditions[$condition->getSiteCollection()->getId()] = $condition;
+            }
+        }
+    
         return $this->render('counting_campaign/show.html.twig', [
             'counting_campaign' => $countingCampaign,
             'existingConditions' => $existingConditions,  // Transmettre les conditions environnementales
         ]);
     }
+    
 
 
-    // #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     #[IsGranted(CountingCampaignVoter::EDIT, 'countingCampaign')]
     #[Route('/{id}/edit', name: 'app_counting_campaign_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
@@ -152,10 +176,6 @@ class CountingCampaignController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                if ($countingCampaign->getStartDate() > $countingCampaign->getEndDate()) {
-                    $this->addFlash('danger', 'Date de début ne peut pas être supérieure à la date de fin.');
-                    return $this->redirectToRoute('app_counting_campaign_edit', ['id' => $countingCampaign->getId()]);
-                }
                 // Vérification si la collection de SiteAgentsGroup est vide
                 if ($countingCampaign->getSiteAgentsGroups()->isEmpty()) {
                     $this->addFlash('error', 'Vous devez sélectionner au moins un site et un groupe d\'agents.');
@@ -190,14 +210,21 @@ class CountingCampaignController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_SUPER_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
+    #[IsGranted(CountingCampaignVoter::DELETE, 'countingCampaign')]
     #[Route('/{id}', name: 'app_counting_campaign_delete', methods: ['POST'])]
     public function delete(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$countingCampaign->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($countingCampaign);
-            $entityManager->flush();
-            $this->addFlash('success', "Campagne de comptage a bien été supprimée");
+            try {
+                $entityManager->remove($countingCampaign);
+                $entityManager->flush();
+                $this->addFlash('success', "Campagne de comptage a bien été supprimée");
+            } catch (\Exception $e) {
+                $this->addFlash('error', "Erreur lors de la suppression : " . $e->getMessage());
+            }
+        }  else {
+            // Ajouter un message d'erreur si le jeton CSRF est invalide
+            $this->addFlash('error', 'Jeton CSRF invalide. Suppression annulée.');
         }
 
         return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
@@ -353,7 +380,8 @@ class CountingCampaignController extends AbstractController
             return;  // Quitter la fonction pour préserver l'état "Suspens"
         }
 
-        if (!$status || $status === 'En attente' || $status === 'En cours' || $status === 'En attente') {
+        // if (!$status || $status === 'En attente' || $status === 'En cours' || $status === 'En attente') {
+        if (!$status || $status !== 'Clôturé') {
             if ($startDate > $now) {
                 $countingCampaign->setCampaignStatus('En attente');
             } elseif ($startDate <= $now && $endDate >= $now) {

@@ -12,7 +12,7 @@ class CountingCampaignVoter extends Voter
     public const EDIT = 'ROLE_EDIT';
     public const VIEW = 'ROLE_VIEW';
     public const CREATE = 'ROLE_SUPER_CREAT';
-    public const DELETE = 'ROLE_DELETE';
+    public const DELETE = 'ROLE_SUPER_ADMIN';
     public const IMPORT = 'ROLE_IMPORT';
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -103,7 +103,7 @@ class CountingCampaignVoter extends Voter
     private function canDelete(CountingCampaign $campaign, User $user): bool
     {
         // L'administrateur peut tout supprimer
-        if (in_array('ROLE_ADMIN', $user->getRoles())) {
+        if (in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
             return true;
         }
 
@@ -115,7 +115,7 @@ class CountingCampaignVoter extends Voter
     private function canImport(CountingCampaign $campaign, User $user): bool
     {
         // Le super admin peut importer des données
-        return in_array('ROLE_SUPER_ADMIN', $user->getRoles());
+        return in_array('ROLE_ADMIN', $user->getRoles());
     }
 
     // /**

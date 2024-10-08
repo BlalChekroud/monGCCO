@@ -66,12 +66,15 @@
                     <!-- Sites et collectes -->
                     <h6 class="mt-4"><i class="bi bi-geo-alt-fill"></i> Sites et collectes :</h6>
                     {% if counting_campaign.siteAgentsGroups|length > 0 %}
+                        {% set totalCountsPerSite = counting_campaign.getTotalCountsPerSite() %}
                         {% for siteAgentsGroup in counting_campaign.siteAgentsGroups %}
                             {% set site = siteAgentsGroup.siteCollection %}
                             <div class="site-section mb-4">
                                 <h5 class="mb-3">
                                     <i class="bi bi-geo-alt-fill text-warning"></i> Site : {{ site.siteName }} ({{ site.city.name }} / {{ site.city.region.name }})
                                 </h5>
+                                <!-- Afficher le total des comptages pour ce site -->
+                                <h6><i class="bi bi-file-earmark-bar-graph-fill"></i> Total de comptages d'oiseaux : <span class="badge bg-info">{{ totalCountsPerSite[site.id] ?? 0 }}</span></h6>
 
                                 <!-- Groupes d'agents associés -->
                                 <h6><i class="bi bi-people-fill"></i> Groupes d'agents associés :</h6>

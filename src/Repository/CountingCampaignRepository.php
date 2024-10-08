@@ -41,7 +41,19 @@ class CountingCampaignRepository extends ServiceEntityRepository
             ->getResult();
     }
     
+    public function getBirdsPerDay(): array
+    {
+        // Requête DQL pour récupérer les observations d'oiseaux par jour
+        return $this->createQueryBuilder('c')
+            ->select('DATE(o.observationDate) as day, SUM(o.birdCount) as totalBirds')
+            ->join('c.observations', 'o') // Jointure avec les observations (assurez-vous que la relation existe)
+            ->groupBy('day') // Grouper par jour
+            ->orderBy('day', 'ASC') // Tri par jour (optionnel)
+            ->getQuery()
+            ->getResult();
+    }
 
+    
     //    /**
     //     * @return CountingCampaign[] Returns an array of CountingCampaign objects
     //     */
