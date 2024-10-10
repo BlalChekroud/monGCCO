@@ -55,17 +55,6 @@
                                         {% else %}
                                             <p>Aucune région</p>
                                         {% endif %}
-
-                                        {# {% if country.city|length > 0 %}
-                                            {% set sorted_cities = country.city|sort((a, b) => a.name <=> b.name) %}
-                                            <ul>
-                                                {% for city in sorted_cities %}
-                                                    <li>{{ city.name }}</li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            <p>Aucune ville</p>
-                                        {% endif %} #}
                                     </div>
                                 </div>
                             </td>
@@ -90,23 +79,22 @@
               
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer un nouveau pays</a>
-              <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des régions</a>
-              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une nouvelle région</a>
-              <a href="{{ path('app_city_index') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Liste des villes</a>
-              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une nouvelle ville</a>
+              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Ajouter un pays</a>
+              <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des régions</a>
+              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une région</a>
+              <a href="{{ path('app_city_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des villes</a>
+              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une ville</a>
             </div>
           </div>
 
         </div>
       </div>
     </section>
-    <section class="section">
+    {# <section class="section">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        {# <h5 class="card-title">Importer un fichier CSV</h5> #}
                         {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
                             {{ form_row(form.csvFile, {
                                 'attr': {
@@ -122,9 +110,9 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> #}
 
-    {% if headers is defined and rows is defined %}
+    {# {% if headers is defined and rows is defined %}
         <!-- Modal -->
         <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable">
@@ -172,6 +160,21 @@
                 myModal.show();
             });
         </script>
+    {% endif %} #}
+    {% import 'macros/form_macros.html.twig' as form_macros %}
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    {{ form_macros.csv_import_form(form, 'app_country_index') }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if headers is defined and rows is defined %}
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_country_index', ['country', 'iso2']) }}
     {% endif %}
 
   </main><!-- End #main -->

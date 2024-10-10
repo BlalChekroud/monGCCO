@@ -30,7 +30,10 @@
                                     {% if logo.image and logo.image.imageFilename %}
                                         <turbo-frame id="logo_{{ logo.id }}">
                                             <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgLogoShow rounded mx-auto d-block">
-                                            <a href="{{ path('app_logo_edit', {'id': logo.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
+                                            <div class="d-flex justify-content-end">
+                                                {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                                {{ macros.action_buttons('app_logo_edit', 'logo/_delete_form.html.twig', logo) }}
+                                            </div>
                                         </turbo-frame>
                                     {% else %}
                                         <p>Aucune image disponible</p>
@@ -44,12 +47,14 @@
                         </div>
                         <div class="card-footer">
                             <div class="d-flex justify-content-between">
-                                <div class="d-flex justify-content-end">
+                                <div class="d-flex justify-content-start">
                                     <a href="{{ path('app_logo_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation du logo">Retour</a>
                                     <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list mx-1"> Consultation des campagnes</a>
-                                    {{ include('logo/_delete_form.html.twig') }}
                                 </div>
-                                <a href="{{ path('home') }}" class="btn btn-light btn-sm ri-home-4-line mx-1"> Page d'accueil</a>
+                                <div>
+                                    <a href="{{ path('app_logo_new') }}" class="btn btn-light btn-sm mx-1"> Ajouter le logo</a>
+                                    <a href="{{ path('home') }}" class="btn btn-light btn-sm ri-home-4-line mx-1"> Page d'accueil</a>
+                                </div>
                             </div>
                         </div>
                     </div>

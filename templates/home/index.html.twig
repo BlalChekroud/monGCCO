@@ -9,7 +9,9 @@
       <h1>Page d'accueil</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item active"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item active">
+            <a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a>
+          </li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -82,68 +84,52 @@
                   <div id="reportsChart"></div>
 
                   <script>
-                      document.addEventListener("DOMContentLoaded", () => {
-                          new ApexCharts(document.querySelector("#reportsChart"), {
-                              series: [{
-                                  name: 'Total d\'oiseaux',
-                                  data: {{ totalCounts|json_encode|raw }},
-                              }, {
-                                  name: 'Total d\'espèces d\'oiseaux uniques observées',
-                                  data: {{ totalUniqueSpecies|json_encode|raw }}
-                              }, {
-                                  name: 'Total d\'agents',
-                                  data: {{ totalAgents|json_encode|raw }}
-                              }, {
-                                  name: 'Total de collectes',
-                                  data: {{ totalCollects|json_encode|raw }}
-                              }],
-                              chart: {
-                                  height: 350,
-                                  type: 'area',
-                                  toolbar: {
-                                      show: false
-                                  },
-                              },
-                              markers: {
-                                  size: 4
-                              },
-                              colors: ['#4154f1', '#0dcaf0', '#2eca6a', '#ffc107'],
-                              fill: {
-                                  type: "gradient",
-                                  gradient: {
-                                      shadeIntensity: 1,
-                                      opacityFrom: 0.3,
-                                      opacityTo: 0.4,
-                                      stops: [0, 90, 100]
-                                  }
-                              },
-                              dataLabels: {
-                                  enabled: false
-                              },
-                              stroke: {
-                                  curve: 'smooth',
-                                  width: 2
-                              },
-                              xaxis: {
-                                  categories: {{ categories|json_encode|raw }},
-                                  title: {
-                                      text: 'Date de fin de campagne',
-                                      style: {
-                                          fontSize: '14px',
-                                          fontWeight: 'bold',
-                                          color: '#666'
-                                      }
-                                  }
-                              },
-                              tooltip: {
-                                  x: {
-                                      format: 'dd/MM/yy'
-                                  },
-                              }
-                          }).render();
-                      });
+                    document.addEventListener("DOMContentLoaded", () => {
+                      new ApexCharts(document.querySelector("#reportsChart"), {
+                        series: [{
+                          name: 'Total d\'oiseaux',
+                          data: {{ totalCounts|json_encode|raw }},
+                        }, {
+                          name: 'Total d\'espèces d\'oiseaux uniques observées',
+                          data: {{ totalUniqueSpecies|json_encode|raw }}
+                        }, {
+                          name: 'Total d\'agents',
+                          data: {{ totalAgents|json_encode|raw }}
+                        }, {
+                          name: 'Total de collectes',
+                          data: {{ totalCollects|json_encode|raw }}
+                        }],
+                        chart: {
+                          height: 350,
+                          type: 'area',
+                          toolbar: { show: false },
+                        },
+                        markers: { size: 4 },
+                        colors: ['#4154f1', '#0dcaf0', '#2eca6a', '#ffc107'],
+                        fill: {
+                          type: "gradient",
+                          gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.3,
+                            opacityTo: 0.4,
+                            stops: [0, 90, 100]
+                          }
+                        },
+                        dataLabels: { enabled: false },
+                        stroke: { curve: 'smooth', width: 2 },
+                        xaxis: {
+                          categories: {{ categories|json_encode|raw }},
+                          title: {
+                            text: 'Date de fin de campagne',
+                            style: { fontSize: '14px', fontWeight: 'bold', color: '#666' }
+                          }
+                        },
+                        tooltip: { x: { format: 'dd/MM/yy' } }
+                      }).render();
+                    });
                   </script>
                   <!-- End Line Chart -->
+                </div>
               </div>
             </div><!-- End Reports -->
 
@@ -167,7 +153,7 @@
                         <tr>
                           <th scope="row"><a href="#">{{ loop.index }}</a></th>
                           <td>{{ campaign.endDate ? campaign.endDate|date('d-m-Y H:i') : '' }}</td>
-                          <td><a href="{{ path('app_counting_campaign_show', {'id': campaign.id} )}}" class="text-primary">{{ campaign.campaignName }}</a></td>
+                          <td><a href="{{ path('app_counting_campaign_show', {'id': campaign.id}) }}" class="text-primary">{{ campaign.campaignName }}</a></td>
                           <td>{{ campaign.siteAgentsGroups|length }}</td>
                           <td>
                             {% set status_classes = {
@@ -204,48 +190,42 @@
               <div id="siteChart" style="height: 400px;"></div>
 
               <script>
-                  document.addEventListener("DOMContentLoaded", () => {
-                      const siteData = {{ totalCountsPerSite|json_encode|raw }};
-                      const siteNames = Object.keys(siteData);
-                      const siteCounts = Object.values(siteData);
+                document.addEventListener("DOMContentLoaded", () => {
+                  const siteData = {{ totalCountsPerSite|json_encode|raw }};
+                  const siteNames = Object.keys(siteData);
+                  const siteCounts = Object.values(siteData);
 
-                      const option = {
-                          title: {
-                              text: 'Répartition des oiseaux par site',
-                              subtext: 'Total d\'oiseaux',
-                              left: 'center'
-                          },
-                          tooltip: {
-                              trigger: 'item'
-                          },
-                          legend: {
-                              orient: 'vertical',
-                              left: 'left'
-                          },
-                          series: [
-                              {
-                                  name: 'Sites',
-                                  type: 'pie',
-                                  radius: '50%',
-                                  data: siteNames.map((name, index) => ({ value: siteCounts[index], name: name })),
-                                  emphasis: {
-                                      itemStyle: {
-                                          shadowBlur: 10,
-                                          shadowOffsetX: 0,
-                                          shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                      }
-                                  }
-                              }
-                          ]
-                      };
+                  const option = {
+                    title: {
+                      text: 'Répartition des oiseaux par site',
+                      subtext: 'Total d\'oiseaux',
+                      left: 'center'
+                    },
+                    tooltip: { trigger: 'item' },
+                    legend: { orient: 'vertical', left: 'left' },
+                    series: [{
+                      name: 'Sites',
+                      type: 'pie',
+                      radius: '50%',
+                      data: siteNames.map((name, index) => ({ value: siteCounts[index], name })),
+                      emphasis: {
+                        itemStyle: {
+                          shadowBlur: 10,
+                          shadowOffsetX: 0,
+                          shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                      }
+                    }]
+                  };
 
-                      const myChart = echarts.init(document.getElementById('siteChart'));
-                      myChart.setOption(option);
-                  });
+                  const myChart = echarts.init(document.getElementById('siteChart'));
+                  myChart.setOption(option);
+                });
               </script>
             </div>
           </div>
         </div><!-- End Right side columns -->
+
       </div>
     </section>
 

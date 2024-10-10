@@ -124,26 +124,6 @@
                                                                                         Ajouter Conditions Environnementales de collecte
                                                                                     </a>
                                                                                 {% endif %}
-
-                                                                                {# {% if existingConditions[site.id] is not empty %}
-
-                                                                                    {% if existingConditions[site.id].collectedData is empty %}
-                                                                                        <a href="{{ path('app_collected_data_new', {'campaignId': counting_campaign.id, 'siteId': site.id}) }}" class="btn btn-success btn-sm" title="Commentcez a collecter"> Collecter des données 
-                                                                                            <i class="bi bi-arrow-bar-right">
-                                                                                                <div class="spinner-grow spinner-grow-sm text-light" role="status"></div>
-                                                                                            </i>
-                                                                                        </a>
-                                                                                    {% else %}
-                                                                                        <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-outline-success btn-sm my-2" title="Ajouter les conditions environnementales puis commencer à collecter">
-                                                                                            Ajouter Conditions Environnementales de collecte
-                                                                                        </a>
-                                                                                    {% endif %}
-                                                                                    
-                                                                                {% else %}
-                                                                                    <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-outline-success btn-sm my-2" title="Ajouter les conditions environnementales puis commencer à collecter">
-                                                                                        Ajouter Conditions Environnementales de collecte
-                                                                                    </a>
-                                                                                {% endif %} #}
                                                                             {% endif %}
                                                                         {% else %}
                                                                             <code>

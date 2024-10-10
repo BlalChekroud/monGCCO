@@ -119,7 +119,7 @@ class LogoController extends AbstractController
 
         return $this->render('logo/edit.html.twig', [
             'logo' => $logo,
-            'form' => $form,
+            'formEdit' => $form,
         ]);
     }
 
@@ -129,8 +129,9 @@ class LogoController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$logo->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($logo);
             $entityManager->flush();
+            $this->addFlash('success', "Le logo a bien été supprimé");
         }
 
-        return $this->redirectToRoute('app_logo_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_logo_new', [], Response::HTTP_SEE_OTHER);
     }
 }

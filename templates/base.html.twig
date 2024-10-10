@@ -579,6 +579,7 @@
           </ul>
         </li><!-- End users Nav -->
 
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#parameters-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-gear"></i><span>Paramètres</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -586,7 +587,12 @@
           <ul id="parameters-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="{{ path('app_logo_index') }}">
-                <i class="bi bi-circle"></i><span>Logo</span>
+                <i class="bi bi-circle"></i><span>Consulter le logo</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_logo_new') }}">
+                <i class="bi bi-circle"></i><span>Ajouter le logo</span>
               </a>
             </li>
             <li>
@@ -596,6 +602,7 @@
             </li>
           </ul>
         </li><!-- End parameters Nav -->
+        {% endif %}
 
         <li class="nav-heading">Pages</li>
 

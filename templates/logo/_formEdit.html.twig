@@ -1,10 +1,10 @@
-{# <turbo-frame id="logo_{{ logo.id }}"> #}
-  {{ form_start(form) }}
-      {{ form_widget(form) }}
+<turbo-frame id="logo_{{ logo.id }}">
+  {{ form_start(formEdit, {action: path('app_logo_edit', {'id': logo.id}) }) }}
+      {{ form_widget(formEdit) }}
       <div class="row mb-3">
         <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
           <button class="btn btn-outline-primary bi bi-save"> {{ button_label|default('Enregistrer') }}</button>
         </div>
       </div>
-  {{ form_end(form) }}
-{# </turbo-frame> #}
+  {{ form_end(formEdit) }}
+</turbo-frame>

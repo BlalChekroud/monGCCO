@@ -1,0 +1,77 @@
+{% macro csv_import_form(form, submit_action) %}
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Importer un fichier CSV</h5>
+        <div>
+            <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="Imprimer"></button>
+            <a href="#" class="btn btn-outline-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
+        </div>
+    </div>
+    <div class="card-body">
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
+            {{ form_row(form.csvFile, {
+                'attr': {'onchange': 'document.getElementById("csvForm").submit();'}
+            }) }}
+        {{ form_end(form) }}
+        <small class="form-text text-muted">Assurez-vous que votre fichier contient les colonnes nécessaires.</small>
+    </div>
+{% endmacro %}
+
+{% macro csv_modal(headers, rows, csvData, submit_action, requiredHeaders) %}
+    <!-- Modal -->
+    <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable"> <!-- Changement ici pour agrandir la fenêtre -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="csvPreviewModalLabel">Aperçu du fichier CSV</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <b>NB: </b><span>Les colonnes </span>
+                        {% for header in requiredHeaders %}
+                            <code>{{ header }}, </code>
+                        {% endfor %}
+                        <span>sont obligatoires.</span>
+                    </p>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for header in headers %}
+                                    <th>
+                                        {{ header }} 
+                                        {% if header in requiredHeaders %}
+                                            <span class="text-danger">*</span> <!-- Indique que c'est obligatoire -->
+                                        {% endif %}
+                                    </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                <tr>
+                                    {% for cell in row %}
+                                        <td>{{ cell }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <form method="post" action="{{ path(submit_action) }}">
+                        <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
+                        <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
+                        <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
+            myModal.show();
+        });
+    </script>
+{% endmacro %}

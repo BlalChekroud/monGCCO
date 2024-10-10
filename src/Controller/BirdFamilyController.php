@@ -3,15 +3,8 @@
 namespace App\Controller;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\String\Slugger\SluggerInterface;
-
 use App\Form\ImportCsvType;
-use App\Service\FileUploader;
-
-use Monolog\DateTimeImmutable;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Form\BirdFamilyType;
 use App\Entity\BirdFamily;
@@ -22,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/bird/family')]
+#[Route('/user/bird/family')]
 class BirdFamilyController extends AbstractController
 {
     #[Route('/', name: 'app_bird_family_index', methods: ['GET', 'POST'])]
@@ -30,23 +23,140 @@ class BirdFamilyController extends AbstractController
     {
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $csvFile */
             $csvFile = $form->get('csvFile')->getData();
-
-            if ($csvFile && $this->IsGranted('ROLE_IMPORT')) {
-                try {
-                    $this->processCsv($csvFile, $entityManager);
-                    $this->addFlash('success', 'Les données ont été importées avec succès.');
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Une erreur s\'est produite lors de l\'importation du fichier CSV : ' . $e->getMessage());
+    
+            if ($csvFile) {
+                if (!$this->isGranted('ROLE_IMPORT')) {
+                    throw $this->createNotFoundException('Vous n\'avez pas l\'autorisation d\'importer des données.');
                 }
-
-                return $this->redirectToRoute('app_bird_family_index');
+    
+                $csvData = file_get_contents($csvFile->getPathname());
+                $rows = array_map(function($row) {
+                    return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
+                }, explode("\n", $csvData));
+    
+                $headers = array_shift($rows); // Enlever la première ligne qui contient les en-têtes
+    
+                return $this->render('bird_family/index.html.twig', [
+                    'bird_families' => $birdFamilyRepository->findAll(),
+                    'form' => $form->createView(),
+                    'headers' => $headers,
+                    'rows' => $rows,
+                    'csvData' => $csvData,
+                ]);
             }
         }
+    
+        if ($request->isMethod('POST') && $request->request->get('action') === 'import') {
+            $csvData = $request->request->get('csvData');
+            $rows = array_map(function($row) {
+                return str_getcsv($row, ';');
+            }, explode("\n", $csvData));
+    
+            $headers = array_shift($rows);
+    
+            $importedCount = 0; // Compteur de familles d'oiseaux importées
+            $invalidCount = 0; // Compteur de lignes non importées
+            $processedFamilies = []; // Tableau pour suivre les familles déjà traitées
+    
+            foreach ($rows as $row) {
+                // Ignorez les lignes vides, mais ne comptez pas la dernière ligne vide
+                if (empty(array_filter($row))) {
+                    continue; // Ignorez cette ligne sans l'incrémenter à invalidCount
+                }
+    
+                // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
+                if (count($row) !== count($headers)) {
+                    // $this->addFlash('error', 'Ligne incorrecte : ' . implode(', ', $row));
+                    $invalidCount++; // Compter comme ligne non valide
+                    continue; // Ignorez cette ligne
+                }
+    
+                $data = array_combine($headers, $row);
+    
+                if ($data === false) {
+                    $invalidCount++; // Compter comme ligne non valide
+                    continue; // Ignorez les lignes où array_combine échoue
+                }
+    
+                // Fetch or create the Birdfamily entity
+                $familyName = $data['Family name'] ?? null;
+                $subFamily = $data['Subfamily'] ?? null;
+                $family = $data['Family'] ?? null;
+                $ordre = $data['Ordre'] ?? null;
+                $tribe = $data['Tribe'] ?? null;
+    
+                
 
+                if (empty($familyName) || empty($family) || empty($ordre)) {
+                    $invalidCount++; // Compter comme ligne non valide
+                    continue; // Ignorez si les champs nécessaires sont vides
+                }
+    
+                // Vérifier si la famille a déjà été traitée dans ce fichier
+                if (isset($processedFamilies[$familyName])) {
+                    $invalidCount++; // Compter comme ligne non valide
+                    continue; // Si oui, ignorer cette entrée
+                }
+    
+                // Vérifier si la famille existe déjà dans la base de données
+                $criteria = [];
+                // Ajoutez uniquement les critères non vides
+                if (!empty($familyName)) {
+                    $criteria['familyName'] = $familyName;
+                }
+                if (!empty($family)) {
+                    $criteria['family'] = $family;
+                }
+                if (!empty($ordre)) {
+                    $criteria['ordre'] = $ordre;
+                }
+                if (!empty($subFamily)) {
+                    $criteria['subFamily'] = $subFamily;
+                }
+                if (!empty($tribe)) {
+                    $criteria['tribe'] = $tribe;
+                }
+
+                // Effectuez la recherche seulement si au moins un critère est présent
+                if (!empty($criteria)) {
+                    $existingFamily = $birdFamilyRepository->findOneBy($criteria);
+                    if ($existingFamily) {
+                        $processedFamilies[$familyName] = true;
+                        $invalidCount++; // Compter comme ligne non valide
+                        continue; // Si oui, ignorer cette entrée
+                    }
+                }
+
+                
+                // Créez et persistez une nouvelle famille d'oiseaux
+                $birdFamily = new BirdFamily();
+                $birdFamily->setOrdre($ordre);
+                $birdFamily->setFamilyName($familyName);
+                $birdFamily->setFamily(family: $family);
+                $birdFamily->setSubFamily($data['Subfamily'] ?? null);
+                $birdFamily->setTribe($data['Tribe'] ?? null);
+                $birdFamily->setCreatedAt(new \DateTimeImmutable());
+    
+                $entityManager->persist($birdFamily);
+                $importedCount++; // Incrémentez le compteur
+    
+                // Marquer cette famille comme traitée
+                $processedFamilies[$familyName] = true;
+                
+            }
+    
+            $entityManager->flush();
+    
+            // Affichez le nombre de lignes importées et non importées
+            $this->addFlash('success', "$importedCount familles d'oiseaux ont été importées avec succès. $invalidCount lignes n'ont pas pu être importées.");
+    
+            return $this->redirectToRoute('app_bird_family_index');
+        }
+    
         return $this->render('bird_family/index.html.twig', [
             'bird_families' => $birdFamilyRepository->findAll(),
             'form' => $form->createView(),
@@ -63,7 +173,7 @@ class BirdFamilyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $birdFamily->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+            $birdFamily->setCreatedAt(new \DateTimeImmutable());
             $entityManager->persist($birdFamily);
             $entityManager->flush();
             $this->addFlash('success', "Famille d'oiseaux a bien été crée");
@@ -77,158 +187,6 @@ class BirdFamilyController extends AbstractController
         ]);
     }
 
-    #[Route('/import', name: 'app_bird_family_import', methods: ['POST'])]
-    public function import(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(ImportCsvType::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted()) {
-            if ($form->isValid()) {
-                $csvFile = $form->get('csvFile')->getData();
-                $extension = $csvFile->getClientOriginalExtension();
-
-                if (!in_array($extension, ['csv', 'txt'])) {
-                    $this->addFlash('error', 'Veuillez charger un fichier CSV ou TXT valide.');
-                    return $this->redirectToRoute('app_bird_family_import');
-                }
-
-                if ($csvFile) {
-                    try {
-                        $this->processCsv($csvFile, $entityManager);
-                        $this->addFlash('success', 'Les données ont été importées avec succès.');
-                        return $this->redirectToRoute('app_bird_family_index');
-                    } catch (\Exception $e) {
-                        $this->addFlash('error', 'Une erreur s\'est produite lors de l\'importation du fichier CSV : ' . $e->getMessage());
-                    }
-                }
-            } else {
-                $this->addFlash('error', 'Le fichier CSV contient des erreurs de validation.');
-            }
-        }
-
-        return $this->render('bird_family/import.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-    // public function import(Request $request, EntityManagerInterface $entityManager): Response
-    // {
-    //     $form = $this->createForm(ImportCsvType::class);
-    //     $form->handleRequest($request);
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         /** @var UploadedFile $csvFile */
-    //         $csvFile = $form->get('csvFile')->getData();
-
-    //         // Validate file extension
-    //         $extension = $csvFile->getClientOriginalExtension();
-    //         if (!in_array($extension, ['csv', 'txt'])) {
-    //             $this->addFlash('error', 'Veuillez charger un fichier CSV ou TXT valide.');
-    //             return $this->redirectToRoute('app_bird_family_import');
-    //         }
-
-    //         if ($csvFile) {
-    //             try {
-    //                 $this->processCsv($csvFile, $entityManager);
-    //                 $this->addFlash('success', 'Les données ont été importées avec succès.');
-
-    //                 return $this->redirectToRoute('app_bird_family_index');
-    //             } catch (\Exception $e) {
-    //                 $this->addFlash('error', 'Une erreur s\'est produite lors de l\'importation du fichier CSV : ' . $e->getMessage());
-    //             }
-    //         }
-    //     }
-
-    //     return $this->render('bird_family/import.html.twig', [
-    //         'form' => $form->createView(),
-    //     ]);
-    // }
-
-    private function processCsv(UploadedFile $csvFile, EntityManagerInterface $entityManager)
-    {
-        $csvData = file_get_contents($csvFile->getPathname());
-        $rows = array_map(function($row) {
-            return str_getcsv($row, ';');
-        }, explode("\n", $csvData));
-        
-        $headers = array_shift($rows);
-    
-        foreach ($rows as $row) {
-            if (count($row) !== count($headers)) {
-                continue; // Skip rows where the number of columns does not match the number of headers
-            }
-    
-            $data = array_combine($headers, $row);
-    
-            if ($data === false) {
-                continue; // Skip rows where array_combine fails
-            }
-    
-            // $birdFamily = new BirdFamily();
-            // $birdFamily->setOrdre($data['Ordre'] ?? null);
-            // $birdFamily->setFamilyName($data['Family name'] ?? null);
-            // $birdFamily->setFamily($data['Family'] ?? null);
-            // $birdFamily->setSubFamily($data['Subfamily'] ?? null);
-            // $birdFamily->setTribe($data['Tribe'] ?? null);
-            // $birdFamily->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-    
-            // $entityManager->persist($birdFamily);
-
-            // Fetch or create the Birdfamily entity
-            $familyName = $data['Family name'] ?? null;
-            $subFamily = $data['subfamily'] ?? null;
-            $family = $data['Family'] ?? null;
-            $ordre = $data['Ordre'] ?? null;
-            $tribe = $data['Tribe'] ?? null;
-    
-            if ($familyName && $family) {
-                $familyRepository = $entityManager->getRepository(BirdFamily::class);
-                $birdFamily = $familyRepository->findOneBy(['familyName' => $familyName, 'family' => $family]);
-    
-                if (!$birdFamily) {
-                    $birdFamily = new BirdFamily();
-                    $birdFamily->setOrdre($data['Ordre'] ?? null);
-                    $birdFamily->setFamilyName($data['Family name'] ?? null);
-                    $birdFamily->setFamily($data['Family'] ?? null);
-                    $birdFamily->setSubFamily($data['Subfamily'] ?? null);
-                    $birdFamily->setTribe($data['Tribe'] ?? null);
-                    $birdFamily->setCreatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-            
-                    $entityManager->persist($birdFamily);
-                }
-            }
-        }
-    
-        $entityManager->flush();
-    }
-    
-    #[Route('/preview', name: 'app_bird_family_preview', methods: ['POST'])]
-    public function preview(Request $request): Response
-    {
-        $form = $this->createForm(ImportCsvType::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $csvFile */
-            $csvFile = $form->get('csvFile')->getData();
-            if ($csvFile) {
-                $csvData = file_get_contents($csvFile->getPathname());
-                $rows = array_map(function($row) {
-                    return str_getcsv($row, ';');
-                }, explode("\n", $csvData));
-                
-                $headers = array_shift($rows);
-
-                return $this->render('bird_family/preview.html.twig', [
-                    'headers' => $headers,
-                    'rows' => $rows,
-                    'csvData' => $csvData, // Pass the raw CSV data to the template
-                ]);
-            }
-        }
-
-        return $this->redirectToRoute('app_bird_family_index');
-    }
 
     #[Route('/{id}', name: 'app_bird_family_show', methods: ['GET'])]
     public function show(BirdFamily $birdFamily): Response
@@ -246,7 +204,7 @@ class BirdFamilyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $birdFamily->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+            $birdFamily->setUpdatedAt(new \DateTimeImmutable());
             $entityManager->flush();
             $this->addFlash('success', 'La famille a bien été modifié');
 

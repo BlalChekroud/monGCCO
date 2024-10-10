@@ -1,0 +1,4 @@
+{% macro action_buttons(edit_path, delete_form, bird_family) %}
+        <a href="{{ path(edit_path, {'id': bird_family.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
+        {{ include(delete_form, {'id': bird_family.id}) }}
+{% endmacro %}

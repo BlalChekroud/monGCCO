@@ -492,7 +492,7 @@ h6.explanation {
   .card-header,
   .card-footer {
     border-color: #ebeef4;
-    background-color: #0004086e; /*#fff;*/
+    background-color: #fff; /*#0004086e; */
     color: #798eb3;
     padding: 15px;
   }

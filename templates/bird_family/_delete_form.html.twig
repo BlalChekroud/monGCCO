@@ -1,11 +1,11 @@
-{# {% if is_granted('ROLE_ADMIN') %}
-<form method="post" action="{{ path('app_bird_family_delete', {'id': bird_family.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bird_family.id) }}">
-    <button class="btn-action btn btn-outline-danger btn-sm bi bi-x-circle-fill mx-1"> Supprimer</button>
-</form>
-{% endif %} #}
+{% if is_granted('ROLE_DELETE') %}
+    <form method="post" action="{{ path('app_bird_family_delete', {'id': bird_family.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bird_family.id) }}">
+        <button class="btn btn-danger btn-sm bi bi-trash-fill mx-2" title="Supprimer la famille"></button>
+    </form>
+{% endif %}
 {# <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> #}
-{% if is_granted('ROLE_ADMIN') %}
+{# {% if is_granted('ROLE_DELETE') %}
 <form id="delete-form" method="post" action="{{ path('app_bird_family_delete', {'id': bird_family.id}) }}">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bird_family.id) }}">
     <button type="button" class="btn-action btn btn-outline-danger btn-sm bi bi-x-circle-fill mx-1" onclick="confirmDelete()"> Supprimer</button>
@@ -46,4 +46,4 @@
             }
         });
     }
-</script>
+</script> #}
