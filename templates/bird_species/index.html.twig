@@ -43,8 +43,8 @@
                             <td>{{ bird_specy.scientificName }}</td>
                             <td>{{ bird_specy.frenchName }}</td>
                             <td>
-                              {% if bird_specy.imageFilename %}
-                                  <img src="{{ vich_uploader_asset(bird_specy, 'imageFile') }}" alt="{{ bird_specy.frenchName }}" class="imgIndex rounded mx-auto d-block"/>
+                              {% if bird_specy.image %}
+                                  <img src="{{ vich_uploader_asset(bird_specy.image, 'imageFile') }}" alt="{{ bird_specy.frenchName }}" class="imgIndex rounded mx-auto d-block"/>
                               {% else %}
                                   <p>Aucune image disponible</p>
                               {% endif %}
@@ -52,9 +52,9 @@
                             <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>
                               <div class="d-flex justify-content-end">
-                                  <a href="{{ path('app_bird_species_show', {'id': bird_specy.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text"> Détail</a>
-                                  <a href="{{ path('app_bird_species_edit', {'id': bird_specy.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
-                                  {{ include('bird_species/_delete_form.html.twig') }}
+                                {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                {{ macros.action_buttons('app_bird_species_show', 'app_bird_species_edit', 'bird_species/_delete_form.html.twig', bird_specy, app.request.attributes.get('_route')) }}
+                                {{ include('bird_species/_delete_form.html.twig') }}
                               </div>
                             </td>
                         </tr>
@@ -68,8 +68,8 @@
 
               <div class="row">
                 <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                  <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer nouvelle espèce</a>
-                  <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer nouvelle famille</a>
+                  <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une espèce</a>
+                  <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une famille</a>
                 </div>
               </div>
               <!-- End Table with stripped rows -->
@@ -82,30 +82,20 @@
       </div>
     </section>
         
-    <div class="alert border-light alert-dismissible fade show" role="alert">
-      <!-- Card with header and footer -->
-      <div class="card">
-        <div class="card-header">
-          {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-            {{ form_row(form.csvFile) }}
-            <button type="submit" formaction="{{ path('app_bird_species_preview') }}" class="btn btn-outline-primary btn-sm bi bi-eye"> Aperçu CSV</button>
-            <button type="submit" formaction="{{ path('app_bird_species_import') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
-            {% for error in form.csvFile.vars.errors %}
-              <div class="alert alert-danger">{{ error.message }}</div>
-            {% endfor %}
-              
-            {% for flash_error in app.flashes('error') %}
-              <div class="alert alert-danger">{{ flash_error }}</div>
-            {% endfor %}
-          {{ form_end(form) }}
-        </div>
-        <div class="card-footer">
-          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      </div><!-- End Card with header and footer -->
-    </div>
+    {% import 'macros/form_macros.html.twig' as form_macros %}
 
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    {{ form_macros.csv_import_form(form, 'app_bird_species_index') }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if headers is defined and rows is defined %}
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_bird_species_index', ['Scientific name', 'Family name', 'Family', 'Ordre']) }}
+    {% endif %}
 </main><!-- End #main -->
 {% endblock %}

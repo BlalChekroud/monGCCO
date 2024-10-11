@@ -300,12 +300,16 @@
 
             <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
               {% if app.user %}
-                <img src="{{ vich_uploader_asset(app.user, 'imageFile') }}" alt="Profile" class="rounded-circle">
-                <span class="d-none d-md-block dropdown-toggle ps-2">
-                  {{ app.user.getName() }}
-                </span>
+                  {% if app.user.image %}
+                      <img src="{{ vich_uploader_asset(app.user.image, 'imageFile') }}" alt="Profile" class="rounded-circle mx-auto d-block">
+                  {% else %}
+                      <small>Aucune image disponible</small>
+                  {% endif %}
+                  <span class="d-none d-md-block dropdown-toggle ps-2">
+                      {{ app.user.getName() }}
+                  </span>
               {% else %}
-                <a href="{{ path('app_login') }}">Se connecter</a>
+                  <a href="{{ path('app_login') }}">Se connecter</a>
               {% endif %}
             </a><!-- End Profile Iamge Icon -->
 
@@ -579,12 +583,12 @@
           </ul>
         </li><!-- End users Nav -->
 
-        {% if is_granted('ROLE_SUPER_ADMIN') %}
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#parameters-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-gear"></i><span>Paramètres</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul id="parameters-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          {# {% if is_granted('ROLE_SUPER_ADMIN') %} #}
             <li>
               <a href="{{ path('app_logo_index') }}">
                 <i class="bi bi-circle"></i><span>Consulter le logo</span>
@@ -600,9 +604,9 @@
                 <i class="bi bi-circle"></i><span>Consultation des images</span>
               </a>
             </li>
+          {# {% endif %} #}
           </ul>
         </li><!-- End parameters Nav -->
-        {% endif %}
 
         <li class="nav-heading">Pages</li>
 

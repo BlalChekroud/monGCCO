@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin/logo')]
+#[Route('/super-admin/logo')]
 class LogoController extends AbstractController
 {
     #[Route('/', name: 'app_logo_index', methods: ['GET'])]

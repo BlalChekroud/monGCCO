@@ -47,20 +47,25 @@ class BirdSpeciesType extends AbstractType
                 'required' => false,
                 'empty_data' => '',
             ])
-            ->add('imageFile', FileType::class, [
-                'label' => 'Image (JPG ou PNG)',
-                'mapped' => false,
-                'required' => false,
-                'constraints' => [
-                    new File([
-                        'maxSize' => '1024k',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/png',
-                        ],
-                        'mimeTypesMessage' => "Veuillez télécharger un fichier d'image valide (JPEG ou PNG)",
-                    ])
-                ],
+            // ->add('imageFile', FileType::class, [
+            //     'label' => 'Image (JPG ou PNG)',
+            //     'mapped' => false,
+            //     'required' => false,
+            //     'constraints' => [
+            //         new File([
+            //             'maxSize' => '1024k',
+            //             'mimeTypes' => [
+            //                 'image/jpeg',
+            //                 'image/png',
+            //             ],
+            //             'mimeTypesMessage' => "Veuillez télécharger un fichier d'image valide (JPEG ou PNG)",
+            //         ])
+            //     ],
+            // ])
+            ->add('image', ImageType::class, [
+                'label' => 'Inserer une image<span class="requiredField">*</span>',
+                'label_html' => true,
+                'required' => false
             ])
             ->add('authority',TextType::class, [
                 'required' => false,

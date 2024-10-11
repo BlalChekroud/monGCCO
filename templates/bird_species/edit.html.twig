@@ -31,9 +31,15 @@
                     </div>
                     <div class="card-footer">
                         <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justify-content-end">
-                                <a href="{{ path('app_bird_species_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
-                                {{ include('bird_species/_delete_form.html.twig') }}
+                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justify-content-betzeen">
+                                <div>
+                                    <a href="{{ path('app_bird_species_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des espèce d'oiseaux">Retour</a>
+                                </div>
+                                <div>
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_bird_species_show', 'app_bird_species_edit', 'bird_species/_delete_form.html.twig', bird_specy, app.request.attributes.get('_route')) }}
+                                    {{ include('bird_species/_delete_form.html.twig') }}
+                                </div>
                             </div>
                         </div>
                     </div>

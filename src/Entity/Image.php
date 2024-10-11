@@ -28,9 +28,6 @@ class Image
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\OneToOne(inversedBy: 'image', cascade: ['persist', 'remove'])]
-    private ?User $userImage = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -84,16 +81,5 @@ class Image
         return $this;
     }
 
-    public function getUserImage(): ?User
-    {
-        return $this->userImage;
-    }
-
-    public function setUserImage(?User $userImage): static
-    {
-        $this->userImage = $userImage;
-
-        return $this;
-    }
 
 }

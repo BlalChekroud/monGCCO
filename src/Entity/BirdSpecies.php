@@ -30,12 +30,6 @@ class BirdSpecies
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $wispeciescode = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $imageFilename = null;
-
-    #[Vich\UploadableField(mapping: 'bird_Specy', fileNameProperty: 'imageFilename')]
-    private ?File $imageFile = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $authority = null;
 
@@ -93,6 +87,9 @@ class BirdSpecies
     #[ORM\OneToMany(targetEntity: BirdSpeciesCount::class, mappedBy: 'birdSpecies')]
     private Collection $birdSpeciesCounts;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Image $image = null;
+
     public function __construct()
     {
         $this->collectedData = new ArrayCollection();
@@ -138,30 +135,6 @@ class BirdSpecies
         $this->wispeciescode = $wispeciescode;
 
         return $this;
-    }
-
-    public function setImageFile(?File $imageFile = null): void
-    {
-        $this->imageFile = $imageFile;
-
-        if (null !== $imageFile) {
-            $this->updatedAt = new \DateTimeImmutable();
-        }
-    }
-
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
-    }
-
-    public function setImageFilename(?string $imageFilename): void
-    {
-        $this->imageFilename = $imageFilename;
-    }
-
-    public function getImageFilename(): ?string
-    {
-        return $this->imageFilename;
     }
 
     public function getAuthority(): ?string
@@ -304,10 +277,10 @@ class BirdSpecies
         return $this->collectedData;
     }
 
-    public function getImageUrl(): ?string
-    {
-        return $this->imageFilename ? '/uploads/bird_images/' . $this->imageFilename : null;
-    }
+    // public function getImageUrl(): ?string
+    // {
+    //     return $this->imageFilename ? '/uploads/bird_images/' . $this->imageFilename : null;
+    // }
 
 
     public function addCollectedData(CollectedData $collectedData): static
@@ -398,6 +371,18 @@ class BirdSpecies
     public function __toString()
     {
         return $this->getScientificName() ?: 'Unknown Specy';
+    }
+
+    public function getImage(): ?Image
+    {
+        return $this->image;
+    }
+
+    public function setImage(?Image $image): static
+    {
+        $this->image = $image;
+
+        return $this;
     }
 
 }

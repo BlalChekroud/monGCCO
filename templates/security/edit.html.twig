@@ -22,7 +22,7 @@
             <div class="card">
               <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
                 {% if app.user %}
-                  <img src="{{ vich_uploader_asset(user, 'imageFile') }}" alt="Profile" class="imageProfile rounded-circle">
+                  <img src="{{ vich_uploader_asset(user.image, 'imageFile') }}" alt="Profile" class="imageProfile rounded-circle">
                   <h2>{{ user.getName() }} {{ user.getLastName() }}</h2>
                   <h3>{{ user.getRoles()|join(', ') }}</h3>
                   <div class="social-links mt-2">
@@ -86,26 +86,12 @@
                     <div class="row mb-3">
                       <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Image de Profil</label>
                       <div class="col-md-8 col-lg-9">
-                        {% if user.imageFilename %} 
-                            {# <img src="{{ vich_uploader_asset(user, 'imageFile') }}" alt="Profile"> #}
-                            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
-                        {% else %}
-                            <p>Aucune image disponible</p>
-                            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+                        
+                        {% if not user.image %}
+                          <p>Aucune image disponible</p>
                         {% endif %}
-                      {# {{ form_start(formImage) }}
-                        {{ form_row(formImage.imageFile) }}
-                        <button type="submit" class="btn btn-primary">Enregistrer l'image</button>
-                      {{ form_end(formImage) }} #}
-                        {# <div class="pt-2"> #}
-                          {# <div class="input-group">
-                            <span class="input-group-text"><i class="text-primary bi bi-upload"></i></span>
-                            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
-                          </div> #}
-
-                          {# {{ include('security/delete_image.html.twig') }} #}
-                          {# <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a> #}
-                        {# </div> #}
+                              
+                        {{ form_widget(form.image.imageFile, {'attr': {'class': 'form-control'}}) }}
                       </div>
                     </div>
 

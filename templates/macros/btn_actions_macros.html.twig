@@ -1,4 +1,9 @@
-{% macro action_buttons(edit_path, delete_form, bird_family) %}
-        <a href="{{ path(edit_path, {'id': bird_family.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
-        {{ include(delete_form, {'id': bird_family.id}) }}
+{% macro action_buttons(show_path, edit_path, delete_form, entit, current_route) %}
+        {% if current_route != show_path %}
+                <a href="{{ path(show_path, {'id': entit.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
+        {% endif %}
+        {% if current_route != edit_path %}
+                <a href="{{ path(edit_path, {'id': entit.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
+        {% endif %}
+        {# {{ include(delete_form, {'id': entit.id}) }} #}
 {% endmacro %}

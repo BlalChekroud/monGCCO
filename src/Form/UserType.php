@@ -2,23 +2,10 @@
 
 namespace App\Form;
 
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use App\Entity\Image;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormError;
-
-use Vich\UploaderBundle\Form\Type\VichImageType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Validator\Constraints\IsFalse;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -39,6 +26,8 @@ class UserType extends AbstractType
                     'ROLE_EDIT' => 'ROLE_EDIT',
                     'ROLE_CREAT' => 'ROLE_CREAT',
                     'ROLE_DELETE' => 'ROLE_DELETE',
+                    'ROLE_IMPORT' => 'ROLE_IMPORT',
+                    'ROLE_SUPER_CREAT' => 'ROLE_SUPER_CREAT',
                     'Collecteur' => 'ROLE_COLLECTOR',
                     'Chef d\'équipe' => 'ROLE_TEAMLEADER',
                     'Administrateur' => 'ROLE_ADMIN',
@@ -48,47 +37,12 @@ class UserType extends AbstractType
                 'multiple' => true,
                 'label' => 'Rôles',
             ])
-            // ->add('image', EntityType::class, [
-            //     'class' => Image::class,
-            //     'choice_label' => 'imageFilename',
-            //     'label' => 'Image de profil',
-            //     'required' => false,
-            // ])
-            // ->add('imageFile', VichImageType::class, [
-            //     'label' => 'Image (JPG ou PNG)',
-            //     'required' => false,
-            //     'allow_delete' => true,
-            //     'download_uri' => true,
-            //     'imagine_pattern' => 'squared_thumbnail_small',
-            // ])
-            
-
-            // ->add('imageFile', FileType::class, [
-            //     'required' => false,
-            //     'label' => 'Image de profil (fichiers PNG ou JPG)',
-            // ])
-
-            ->add('imageFile', VichImageType::class, [
-                'label' => 'Image (JPG ou PNG)',
-                'label_attr' => [
-                    'class' => 'form-label mt-4'
-                ],
-                'mapped' => false,
+            ->add('image', ImageType::class, [
+                'label' => 'Inserer une image<span class="requiredField">*</span>',
+                'label_html' => true,
                 'required' => false,
-                'download_uri' => false,
-                'delete_label' => 'Supprimer',
-                'download_label' => 'Télécharger',
-                'constraints' => [
-                    new File([
-                        'maxSize' => '1024k',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/png',
-                        ],
-                        'mimeTypesMessage' => "Veuillez télécharger un fichier d'image valide (JPEG ou PNG)",
-                    ])
-                ],
             ])
+
             // ->add('email', EmailType::class, [
             //     'attr' => [
             //         'class' => 'form-control',
@@ -163,20 +117,6 @@ class UserType extends AbstractType
                 ],
             ])
         ;
-            // // Ajouter un écouteur d'événement pour la validation après la soumission du formulaire
-            // $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-            //     $form = $event->getForm();
-            //     $data = $form->getData();
-
-            //     // Obtiens les données des champs
-            //     $plainPassword = $form->get('plainPassword')->getData();
-            //     $passwordConfirm = $form->get('passwordConfirm')->getData();
-
-            //     // Vérifie si les mots de passe correspondent
-            //     if ($plainPassword !== $passwordConfirm) {
-            //         $form->get('passwordConfirm')->addError(new FormError('Les mots de passe ne correspondent pas.'));
-            //     }
-            // });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

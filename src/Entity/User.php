@@ -4,10 +4,8 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\DBAL\Types\Types;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -61,15 +59,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
-// 
-    // #[ORM\OneToOne(mappedBy: 'userImage', cascade: ['persist', 'remove'])]
-    // private ?Image $image = null;
-// 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $imageFilename = null;
-
-    #[Vich\UploadableField(mapping: 'userImage', fileNameProperty: 'imageFilename')]
-    private ?File $imageFile = null;
 
     /**
      * @var Collection<int, AgentsGroup>
@@ -107,6 +96,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: AgentsGroup::class, mappedBy: 'createdBy')]
     private Collection $groupCreatedBy;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Image $image = null;
+
     public function __construct()
     {
         $this->agentsGroups = new ArrayCollection();
@@ -117,30 +109,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->groupCreatedBy = new ArrayCollection();
     }
 
-    public function setImageFile(?File $imageFile = null): void
-    {
-        $this->imageFile = $imageFile;
-
-        if (null !== $imageFile) {
-        // if ($imageFile) {
-            $this->updatedAt = new \DateTimeImmutable();
-        }
-    }
-
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
-    }
-
-    public function setImageFilename(?string $imageFilename): void
-    {
-        $this->imageFilename = $imageFilename;
-    }
-
-    public function getImageFilename(): ?string
-    {
-        return $this->imageFilename;
-    }
 
     public function getId(): ?int
     {
@@ -278,28 +246,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function getImage(): ?Image
-    {
-        return $this->image;
-    }
-
-    public function setImage(?Image $image): static
-    {
-        // unset the owning side of the relation if necessary
-        if ($image === null && $this->image !== null) {
-            $this->image->setUserImage(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($image !== null && $image->getUserImage() !== $this) {
-            $image->setUserImage($this);
-        }
-
-        $this->image = $image;
 
         return $this;
     }
@@ -485,4 +431,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getImage(): ?Image
+    {
+        return $this->image;
+    }
+
+    public function setImage(?Image $image): static
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
 }

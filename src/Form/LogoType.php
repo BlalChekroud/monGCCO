@@ -2,9 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Image;
 use App\Entity\Logo;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;

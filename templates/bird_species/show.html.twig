@@ -21,8 +21,8 @@
             <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
               <div id="printableArea">
                 <div class="card">
-                    {% if bird_specy.imageFilename %}
-                        <img src="{{ vich_uploader_asset(bird_specy, 'imageFile') }}" alt="{{ bird_specy.frenchName }}" class="imgShow rounded mx-auto d-block">
+                    {% if bird_specy.image %}
+                        <img src="{{ vich_uploader_asset(bird_specy.image, 'imageFile') }}" alt="{{ bird_specy.frenchName }}" class="imgShow rounded mx-auto d-block">
                     {% else %}
                         <p>Aucune image disponible</p>
                     {% endif %}
@@ -123,11 +123,18 @@
                     </div>
                     <div class="card-footer">
                         <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justify-content-end">
-                                <a href="{{ path('app_bird_species_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-1"> retour vers la liste</a>
-                                <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Créer nouvelle espèce</a>
-                                <a href="{{ path('app_bird_species_edit', {'id': bird_specy.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
-                                {{ include('bird_species/_delete_form.html.twig') }}
+                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justify-content-between">
+                                <div>
+                                    <a href="{{ path('app_bird_species_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des espèce d'oiseaux">Retour</a>
+                                    <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Créer une espèce</a>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_bird_species_show', 'app_bird_species_edit', 'bird_species/_delete_form.html.twig', bird_specy, app.request.attributes.get('_route')) }}
+                                    {{ include('bird_species/_delete_form.html.twig') }}
+                                    <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="Imprimer"></button>
+                                    <a href="#" class="btn btn-outline-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -137,18 +144,6 @@
             </div>
         </div>
     </section>
-        
-    <div class="alert border-light alert-dismissible fade show" role="alert">
-      <!-- Card with header and footer -->
-      <div class="card">
-        <div class="card-footer">
-          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      </div><!-- End Card with header and footer -->
-    </div>
-
 </main>
 
 {% endblock %}

@@ -68,42 +68,37 @@ class SecurityController extends AbstractController
             $this->addFlash('info', "Vous n'avez pas le droit de modifier ce compte.");
             return $this->redirectToRoute('home');
         }
-    
-        // Récupérer l'image associée à l'utilisateur ou en créer une nouvelle
-        // $image = $user->getImage() ?: new Image();
 
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
     
         $formPassword = $this->createForm(EditPasswordType::class, $user);
         $formPassword->handleRequest($request);
-
-        // $formImage = $this->createForm(ImageType::class, $image);
-        // $formImage->handleRequest($request);
     
         // Traitement du formulaire d'édition du profil
         if ($form->isSubmitted() && $form->isValid()) {
             if ($hasher->isPasswordValid($user, $form->get('password')->getData())) {
-                
-                // /** @var UploadedFile $imageFile */
-                // $imageFile = $formImage->get('imageFile')->getData();
-                // if ($imageFile) {
-                //     $image->setImageFile($imageFile);
-                //     $image->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-                //     $entityManager->persist($image);
-                //     $user->setImage($image); // Associer l'image à l'utilisateur
-                // }
-
-                $imageFile = $form->get('imageFile')->getData();
-
-                if ($imageFile) {
-                    $user->setImageFile($imageFile);
-                }
     
-                $user->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
-                
-                // $entityManager->persist($user);
+                $imageFile = $form->get('image')['imageFile']->getData(); // Get the uploaded image
+                // Handle image upload only if a new image is provided
+                if ($imageFile) {
+                    // If there's already an image, we need to update it
+                    if ($user->getImage()) {
+                        $image = $user->getImage();
+                        $image->setCreatedAt(new \DateTimeImmutable());
+                        $image->setImageFile($imageFile); // Update with the new file
+                    } else {
+                        // If there's no image yet, create a new Image entity
+                        $image = new Image();
+                        $image->setImageFile($imageFile);
+                        $image->setCreatedAt(new \DateTimeImmutable());
+                        $entityManager->persist($image);
+                        $user->setImage($image); // Set the new image to the user
+                    }
+                }
 
+                $user->setUpdatedAt(new \DateTimeImmutable());
+                
                 $entityManager->flush();
                 $this->addFlash('success', 'Les informations de votre compte ont été bien modifiées');
                 return $this->redirectToRoute('app_profile_edit', ['id' => $user->getId()], Response::HTTP_SEE_OTHER);
@@ -118,7 +113,7 @@ class SecurityController extends AbstractController
             $newPassword = $formPassword->get('plainPassword')->getData();
     
             if ($hasher->isPasswordValid($user, $currentPassword)) {
-                $user->setUpdatedAt(DateTimeImmutable::createFromMutable(new DateTime()));
+                $user->setUpdatedAt(new \DateTimeImmutable());
                 $user->setPassword($hasher->hashPassword($user, $newPassword));
                 $entityManager->flush();
                 $this->addFlash('success', 'Le mot de passe a été bien modifié.');
@@ -132,7 +127,6 @@ class SecurityController extends AbstractController
             'user' => $user,
             'form' => $form->createView(),
             'formPassword' => $formPassword->createView(),
-            // 'formImage' => $formImage->createView(),
         ]);
     }
 
