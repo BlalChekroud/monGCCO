@@ -277,10 +277,10 @@ class BirdSpecies
         return $this->collectedData;
     }
 
-    // public function getImageUrl(): ?string
-    // {
-    //     return $this->imageFilename ? '/uploads/bird_images/' . $this->imageFilename : null;
-    // }
+    public function getImageUrl(): ?string
+    {
+        return $this->imageFilename ? '/uploads/bird_images/' . $this->imageFilename : null;
+    }
 
 
     public function addCollectedData(CollectedData $collectedData): static
