@@ -27,13 +27,13 @@
             <div class="col-xxl-4 col-md-6">
               <div class="card info-card sales-card">
                 <div class="card-body">
-                  <h5 class="card-title">Total d'oiseaux observés</h5>
+                  <h5 class="card-title">Total d'espèces uniques observées</h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="ri-twitter-fill" style="color: #2eca6a;"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>{{ totalBirds }}</h6>
+                      <h6>{{ totalUniqueSpeciesCount }}</h6>
                     </div>
                   </div>
                 </div>
@@ -41,7 +41,7 @@
             </div><!-- End Total Birds Card -->
 
             <!-- Total Unique Species Card -->
-            <div class="col-xxl-4 col-md-6">
+            {# <div class="col-xxl-4 col-md-6">
               <div class="card info-card revenue-card">
                 <div class="card-body">
                   <h5 class="card-title">Total d'espèces uniques observées</h5>
@@ -55,10 +55,10 @@
                   </div>
                 </div>
               </div>
-            </div><!-- End Total Unique Species Card -->
+            </div><!-- End Total Unique Species Card --> #}
 
             <!-- Total Agents Card -->
-            <div class="col-xxl-4 col-md-6">
+            {# <div class="col-xxl-4 col-md-6">
               <div class="card info-card customers-card">
                 <div class="card-body">
                   <h5 class="card-title">Total d'agents</h5>
@@ -72,7 +72,71 @@
                   </div>
                 </div>
               </div>
-            </div><!-- End Total Agents Card -->
+            </div><!-- End Total Agents Card --> #}
+
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{ recentCampaign.campaignName }} <span>/ Aujourd'hui</span></h5>
+                  
+                  <!-- Column Chart -->
+                  <div id="columnChart"></div>
+
+                    <script>
+                      document.addEventListener("DOMContentLoaded", () => {
+                        new ApexCharts(document.querySelector("#columnChart"), {
+                          series: [{
+                            name: 'Total des Oiseaux Comptés',
+                            data: {{ totalCountsSite|json_encode|raw }},
+                          }, {
+                            name: 'Total d\'espèces d\'oiseaux uniques observées',
+                            data: {{ totalUniqueSpecies|json_encode|raw }}
+                          }
+                          ],
+                          chart: {
+                            type: 'bar',
+                            height: 350
+                          },
+                          plotOptions: {
+                            bar: {
+                              horizontal: false,
+                              columnWidth: '55%',
+                              endingShape: 'rounded'
+                            },
+                          },
+                          dataLabels: {
+                            enabled: false
+                          },
+                          stroke: {
+                            show: true,
+                            width: 2,
+                            colors: ['transparent']
+                          },
+                          xaxis: {
+                            categories: {{ siteNames|json_encode|raw }},
+                          },
+                          yaxis: {
+                            title: {
+                              text: 'Total des oiseaux comptés'
+                            }
+                          },
+                          fill: {
+                            opacity: 1
+                          },
+                          tooltip: {
+                            y: {
+                              formatter: function(val) {
+                                return val + " oiseaux"
+                              }
+                            }
+                          }
+                        }).render();
+                      });
+                    </script>
+                    <!-- End Column Chart -->
+                <div>
+              <div>
+            <div>
 
             <!-- Reports -->
             <div class="col-12">
@@ -92,10 +156,12 @@
                         }, {
                           name: 'Total d\'espèces d\'oiseaux uniques observées',
                           data: {{ totalUniqueSpecies|json_encode|raw }}
-                        }, {
+                        }, 
+                        {# {
                           name: 'Total d\'agents',
                           data: {{ totalAgents|json_encode|raw }}
-                        }, {
+                        },  #}
+                        {
                           name: 'Total de collectes',
                           data: {{ totalCollects|json_encode|raw }}
                         }],
@@ -105,7 +171,7 @@
                           toolbar: { show: false },
                         },
                         markers: { size: 4 },
-                        colors: ['#4154f1', '#0dcaf0', '#2eca6a', '#ffc107'],
+                        colors: ['#4154f1', '#0dcaf0', '#ffc107'],
                         fill: {
                           type: "gradient",
                           gradient: {
@@ -157,15 +223,15 @@
                           <td>{{ campaign.siteAgentsGroups|length }}</td>
                           <td>
                             {% set status_classes = {
-                              'En attente': 'info',
-                              'En cours': 'primary',
-                              'Terminé': 'success',
-                              'Clôturé': 'light',
-                              'Annulé': 'dark',
-                              'Erreur': 'warning',
-                              'Suspens': 'secondary'
+                                1: 'primary',   
+                                2: 'info',      
+                                3: 'success',   
+                                4: 'light', 
+                                5: 'warning',    
+                                6: 'secondary',   
+                                7: 'dark'       
                             } %}
-                            <div class="badge bg-{{ status_classes[campaign.campaignStatus] ?? 'secondary' }}">
+                            <div class="badge bg-{{ status_classes[campaign.campaignStatus.id] ?? 'secondary' }}">
                               {{ campaign.campaignStatus }}
                             </div>
                           </td>
@@ -191,7 +257,7 @@
 
               <script>
                 document.addEventListener("DOMContentLoaded", () => {
-                  const siteData = {{ totalCountsPerSite|json_encode|raw }};
+                  {# const siteData = {{ totalCountsPerSite|json_encode|raw }}; #}
                   const siteNames = Object.keys(siteData);
                   const siteCounts = Object.values(siteData);
 

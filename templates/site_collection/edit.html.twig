@@ -26,14 +26,18 @@
                         <h5 class="card-title">Modifier</h5>
                         {{ include('site_collection/_form.html.twig', {'button_label': ' Mise à jour'}) }}
                     </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justify-content-end">
-                                <a href="{{ path('app_site_collection_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left"> retour vers la liste</a>
-                                {{ include('site_collection/_delete_form.html.twig') }}
-                            </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <div>
+                            <a href="{{ path('app_site_collection_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des site">Retour</a>
+                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Créer un site de collecte</a>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                            {{ macros.action_buttons('app_site_collection_new','app_site_collection_show', 'app_site_collection_edit', 'site_collection/_delete_form.html.twig', site_collection, app.request.attributes.get('_route'), false) }}
+                            {{ include('site_collection/_delete_form.html.twig') }}
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

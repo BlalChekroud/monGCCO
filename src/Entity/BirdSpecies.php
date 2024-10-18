@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\DBAL\Types\Types;
@@ -89,6 +88,9 @@ class BirdSpecies
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Image $image = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $englishName = null;
 
     public function __construct()
     {
@@ -381,6 +383,18 @@ class BirdSpecies
     public function setImage(?Image $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getEnglishName(): ?string
+    {
+        return $this->englishName;
+    }
+
+    public function setEnglishName(?string $englishName): static
+    {
+        $this->englishName = $englishName;
 
         return $this;
     }

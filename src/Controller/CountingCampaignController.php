@@ -3,9 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\EnvironmentalConditions;
+use App\Repository\CampaignStatusRepository;
 use App\Security\Voter\CountingCampaignVoter;
+use App\Service\CampaignStatusService;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Monolog\DateTimeImmutable;
 use App\Entity\CountingCampaign;
 use App\Form\CountingCampaignType;
 use App\Repository\CountingCampaignRepository;
@@ -18,27 +19,42 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/user/counting/campaign')]
 class CountingCampaignController extends AbstractController
 {
+    private $campaignStatusService;
+
+    public function __construct(CampaignStatusService $campaignStatusService)
+    {
+        $this->campaignStatusService = $campaignStatusService;
+    }
+
     #[Route('/', name: 'app_counting_campaign_index', methods: ['GET'])]
-    public function index(CountingCampaignRepository $countingCampaignRepository, EntityManagerInterface $entityManager): Response
+    public function index(CampaignStatusRepository $campaignStatusRepository, CountingCampaignRepository $countingCampaignRepository, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         
+        // Appel de la méthode pour récupérer les statuts
+        $statuses = $this->campaignStatusService->getCampaignStatuses();
+        $statusClosed = $statuses['statusClosed'];
+        $statusSuspended = $statuses['statusSuspended'];
+        $statusCancelled = $statuses['statusCancelled'];
+        $statusIndexMap = $statuses['statusIndexMap'];
+        
         // Vérifier si l'utilisateur a le rôle ADMIN
-        if ($this->isGranted('ROLE_ADMIN')) {
+        if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_VIEW')) {
             $countingCampaigns = $countingCampaignRepository->findAll();
         } else {
             $countingCampaigns = $countingCampaignRepository->findByUser($user);
         }
         
         $needsFlush = false; // Variable pour suivre si flush est nécessaire
+
     
         foreach ($countingCampaigns as $countingCampaign) {
             // Vérifier si la campagne n'est ni clôturée ni en suspens avant de mettre à jour le statut
-            if ($countingCampaign->getCampaignStatus() !== 'Clôturé' && $countingCampaign->getCampaignStatus() !== 'Suspens') {
+            if ($countingCampaign->getCampaignStatus() !== $statusClosed && $countingCampaign->getCampaignStatus() !== $statusSuspended && $countingCampaign->getCampaignStatus() !== $statusCancelled) {
                 $previousStatus = $countingCampaign->getCampaignStatus(); // Sauvegarder le statut précédent
                 
                 // Mettre à jour le statut
-                $this->updateCampaignStatus($countingCampaign);
+                $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
                 
                 // Si le statut a changé, indiquer qu'il faut flusher
                 if ($countingCampaign->getCampaignStatus() !== $previousStatus) {
@@ -54,12 +70,14 @@ class CountingCampaignController extends AbstractController
 
         return $this->render('counting_campaign/index.html.twig', [
             'counting_campaigns' => $countingCampaigns,
+            'statusIndexMap' => $statusIndexMap,  // Passer le tableau d'index des statuts
         ]);
     }
 
+    
     #[IsGranted(CountingCampaignVoter::CREATE)]
     #[Route('/new', name: 'app_counting_campaign_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(CampaignStatusRepository $campaignStatusRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         $countingCampaign = new CountingCampaign();
@@ -84,7 +102,7 @@ class CountingCampaignController extends AbstractController
                 // Générer et définir le nom de la campagne
                 $countingCampaign->generateCampaignName();
                 // Mettre à jour le statut de la campagne
-                $this->updateCampaignStatus($countingCampaign);
+                $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
                 $entityManager->persist($countingCampaign);
                 $entityManager->flush();
                 
@@ -109,10 +127,18 @@ class CountingCampaignController extends AbstractController
 
     #[IsGranted(CountingCampaignVoter::VIEW, 'countingCampaign')]
     #[Route('/{id}', name: 'app_counting_campaign_show', methods: ['GET'])]
-    public function show(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
+    public function show(CampaignStatusRepository $campaignStatusRepository, CountingCampaignRepository $countingCampaignRepository, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();  // Utilisateur actuel
-    
+
+        // Appel de la méthode pour récupérer les statuts
+        $statuses = $this->campaignStatusService->getCampaignStatuses();
+        $statusFinished = $statuses['statusFinished'];
+        $statusClosed = $statuses['statusClosed'];
+        $statusSuspended = $statuses['statusSuspended'];
+        $statusCancelled = $statuses['statusCancelled'];
+        $statusIndexMap = $statuses['statusIndexMap'];
+
         // Récupérer les SiteAgentsGroups associés à la campagne
         $siteAgentsGroups = $countingCampaign->getSiteAgentsGroups();
     
@@ -121,9 +147,9 @@ class CountingCampaignController extends AbstractController
         $existingConditions = [];
     
         // Mettre à jour le statut de la campagne avant l'affichage uniquement si cela est nécessaire
-        if ($countingCampaign->getCampaignStatus() !== 'Clôturé' && $countingCampaign->getCampaignStatus() !== 'Suspens') {
+        if ($countingCampaign->getCampaignStatus() !== $statusClosed && $countingCampaign->getCampaignStatus() !== $statusSuspended && $countingCampaign->getCampaignStatus() !== $statusCancelled) {
             $previousStatus = $countingCampaign->getCampaignStatus(); // Sauvegarder le statut précédent
-            $this->updateCampaignStatus($countingCampaign);
+            $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
     
             // Si le statut a changé, flusher les modifications
             if ($countingCampaign->getCampaignStatus() !== $previousStatus) {
@@ -158,17 +184,31 @@ class CountingCampaignController extends AbstractController
         return $this->render('counting_campaign/show.html.twig', [
             'counting_campaign' => $countingCampaign,
             'existingConditions' => $existingConditions,  // Transmettre les conditions environnementales
+            'statusIndexMap' => $statusIndexMap,
+            'statusFinished' => $statusFinished,
+            'statusClosed' => $statusClosed,
+            'statusSuspended' => $statusSuspended,
+            'statusCancelled' => $statusCancelled,
+            'collections' => $countingCampaignRepository->getCollectedDataForCampaign($countingCampaign), // Récupérer les collectes associées à la campagne
         ]);
     }
     
 
-
     #[IsGranted(CountingCampaignVoter::EDIT, 'countingCampaign')]
     #[Route('/{id}/edit', name: 'app_counting_campaign_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
+    public function edit(CampaignStatusRepository $campaignStatusRepository, Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
-        if ($countingCampaign->getCampaignStatus() == 'Clôturé') {
-            throw $this->createNotFoundException('Impossible de modifier une campagne clôturée.');
+        $statuses = $this->campaignStatusService->getCampaignStatuses();
+        $statusClosed = $statuses['statusClosed'];
+        $statusCancelled = $statuses['statusCancelled'];
+
+        // Empêcher la modification d'une campagne si elle est clôturée ou Annulée
+        if ($countingCampaign->getCampaignStatus() === $statusClosed) {
+            throw $this->createNotFoundException('Impossible de modifier une campagne ' . $statusClosed);
+        }
+        
+        if ($countingCampaign->getCampaignStatus() === $statusCancelled) {
+            throw $this->createNotFoundException('Impossible de modifier une campagne ' . $statusCancelled);
         }
 
         $form = $this->createForm(CountingCampaignType::class, $countingCampaign);
@@ -191,7 +231,7 @@ class CountingCampaignController extends AbstractController
                 $countingCampaign->setUpdatedAt(new \DateTimeImmutable());
                 // Générer et définir le nom de la campagne
                 $countingCampaign->generateCampaignName();
-                $this->updateCampaignStatus($countingCampaign);
+                $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
     
                 // Enregistrer les changements
                 $entityManager->flush();
@@ -232,54 +272,99 @@ class CountingCampaignController extends AbstractController
 
     #[Route('/{id}/suspend', name: 'app_counting_campaign_suspend', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas accès à cette fonction.')]
-    public function suspendCampaign(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
+    public function suspendCampaign(CampaignStatusRepository $campaignStatusRepository, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
+        // Appel de la méthode pour récupérer les statuts
+        $statuses = $this->campaignStatusService->getCampaignStatuses();
+        $statusClosed = $statuses['statusClosed'];
+        $statusSuspended = $statuses['statusSuspended'];
+        $statusCancelled = $statuses['statusCancelled'];
+
         // Si la campagne n'est ni "Clôturé" ni déjà en "Suspens"
-        if ($countingCampaign->getCampaignStatus() != 'Clôturé' && $countingCampaign->getCampaignStatus() != 'Suspens') {
-            $countingCampaign->setCampaignStatus('Suspens');
+        if ($countingCampaign->getCampaignStatus() != $statusClosed && $countingCampaign->getCampaignStatus() != $statusSuspended && $countingCampaign->getCampaignStatus() !== $statusCancelled) {
+            $countingCampaign->setCampaignStatus($statusSuspended);
             $entityManager->flush();
             $this->addFlash('success', 'La campagne a été mise en suspens.');
         } 
         // Si la campagne est déjà en "Suspens", on la reprend
-        elseif ($countingCampaign->getCampaignStatus() == 'Suspens') {
+        elseif ($countingCampaign->getCampaignStatus() == $statusSuspended) {
             // Enlever le statut "Suspens" avant de recalculer le nouveau statut
-            $countingCampaign->setCampaignStatus(''); // Supprimer l'état suspens pour forcer la mise à jour
-            $this->updateCampaignStatus($countingCampaign);
+            $countingCampaign->setCampaignStatus(null); // Supprimer l'état suspens pour forcer la mise à jour
+            $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
             $entityManager->flush();
             $this->addFlash('success', 'La campagne a été reprise.');
         } 
         // Sinon, la campagne est clôturée, et ne peut pas être mise en suspens
         else {
-            $this->addFlash('warning', 'Cette campagne ne peut pas être mise en suspens car elle est déjà clôturée.');
+            $this->addFlash('warning', "Cette campagne ne peut pas être $statusSuspended car elle est déjà $statusClosed.");
         }
     
         return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()]);
     }
     
+    
+    #[Route('/{id}/cancel', name: 'app_counting_campaign_cancel', methods: ['GET'])]
+    #[IsGranted('ROLE_SUPER_ADMIN', message: 'Vous n\'avez pas accès à cette fonction.')]
+    public function cancelCampaign(CampaignStatusRepository $campaignStatusRepository, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
+    {
+        // Appel de la méthode pour récupérer les statuts
+        $statuses = $this->campaignStatusService->getCampaignStatuses();
+        $statusClosed = $statuses['statusClosed'];
+        $statusSuspended = $statuses['statusSuspended'];
+        $statusCancelled = $statuses['statusCancelled'];
 
-
+        // Si la campagne n'est ni "Clôturé", ni annulée, ni déjà en "Suspens"
+        if ($countingCampaign->getCampaignStatus() != $statusClosed 
+            && $countingCampaign->getCampaignStatus() != $statusSuspended 
+            && $countingCampaign->getCampaignStatus() !== $statusCancelled) {
+            try {
+                $countingCampaign->setCampaignStatus($statusCancelled);
+                $entityManager->flush();
+                $this->addFlash('success', "La campagne a bien été $statusCancelled.");
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de l\'annulation de la campagne : ' . $e->getMessage());
+                return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
+            }
+        } 
+        elseif ($countingCampaign->getCampaignStatus() == $statusSuspended) {
+            // Enlever le statut "Suspens" avant l'annulation
+            $this->addFlash('success', "La campagne est actuellement $statusSuspended. Veuillez la lever avant d'annuler.");
+        } 
+        // Sinon, la campagne est clôturée, et ne peut pas être mise en suspens
+        else {
+            // Si la campagne est déjà clôturée ou annulée
+            $this->addFlash('warning', "Cette campagne est déjà $statusClosed ou $statusCancelled, elle ne peut pas être modifiée.");
+        }
+    
+        return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()]);
+    }
+    
     #[Route('/{id}/close', name: 'app_counting_campaign_close', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas accès à cette fonction.')]
-    public function close(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
+    public function close(CampaignStatusRepository $campaignStatusRepository, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
-        return $this->closeCampaign($countingCampaign, $entityManager);
+        return $this->closeCampaign($campaignStatusRepository, $countingCampaign, $entityManager);
     }
 
     /**
      * Clôture la campagne si toutes les conditions sont remplies
      */
-    public function closeCampaign(CountingCampaign $countingCampaign, EntityManagerInterface $entityManager)
+    public function closeCampaign(CampaignStatusRepository $campaignStatusRepository, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager)
     {
         try {
+            // Appel de la méthode pour récupérer les statuts
+            $statuses = $this->campaignStatusService->getCampaignStatuses();
+            $statusClosed = $statuses['statusClosed'];
+
             // Valider la campagne avant de la clôturer
-            if ($this->validateCampaignClosure($countingCampaign)) {
-                $countingCampaign->setCampaignStatus('Clôturé');
+            if ($this->validateCampaignClosure($campaignStatusRepository,$countingCampaign)) {
+                $countingCampaign->setCampaignStatus($statusClosed);
                 $entityManager->flush();
-                $this->addFlash('success', 'La campagne a été clôturée avec succès.');
+                $this->addFlash('success', "La campagne a été $statusClosed avec succès.");
             } 
 
         } catch (\Exception $e) {
-            $this->addFlash('error', 'Une erreur est survenue lors de la clôture de la campagne : ' . $e->getMessage());
+            $this->addFlash('error', "Une erreur est survenue lors de la $statusClosed de la campagne : " . $e->getMessage());
         }
 
         return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()]);
@@ -291,12 +376,16 @@ class CountingCampaignController extends AbstractController
      * @param CountingCampaign $countingCampaign
      * @return bool
      */
-    private function validateCampaignClosure(CountingCampaign $countingCampaign): bool
+    private function validateCampaignClosure(CampaignStatusRepository $campaignStatusRepository, CountingCampaign $countingCampaign): bool
     {
+        // Récupérer les statuts de campagne indexés
+        $campaignStatuses = $campaignStatusRepository->findBy([], ['createdAt' => 'ASC']);
+        $statusClosed = $campaignStatuses[3];  // "Clôturée"
+
         // Vérification des dates de début et de fin de la campagne
         $now = new \DateTimeImmutable();
         if ($countingCampaign->getEndDate() > $now) {
-            $this->addFlash('warning', "La campagne ne peut pas être clôturée avant sa date de fin.");
+            $this->addFlash('warning', "La campagne ne peut pas être $statusClosed avant sa date de fin.");
             return false;
         }
         // Vérifier si la campagne a des sites associés
@@ -354,8 +443,8 @@ class CountingCampaignController extends AbstractController
         }
 
         // Vérification supplémentaire pour s'assurer que la campagne est dans un état pouvant être clôturé
-        if ($countingCampaign->getCampaignStatus() == 'Clôturé') {
-            $this->addFlash('warning', "Cette campagne est déjà clôturée.");
+        if ($countingCampaign->getCampaignStatus() == $statusClosed) {
+            $this->addFlash('warning', "Cette campagne est déjà $statusClosed");
             return false;
         }
 
@@ -366,33 +455,59 @@ class CountingCampaignController extends AbstractController
 
 
     /**
-     * Met à jour automatiquement le statut d'une campagne en fonction des dates de début et de fin.
+     * Met à jour automatiquement le statut d'une campagne en fonction des dates de début et de fin,
+     * en se basant sur l'ordre des statuts dans la base de données.
      */
-    private function updateCampaignStatus(CountingCampaign $countingCampaign): void
+    private function updateCampaignStatus(CountingCampaign $countingCampaign, CampaignStatusRepository $campaignStatusRepository): void
     {
         $now = new \DateTimeImmutable();
         $startDate = $countingCampaign->getStartDate();
         $endDate = $countingCampaign->getEndDate();
-        $status = $countingCampaign->getCampaignStatus();
+        $currentStatus = $countingCampaign->getCampaignStatus();
 
-        // Ne pas changer l'état si la campagne est en suspens
-        if ($status === 'Suspens') {
-            return;  // Quitter la fonction pour préserver l'état "Suspens"
+        // Récupérer tous les statuts de campagne classés par ordre (par exemple, par champ 'createdAt' ou un autre champ d'ordre)
+        $campaignStatuses = $campaignStatusRepository->findBy([], ['createdAt' => 'ASC']);
+
+        // Si aucun statut n'est défini dans la base de données, sortir de la fonction
+        if (empty($campaignStatuses)) {
+            throw new \Exception("Aucun statut de campagne n'est disponible.");
         }
 
-        // if (!$status || $status === 'En attente' || $status === 'En cours' || $status === 'En attente') {
-        if (!$status || $status !== 'Clôturé') {
+        /**
+         * Indexation des statuts (exemple hypothétique) :
+         * $campaignStatuses[0] -> "Planifiée"
+         * $campaignStatuses[1] -> "En cours"
+         * $campaignStatuses[2] -> "Terminée"
+         * $campaignStatuses[3] -> "Clôturée"
+         * $campaignStatuses[4] -> "Erreur"
+         * $campaignStatuses[5] -> "Suspendue"
+         * $campaignStatuses[6] -> "Annulée"
+        */
+
+        // Si le statut actuel est "Suspendue" (6ème position), ne rien changer
+        if ($currentStatus && $currentStatus === $campaignStatuses[5]) {
+            return; // Préserver le statut "Suspendue"
+        }
+
+        // Si le statut n'est pas "Clôturée" (4ème position)
+        if (!$currentStatus || $currentStatus !== $campaignStatuses[3]) {
             if ($startDate > $now) {
-                $countingCampaign->setCampaignStatus('En attente');
+                // Campagne à venir -> Statut "Planifiée" (1ère position)
+                $newStatus = $campaignStatuses[0]; // "Planifiée"
             } elseif ($startDate <= $now && $endDate >= $now) {
-                $countingCampaign->setCampaignStatus('En cours');
+                // Campagne en cours -> Statut "En cours" (2ème position)
+                $newStatus = $campaignStatuses[1]; // "En cours"
             } elseif ($endDate < $now) {
-                $countingCampaign->setCampaignStatus('Terminé');
+                // Campagne terminée -> Statut "Terminée" (3ème position)
+                $newStatus = $campaignStatuses[2]; // "Terminée"
             } else {
-                $countingCampaign->setCampaignStatus('Erreur');
+                // Statut d'erreur (5ème position)
+                $newStatus = $campaignStatuses[4]; // "Erreur"
             }
-        }
 
+            // Mettre à jour le statut de la campagne
+            $countingCampaign->setCampaignStatus($newStatus);
+        }
     }
     
 }

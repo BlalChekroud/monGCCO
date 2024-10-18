@@ -1,9 +1,58 @@
-{% macro action_buttons(show_path, edit_path, delete_form, entit, current_route) %}
-        {% if current_route != show_path %}
+{# {% macro action_buttons(creat_path, show_path, edit_path, delete_form, entit, current_route) %}
+        {% if current_route == creat_path %}
+                <div class="row mb-3">
+                        <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                <button type="reset" class="btn-sm btn btn-outline-dark bi bi-x-square"> Annuler</button>
+                        </div>
+                        <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                <button class="btn-sm btn btn-outline-primary bi bi-save"> {{ button_label|default('Enregistrer') }}</button>
+                        </div>
+                </div>
+        {% else %}
+                {% if current_route != show_path and show_path != 'home' %}
+                        <a href="{{ path(show_path, {'id': entit.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
+                {% endif %}
+                {% if current_route != edit_path %}
+                        <a href="{{ path(edit_path, {'id': entit.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
+                {% endif %}
+        {% endif %}
+        {{ include(delete_form, {'id': entit.id}) }}
+{% endmacro %} #}
+{% macro action_buttons(creat_path, show_path, edit_path, delete_form, entit, current_route, is_first_call = true) %}
+    {% if current_route == creat_path %}
+        <div class="row mb-3">
+            <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+                <button type="reset" class="btn-sm btn btn-outline-dark bi bi-x-square"> Annuler</button>
+            </div>
+            <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+                <button class="btn-sm btn btn-outline-primary bi bi-save"> {{ button_label|default('Enregistrer') }}</button>
+            </div>
+        </div>
+    {% elseif current_route == edit_path %}
+        {% if is_first_call %}
+            <div class="row mb-3">
+                <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+                    <button type="reset" class="btn-sm btn btn-outline-dark bi bi-x-square"> Annuler</button>
+                </div>
+                <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+                    <button class="btn-sm btn btn-outline-primary bi bi-save"> {{ button_label|default('Mise à jour') }}</button>
+                </div>
+            </div>
+        {% else %}
+            {% if current_route != show_path and show_path != 'home' %}
                 <a href="{{ path(show_path, {'id': entit.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        {% if current_route != show_path and show_path != 'home' %}
+            <a href="{{ path(show_path, {'id': entit.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
         {% endif %}
         {% if current_route != edit_path %}
-                <a href="{{ path(edit_path, {'id': entit.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
+            {% if current_route == show_path %}
+                <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="Imprimer"></button>
+                <a href="#" class="btn btn-outline-secondary btn-sm bi bi-folder me-2" title="Exporter en CSV"></a>
+            {% endif %}
+            <a href="{{ path(edit_path, {'id': entit.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
         {% endif %}
-        {# {{ include(delete_form, {'id': entit.id}) }} #}
+    {% endif %}
 {% endmacro %}

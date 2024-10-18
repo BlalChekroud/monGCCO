@@ -43,9 +43,9 @@
                             <td>{{ site_collection.parentSite }}</td>
                             <td>
                                 <div class="d-flex justify-content-end">
-                                      <a href="{{ path('app_site_collection_show', {'id': site_collection.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-2"> Détail</a>
-                                      <a href="{{ path('app_site_collection_edit', {'id': site_collection.id}) }}" class="bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
-                                      {{ include('site_collection/_delete_form.html.twig') }}
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_site_collection_new','app_site_collection_show', 'app_site_collection_edit', 'site_collection/_delete_form.html.twig', site_collection, app.request.attributes.get('_route'), true) }}
+                                    {{ include('site_collection/_delete_form.html.twig') }}
                                 </div>
                             </td>
                         </tr>
@@ -59,11 +59,9 @@
               </div>
               
               <div class="card-footer">
-                <div class="d-flex justify-content-end">
-                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer un site de collecte</a>
-                  <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des campagnes</a>
-                  <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
-                </div>
+                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer un site de collecte</a>
+                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des campagnes</a>
+                <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
               </div>
 
             </div>
@@ -71,77 +69,21 @@
         </div>
       </div>
     </section>
-{# {% include 'import/csv.html.twig' %} #}
+    
+    {% import 'macros/form_macros.html.twig' as form_macros %}
+
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header">
-                        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
-                            {{ form_row(form.csvFile, {
-                                'attr': {
-                                    'onchange': 'document.getElementById("csvForm").submit();'
-                                }
-                            }) }}
-                        {{ form_end(form) }}
-                    </div>
-                    <div class="card-body">
-                      <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-                      <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-                    </div>
+                    {{ form_macros.csv_import_form(form, 'app_site_collection_index') }}
                 </div>
             </div>
         </div>
     </section>
 
     {% if headers is defined and rows is defined %}
-        <!-- Modal -->
-        <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h6 class="modal-title" id="csvPreviewModalLabel"><b>NB:</b> Les colonnes <code>siteName</code>, <code>siteCode</code>, <code>latDepart</code>, <code>longDepart</code>, <code>latFin</code>, <code>longFin</code> et <code>city</code> sont obligatoires.</h6>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <h5 class="text-center">Aperçu du fichier CSV</h5>
-                    <div class="modal-body">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    {% for header in headers %}
-                                        <th>{{ header }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in rows %}
-                                    <tr>
-                                        {% for cell in row %}
-                                            <td>{{ cell }}</td>
-                                        {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <form method="post" action="{{ path('app_site_collection_index') }}">
-                            <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
-                            <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
-                            <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Script to auto-show the modal after form submission -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
-                myModal.show();
-            });
-        </script>
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_site_collection_index', ['siteName', 'siteCode', 'latDepart', 'longDepart', 'latFin', 'longFin', 'city'], ['nationalSiteCode', 'internationalSiteCode', 'cityLat', 'cityLong', 'region']) }}
     {% endif %}
 
   </main><!-- End #main -->

@@ -34,9 +34,23 @@ class BirdFamilyController extends AbstractController
                 }
     
                 $csvData = file_get_contents($csvFile->getPathname());
-                $rows = array_map(function($row) {
-                    return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
-                }, explode("\n", $csvData));
+
+                // Convertir l'encodage si nécessaire
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $csvData = mb_convert_encoding($csvData, 'UTF-8', 'ISO-8859-1'); // Changez 'ISO-8859-1' si besoin
+                }
+
+                // Vérifiez si la conversion a réussi
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    return $this->redirectToRoute('app_bird_family_index');
+                }
+
+                $rows = array_filter(array_map(function($row) {
+                    return str_getcsv($row, ';');
+                }, explode("\n", $csvData)), function($row) {
+                    return !empty(array_filter($row)); // Supprime les lignes vides
+                }); 
     
                 $headers = array_shift($rows); // Enlever la première ligne qui contient les en-têtes
     
@@ -61,8 +75,9 @@ class BirdFamilyController extends AbstractController
             $importedCount = 0; // Compteur de familles d'oiseaux importées
             $invalidCount = 0; // Compteur de lignes non importées
             $processedFamilies = []; // Tableau pour suivre les familles déjà traitées
+            $invalidRows = []; // Tableau pour stocker les numéros des lignes invalides
     
-            foreach ($rows as $row) {
+            foreach ($rows as $lineNumber => $row) {
                 // Ignorez les lignes vides, mais ne comptez pas la dernière ligne vide
                 if (empty(array_filter($row))) {
                     continue; // Ignorez cette ligne sans l'incrémenter à invalidCount
@@ -70,7 +85,7 @@ class BirdFamilyController extends AbstractController
     
                 // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
                 if (count($row) !== count($headers)) {
-                    // $this->addFlash('error', 'Ligne incorrecte : ' . implode(', ', $row));
+                    $invalidRows[] = $lineNumber + 2; // Ajouter 2 pour compenser les décalages d'index et la ligne d'en-tête
                     $invalidCount++; // Compter comme ligne non valide
                     continue; // Ignorez cette ligne
                 }
@@ -78,7 +93,8 @@ class BirdFamilyController extends AbstractController
                 $data = array_combine($headers, $row);
     
                 if ($data === false) {
-                    $invalidCount++; // Compter comme ligne non valide
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Ignorez les lignes où array_combine échoue
                 }
     
@@ -89,54 +105,34 @@ class BirdFamilyController extends AbstractController
                 $ordre = $data['Ordre'] ?? null;
                 $tribe = $data['Tribe'] ?? null;
     
-                
-
                 if (empty($familyName) || empty($family) || empty($ordre)) {
-                    $invalidCount++; // Compter comme ligne non valide
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Ignorez si les champs nécessaires sont vides
                 }
     
                 // Vérifier si la famille a déjà été traitée dans ce fichier
                 if (isset($processedFamilies[$familyName])) {
-                    $invalidCount++; // Compter comme ligne non valide
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
+                    $processedFamilies[$familyName] = true; // Marquer le site comme traité
                     continue; // Si oui, ignorer cette entrée
                 }
     
-                // Vérifier si la famille existe déjà dans la base de données
-                $criteria = [];
-                // Ajoutez uniquement les critères non vides
-                if (!empty($familyName)) {
-                    $criteria['familyName'] = $familyName;
+                $existingFamily = $birdFamilyRepository->findOneBy(['familyName' => $familyName, 'family' => $family, 'ordre' => $ordre, 'subFamily' => $subFamily, 'tribe' => $tribe]);
+                if ($existingFamily) {
+                    $processedFamilies[$familyName] = true;
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++; // Compter comme ligne non valide
+                    continue; // Si oui, ignorer cette entrée
                 }
-                if (!empty($family)) {
-                    $criteria['family'] = $family;
-                }
-                if (!empty($ordre)) {
-                    $criteria['ordre'] = $ordre;
-                }
-                if (!empty($subFamily)) {
-                    $criteria['subFamily'] = $subFamily;
-                }
-                if (!empty($tribe)) {
-                    $criteria['tribe'] = $tribe;
-                }
-
-                // Effectuez la recherche seulement si au moins un critère est présent
-                if (!empty($criteria)) {
-                    $existingFamily = $birdFamilyRepository->findOneBy($criteria);
-                    if ($existingFamily) {
-                        $processedFamilies[$familyName] = true;
-                        $invalidCount++; // Compter comme ligne non valide
-                        continue; // Si oui, ignorer cette entrée
-                    }
-                }
-
+                
                 
                 // Créez et persistez une nouvelle famille d'oiseaux
                 $birdFamily = new BirdFamily();
                 $birdFamily->setOrdre($ordre);
                 $birdFamily->setFamilyName($familyName);
-                $birdFamily->setFamily(family: $family);
+                $birdFamily->setFamily( $family);
                 $birdFamily->setSubFamily($data['Subfamily'] ?? null);
                 $birdFamily->setTribe($data['Tribe'] ?? null);
                 $birdFamily->setCreatedAt(new \DateTimeImmutable());
@@ -148,12 +144,19 @@ class BirdFamilyController extends AbstractController
                 $processedFamilies[$familyName] = true;
                 
             }
-    
-            $entityManager->flush();
-    
-            // Affichez le nombre de lignes importées et non importées
-            $this->addFlash('success', "$importedCount familles d'oiseaux ont été importées avec succès. $invalidCount lignes n'ont pas pu être importées.");
-    
+
+            // Affichez le nombre de lignes importées et non importées    
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', "$importedCount familles d'oiseaux ont été importées avec succès. $invalidCount lignes n'ont pas pu être importées.");
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
+            }
+            
+            if ($invalidCount > 0) {
+                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+            }
+
             return $this->redirectToRoute('app_bird_family_index');
         }
     

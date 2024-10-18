@@ -24,12 +24,16 @@
             <div class="card-body">
               <h5 class="card-title">Les nouvelles informations sur la région</h5>
 
-              {{ include('region/_form.html.twig', {'button_label': ' Mise à jour'}) }}
+              {{ include('region/_form.html.twig') }}
 
             </div>
-            <div class="card-footer">
+            <div class="card-footer d-flex justify-content-between">
+              <div>
+                <a href="{{ path('app_region_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des régions">Retour</a>
+              </div>
               <div class="d-flex justify-content-end">
-                <a href="{{ path('app_region_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>
+                {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                {{ macros.action_buttons('app_region_new','app_region_show', 'app_region_edit', 'region/_delete_form.html.twig', region, app.request.attributes.get('_route'), false) }}
                 {{ include('region/_delete_form.html.twig') }}
               </div>
             </div>

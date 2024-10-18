@@ -1,4 +1,3 @@
-{# {{ form_start(form) }} #}
 {{ form_start(form, {'attr': {'id': 'myForm'}}) }}
   <div class="row mb-3">
       <!-- Date de début -->
@@ -57,14 +56,8 @@
   </div>
 
   <!-- Boutons de soumission et annulation -->
-  <div class="row mt-4">
-      <div class="col-md-3">
-          <button type="reset" class="btn btn-outline-dark"><i class="bi bi-x-square"></i> Annuler</button>
-      </div>
-      <div class="col-md-3">
-          <button type="submit" class="btn btn-outline-primary"><i class="bi bi-save"></i> Enregistrer</button>
-      </div>
-  </div>
+  {% import 'macros/btn_actions_macros.html.twig' as macros %}
+  {{ macros.action_buttons('app_counting_campaign_new', 'app_counting_campaign_show', 'app_counting_campaign_edit', 'counting_campaign/_delete_form.html.twig', counting_campaign, app.request.attributes.get('_route'), true) }}
 {{ form_end(form) }}
 
 <!-- Script pour la gestion dynamique des collections et suppression -->

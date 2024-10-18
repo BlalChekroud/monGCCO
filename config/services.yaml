@@ -19,20 +19,6 @@ services:
     App\EventSubscriber\LogoSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
-    
-    # Définir le service CsvUploader
-    # App\Service\FileUploader\CsvUploader:
-    #     class: App\Service\FileUploader
-    #     arguments:
-    #         $targetDirectory: '%csvs_directory%'
-    #         $slugger: '@slugger'
-            
-    # # Définir le service ImageUploader
-    # App\Service\FileUploader\ImageUploader:
-    #     class: App\Service\FileUploader
-    #     arguments:
-    #         $targetDirectory: '%images_directory%'
-    #         $slugger: '@slugger'
 
 
     # default configuration for services in *this* file

@@ -2,11 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Country;
-use App\Repository\CountryRepository;
-use App\Repository\RegionRepository;
-use App\Service\CsvImportService;
-
 use App\Entity\Region;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -39,6 +34,18 @@ class CityController extends AbstractController
             
             if ($csvFile && $this->IsGranted('ROLE_IMPORT')) {
                 $csvData = file_get_contents($csvFile->getPathname());
+
+                // Convertir l'encodage si nécessaire
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $csvData = mb_convert_encoding($csvData, 'UTF-8', 'ISO-8859-1'); // Changez 'ISO-8859-1' si besoin
+                }
+
+                // Vérifiez si la conversion a réussi
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    return $this->redirectToRoute('app_city_index');
+                }
+
                 $rows = array_map(function($row) {
                     return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
                 }, explode("\n", $csvData));
@@ -65,8 +72,10 @@ class CityController extends AbstractController
     
             $importedCount = 0; // Compteur de régions importées
             $processedCities = []; // Tableau pour suivre les régions déjà traitées
+            $invalidCount = 0; // Compteur de lignes non importées
+            $invalidRows = []; // Tableau pour stocker les numéros des lignes invalides
     
-            foreach ($rows as $row) {
+            foreach ($rows as $lineNumber => $row) {
                 // Ignorer les lignes vides
                 if (empty(array_filter($row))) {
                     continue;
@@ -74,13 +83,16 @@ class CityController extends AbstractController
     
                 // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
                 if (count($row) !== count($headers)) {
-                    $this->addFlash('error', 'Ligne incorrecte : ' . implode(', ', $row));
+                    $invalidRows[] = $lineNumber + 2; // Ajouter 2 pour compenser les décalages d'index et la ligne d'en-tête
+                    $invalidCount++;
                     continue; // Ignorez cette ligne
                 }
         
                 $data = array_combine($headers, $row);
         
                 if ($data === false) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Ignorez les lignes où array_combine échoue
                 }
     
@@ -91,24 +103,30 @@ class CityController extends AbstractController
                 $regionCode = $data['regionCode'] ?? null;
     
                 if (empty($cityName) || empty($latitude) || empty($longitude) || empty($regionName) || empty($regionCode)) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue;
                 }
     
                 // Vérifier si la ville a déjà été traitée dans ce fichier
                 if (isset($processedCities[$regionName])) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Si oui, ignorer cette entrée
                 }
     
                 // Vérifier si la ville existe déjà dans la base de données
-                $existingCity = $cityRepository->findOneBy(['name' => $cityName]);
+                $existingCity = $cityRepository->findOneBy(['name' => $cityName, 'latitude' => $latitude, 'longitude' => $longitude]);
                 if ($existingCity) {
                     $processedCities[$cityName] = true;
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Si oui, ignorer cette entrée
                 }
     
                 // Récupérer ou créer la région associée
                 $regionRepository = $entityManager->getRepository(Region::class);
-                $existingRegion = $regionRepository->findOneBy(['name' => $regionName]);
+                $existingRegion = $regionRepository->findOneBy(['name' => $regionName, 'regionCode' => $regionCode]);
     
                 if (!$existingRegion) {
                     $region = new Region();
@@ -137,10 +155,16 @@ class CityController extends AbstractController
                 $processedCities[$cityName] = true;
             }
     
-            $entityManager->flush();
-    
-            $this->addFlash('success', $importedCount . ' villes ont été importées avec succès.');
-    
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', "$importedCount villes ont été importés avec succès.");
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
+            }
+            
+            if ($invalidCount > 0) {
+                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+            }
             return $this->redirectToRoute('app_city_index');
         }
     

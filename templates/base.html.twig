@@ -499,7 +499,7 @@
         
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-bar-chart"></i><span>Données collectées</span><i class="bi bi-chevron-down ms-auto"></i>
+            <i class="bi bi-bar-chart"></i><span>Gestion des collectées</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
@@ -583,20 +583,20 @@
           </ul>
         </li><!-- End users Nav -->
 
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#parameters-nav" data-bs-toggle="collapse" href="#">
             <i class="bi bi-gear"></i><span>Paramètres</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul id="parameters-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          {# {% if is_granted('ROLE_SUPER_ADMIN') %} #}
-            <li>
-              <a href="{{ path('app_logo_index') }}">
-                <i class="bi bi-circle"></i><span>Consulter le logo</span>
-              </a>
-            </li>
             <li>
               <a href="{{ path('app_logo_new') }}">
                 <i class="bi bi-circle"></i><span>Ajouter le logo</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_logo_index') }}">
+                <i class="bi bi-circle"></i><span>Consulter le logo</span>
               </a>
             </li>
             <li>
@@ -604,9 +604,14 @@
                 <i class="bi bi-circle"></i><span>Consultation des images</span>
               </a>
             </li>
-          {# {% endif %} #}
+            <li>
+              <a href="{{ path('app_campaign_status_index') }}">
+                <i class="bi bi-circle"></i><span>Statuts des campagnes</span>
+              </a>
+            </li>
           </ul>
         </li><!-- End parameters Nav -->
+        {% endif %}
 
         <li class="nav-heading">Pages</li>
 

@@ -6,6 +6,7 @@ use App\Entity\CountingCampaign;
 use App\Entity\SiteCollection;
 use App\Repository\BirdSpeciesRepository;
 use App\Repository\EnvironmentalConditionsRepository;
+use App\Service\CampaignStatusService;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use App\Entity\CollectedData;
@@ -20,6 +21,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/user/collected/data')]
 class CollectedDataController extends AbstractController
 {
+    private $campaignStatusService;
+
+    public function __construct(CampaignStatusService $campaignStatusService)
+    {
+        $this->campaignStatusService = $campaignStatusService;
+    }
+    
+
     #[Route('/', name: 'app_collected_data_index', methods: ['GET'])]
     public function index(CollectedDataRepository $collectedDataRepository): Response
     {
@@ -47,6 +56,11 @@ class CollectedDataController extends AbstractController
         // Récupérer l'utilisateur actuel
         $user = $this->getUser();
 
+        $statuses =$this->campaignStatusService->getCampaignStatuses();
+        $statusClosed = $statuses['statusClosed'];
+        $statusSuspended = $statuses['statusSuspended'];
+        $statusCancelled = $statuses['statusCancelled'];
+
         // Récupérer la campagne et le site en fonction des paramètres de la requête ou d'un choix de l'utilisateur
         $campaignId = $request->query->get('campaignId');
         $siteId = $request->query->get('siteId');
@@ -54,8 +68,14 @@ class CollectedDataController extends AbstractController
         $campaign = $entityManager->getRepository(CountingCampaign::class)->find($campaignId);
         $site = $entityManager->getRepository(SiteCollection::class)->find($siteId);
 
-        if ($campaign->getCampaignStatus() === 'Clôturé') {
-            throw $this->createNotFoundException('Une campagne clôturée ne peut pas être modifiée.');
+        if ($campaign->getCampaignStatus() === $statusClosed) {
+            throw $this->createNotFoundException("Une campagne $statusClosed ne peut pas être modifiée");
+        }
+        if ($campaign->getCampaignStatus() === $statusSuspended) {
+            throw $this->createNotFoundException("Une campagne $statusSuspended ne peut pas être modifiée");
+        }
+        if ($campaign->getCampaignStatus() === $statusCancelled) {
+            throw $this->createNotFoundException("Une campagne $statusClosed ne peut pas être modifiée");
         }
         
         // Vérifier si la campagne et le site existent
@@ -231,9 +251,22 @@ class CollectedDataController extends AbstractController
     public function edit(Request $request, CollectedData $collectedDatum, EntityManagerInterface $entityManager): Response
     {
         $campaign = $collectedDatum->getCountingCampaign();
-        if ($campaign->getCampaignStatus() === 'Clôturé') {
-            throw $this->createNotFoundException('Une campagne clôturée ne peut pas être modifiée.');
+
+        $statuses =$this->campaignStatusService->getCampaignStatuses();
+        $statusClosed = $statuses['statusClosed'];
+        $statusSuspended = $statuses['statusSuspended'];
+        $statusCancelled = $statuses['statusCancelled'];
+
+        if ($campaign->getCampaignStatus() === $statusClosed) {
+            throw $this->createNotFoundException("Une campagne $statusClosed ne peut pas être modifiée");
         }
+        if ($campaign->getCampaignStatus() === $statusSuspended) {
+            throw $this->createNotFoundException("Une campagne $statusSuspended ne peut pas être modifiée");
+        }
+        if ($campaign->getCampaignStatus() === $statusCancelled) {
+            throw $this->createNotFoundException("Une campagne $statusClosed ne peut pas être modifiée");
+        }
+
         $form = $this->createForm(CollectedDataType::class, $collectedDatum);
         $form->handleRequest($request);
 

@@ -46,8 +46,8 @@
                                             <td>{{ city.createdAt ? city.createdAt|date('d-m-Y') : '' }}</td>
                                             <td>
                                                 <div class="d-flex justify-content-end">
-                                                    <a href="{{ path('app_city_show', {'id': city.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
-                                                    <a href="{{ path('app_city_edit', {'id': city.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
+                                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                                    {{ macros.action_buttons('app_city_new','app_city_show', 'app_city_edit', 'city/_delete_form.html.twig', city, app.request.attributes.get('_route'), true) }}
                                                     {{ include('city/_delete_form.html.twig') }}
                                                 </div>
                                             </td>
@@ -63,93 +63,33 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <div class="d-flex justify-content-end">
-                                <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une ville</a>
-                                <a href="{{ path('app_site_collection_index') }}" class="btn btn-outline-info btn-sm bi bi bi-list-task mx-1"> Consultation des sites</a>
-                                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Ajouter un site</a>
-                                <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des régions</a>
-                                <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une région</a>
-                                <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des pays</a>
-                                <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter un pays</a>
-                            </div>
+                            <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une ville</a>
+                            <a href="{{ path('app_site_collection_index') }}" class="btn btn-outline-info btn-sm bi bi bi-list-task mx-1"> Consultation des sites</a>
+                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Ajouter un site</a>
+                            <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des régions</a>
+                            <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une région</a>
+                            <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des pays</a>
+                            <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter un pays</a>
                         </div>
                     </div>
 
                 </div>
             </div>
         </section>
-        
+        {% import 'macros/form_macros.html.twig' as form_macros %}
+
         <section class="section">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
-                        <div class="card-header d-flex justify-content-end">
-                            <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer" title="Imprimer"></button>
-                            <a href="#" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
-                        </div>
-                        <div class="card-body">
-                            {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
-                                {{ form_row(form.csvFile, {
-                                    'attr': {
-                                        'onchange': 'document.getElementById("csvForm").submit();'
-                                    }
-                                }) }}
-                            {{ form_end(form) }}
-                        </div>
-                        
+                        {{ form_macros.csv_import_form(form, 'app_city_index') }}
                     </div>
                 </div>
             </div>
         </section>
 
         {% if headers is defined and rows is defined %}
-            <!-- Modal -->
-            <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-scrollable">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="csvPreviewModalLabel"><b>NB:</b> Les colonnes <code>city</code>,<code> lat</code>, <code>lng</code>, <code>region</code> et <code>regionCode</code> sont obligatoires.</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <h5 class="text-center">Aperçu du fichier CSV</h5>
-                        <div class="modal-body">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        {% for header in headers %}
-                                            <th>{{ header }}</th>
-                                        {% endfor %}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for row in rows %}
-                                        <tr>
-                                            {% for cell in row %}
-                                                <td>{{ cell }}</td>
-                                            {% endfor %}
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <form method="post" action="{{ path('app_city_index') }}">
-                                <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
-                                <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
-                                <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Script to auto-show the modal after form submission -->
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
-                    myModal.show();
-                });
-            </script>
+            {{ form_macros.csv_modal(headers, rows, csvData, 'app_city_index', ['city', 'lat', 'lng', 'region', 'regionCode']) }}
         {% endif %}
 
     </main><!-- End #main -->

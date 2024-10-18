@@ -33,9 +33,23 @@ class SiteCollectionController extends AbstractController
             
             if ($csvFile && $this->IsGranted('ROLE_IMPORT')) {
                 $csvData = file_get_contents($csvFile->getPathname());
-                $rows = array_map(function($row) {
-                    return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
-                }, explode("\n", $csvData));
+
+                // Convertir l'encodage si nécessaire
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $csvData = mb_convert_encoding($csvData, 'UTF-8', 'ISO-8859-1'); // Changez 'ISO-8859-1' si besoin
+                }
+
+                // Vérifiez si la conversion a réussi
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    return $this->redirectToRoute('app_site_collection_index');
+                }
+
+                $rows = array_filter(array_map(function($row) {
+                    return str_getcsv($row, ';');
+                }, explode("\n", $csvData)), function($row) {
+                    return !empty(array_filter($row)); // Supprime les lignes vides
+                });                
                 
                 $headers = array_shift($rows); // Enlever la première ligne qui contient les en-têtes
     
@@ -62,8 +76,10 @@ class SiteCollectionController extends AbstractController
     
             $importedCount = 0; // Compteur de sites importées
             $processedSites = []; // Tableau pour suivre les sites déjà traitées
+            $invalidCount = 0; // Compteur de lignes non importées
+            $invalidRows = []; // Tableau pour stocker les numéros des lignes invalides
     
-            foreach ($rows as $row) {
+            foreach ($rows as $lineNumber => $row) {
                 // Ignorer les lignes vides
                 if (empty(array_filter($row))) {
                     continue;
@@ -71,13 +87,16 @@ class SiteCollectionController extends AbstractController
     
                 // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
                 if (count($row) !== count($headers)) {
-                    $this->addFlash('error', 'Ligne incorrecte : ' . implode(', ', $row));
+                    $invalidRows[] = $lineNumber + 2; // Ajouter 2 pour compenser les décalages d'index et la ligne d'en-tête
+                    $invalidCount++; // Compter comme ligne non valide
                     continue; // Ignorez cette ligne
                 }
         
                 $data = array_combine($headers, $row);
         
                 if ($data === false) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Ignorez les lignes où array_combine échoue
                 }
     
@@ -89,32 +108,45 @@ class SiteCollectionController extends AbstractController
                 $longDepart = $data['longDepart'];
                 $latFin = $data['latFin'];
                 $longFin = $data['longFin'];
-                // $parentSite = $data['parentSite'] ?? null;
+                $parentSite = $data['parentSite'] ?? null;
                 $cityName = $data['city'] ?? null;
-                $lat = $data['lat'] ?? null;
-                $lng = $data['lng'] ?? null;
+                $lat = $data['cityLat'] ?? null;
+                $lng = $data['cityLng'] ?? null;
                 $regionName = $data['region'] ?? null;
     
                 if (empty($siteName) || empty($siteCode) || empty($latDepart) || empty($longDepart) || empty($latFin) || empty($longFin)  || empty($cityName)) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue;
                 }
+
+                // if (!is_numeric($latDepart) || !is_numeric($longDepart) || !is_numeric($latFin) || !is_numeric($longFin)) {
+                //     $this->addFlash('error', "Les coordonnées ne sont pas valides pour le site: $siteName.");
+                //     $invalidRows[] = $lineNumber + 2;
+                //     $invalidCount++;
+                //     continue; // Ignorer cette entrée si les coordonnées ne sont pas valides
+                // }                
     
                 // Vérifier si le site a déjà été traitée dans ce fichier
                 if (isset($processedSites[$siteName])) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
+                    $processedSites[$siteName] = true; // Marquer le site comme traité
                     continue; // Si oui, ignorer cette entrée
                 }
     
                 // Vérifier si le site existe déjà dans la base de données
-                $existingSite = $siteCollectionRepository->findOneBy(['siteName' => $siteName]);
+                $existingSite = $siteCollectionRepository->findOneBy(['siteName' => $siteName, 'siteCode' => $siteCode]);
                 if ($existingSite) {
-                    // $this->addFlash('info', 'Le site ' . $siteName . ' existe déjà dans la base de données.');
                     $processedSites[$siteName] = true;
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Si oui, ignorer cette entrée
                 }
     
                 // Récupérer ou créer la ville associée
                 $cityRepository = $entityManager->getRepository(City::class);
-                $existingCity = $cityRepository->findOneBy(['name' => $cityName]);
+                $existingCity = $cityRepository->findOneBy(['name' => $cityName, 'latitude' => $lat, 'longitude' => $lng]);
 
                 $regionRepository = $entityManager->getRepository(Region::class);
                 $existingRegion = $regionRepository->findOneBy(['name' => $regionName]);
@@ -129,12 +161,28 @@ class SiteCollectionController extends AbstractController
                     $city->setLatitude($lat);
                     $city->setLongitude($lng);
                     $city->setCreatedAt(new \DateTimeImmutable());
-                    $city->setRegion($regionName);
+                    $city->setRegion($existingRegion);
 
                     $entityManager->persist($city);
                     $existingCity = $city; // Réassigner pour utiliser l'objet persisté
                 }
     
+                $existingSite = $siteCollectionRepository->findOneBy(['siteName' => $siteName, 'siteCode' => $siteCode]);
+
+                if ($existingSite) {
+                    $this->addFlash('error', "Le site $siteName avec le code $siteCode existe déjà.");
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
+                    continue; // Ignorer cette entrée si le site existe déjà
+                }
+
+                $existingParentSite = $siteCollectionRepository->findOneBy(['siteName' => $parentSite]);
+
+                if (!$existingParentSite && $parentSite) {
+                    $this->addFlash('error', "Le site parent '$parentSite' n'existe pas dans la base de données.");
+                    // continue; // Passer à la ligne suivante du CSV
+                }
+                
                 // Créez et persistez un nouveau site
                 $site = new SiteCollection();
                 $site->setSiteName($siteName);
@@ -145,10 +193,13 @@ class SiteCollectionController extends AbstractController
                 $site->setLongDepart($longDepart);
                 $site->setLatFin($latFin);
                 $site->setLongFin($longFin);
-                // $site->setParentSite($parentSite);
-
                 $site->setCreatedAt(new \DateTimeImmutable());
-    
+                if ($existingParentSite) {
+                    $site->setParentSite($existingParentSite);
+                } else {
+                    $site->setParentSite(null); // Ou gérer cela comme une erreur si nécessaire
+                }
+                
                 // Associer le site au ville
                 $site->setCity($existingCity);
     
@@ -159,10 +210,16 @@ class SiteCollectionController extends AbstractController
                 $processedSites[$siteName] = true;
             }
     
-            $entityManager->flush();
-    
-            $this->addFlash('success', $importedCount . ' sites de collecte ont été importées avec succès.');
-    
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', "$importedCount sites ont été importés avec succès.");
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
+            }
+            
+            if ($invalidCount > 0) {
+                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+            }
             return $this->redirectToRoute('app_site_collection_index');
         }
     

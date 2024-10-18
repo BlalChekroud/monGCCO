@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -22,13 +23,19 @@ class CountingCampaignType extends AbstractType
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control'],
                 'label' => 'Date de début',
-                'required' => true
+                'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'La date de début ne peut pas être vide.']),
+                ]
             ])
             ->add('endDate', DateTimeType::class, [
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control'],
                 'label' => 'Date de fin',
-                'required' => true
+                'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'La date de fin ne peut pas être vide.']),
+                ]
             ])
             ->add('siteAgentsGroups', CollectionType::class, [
                 'entry_type' => SiteAgentsGroupType::class,

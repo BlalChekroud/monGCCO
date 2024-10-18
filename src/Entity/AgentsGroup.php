@@ -41,12 +41,6 @@ class AgentsGroup
     #[ORM\JoinColumn(nullable: false)]
     private ?Country $country = null;
 
-    // /**
-    //  * @var Collection<int, CountingCampaign>
-    //  */
-    // #[ORM\ManyToMany(targetEntity: CountingCampaign::class, inversedBy: 'agentsGroups')]
-    // private Collection $agents;
-
     /**
      * @var Collection<int, SiteAgentsGroup>
      */
@@ -193,30 +187,7 @@ class AgentsGroup
 
         return $this;
     }
-
-    // /**
-    //  * @return Collection<int, CountingCampaign>
-    //  */
-    // public function getAgents(): Collection
-    // {
-    //     return $this->agents;
-    // }
-
-    // public function addAgent(CountingCampaign $agent): static
-    // {
-    //     if (!$this->agents->contains($agent)) {
-    //         $this->agents->add($agent);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removeAgent(CountingCampaign $agent): static
-    // {
-    //     $this->agents->removeElement($agent);
-
-    //     return $this;
-    // }
+    
 
     /**
      * @return Collection<int, SiteAgentsGroup>

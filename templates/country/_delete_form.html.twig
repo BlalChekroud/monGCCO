@@ -1,8 +1,8 @@
-{# <form method="post" action="{{ path('app_country_delete', {'id': country.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+<form method="post" action="{{ path('app_country_delete', {'id': country.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ country.id) }}">
-    <button class="btn">Delete</button>
-</form> #}
-<form id="delete-form-{{ country.id }}" method="post" action="{{ path('app_country_delete', {'id': country.id}) }}">
+     <button class="btn btn-danger btn-sm bi bi-trash mx-2" title="Supprimer"></button>
+</form>
+{# <form id="delete-form-{{ country.id }}" method="post" action="{{ path('app_country_delete', {'id': country.id}) }}">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ country.id) }}">
     <button type="button" class="btn-action btn btn-outline-danger btn-sm bi bi-x-circle-fill mx-2" onclick="confirmDeletion({{ country.id }})"> Supprimer</button>
 </form>
@@ -35,4 +35,4 @@ function confirmDeletion(countryId) {
         }
     });
 }
-</script>
+</script> #}

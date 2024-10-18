@@ -9,28 +9,34 @@
       {{ form_errors(form.scientificName) }}
     </div>
   </div>
+
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.frenchName, 'Nom français') }}
+      {{ form_label(form.frenchName, 'Nom français') }}<span class="explanation me-4"> (nom vernaculaire)</span>
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.frenchName, {'attr': {'class': 'form-control'}}) }}
     </div>
-  <div class="row mb-3">
-    <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11 mt-4 mx-3">
-      {{ form_row(form.birdFamily, {'attr': {'class': 'form-control'}}) }}
-      {{ form_errors(form.birdFamily) }}
-    </div>
   </div>
-  </div>
+
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.wispeciescode, 'WI code espèse') }}
+      {{ form_label(form.englishName, 'Nom anglais') }}
+    </div>
+    <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+      {{ form_widget(form.englishName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+      {{ form_label(form.wispeciescode, "Code WI d'espèse") }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.wispeciescode, {'attr': {'class': 'form-control'}}) }}
     </div>
   </div>
+
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
       {{ form_label(form.image, 'Image') }}
@@ -39,6 +45,7 @@
       {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
     </div>
   </div>
+
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
       {{ form_label(form.authority, 'Autorité') }}
@@ -67,20 +74,20 @@
       </div>
   </div> #}
 
-  <div class="row mb-3">
+  {# <div class="row mb-3">
     <label for="coverage" class="col-sm-3 col-md-3 col-lg-3 col-xl-3 col-form-label">Couverture</label>
     <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
-        {# <select id="coverageDropdown" name="coverageDropdown" class="form-control">
+        <select id="coverageDropdown" name="coverageDropdown" class="form-control">
             {% for option in form.coverage.vars.choices %}
                 <option value="{{ option.value }}">{{ option.label }}</option>
             {% endfor %}
-        </select> #}
+        </select>
         {{ form_widget(form.coverage, {'attr': {'class': 'form-control'}}) }}
     </div>
     <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
         <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#coverageModal">Ajouter</button>
     </div>
-</div>
+  </div> #}
 
 
   <div class="row mb-3">
@@ -111,7 +118,6 @@
       </div>
   </div>
   
-  
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
       {{ form_label(form.commonName, 'Nom commun') }}
@@ -120,6 +126,7 @@
       {{ form_widget(form.commonName, {'attr': {'class': 'form-control'}}) }}
     </div>
   </div>
+
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
       {{ form_label(form.commonNameAlt, 'Noms communs alternatifs') }}
@@ -128,6 +135,7 @@
       {{ form_widget(form.commonNameAlt, {'attr': {'class': 'form-control'}}) }}
     </div>
   </div>
+
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
       {{ form_label(form.synonyms, 'Synonyms') }}
@@ -136,6 +144,7 @@
       {{ form_widget(form.synonyms, {'attr': {'class': 'form-control'}}) }}
     </div>
   </div>
+
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
       {{ form_label(form.taxonomicSources, 'Source(s) Taxonomique') }}
@@ -144,6 +153,7 @@
       {{ form_widget(form.taxonomicSources, {'attr': {'class': 'form-control'}}) }}
     </div>
   </div>
+
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
       {{ form_label(form.sisRecId, 'sisRec ID') }}
@@ -152,6 +162,7 @@
       {{ form_widget(form.sisRecId, {'attr': {'class': 'form-control'}}) }}
     </div>
   </div>
+
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
       {{ form_label(form.spcRecId, 'spcRec ID') }}
@@ -160,6 +171,7 @@
       {{ form_widget(form.spcRecId, {'attr': {'class': 'form-control'}}) }}
     </div>
   </div>
+
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
       {{ form_label(form.subsppId, 'subspp ID') }}
@@ -168,12 +180,14 @@
       {{ form_widget(form.subsppId, {'attr': {'class': 'form-control'}}) }}
     </div>
   </div>
+
   <div class="row mb-3">
-    <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      <button type="reset" class="btn btn-outline-dark bi bi-x-square"> Annuler</button>
-    </div>
-    <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
-      <button class="btn btn-outline-primary bi bi-save"> {{ button_label|default('Enregistrer') }}</button>
+    <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11 mt-4 mx-3">
+      {{ form_row(form.birdFamily, {'attr': {'class': 'form-control'}}) }}
+      {{ form_errors(form.birdFamily) }}
     </div>
   </div>
+
+  {% import 'macros/btn_actions_macros.html.twig' as macros %}
+  {{ macros.action_buttons('app_bird_species_new', 'app_bird_species_show', 'app_bird_species_edit', 'bird_species/_delete_form.html.twig', bird_specy, app.request.attributes.get('_route')) }}
 {{ form_end(form) }}<!-- End General Form Elements -->

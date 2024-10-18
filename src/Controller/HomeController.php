@@ -24,7 +24,25 @@ class HomeController extends AbstractController
     $totalAgents = [];
     $totalUniqueSpecies = [];
     $categories = [];
-    $totalCountsPerSite = []; // Initialiser ici
+    
+    // Récupérer la dernière campagne créée
+    $recentCampaign = $countingCampaignRepository->findMostRecentCampaign();
+    if (!$recentCampaign) {
+        $this->addFlash('warning', 'Aucune campagne trouvée.');
+        return $this->redirectToRoute('home'); 
+    }
+    
+    // Utiliser la méthode pour récupérer les comptages par site
+    $totalCountsBySite = $countingCampaignRepository->getTotalCountsBySite($recentCampaign);
+
+    // Initialiser les tableaux pour les données du graphique
+    $siteNames = [];
+    $totalCountsSite = [];
+
+    foreach ($totalCountsBySite as $siteData) {
+        $siteNames[] = $siteData['siteName']; // Récupérer les noms des sites
+        $totalCountsSite[] = $siteData['totalCounts']; // Récupérer le total des comptages par site
+    }
 
     // Parcourir les campagnes pour extraire les données
     foreach ($campaigns as $campaign) {
@@ -34,17 +52,11 @@ class HomeController extends AbstractController
         $totalUniqueSpecies[] = $campaign->getTotalUniqueSpecies();
         $categories[] = $campaign->getEndDate()->format('d-m-Y');
 
-        // Récupérer les données par site
-        foreach ($campaign->getSiteAgentsGroups() as $siteAgentsGroup) {
-            foreach ($siteAgentsGroup->getSiteCollection() as $site) {
-                $siteName = $site->getSiteName();
-                $totalCountsPerSite[$siteName] = ($totalCountsPerSite[$siteName] ?? 0) + $site->getTotalCounts();
-            }
-        }
     }
 
-    // Récupérer la campagne la plus récente
-    $recentCampaign = end($campaigns); // Récupère la dernière campagne de la liste triée
+
+
+
 
     // Calculer les totaux
     $totalBirds = array_sum($totalCounts);
@@ -55,16 +67,18 @@ class HomeController extends AbstractController
     return $this->render('home/index.html.twig', [
         'logo' => $logo,
         'campaigns' => $campaigns,
-        'totalCounts' => $totalCounts,
         'totalCollects' => $totalCollects,
         'totalAgents' => $totalAgents,
-        'totalUniqueSpecies' => $totalUniqueSpecies,
         'categories' => $categories,
-        'recentCampaign' => $recentCampaign,
         'totalBirds' => $totalBirds,
         'totalUniqueSpeciesCount' => $totalUniqueSpeciesCount,
         'totalAgentsCount' => $totalAgentsCount,
-        'totalCountsPerSite' => $totalCountsPerSite,
+        'totalCounts' => $totalCounts,
+
+        'recentCampaign' => $recentCampaign,
+        'totalUniqueSpecies' => $totalUniqueSpecies,
+        'siteNames' => $siteNames,       // Les noms des sites
+        'totalCountsSite' => $totalCountsSite,   // Les totaux des oiseaux comptés
     ]);
 }
 

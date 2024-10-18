@@ -29,6 +29,18 @@ class RegionController extends AbstractController
             
             if ($csvFile) {
                 $csvData = file_get_contents($csvFile->getPathname());
+                
+                // Convertir l'encodage si nécessaire
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $csvData = mb_convert_encoding($csvData, 'UTF-8', 'ISO-8859-1'); // Changez 'ISO-8859-1' si besoin
+                }
+
+                // Vérifiez si la conversion a réussi
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    return $this->redirectToRoute('app_region_index');
+                }
+                
                 $rows = array_map(function($row) {
                     return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
                 }, explode("\n", $csvData));
@@ -55,8 +67,10 @@ class RegionController extends AbstractController
     
             $importedCount = 0; // Compteur de régions importées
             $processedRegions = []; // Tableau pour suivre les régions déjà traitées
+            $invalidCount = 0; // Compteur de lignes non importées
+            $invalidRows = []; // Tableau pour stocker les numéros des lignes invalides
     
-            foreach ($rows as $row) {
+            foreach ($rows as $lineNumber => $row) {
                 // Ignorer les lignes vides
                 if (empty(array_filter($row))) {
                     continue;
@@ -64,13 +78,16 @@ class RegionController extends AbstractController
     
                 // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
                 if (count($row) !== count($headers)) {
-                    $this->addFlash('error', 'Ligne incorrecte : ' . implode(', ', $row));
+                    $invalidRows[] = $lineNumber + 2; // Ajouter 2 pour compenser les décalages d'index et la ligne d'en-tête
+                    $invalidCount++;
                     continue; // Ignorez cette ligne
                 }
         
                 $data = array_combine($headers, $row);
         
                 if ($data === false) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Ignorez les lignes où array_combine échoue
                 }
     
@@ -79,12 +96,16 @@ class RegionController extends AbstractController
                 $countryName = $data['country'] ?? null;
                 $iso2 = $data['iso2'] ?? null;
     
-                if (empty($regionName) || empty($regionCode) || empty($countryName) || empty($iso2)) {
+                if (empty($regionName) || empty($regionCode) || empty($countryName)) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue;
                 }
     
                 // Vérifier si la région a déjà été traitée dans ce fichier
                 if (isset($processedRegions[$regionName])) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Si oui, ignorer cette entrée
                 }
     
@@ -92,6 +113,8 @@ class RegionController extends AbstractController
                 $existingRegion = $regionRepository->findOneBy(['name' => $regionName]);
                 if ($existingRegion) {
                     $processedRegions[$regionName] = true;
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Si oui, ignorer cette entrée
                 }
     
@@ -127,8 +150,12 @@ class RegionController extends AbstractController
     
             $entityManager->flush();
     
-            $this->addFlash('success', $importedCount . ' régions ont été importées avec succès.');
+            $this->addFlash('success', "$importedCount régions ont été importées avec succès.  $invalidCount lignes n'ont pas pu être importées.");
     
+            if ($invalidCount > 0) {
+                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+            }
+            
             return $this->redirectToRoute('app_region_index');
         }
     

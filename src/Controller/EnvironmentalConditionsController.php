@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\CountingCampaign;
 use App\Entity\SiteCollection;
+use App\Service\CampaignStatusService;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\EnvironmentalConditions;
 use App\Form\EnvironmentalConditionsType;
@@ -15,10 +16,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/environmental/conditions')]
+#[Route('/user/environmental/conditions')]
 #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class EnvironmentalConditionsController extends AbstractController
 {
+    private $campaignStatusService;
+
+    public function __construct(CampaignStatusService $campaignStatusService)
+    {
+        $this->campaignStatusService = $campaignStatusService;
+    }
+    
     #[Route('/', name: 'app_environmental_conditions_index', methods: ['GET'])]
     public function index(EnvironmentalConditionsRepository $environmentalConditionsRepository): Response
     {
@@ -84,12 +92,18 @@ class EnvironmentalConditionsController extends AbstractController
     //     ]);
     // }
 
+
     #[Route('/new', name: 'app_environmental_conditions_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser(); // Récupérer l'utilisateur actuel
         $siteId = $request->query->get('siteId');
         $campaignId = $request->query->get('campaignId');
+
+        $statuses =$this->campaignStatusService->getCampaignStatuses();
+        $statusClosed = $statuses['statusClosed'];
+        $statusSuspended = $statuses['statusSuspended'];
+        $statusCancelled = $statuses['statusCancelled'];
 
         $site = $entityManager->getRepository(SiteCollection::class)->find($siteId);
         $campaign = $entityManager->getRepository(CountingCampaign::class)->find($campaignId);
@@ -101,8 +115,14 @@ class EnvironmentalConditionsController extends AbstractController
             throw $this->createNotFoundException('Aucun site trouvé');
         }
 
-        if ($campaign->getCampaignStatus() === 'Clôturé') {
-            throw $this->createNotFoundException('Une campagne clôturée ne peut pas être modifiée.');
+        if ($campaign->getCampaignStatus() === $statusClosed) {
+            throw $this->createNotFoundException("Une campagne $statusClosed ne peut pas être modifiée");
+        }
+        if ($campaign->getCampaignStatus() === $statusSuspended) {
+            throw $this->createNotFoundException("Une campagne $statusSuspended ne peut pas être modifiée");
+        }
+        if ($campaign->getCampaignStatus() === $statusCancelled) {
+            throw $this->createNotFoundException("Une campagne $statusClosed ne peut pas être modifiée");
         }
 
         // Vérifier si l'utilisateur est membre d'un groupe d'agents assigné à ce site
@@ -173,16 +193,26 @@ class EnvironmentalConditionsController extends AbstractController
     {
         $user = $this->getUser(); // Récupérer l'utilisateur actuel
         $campaign = $environmentalCondition->getCountingCampaign();
+
+        $statuses =$this->campaignStatusService->getCampaignStatuses();
+        $statusClosed = $statuses['statusClosed'];
+        $statusSuspended = $statuses['statusSuspended'];
+        $statusCancelled = $statuses['statusCancelled'];
         
         if ($user != $environmentalCondition->getUser() && !$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error', "Vous n'avez pas l'autorisation pour faire la modification");
             return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
         }
         
-        if ($campaign->getCampaignStatus() === 'Clôturé') {
-            throw $this->createNotFoundException('Une campagne clôturée ne peut pas être modifiée.');
+        if ($campaign->getCampaignStatus() === $statusClosed) {
+            throw $this->createNotFoundException("Une campagne $statusClosed ne peut pas être modifiée");
         }
-
+        if ($campaign->getCampaignStatus() === $statusSuspended) {
+            throw $this->createNotFoundException("Une campagne $statusSuspended ne peut pas être modifiée");
+        }
+        if ($campaign->getCampaignStatus() === $statusCancelled) {
+            throw $this->createNotFoundException("Une campagne $statusClosed ne peut pas être modifiée");
+        }
         
         $form = $this->createForm(EnvironmentalConditionsType::class, $environmentalCondition);
         $form->handleRequest($request);
@@ -195,10 +225,6 @@ class EnvironmentalConditionsController extends AbstractController
     
                 return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
             } else {
-                // Log the errors for debugging
-                foreach ($form->getErrors(true) as $error) {
-                    error_log($error->getMessage());
-                }
                 $this->addFlash('error','Une erreur s\'est produite lors de la modification de conditions d\'environnement.');
             }
         }

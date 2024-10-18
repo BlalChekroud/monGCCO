@@ -44,8 +44,8 @@
                                 <td>{{ region.createdAt ? region.createdAt|date('d-m-Y') : '' }}</td>
                                 <td>
                                     <div class="d-flex justify-content-end">
-                                        <a href="{{ path('app_region_show', {'id': region.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail</a>
-                                        <a href="{{ path('app_region_edit', {'id': region.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
+                                        {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                        {{ macros.action_buttons('app_region_new','app_region_show', 'app_region_edit', 'region/_delete_form.html.twig', region, app.request.attributes.get('_route'), true) }}
                                         {{ include('region/_delete_form.html.twig') }}
                                     </div>
                                 </td>
@@ -61,11 +61,11 @@
               
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer une nouvelle région</a>
+              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer une région</a>
               <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des pays</a>
-              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer un nouveau pays</a>
+              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer pays</a>
               <a href="{{ path('app_city_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des villes</a>
-              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une nouvelle ville</a>
+              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une ville</a>
             </div>
           </div>
 
@@ -73,76 +73,20 @@
       </div>
     </section>
 
+    {% import 'macros/form_macros.html.twig' as form_macros %}
+
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-header">
-                        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
-                            {{ form_row(form.csvFile, {
-                                'attr': {
-                                    'onchange': 'document.getElementById("csvForm").submit();'
-                                }
-                            }) }}
-                        {{ form_end(form) }}
-                    </div>
-                    <div class="card-body">
-                      <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-                      <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-                    </div>
+                    {{ form_macros.csv_import_form(form, 'app_region_index') }}
                 </div>
             </div>
         </div>
     </section>
 
     {% if headers is defined and rows is defined %}
-        <!-- Modal -->
-        <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="csvPreviewModalLabel">Aperçu du fichier CSV</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <h5 class="text-center"><b>NB:</b> Les colonnes <code>region</code>,<code> country</code>, <code>iso2</code> et <code>regionCode</code> sont obligatoires.</h5>
-                    <div class="modal-body">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    {% for header in headers %}
-                                        <th>{{ header }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in rows %}
-                                    <tr>
-                                        {% for cell in row %}
-                                            <td>{{ cell }}</td>
-                                        {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <form method="post" action="{{ path('app_region_index') }}">
-                            <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
-                            <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
-                            <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Script to auto-show the modal after form submission -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
-                myModal.show();
-            });
-        </script>
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_region_index', ['region', 'regionCode'], ['country', 'iso2']) }}
     {% endif %}
 
   </main><!-- End #main -->

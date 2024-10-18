@@ -38,6 +38,22 @@
                     </tr>
                   </thead>
                   <tbody>
+                    {# * $campaignStatuses[0] -> "Planifiée"
+                    * $campaignStatuses[1] -> "En cours"
+                    * $campaignStatuses[2] -> "Terminée"
+                    * $campaignStatuses[3] -> "Clôturée"
+                    * $campaignStatuses[4] -> "Erreur"
+                    * $campaignStatuses[5] -> "Suspendue"
+                    * $campaignStatuses[6] -> "Annulée #}
+                    {% set status_classes = {
+                        0: 'primary',   
+                        1: 'info',      
+                        2: 'light',   
+                        3: 'success', 
+                        4: 'warning',    
+                        5: 'secondary',   
+                        6: 'dark'       
+                    } %}
                     {% for counting_campaign in counting_campaigns %}
                       <tr>
                         <td>{{ counting_campaign.id }}</td>
@@ -45,18 +61,11 @@
                         <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y') : '' }}</td>
                         <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y') : '' }}</td>
                         <td>
-                          {% set status_classes = {
-                            'En attente': 'info',
-                            'En cours': 'primary',
-                            'Terminé': 'success',
-                            'Clôturé': 'light',
-                            'Annulé': 'dark',
-                            'Erreur': 'warning',
-                            'Suspens': 'secondary'
-                          } %}
-                          <div class="badge bg-{{ status_classes[counting_campaign.campaignStatus] ?? 'secondary' }}">
-                            <i class="bi bi-circle-fill"></i>
-                            {{ counting_campaign.campaignStatus }}
+                          {# Utiliser le label du statut pour obtenir l'index depuis statusIndexMap #}
+                          {% set campaignStatusIndex = statusIndexMap[counting_campaign.campaignStatus.id] %}
+                          <div class="badge bg-{{ status_classes[campaignStatusIndex] ?? 'secondary' }}">
+                              <i class="bi bi-circle-fill"></i>
+                              {{ counting_campaign.campaignStatus.label }}
                           </div>
                         </td>
                         <td>
@@ -79,8 +88,9 @@
             </div>
             <div class="card-footer d-flex justify-content-between">
               <div class="d-flex justify-content-end">
-                  <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
-                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Créer un site de collecte</a>
+                  <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Créer une campagne</a>
+                  <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mz-2"> Consultation des collectes</a>
+                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Créer un site de collecte</a>
               </div>
               <div>
                 <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer" title="Imprimer"></button>

@@ -38,21 +38,25 @@
                                     <td>{{ bird_specy.scientificName }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Nom français</th>
+                                    <th>Nom français <h6>(nom vernaculaire)</h6></th>
                                     <td>{{ bird_specy.frenchName }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Code WI espèce</th>
+                                    <th>Nom anglais</th>
+                                    <td>{{ bird_specy.englishName }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Code WI d'espèce</th>
                                     <td>{{ bird_specy.wispeciescode }}</td>
                                 </tr>
                                 <tr>
                                     <th>Autorité</th>
                                     <td>{{ bird_specy.authority }}</td>
                                 </tr>
-                                <tr>
+                                {# <tr>
                                     <th>Couverture</th>
                                     <td>{{ bird_specy.coverage }}</td>
-                                </tr>
+                                </tr> #}
                                 <tr>
                                     <th>Créé le</th>
                                     <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('Y-m-d H:i:s') : '' }}</td>
@@ -125,12 +129,12 @@
                         <div class="row">
                             <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justify-content-between">
                                 <div>
-                                    <a href="{{ path('app_bird_species_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des espèce d'oiseaux">Retour</a>
+                                    <a href="{{ path('app_bird_species_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des espèces d'oiseaux">Retour</a>
                                     <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Créer une espèce</a>
                                 </div>
                                 <div class="d-flex justify-content-end">
                                     {% import 'macros/btn_actions_macros.html.twig' as macros %}
-                                    {{ macros.action_buttons('app_bird_species_show', 'app_bird_species_edit', 'bird_species/_delete_form.html.twig', bird_specy, app.request.attributes.get('_route')) }}
+                                    {{ macros.action_buttons('app_bird_species_new', 'app_bird_species_show', 'app_bird_species_edit', 'bird_species/_delete_form.html.twig', bird_specy, app.request.attributes.get('_route')) }}
                                     {{ include('bird_species/_delete_form.html.twig') }}
                                     <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="Imprimer"></button>
                                     <a href="#" class="btn btn-outline-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>

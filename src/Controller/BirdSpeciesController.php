@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ImportCsvType;
-use DateTime;
 use App\Form\CoverageType;
 use App\Form\BirdLifeTaxTreatType;
 use App\Form\IucnRedListCategoryType;
@@ -24,135 +23,178 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/bird/species')]
+#[Route('/user/bird/species')]
 class BirdSpeciesController extends AbstractController
 {
     #[Route('/', name: 'app_bird_species_index', methods: ['GET', 'POST'])]
-public function index(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager): Response
-{
-    $form = $this->createForm(ImportCsvType::class);
-    $form->handleRequest($request);
+    public function index(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(ImportCsvType::class);
+        $form->handleRequest($request);
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        /** @var UploadedFile $csvFile */
-        $csvFile = $form->get('csvFile')->getData();
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $csvFile */
+            $csvFile = $form->get('csvFile')->getData();
 
-        if ($csvFile) {
-            if (!$this->isGranted('ROLE_IMPORT')) {
-                throw $this->createNotFoundException('Vous n\'avez pas l\'autorisation d\'importer des données.');
+            if ($csvFile) {
+                if (!$this->isGranted('ROLE_IMPORT')) {
+                    throw $this->createNotFoundException('Vous n\'avez pas l\'autorisation d\'importer des données.');
+                }
+
+                $csvData = file_get_contents($csvFile->getPathname());
+                // Convertir l'encodage si nécessaire
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $csvData = mb_convert_encoding($csvData, 'UTF-8', 'ISO-8859-1'); // Changez 'ISO-8859-1' si besoin
+                }
+
+                // Vérifiez si la conversion a réussi
+                if (!mb_check_encoding( $csvData, 'UTF-8')) {
+                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    return $this->redirectToRoute('app_country_index');
+                }
+                
+                $rows = array_map(function($row) {
+                    return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
+                }, explode("\n", $csvData));
+
+                $headers = array_shift($rows); // Enlever la première ligne qui contient les en-têtes
+
+                return $this->render('bird_species/index.html.twig', [
+                    'bird_species' => $birdSpeciesRepository->findAll(),
+                    'form' => $form->createView(),
+                    'headers' => $headers,
+                    'rows' => $rows,
+                    'csvData' => $csvData,
+                ]);
             }
+        }
 
-            $csvData = file_get_contents($csvFile->getPathname());
+        if ($request->isMethod('POST') && $request->request->get('action') === 'import') {
+            $csvData = $request->request->get('csvData');
             $rows = array_map(function($row) {
-                return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
+                return str_getcsv($row, ';');
             }, explode("\n", $csvData));
 
-            $headers = array_shift($rows); // Enlever la première ligne qui contient les en-têtes
+            $headers = array_shift($rows);
 
-            return $this->render('bird_species/index.html.twig', [
-                'bird_species' => $birdSpeciesRepository->findAll(),
-                'form' => $form->createView(),
-                'headers' => $headers,
-                'rows' => $rows,
-                'csvData' => $csvData,
-            ]);
-        }
-    }
+            $importedCount = 0; // Compteur d'espèces d'oiseaux importées
+            $invalidCount = 0; // Compteur de lignes non importées
+            $processedSpecies = []; // Tableau pour suivre les espèces déjà traitées
+            $invalidRows = []; // Tableau pour stocker les numéros des lignes invalides
 
-    if ($request->isMethod('POST') && $request->request->get('action') === 'import') {
-        $csvData = $request->request->get('csvData');
-        $rows = array_map(function($row) {
-            return str_getcsv($row, ';');
-        }, explode("\n", $csvData));
+            foreach ($rows as $lineNumber => $row) {
+                // Ignorez les lignes vides, mais ne comptez pas la dernière ligne vide
+                if (empty(array_filter($row))) {
+                    continue; // Ignorez cette ligne sans l'incrémenter à invalidCount
+                }
 
-        $headers = array_shift($rows);
+                // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
+                if (count($row) !== count($headers)) {
+                    $invalidRows[] = $lineNumber + 2; // Ajouter 2 pour compenser les décalages d'index et la ligne d'en-tête
+                    $invalidCount++; // Compter comme ligne non valide
+                    continue; // Ignorez cette ligne
+                }
 
-        $importedCount = 0; // Compteur d'espèces d'oiseaux importées
-        $invalidCount = 0; // Compteur de lignes non importées
-        $processedSpecies = []; // Tableau pour suivre les espèces déjà traitées
+                $data = array_combine($headers, $row);
 
-        foreach ($rows as $row) {
-            // Ignorez les lignes vides, mais ne comptez pas la dernière ligne vide
-            if (empty(array_filter($row))) {
-                continue; // Ignorez cette ligne sans l'incrémenter à invalidCount
-            }
+                if ($data === false) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
+                    continue; // Ignorez les lignes où array_combine échoue
+                }
 
-            // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
-            if (count($row) !== count($headers)) {
-                $invalidCount++; // Compter comme ligne non valide
-                continue; // Ignorez cette ligne
-            }
+                // Fetch or create the BirdSpecies entity
+                $scientificName = $data['Scientific name'] ?? null;
+                $familyName = $data['Family name'] ?? null;
 
-            $data = array_combine($headers, $row);
+                if (empty($scientificName)) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
+                    continue; // Ignorez si les champs nécessaires sont vides
+                }
 
-            if ($data === false) {
-                $invalidCount++; // Compter comme ligne non valide
-                continue; // Ignorez les lignes où array_combine échoue
-            }
+                // Vérifier si l'espèce a déjà été traitée dans ce fichier
+                if (isset($processedSpecies[$scientificName])) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
+                    $processedSpecies[$scientificName] = true; // Marquer le site comme traité
+                    continue; // Si oui, ignorer cette entrée
+                }
 
-            // Fetch or create the BirdSpecies entity
-            $scientificName = $data['Scientific name'] ?? null;
+                // Vérifier si l'espèce existe déjà dans la base de données
+                $existingSpecies = $birdSpeciesRepository->findOneBy(['scientificName' => $scientificName]);
+                if ($existingSpecies) {
+                    $processedSpecies[$scientificName] = true;
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++; // Compter comme ligne non valide
+                    continue; // Si oui, ignorer cette entrée
+                }
 
-            if (empty($scientificName)) {
-                $invalidCount++; // Compter comme ligne non valide
-                continue; // Ignorez si les champs nécessaires sont vides
-            }
+                // Récupérer ou créer le pays associé
+                $birdFamilyRepository = $entityManager->getRepository(BirdFamily::class);
+                $existingFamily = $birdFamilyRepository->findOneBy(['familyName' => $familyName]);
 
-            // Vérifier si l'espèce a déjà été traitée dans ce fichier
-            if (isset($processedSpecies[$scientificName])) {
-                $invalidCount++; // Compter comme ligne non valide
-                continue; // Si oui, ignorer cette entrée
-            }
+                if (!$existingFamily) {
+                    $birdFamily = new BirdFamily();
+                    $birdFamily->setOrdre($data['ordre']);
+                    $birdFamily->setFamilyName($familyName);
+                    $birdFamily->setFamily( $data['family']);
+                    $birdFamily->setSubFamily($data['Subfamily'] ?? null);
+                    $birdFamily->setTribe($data['Tribe'] ?? null);
+                    $birdFamily->setCreatedAt(new \DateTimeImmutable());
+        
+                    $entityManager->persist($birdFamily);
+                    $existingFamily = $birdFamily; // Réassigner pour utiliser l'objet persisté
+                }
 
-            // Vérifier si l'espèce existe déjà dans la base de données
-            $existingSpecies = $birdSpeciesRepository->findOneBy(['scientificName' => $scientificName]);
-            if ($existingSpecies) {
+                // Créez et persistez une nouvelle espèce d'oiseaux
+                $birdSpecy = new BirdSpecies();
+                $birdSpecy->setScientificName($scientificName);
+                $birdSpecy->setFrenchName($data['French name'] ?? null);
+                $birdSpecy->setEnglishName($data['English name'] ?? null);
+                $birdSpecy->setWispeciescode($data['Wispeciescode'] ?? null);
+                $birdSpecy->setAuthority($data['Authority'] ?? null);
+                $birdSpecy->setCreatedAt(new \DateTimeImmutable());
+                $birdSpecy->setCommonName($data['Common name'] ?? null);
+                $birdSpecy->setCommonNameAlt($data['Alternative common names'] ?? null);
+                $birdSpecy->setSynonyms($data['Synonyms'] ?? null);
+                $birdSpecy->setTaxonomicSources($data['Taxonomic source'] ?? null);
+                $birdSpecy->setSisRecId($data['SISRecID'] ?? null);
+                $birdSpecy->setSpcRecId($data['SpcRecID'] ?? null);
+                $birdSpecy->setSubsppId($data['SubsppID'] ?? null);
+
+                $birdSpecy->setBirdFamily($existingFamily ?? null);
+                // $birdSpecy->setCoverage($coverage ?? null);
+                $birdSpecy->setBirdLifeTaxTreat($birdLifeTaxTreat ?? null);
+                $birdSpecy->setIucnRedListCategory($iucnRedListCategory ?? null);
+        
+
+                $entityManager->persist($birdSpecy);
+                $importedCount++; // Incrémentez le compteur
+
+                // Marquer cette espèce comme traitée
                 $processedSpecies[$scientificName] = true;
-                $invalidCount++; // Compter comme ligne non valide
-                continue; // Si oui, ignorer cette entrée
             }
 
-            // Créez et persistez une nouvelle espèce d'oiseaux
-            $birdSpecy = new BirdSpecies();
-            $birdSpecy->setScientificName($scientificName);
-            $birdSpecy->setFrenchName($data['French name'] ?? null);
-            $birdSpecy->setWispeciescode($data['Wispeciescode'] ?? null);
-            $birdSpecy->setAuthority($data['Authority'] ?? null);
-            $birdSpecy->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
-            $birdSpecy->setCommonName($data['Common name'] ?? null);
-            $birdSpecy->setCommonNameAlt($data['Alternative common names'] ?? null);
-            $birdSpecy->setSynonyms($data['Synonyms'] ?? null);
-            $birdSpecy->setTaxonomicSources($data['Taxonomic source'] ?? null);
-            $birdSpecy->setSisRecId($data['SISRecID'] ?? null);
-            $birdSpecy->setSpcRecId($data['SpcRecID'] ?? null);
-            $birdSpecy->setSubsppId($data['SubsppID'] ?? null);
-
-            $birdSpecy->setBirdFamily($birdFamily ?? null);
-            $birdSpecy->setCoverage($coverage ?? null);
-            $birdSpecy->setBirdLifeTaxTreat($birdLifeTaxTreat ?? null);
-            $birdSpecy->setIucnRedListCategory($iucnRedListCategory ?? null);
-    
-
-            $entityManager->persist($birdSpecy);
-            $importedCount++; // Incrémentez le compteur
-
-            // Marquer cette espèce comme traitée
-            $processedSpecies[$scientificName] = true;
+            // Affichez le nombre de lignes importées et non importées    
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', "$importedCount espèces d'oiseaux ont été importées avec succès. $invalidCount lignes n'ont pas pu être importées.");
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
+            }
+            
+            if ($invalidCount > 0) {
+                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+            }
+            return $this->redirectToRoute('app_bird_species_index');
         }
 
-        $entityManager->flush();
-
-        // Affichez le nombre de lignes importées et non importées
-        $this->addFlash('success', "$importedCount espèces d'oiseaux ont été importées avec succès. $invalidCount lignes n'ont pas pu être importées.");
-
-        return $this->redirectToRoute('app_bird_species_index');
+        return $this->render('bird_species/index.html.twig', [
+            'bird_species' => $birdSpeciesRepository->findAll(),
+            'form' => $form->createView(),
+        ]);
     }
-
-    return $this->render('bird_species/index.html.twig', [
-        'bird_species' => $birdSpeciesRepository->findAll(),
-        'form' => $form->createView(),
-    ]);
-}
 
     // #[Route('/', name: 'app_bird_species_index', methods: ['GET', 'POST'])]
     // public function index(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager): Response
@@ -384,14 +426,14 @@ public function index(Request $request, BirdSpeciesRepository $birdSpeciesReposi
             return $this->redirectToRoute('app_bird_species_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        $coverageForm = $this->createForm(CoverageType::class);
+        // $coverageForm = $this->createForm(CoverageType::class);
         $birdLifeTaxTreatForm = $this->createForm(BirdLifeTaxTreatType::class);
         $iucnRedListCategoryForm = $this->createForm(IucnRedListCategoryType::class);
 
         return $this->render('bird_species/new.html.twig', [
             'bird_specy' => $birdSpecy,
             'form' => $form,
-            'coverageForm' => $coverageForm->createView(),
+            // 'coverageForm' => $coverageForm->createView(),
             'birdLifeTaxTreatForm' => $birdLifeTaxTreatForm->createView(),
             'iucnRedListCategoryForm' => $iucnRedListCategoryForm->createView(),
         ]);

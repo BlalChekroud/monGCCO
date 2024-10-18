@@ -1,0 +1,5 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+    {{ macros.action_buttons('app_campaign_status_new', 'home', 'app_campaign_status_edit', 'campaign_status/_delete_form.html.twig', campaign_status, app.request.attributes.get('_route')) }}
+{{ form_end(form) }}

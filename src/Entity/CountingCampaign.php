@@ -53,14 +53,17 @@ class CountingCampaign
     #[ORM\JoinColumn(nullable: false)]
     private ?User $createdBy = null;
 
-    #[ORM\Column(length: 10)]
-    private ?string $campaignStatus = null;
+    // #[ORM\Column(length: 10)]
+    // private ?string $campaignStatus = null;
 
     /**
      * @var Collection<int, SiteAgentsGroup>
      */
     #[ORM\OneToMany(targetEntity: SiteAgentsGroup::class, mappedBy: 'countingCampaign', orphanRemoval: true)]
     private Collection $siteAgentsGroups;
+
+    #[ORM\ManyToOne(inversedBy: 'campaignStatus')]
+    private ?CampaignStatus $campaignStatus = null;
 
     public function __construct()
     {
@@ -148,52 +151,6 @@ class CountingCampaign
         }
         return $totalCollects;
     }
-    // public function getTotalCollects(): int
-    // {
-    //     $totalCollects = 0;
-
-    //     foreach ($this->getSiteAgentsGroups() as $siteAgentsGroup) {
-    //         $site = $siteAgentsGroup->getSiteCollection();
-    //         if ($site) {
-    //             $totalCollects += $site->getCollectedData()->count();
-    //         }
-    //     }
-
-    //     return $totalCollects;
-    // }
-
-    /**
-     * Retourne le nombre total de comptages d'oiseaux pour chaque site dans cette campagne
-     *
-     * @return array
-     */
-    public function getTotalCountsPerSite(): array
-    {
-        // Tableau pour stocker le total des comptages par site
-        $totalCountsPerSite = [];
-
-        // Parcourir chaque groupe de site associé à la campagne
-        foreach ($this->getSiteAgentsGroups() as $siteAgentsGroup) {
-            // Récupérer le site associé au groupe
-            $site = $siteAgentsGroup->getSiteCollection();
-
-            // Initialiser le total des comptages pour ce site à 0
-            if (!isset($totalCountsPerSite[$site->getId()])) {
-                $totalCountsPerSite[$site->getId()] = 0;
-            }
-
-            // Parcourir les données collectées pour ce site
-            foreach ($site->getCollectedData() as $collectedData) {
-                // Parcourir les comptages d'espèces d'oiseaux
-                foreach ($collectedData->getBirdSpeciesCounts() as $birdSpeciesCount) {
-                    // Ajouter chaque comptage au total pour ce site
-                    $totalCountsPerSite[$site->getId()] += $birdSpeciesCount->getCount();
-                }
-            }
-        }
-
-        return $totalCountsPerSite;
-    }
 
 
     /**
@@ -221,44 +178,6 @@ class CountingCampaign
 
         return $methodsUsed;
     }
-
-    // public function getAverageEnvironmentalConditions(): array
-    // {
-    //     $conditionsSummary = [
-    //         'disturbed' => 0,
-    //         'weather' => [],
-    //         'ice' => [],
-    //         'tidal' => [],
-    //         'water' => []
-    //     ];
-    //     $totalConditions = 0;
-    
-    //     foreach ($this->getCollectedData() as $collect) {
-    //         $environmentalConditions = $collect->getEnvironmentalConditions();
-    //         if ($environmentalConditions) {
-    //             $totalConditions++;
-    //             $conditionsSummary['disturbed'] += $environmentalConditions->getDisturbed() ? 1 : 0;
-    //             $conditionsSummary['weather'][] = $environmentalConditions->getWeather()->getLabel();
-    //             $conditionsSummary['ice'][] = $environmentalConditions->getIce()->getLabel();
-    //             $conditionsSummary['tidal'][] = $environmentalConditions->getTidal()->getLabel();
-    //             $conditionsSummary['water'][] = $environmentalConditions->getWater()->getLabel();
-    //         }
-    //     }
-    
-    //     // Calcul des pourcentages et des conditions les plus fréquentes
-    //     $averageConditions = [
-    //         'disturbed_percentage' => $totalConditions > 0 ? ($conditionsSummary['disturbed'] / $totalConditions) * 100 : 0,
-    //         'most_common_weather' => $this->getMostCommonCondition($conditionsSummary['weather']),
-    //         'most_common_ice' => $this->getMostCommonCondition($conditionsSummary['ice']),
-    //         'most_common_tidal' => $this->getMostCommonCondition($conditionsSummary['tidal']),
-    //         'most_common_water' => $this->getMostCommonCondition($conditionsSummary['water']),
-    //     ];
-    
-    //     return $averageConditions;
-    // }
-    
-
-
     public function getAverageEnvironmentalConditions(): array
     {
         $conditions = [
@@ -552,18 +471,6 @@ class CountingCampaign
         return $this;
     }
 
-    public function getCampaignStatus(): ?string
-    {
-        return $this->campaignStatus;
-    }
-
-    public function setCampaignStatus(string $campaignStatus): static
-    {
-        $this->campaignStatus = $campaignStatus;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, SiteAgentsGroup>
      */
@@ -590,6 +497,18 @@ class CountingCampaign
                 $siteAgentsGroup->setCountingCampaign(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCampaignStatus(): ?CampaignStatus
+    {
+        return $this->campaignStatus;
+    }
+
+    public function setCampaignStatus(?CampaignStatus $campaignStatus): static
+    {
+        $this->campaignStatus = $campaignStatus;
 
         return $this;
     }

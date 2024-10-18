@@ -61,8 +61,8 @@
                             <td>{{ country.createdAt ? country.createdAt|date('d-m-Y') : '' }}</td>
                             <td>
                                 <div class="d-flex justify-content-end">
-                                    <a href="{{ path('app_country_show', {'id': country.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-1"> Détail</a>
-                                    <a href="{{ path('app_country_edit', {'id': country.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_country_new','app_country_show', 'app_country_edit', 'country/_delete_form.html.twig', country, app.request.attributes.get('_route'), true) }}
                                     {{ include('country/_delete_form.html.twig') }}
                                 </div>
                             </td>
@@ -90,77 +90,7 @@
         </div>
       </div>
     </section>
-    {# <section class="section">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
-                            {{ form_row(form.csvFile, {
-                                'attr': {
-                                    'onchange': 'document.getElementById("csvForm").submit();'
-                                }
-                            }) }}
-                        {{ form_end(form) }}
-                    </div>
-                    <div class="card-body">
-                      <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-                      <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section> #}
 
-    {# {% if headers is defined and rows is defined %}
-        <!-- Modal -->
-        <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="csvPreviewModalLabel">Aperçu du fichier CSV</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <h5 class="text-center"><b>NB:</b> Les colonnes <code>country</code> et <code>iso2</code> sont obligatoires.</h5>
-                    <div class="modal-body">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    {% for header in headers %}
-                                        <th>{{ header }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in rows %}
-                                    <tr>
-                                        {% for cell in row %}
-                                            <td>{{ cell }}</td>
-                                        {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <form method="post" action="{{ path('app_country_index') }}">
-                            <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
-                            <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
-                            <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Script to auto-show the modal after form submission -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
-                myModal.show();
-            });
-        </script>
-    {% endif %} #}
     {% import 'macros/form_macros.html.twig' as form_macros %}
 
     <section class="section">

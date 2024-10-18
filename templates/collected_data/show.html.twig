@@ -31,16 +31,12 @@
                                     <th style="width: 30%; white-space: nowrap;">Campagne de comptage:</th>
                                     <td style="width: 70%;">
                                         {% if collected_datum.countingCampaign %}
-                                            {{ collected_datum.countingCampaign.campaignName }}
+                                            <div class="d-flex justify-content-between">{{ collected_datum.countingCampaign.campaignName }}<span class="explanation">({{ collected_datum.countingCampaign.campaignStatus }})</span></div>
                                         {% else %}
                                             <p>Aucune campagne de comptage trouvée</p>
                                         {% endif %}
                                     </td>
                                 </tr>
-                                {# <tr>
-                                    <th style="width: 30%; white-space: nowrap;">Groupe:</th>
-                                    <td style="width: 70%;">{{ collected_datum. }} {{ collected_datum.createdBy.lastName }}</td>
-                                </tr> #}
                                 <tr>
                                     <th style="width: 30%; white-space: nowrap;">Collecteur:</th>
                                     <td style="width: 70%;">{{ collected_datum.createdBy.name }} {{ collected_datum.createdBy.lastName }}</td>
@@ -55,6 +51,10 @@
                                         {% endif %}
                                     </td>
                                 </tr>
+                                {# <tr>
+                                    <th style="width: 30%; white-space: nowrap;">Groupe:</th>
+                                    <td style="width: 70%;">{{ group.collected_datum }}</td>
+                                </tr> #}
                                 {% if collected_datum.environmentalConditions is not empty %}
                                     <tr>
                                         <th style="width: 30%; white-space: nowrap;">Effets des conditions météorologiques sur les comptages <h6>(vent, pluie, brouillard) :</h6></th>

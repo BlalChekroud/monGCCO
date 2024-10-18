@@ -18,31 +18,23 @@
     </div><!-- End Page Title -->
 
     <section class="section">
-        <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
 
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Informations sur la nouvelle campagne</h5>
-
-                        {{ include('counting_campaign/_form.html.twig') }}<br/>
-                        
-                        <div class="card-footer">
-                          <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation des campagnes">Retour</a>
-                              <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-1"> Créer un site de collecte</a>
-                              <a href="{{ path('app_agents_group_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer un groupe</a>
-                            </div>
-                          </div>
-                        </div>
-
-                    </div>
-                </div>
-
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Informations sur la nouvelle campagne</h5>
+              {{ include('counting_campaign/_form.html.twig') }}
             </div>
-
+            <div class="card-footer">
+              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation des campagnes">Retour</a>
+              <a href="{{ path('app_agents_group_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer un groupe</a>
+              <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-1"> Créer un site de collecte</a>
+            </div>
+          </div>
+        
         </div>
+      </div>
     </section>
 </main>
 {% endblock %}

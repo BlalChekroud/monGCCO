@@ -34,6 +34,18 @@ class CountryController extends AbstractController
                 }
 
                 $csvData = file_get_contents($csvFile->getPathname());
+
+                // Convertir l'encodage si nécessaire
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $csvData = mb_convert_encoding($csvData, 'UTF-8', 'ISO-8859-1'); // Changez 'ISO-8859-1' si besoin
+                }
+
+                // Vérifiez si la conversion a réussi
+                if (!mb_check_encoding( $csvData, 'UTF-8')) {
+                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    return $this->redirectToRoute('app_country_index');
+                }
+
                 $rows = array_map(function($row) {
                     return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
                 }, explode("\n", $csvData));
@@ -59,9 +71,11 @@ class CountryController extends AbstractController
             $headers = array_shift($rows);
     
             $importedCount = 0; // Compteur de pays importés
+            $invalidCount = 0; // Compteur de lignes non importées
             $processedCountries = []; // Tableau pour suivre les pays déjà traités
+            $invalidRows = []; // Tableau pour stocker les numéros des lignes invalides
     
-            foreach ($rows as $row) {
+            foreach ($rows as $lineNumber => $row) {
                 // Ignorer les lignes vides
                 if (empty(array_filter($row))) {
                     continue;
@@ -69,13 +83,17 @@ class CountryController extends AbstractController
     
                 // Vérifiez si la ligne a le même nombre de colonnes que les en-têtes
                 if (count($row) !== count($headers)) {
-                    $this->addFlash('error', 'Ligne incorrecte : ' . implode(', ', $row));
+                    $invalidRows[] = $lineNumber + 2; // Ajouter 2 pour compenser les décalages d'index et la ligne d'en-tête
+                    $invalidCount++; // Compter comme ligne non valide
+                    // $this->addFlash('error', 'Ligne incorrecte : ' . implode(', ', $row));
                     continue; // Ignorez cette ligne
                 }
         
                 $data = array_combine($headers, $row);
         
                 if ($data === false) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Ignorez les lignes où array_combine échoue
                 }
     
@@ -83,11 +101,15 @@ class CountryController extends AbstractController
                 $iso2 = $data['iso2'];
     
                 if (empty($countryName) || empty($iso2)) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue;
                 }
 
                 // Vérifier si le pays a déjà été traité dans ce fichier
                 if (isset($processedCountries[$countryName])) {
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Si oui, ignorer cette entrée
                 }
     
@@ -95,6 +117,8 @@ class CountryController extends AbstractController
                 $existingCountry = $countryRepository->findOneBy(['name' => $countryName]);
                 if ($existingCountry) {
                     $processedCountries[$countryName] = true;
+                    $invalidRows[] = $lineNumber + 2;
+                    $invalidCount++;
                     continue; // Si oui, ignorer cette entrée
                 }
     
@@ -111,10 +135,17 @@ class CountryController extends AbstractController
                 $processedCountries[$countryName] = true;
             }
     
-            $entityManager->flush();
-    
-            $this->addFlash('success', $importedCount . ' pays ont été importés avec succès.');
-    
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', "$importedCount pays ont été importés avec succès.");
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
+            }
+            
+            if ($invalidCount > 0) {
+                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+            }
+
             return $this->redirectToRoute('app_country_index');
         }
     
@@ -123,8 +154,7 @@ class CountryController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-      
-
+    
     #[Route('/new', name: 'app_country_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {

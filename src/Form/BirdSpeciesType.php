@@ -28,6 +28,11 @@ class BirdSpeciesType extends AbstractType
                 'required' => false,
                 'empty_data' => '',
             ])
+            ->add('englishName',TextType::class, [
+                'label' => 'Nom anglais',
+                'required' => false,
+                'empty_data' => '',
+            ])
             ->add('birdFamily', EntityType::class, [
                 'class' => BirdFamily::class,
                 'autocomplete' => true,

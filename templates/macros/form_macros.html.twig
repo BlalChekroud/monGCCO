@@ -16,7 +16,7 @@
     </div>
 {% endmacro %}
 
-{% macro csv_modal(headers, rows, csvData, submit_action, requiredHeaders) %}
+{% macro csv_modal(headers, rows, csvData, submit_action, requiredHeaders, optionalHeaders) %}
     <!-- Modal -->
     <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable"> <!-- Changement ici pour agrandir la fenêtre -->
@@ -33,6 +33,31 @@
                         {% endfor %}
                         <span>sont obligatoires.</span>
                     </p>
+                    {% if optionalHeaders|length > 0 %}
+                        <p>
+                            <span>Les colonnes </span>
+                            {% for header in optionalHeaders %}
+                                <code>{{ header }}, </code>
+                            {% endfor %}
+                            <span>sont facultatives.</span>
+                        </p>
+                    {% endif %}
+                    <!-- Afficher les colonnes manquantes -->
+                    <span class="text-danger">Colonnes manquantes :
+                        {% set missingHeaders = [] %}
+                        {% for requiredHeader in requiredHeaders %}
+                            {% if requiredHeader not in headers %}
+                                {% set missingHeaders = missingHeaders|merge([requiredHeader]) %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if missingHeaders is empty %}
+                            <span>Aucune colonne manquante</span>
+                        {% else %}
+                            {% for missingHeader in missingHeaders %}
+                                <code>{{ missingHeader }}</code>{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </span>
                     <table class="table table-striped">
                         <thead>
                             <tr>
@@ -40,7 +65,10 @@
                                     <th>
                                         {{ header }} 
                                         {% if header in requiredHeaders %}
-                                            <span class="text-danger">*</span> <!-- Indique que c'est obligatoire -->
+                                            <span class="text-success bi bi-check-circle me-1"></span> <!-- Indique que c'est obligatoire -->
+                                        {% endif %}
+                                        {% if header in optionalHeaders %}
+                                            <span class="text-success bi bi-check-circle me-1"></span> <!-- Indique que c'est obligatoire -->
                                         {% endif %}
                                     </th>
                                 {% endfor %}
@@ -60,7 +88,9 @@
                 <div class="modal-footer">
                     <form method="post" action="{{ path(submit_action) }}">
                         <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
-                        <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
+                        {% if missingHeaders is empty %}
+                            <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
+                        {% endif %}
                         <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
                     </form>
                 </div>

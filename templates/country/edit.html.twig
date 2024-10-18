@@ -24,12 +24,16 @@
             <div class="card-body">
               <h5 class="card-title">Les nouvelles informations sur le pays</h5>
 
-              {{ include('country/_form.html.twig', {'button_label': ' Mise à jour'}) }}
+              {{ include('country/_form.html.twig') }}
 
             </div>
-            <div class="card-footer">
+            <div class="card-footer d-flex justify-content-between">
+              <div>
+                <a href="{{ path('app_country_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des pays">Retour</a>
+              </div>
               <div class="d-flex justify-content-end">
-                <a href="{{ path('app_country_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>
+                {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                {{ macros.action_buttons('app_country_new','app_country_show', 'app_country_edit', 'country/_delete_form.html.twig', country, app.request.attributes.get('_route'), false) }}
                 {{ include('country/_delete_form.html.twig') }}
               </div>
             </div>

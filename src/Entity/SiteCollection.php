@@ -53,12 +53,6 @@ class SiteCollection
     #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $longFin = null;
 
-    // /**
-    //  * @var Collection<int, CountingCampaign>
-    //  */
-    // #[ORM\ManyToMany(targetEntity: CountingCampaign::class, mappedBy: 'siteCollection')]
-    // private Collection $countingCampaigns;
-
     #[ORM\ManyToOne(inversedBy: 'siteCollections')]
     #[ORM\JoinColumn(nullable: false)]
     private ?City $city = null;
@@ -92,7 +86,6 @@ class SiteCollection
 
     public function __construct()
     {
-        // $this->countingCampaigns = new ArrayCollection();
         $this->collectedData = new ArrayCollection();
         $this->environmentalConditions = new ArrayCollection();
         $this->siteCollections = new ArrayCollection();
@@ -223,33 +216,6 @@ class SiteCollection
 
         return $this;
     }
-
-    // /**
-    //  * @return Collection<int, CountingCampaign>
-    //  */
-    // public function getCountingCampaigns(): Collection
-    // {
-    //     return $this->countingCampaigns;
-    // }
-
-    // public function addCountingCampaign(CountingCampaign $countingCampaign): static
-    // {
-    //     if (!$this->countingCampaigns->contains($countingCampaign)) {
-    //         $this->countingCampaigns->add($countingCampaign);
-    //         $countingCampaign->addSiteCollection($this);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removeCountingCampaign(CountingCampaign $countingCampaign): static
-    // {
-    //     if ($this->countingCampaigns->removeElement($countingCampaign)) {
-    //         $countingCampaign->removeSiteCollection($this);
-    //     }
-
-    //     return $this;
-    // }
 
     /**
      * @return Collection<int, CollectedData>

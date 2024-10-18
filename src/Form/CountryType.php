@@ -16,12 +16,10 @@ class CountryType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Nom du pays<span class="requiredField">*</span>',
                 'label_html' => true,
-                'required' => false,
                 ])
             ->add('iso2', TextType::class, [
                 'label' => 'Iso2<span class="requiredField">*</span>',
                 'label_html' => true,
-                'required' => false,
                 ])
         ;
     }

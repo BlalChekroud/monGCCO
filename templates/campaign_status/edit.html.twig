@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier une famille des espèces{% endblock %}
+{% block title %}Modifier un état de campagne{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Modifier cette famille d'espèces</h1>
+      <h1>Modifier un état de campagne</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_bird_family_index') }}">Gestion des familles</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_campaign_status_index') }}">Gestion des états de campagne</a></li>
           <li class="breadcrumb-item active">Modification</li>
         </ol>
       </nav>
@@ -22,20 +22,18 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Les nouvelles informations de la famille</h5>
+              <h5 class="card-title">Les nouvelles informations sur l'état</h5>
 
-              {{ include('bird_family/_form.html.twig') }}
+              {{ include('campaign_status/_form.html.twig') }}
 
             </div>
             <div class="card-footer">
               <div class="d-flex justify-content-between">
                 <div>
-                  <a href="{{ path('app_bird_family_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers consultation des famille">Retour</a>
+                    <a href="{{ path('app_campaign_status_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des état de campagne">Retour</a>
                 </div>
                 <div class="d-flex justify-content-end">
-                  {% import 'macros/btn_actions_macros.html.twig' as macros %}
-                  {{ macros.action_buttons('app_bird_family_new', 'app_bird_family_show', 'app_bird_family_edit', 'bird_family/_delete_form.html.twig', bird_family, app.request.attributes.get('_route'), false) }}
-                  {{ include('bird_family/_delete_form.html.twig') }}
+                    {{ include('campaign_status/_delete_form.html.twig') }}
                 </div>
               </div>
             </div>

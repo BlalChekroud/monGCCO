@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau état{% endblock %}
+
+{% block body %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Créer un état de campagne</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_campaign_status_index') }}">Gestion des pays</a></li>
+          <li class="breadcrumb-item active">Création</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Informations sur le nouveau état</h5>
+
+              {{ include('campaign_status/_form.html.twig') }}
+
+            </div>
+            <div class="card-footer">
+                <a href="{{ path('app_campaign_status_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des état de campagne">Retour</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}
