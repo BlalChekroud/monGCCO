@@ -1,6 +1,7 @@
 <?php
 
-namespace App\EventSubscriber;
+namespace App\Service\EventSubscriber;
+// namespace App\EventSubscriber;
 
 use App\Repository\LogoRepository;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;

@@ -1,1 +1,19 @@
-error 
+{# {% extends 'base.html.twig' %} #}
+
+{% block body %}
+    <main id="main" class="main">
+        <section class="section">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                    <h1>Page error</h1>
+
+                    <p>
+                        The requested page couldn't be located. Checkout for any URL
+                        misspelling or <a href="{{ path('home') }}">return to the homepage</a>.
+                        error
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}
