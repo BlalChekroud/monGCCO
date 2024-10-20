@@ -31,7 +31,8 @@
                         </div>
 
                         {{ include('collected_data/_form.html.twig') }}
-
+                    </div>
+                    <div class="card-footer">
                         <a href="{{ path('app_collected_data_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation des collectes">Retour</a>
                         <a href="{{ path('app_environmental_conditions_show', {'id': environmentalConditions.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-2" title="Détail de conditions environnementales"> Conditions environnementales</a>
                         <a href="{{ path('app_counting_campaign_show', {'id': campaign_id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-1" title="Détail de la campagne"> Campagne</a>

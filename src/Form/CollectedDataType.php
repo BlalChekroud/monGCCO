@@ -52,7 +52,7 @@ class CollectedDataType extends AbstractType
             // ])
             ->add('birdSpeciesCounts', CollectionType::class, [
                 'entry_type' => BirdSpeciesCountType::class,
-                'entry_options' => ['label' => false],
+                // 'entry_options' => ['label' => false],
                 'allow_add' => true,
                 'allow_delete' => true,
                 'by_reference' => false,

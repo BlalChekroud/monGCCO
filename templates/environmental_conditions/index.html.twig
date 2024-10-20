@@ -52,8 +52,8 @@
                             <td>{{ environmental_condition.updatedAt ? environmental_condition.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>
                                 <div class="d-flex justify-content-end">
-                                    <a href="{{ path('app_environmental_conditions_show', {'id': environmental_condition.id}) }}" class="btn-action btn btn-outline-success btn-sm bi bi-card-text mx-2"> Détail</a>
-                                    <a href="{{ path('app_environmental_conditions_edit', {'id': environmental_condition.id}) }}" class="btn-action bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_environmental_conditions_new','app_environmental_conditions_show', 'app_environmental_conditions_edit', 'environmental_condition/_delete_form.html.twig', environmental_condition, app.request.attributes.get('_route')) }}
                                     {{ include('environmental_conditions/_delete_form.html.twig') }}
                                 </div>
                             </td>
@@ -70,40 +70,19 @@
               
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task"> Consultation des campagnes</a>
-              <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des collectes</a>
-              <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une collecte</a>
+              <div>
+                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task"> Consultation des campagnes</a>
+                <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des collectes</a>
+                {# <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une collecte</a> #}
+              </div>
+              <div>
+              </div>
             </div>
           </div>
 
         </div>
       </div>
     </section>
-
-    <div class="alert border-light alert-dismissible fade show" role="alert">
-      <!-- Card with header and footer -->
-      <div class="card">
-        <div class="card-header">
-          {# {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-            {{ form_row(form.csvFile) }}
-            <button type="submit" formaction="{{ path('app_bird_family_preview') }}" class="btn btn-outline-primary btn-sm bi bi-eye"> Aperçu CSV</button>
-            <button type="submit" formaction="{{ path('app_bird_family_import') }}" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer CSV</button>
-            {% for error in form.csvFile.vars.errors %}
-              <div class="alert alert-danger">{{ error.message }}</div>
-            {% endfor %}
-              
-            {% for flash_error in app.flashes('error') %}
-              <div class="alert alert-danger">{{ flash_error }}</div>
-            {% endfor %}
-          {{ form_end(form) }} #}
-        </div>
-        <div class="card-footer">
-          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      </div><!-- End Card with header and footer -->
-    </div>
 
   </main><!-- End #main -->
 {% endblock %}

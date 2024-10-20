@@ -81,5 +81,11 @@ class Image
         return $this;
     }
 
+    // In your Image entity
+    public function getImageUrl(): ?string
+    {
+        return $this->imageFile ? '/images/all/' . $this->imageFile->getFilename() : null;
+    }
+
 
 }

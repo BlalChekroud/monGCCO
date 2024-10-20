@@ -51,8 +51,8 @@
                             <td>{{ collected_datum.createdAt ? collected_datum.createdAt|date('d-m-Y') : '' }}</td>
                             <td>
                                 <div class="d-flex justify-content-end">
-                                  <a href="{{ path('app_collected_data_show', {'id': collected_datum.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-2"> Détail</a>
-                                  <a href="{{ path('app_collected_data_edit', {'id': collected_datum.id}) }}" class="bi bi-pencil-square btn btn-outline-primary btn-sm mx-2"> Modifier</a>
+                                  {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                  {{ macros.action_buttons('app_collected_data_new','app_collected_data_show', 'app_collected_data_edit', 'collected_data/_delete_form.html.twig', collected_datum, app.request.attributes.get('_route'), true) }}
                                   {{ include('collected_data/_delete_form.html.twig') }}
                               </div>
                             </td>

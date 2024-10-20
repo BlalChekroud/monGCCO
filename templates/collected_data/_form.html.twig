@@ -140,9 +140,18 @@
 {{ form_start(form) }} 
     {{ form_errors(form) }}
     
-    {{ form_row(form.countType) }}
-    {{ form_row(form.quality) }}
-    {{ form_row(form.method) }}
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            {{ form_row(form.countType, {'attr': {'class': 'form-control shadow-sm rounded'}}) }}
+        </div>
+        <div class="col-md-6 mb-4">
+            {{ form_row(form.quality, {'attr': {'class': 'form-control shadow-sm rounded'}}) }}
+        </div>
+    </div>
+
+    <div class="form-group mb-4">
+        {{ form_row(form.method, {'attr': {'class': 'form-control shadow-sm rounded'}}) }}
+    </div>
 
     <div class="container">
         <div class="row">
@@ -168,7 +177,8 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
-                                    <button type="button" class="btn btn-danger remove-item">Supprimer</button>
+                                    {# <button type="button" class="btn btn-danger remove-item">Supprimer</button> #}
+                                    <button type="button" class="btn btn-danger bi bi-trash btn-sm remove-birdSpeciesCount" title="Supprimer"></button>
                                 </div>
                             </div>
                         </div>
@@ -176,129 +186,284 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
-                <button type="button" class="btn btn-primary add-item">Ajouter un oiseau</button>
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <button type="button" class="btn btn-sm btn-primary rounded-pill shadow-sm add-item"><i class="bi bi-twitter me-2"></i>Compter un oiseau</button>
             </div>
         </div>
     </div>
 
-    <div class="row mb-3">
-        <div class="col-sm-3">
-            <button type="reset" class="btn btn-light">Annuler</button>
-        </div>
-        <div class="col-sm-4">
-            <button class="btn btn-outline-primary">Enregistrer</button>
-        </div>
-    </div>
+    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+    {{ macros.action_buttons('app_collected_data_new','app_collected_data_show', 'app_collected_data_edit', 'collected_data/_delete_form.html.twig', collected_datum, app.request.attributes.get('_route'), true) }}
 {{ form_end(form) }}
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const container = document.querySelector('#birdSpeciesCountsContainer');
-        
-        if (container) {
-            const addButton = document.querySelector('.add-item');
-            const prototype = container.getAttribute('data-prototype');
-            let index = {{ form.birdSpeciesCounts|length }};
+    // Bouton pour ajouter une nouvelle espèce d'oiseau
+    var addButton = document.querySelector('.add-item');
+    // Conteneur de la collection des espèces d'oiseaux
+    var collectionHolder = document.getElementById('birdSpeciesCountsContainer');
 
-            addButton.addEventListener('click', function () {
-                const newForm = prototype.replace(/__name__/g, index);
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(newForm, 'text/html');
-                
-                const birdSpeciesSelect = doc.querySelector('[name*="[birdSpecies]"]').outerHTML;
-                const birdSpeciesCountInput = doc.querySelector('[name*="[count]"]').outerHTML;
+    // Compteur d'index pour chaque élément ajouté dynamiquement
+    var index = collectionHolder.children.length;
 
-                // Update the birdSpeciesCountInput to have a unique ID
-                const updatedBirdSpeciesCountInput = birdSpeciesCountInput.replace(/id="[^"]*"/, `id="count-${index}"`);
+    // Fonction pour ajouter une nouvelle espèce d'oiseau
+    addButton.addEventListener('click', function () {
+        var newForm = collectionHolder.dataset.prototype;
+        newForm = newForm.replace(/__name__/g, index);
 
-                const newFormElement = document.createElement('div');
-                newFormElement.classList.add('col-sm-12', 'col-md-12', 'col-lg-12', 'mb-12');
-                newFormElement.innerHTML = `
-                    <div class="card">
-                        <div class="row">
-                            <div class="col-sm-5 col-md-5 col-lg-5 mb-5">
-                                ${birdSpeciesSelect}
-                                <img class="bird-image img-fluid" style="display:none;" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-3 col-md-3 col-lg-3 mb-2">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-${index}">-</button>
-                                    </div>
-                                    ${updatedBirdSpeciesCountInput}
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-${index}">+</button>
+        var formDiv = document.createElement('div');
+        formDiv.classList.add('row', 'mb-3', 'birdSpeciesCountsContainer-item');
+        formDiv.innerHTML = `
+            <div class="col-sm-5 col-md-5 col-lg-5 mb-5">${newForm}</div>
+            {# <div class="col-sm-2 col-md-2 col-lg-2 mb-2">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-${index}">-</button>
+                    </div>
+                    <input type="number" id="count-${index}" name="bird_species_counts[${index}][count]" value="0" class="form-control">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-${index}">+</button>
+                    </div>
+                </div>
+            </div> #}
+            <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                <button type="button" class="btn btn-danger bi bi-trash btn-sm remove-birdSpeciesCount" title="Supprimer"></button>
+            </div>
+        `;
+        collectionHolder.appendChild(formDiv);
+
+        // Ajouter les événements pour l'incrémentation et la suppression au nouveau formulaire
+        attachIncreaseDecreaseListeners(formDiv);
+        formDiv.querySelector('.remove-birdSpeciesCount').addEventListener('click', function () {
+            formDiv.remove();
+        });
+
+        index++;
+    });
+
+    // Fonction pour gérer les boutons d'incrémentation et de décrémentation
+    function attachIncreaseDecreaseListeners(element) {
+        element.querySelectorAll('.increaseButton').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var targetId = button.getAttribute('data-target');
+                var input = document.getElementById(targetId);
+                var value = parseInt(input.value) || 0;
+                input.value = value + 1;
+            });
+        });
+
+        element.querySelectorAll('.decreaseButton').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var targetId = button.getAttribute('data-target');
+                var input = document.getElementById(targetId);
+                var value = parseInt(input.value) || 0;
+                input.value = value > 0 ? value - 1 : 0;
+            });
+        });
+    }
+
+    // Attacher les événements de suppression aux éléments existants
+    document.querySelectorAll('.remove-birdSpeciesCount').forEach(function (button) {
+        button.addEventListener('click', function () {
+            button.closest('.birdSpeciesCountsContainer-item').remove();
+        });
+    });
+
+    function fetchImage(selectElement) {
+        var speciesId = selectElement.value; // ID de l'espèce sélectionnée
+        var index = selectElement.closest('.birdSpeciesCountsContainer-item').querySelector('.text-center').id.split('-')[1]; // Index du conteneur d'image
+
+        fetch(`/user/bird/species/${speciesId}/image`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur de réseau');
+                }
+                return response.json();
+            })
+            .then(data => {
+                var imageContainer = document.getElementById(`imageContainer-${index}`);
+                if (data.image) {
+                    imageContainer.innerHTML = `<img src="${data.image}" alt="Oiseau" class="img-fluid rounded mx-auto d-block shadow-sm">`;
+                } else {
+                    imageContainer.innerHTML = `<p class="text-muted">Aucune image disponible</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+            });
+    }
+</script>
+
+
+
+{# {{ form_start(form) }} 
+    {{ form_errors(form) }}
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            {{ form_row(form.countType, {'attr': {'class': 'form-control shadow-sm rounded'}}) }}
+        </div>
+        <div class="col-md-6 mb-4">
+            {{ form_row(form.quality, {'attr': {'class': 'form-control shadow-sm rounded'}}) }}
+        </div>
+    </div>
+
+    <div class="form-group mb-4">
+        {{ form_row(form.method, {'attr': {'class': 'form-control shadow-sm rounded'}}) }}
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mb-4">
+                <label>{{ form_label(form.birdSpeciesCounts) }}</label>
+                <div id="birdSpeciesCountsContainer" data-prototype="{{ form_widget(form.birdSpeciesCounts.vars.prototype)|e('html_attr') }}">
+                    {% for birdSpeciesCountForm in form.birdSpeciesCounts %}
+                        <div class="card shadow-sm mb-3 p-3 birdSpeciesCountsContainer-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-5 mb-4">
+                                    {{ form_row(birdSpeciesCountForm.birdSpecies, {'attr': {'class': 'form-control shadow-sm rounded', 'onchange': 'fetchImage(this)'}}) }}
+                                    <div class="text-center mt-2" id="imageContainer-{{ loop.index }}">
+                                        {% if birdSpeciesCountForm.birdSpecies.vars.data.image %}
+                                            <img src="{{ vich_uploader_asset(birdSpeciesCountForm.birdSpecies.vars.data.image, 'imageFile') }}" 
+                                                 alt="{{ birdSpeciesCountForm.birdSpecies.vars.data.frenchName }}" 
+                                                 class="img-fluid rounded mx-auto d-block shadow-sm">
+                                        {% else %}
+                                            <p class="text-muted">Aucune image disponible</p>
+                                        {% endif %}
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
-                                <button type="button" class="btn btn-danger remove-item">Supprimer</button>
+                                <div class="col-md-4 mb-4">
+                                    <div class="input-group">
+                                        {{ form_widget(birdSpeciesCountForm.count, {'attr': {'id': 'count-' ~ loop.index, 'class': 'form-control shadow-sm text-center'}}) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-right">
+                                    <button type="button" class="btn btn-danger shadow-sm remove-item" title="Supprimer"></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-                container.appendChild(newFormElement);
-                index++;
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <button type="button" class="btn btn-sm btn-primary rounded-pill shadow-sm add-item"><i class="bi bi-twitter me-2"></i>Compter un oiseau</button>
+            </div>
+        </div>
+    </div>
 
-                attachImageUpdateListener(newFormElement);
-                attachIncreaseDecreaseListeners(newFormElement);
-            });
+    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+    {{ macros.action_buttons('app_collected_data_new','app_collected_data_show', 'app_collected_data_edit', 'collected_data/_delete_form.html.twig', collected_datum, app.request.attributes.get('_route'), true) }}
+{{ form_end(form) }}
 
-            function attachImageUpdateListener(element) {
-                const select = element.querySelector('[name*="[birdSpecies]"]');
-                const img = element.querySelector('.bird-image');
+<script>
+    var addButton = document.querySelector('.add-item');
+    var collectionHolder = document.getElementById('birdSpeciesCountsContainer');
+    var index = collectionHolder.children.length;
 
-                select.addEventListener('change', function () {
-                    const birdId = select.value;
-                    if (birdId) {
-                        fetch(`/bird/species/get-bird-image/${birdId}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.imageUrl) {
-                                    img.src = data.imageUrl;
-                                    img.style.display = 'block';
-                                } else {
-                                    img.style.display = 'none';
-                                }
-                            })
-                            .catch(error => console.error('Erreur lors du chargement de l\'image :', error));
-                    }
-                });
-            }
+    addButton.addEventListener('click', function () {
+        var newForm = collectionHolder.dataset.prototype;
+        newForm = newForm.replace(/__name__/g, index);
 
-            document.querySelectorAll('.birdSpeciesCountsContainer-item').forEach(function (element) {
-                attachImageUpdateListener(element);
-            });
+        var formDiv = document.createElement('div');
+        formDiv.classList.add('row', 'mb-3', 'birdSpeciesCountsContainer-item');
+        formDiv.innerHTML = `
+            <div class="col-md-5 mb-4">${newForm}</div>
+            <div class="col-md-3 text-right">
+                <button type="button" class="btn btn-danger btn-sm remove-birdSpeciesCount shadow-sm bi bi-trash" title="Supprimer"></button>
+            </div>
+        `;
+        collectionHolder.appendChild(formDiv);
+        
+        // Attacher des écouteurs pour le nouveau formulaire
+        attachIncreaseDecreaseListeners(formDiv);
 
-            function attachIncreaseDecreaseListeners(element) {
-                element.querySelectorAll('.increaseButton').forEach(function (button) {
-                    button.addEventListener('click', function () {
-                        const targetId = button.getAttribute('data-target');
-                        const input = document.getElementById(targetId);
-                        if (input) {
-                            let value = parseInt(input.value, 10);
-                            input.value = isNaN(value) ? 1 : value + 1;
-                        }
-                    });
-                });
-
-                element.querySelectorAll('.decreaseButton').forEach(function (button) {
-                    button.addEventListener('click', function () {
-                        const targetId = button.getAttribute('data-target');
-                        const input = document.getElementById(targetId);
-                        if (input) {
-                            let value = parseInt(input.value, 10);
-                            input.value = Math.max(value - 1, 0);
-                        }
-                    });
-                });
-            }
-
-            attachIncreaseDecreaseListeners(document);
-        }
+        formDiv.querySelector('.remove-birdSpeciesCount').addEventListener('click', function () {
+            formDiv.remove();
+        });
+        
+        index++;
     });
-</script>
+
+    function attachIncreaseDecreaseListeners(element) {
+        // Écouteur pour les champs de comptage
+        const countInput = element.querySelector('input[name*="[count]"]');
+        if (countInput) {
+            countInput.addEventListener('change', function () {
+                console.log(`Count changed to: ${this.value}`);
+                // Traitez ici le changement de count
+            });
+        }
+
+        // Écouteur pour les sélecteurs d'espèces
+        const speciesSelect = element.querySelector('select[name*="[birdSpecies]"]');
+        if (speciesSelect) {
+            speciesSelect.addEventListener('change', function () {
+                const selectedSpecies = this.value;
+                console.log(`Bird species changed to: ${selectedSpecies}`);
+                fetchImage(this); // Appeler la fonction fetchImage pour récupérer l'image
+                // Traitez ici le changement d'espèce
+            });
+        }
+
+        // Attach buttons for increasing and decreasing count if applicable
+        element.querySelectorAll('.increaseButton').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var targetId = button.getAttribute('data-target');
+                var input = document.getElementById(targetId);
+                var value = parseInt(input.value) || 0;
+                input.value = value + 1;
+            });
+        });
+        
+        element.querySelectorAll('.decreaseButton').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var targetId = button.getAttribute('data-target');
+                var input = document.getElementById(targetId);
+                var value = parseInt(input.value) || 0;
+                input.value = value > 0 ? value - 1 : 0;
+            });
+        });
+    }
+
+    document.querySelectorAll('.remove-birdSpeciesCount').forEach(function (button) {
+        button.addEventListener('click', function () {
+            button.closest('.birdSpeciesCountsContainer-item').remove();
+        });
+    });
+
+    function fetchImage(selectElement) {
+        var speciesId = selectElement.value; // ID de l'espèce sélectionnée
+        var closestContainer = selectElement.closest('.birdSpeciesCountsContainer-item');
+
+        // Vérifiez si closestContainer est null
+        if (!closestContainer) {
+            console.error('Le conteneur de l\'élément est introuvable.');
+            return; // Sortir de la fonction si le conteneur n'est pas trouvé
+        }
+
+        var index = closestContainer.querySelector('.text-center').id.split('-')[1]; // Index du conteneur d'image
+
+        fetch(`/user/bird/species/${speciesId}/image`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur de réseau');
+                }
+                return response.json();
+            })
+            .then(data => {
+                var imageContainer = document.getElementById(`imageContainer-${index}`);
+                if (data.image) {
+                    imageContainer.innerHTML = `<img src="${data.image}" alt="Oiseau" class="img-fluid rounded mx-auto d-block shadow-sm">`;
+                } else {
+                    imageContainer.innerHTML = `<p class="text-muted">Aucune image disponible</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+            });
+        }
+
+</script> #}
+

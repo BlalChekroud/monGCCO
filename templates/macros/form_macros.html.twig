@@ -3,7 +3,7 @@
         <h5 class="mb-0">Importer un fichier CSV</h5>
         <div>
             <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="Imprimer"></button>
-            <a href="#" class="btn btn-outline-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
+            <button id="exportCSVButton" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></button>
         </div>
     </div>
     <div class="card-body">
@@ -97,11 +97,12 @@
             </div>
         </div>
     </div>
-
+    <script src="{{ asset('./js/csv.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
             myModal.show();
         });
     </script>
+
 {% endmacro %}

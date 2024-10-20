@@ -68,7 +68,7 @@ class EnvironmentalConditionsController extends AbstractController
 
     //     if ($form->isSubmitted()) {
     //         if ($form->isValid()) {
-    //             $environmentalCondition->setCreatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
+    //             $environmentalCondition->setCreatedAt(new \DateTimeImmutable());
     //             $environmentalCondition->setSiteCollection($site);
     //             $environmentalCondition->setCountingCampaign($campaign);
     //             $environmentalCondition->setUser($user);
@@ -157,7 +157,7 @@ class EnvironmentalConditionsController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()){
-                $environmentalCondition->setCreatedAt(\DateTimeImmutable::createFromMutable(new \DateTime()));
+                $environmentalCondition->setCreatedAt(new \DateTimeImmutable());
                 $environmentalCondition->setSiteCollection($site);
                 $environmentalCondition->setCountingCampaign($campaign);
                 $environmentalCondition->setUser($user);
@@ -219,7 +219,7 @@ class EnvironmentalConditionsController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $environmentalCondition->setUpdatedAt(\DateTimeImmutable::createFromMutable(new DateTime()));
+                $environmentalCondition->setUpdatedAt(new \DateTimeImmutable());
                 $entityManager->flush();
                 $this->addFlash('success', "Conditions a bien été modifié");
     

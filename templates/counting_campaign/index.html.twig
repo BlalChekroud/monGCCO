@@ -70,8 +70,8 @@
                         </td>
                         <td>
                           <div class="d-flex justify-content-end">
-                            <a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
-                            <a href="{{ path('app_counting_campaign_edit', {'id': counting_campaign.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
+                            {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                            {{ macros.action_buttons('app_counting_campaign_new','app_counting_campaign_show', 'app_counting_campaign_edit', 'counting_campaign/_delete_form.html.twig', counting_campaign, app.request.attributes.get('_route'), true) }}
                             {{ include('counting_campaign/_delete_form.html.twig') }}
                           </div>
                         </td>
@@ -89,12 +89,13 @@
             <div class="card-footer d-flex justify-content-between">
               <div class="d-flex justify-content-end">
                   <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Créer une campagne</a>
-                  <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mz-2"> Consultation des collectes</a>
+                  <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> Consultation des collectes</a>
+                  <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> Consultation des conditions</a>
                   <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Créer un site de collecte</a>
               </div>
               <div>
-                <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer" title="Imprimer"></button>
-                <a href="#" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
+                <button id="printButton" class="btn btn-sm btn-secondary bi bi-printer" title="Imprimer"></button>
+                <button id="exportCSVButton" class="btn btn-sm btn-secondary bi bi-folder" title="Exporter en CSV"></button>
               </div>
             </div>
 

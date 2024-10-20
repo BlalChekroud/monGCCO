@@ -137,36 +137,26 @@
                         </table>
                     </div>
                   </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justify-content-end">
-                                <a href="{{ path('app_collected_data_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation des collectes">Retour</a>
-                                <a href="{{ path('app_collected_data_edit', {id: collected_datum.id}) }}" class="bi bi-pencil-square btn btn-outline-primary btn-sm mx-1"> Modifier</a>
-                                {% if collected_datum.environmentalConditions %}
-                                    <a href="{{ path('app_environmental_conditions_show', {'id': collected_datum.environmentalConditions.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-2" title="Détail de conditions environnementales"> Conditions environnementales</a>
-                                {% endif %}
-                                {% if collected_datum.countingCampaign %}
-                                    <a href="{{ path('app_counting_campaign_show', {'id': collected_datum.countingCampaign.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-1" title="Détail de la campagne"> Campagne</a>
-                                {% endif %}
-                                <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une collecte</a>
-                                {{ include('collected_data/_delete_form.html.twig') }}
-                            </div>
-
+                    <div class="card-footer d-flex justify-content-between">
+                        <div>
+                            <a href="{{ path('app_collected_data_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation des collectes">Retour</a>
+                            {% if collected_datum.environmentalConditions %}
+                                <a href="{{ path('app_environmental_conditions_show', {'id': collected_datum.environmentalConditions.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-2" title="Détail de conditions environnementales"> Conditions environnementales</a>
+                            {% endif %}
+                            {% if collected_datum.countingCampaign %}
+                                <a href="{{ path('app_counting_campaign_show', {'id': collected_datum.countingCampaign.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-1" title="Détail de la campagne"> Campagne</a>
+                            {% endif %}
+                            <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une collecte</a>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                            {{ macros.action_buttons('app_collected_data_new','app_collected_data_show', 'app_collected_data_edit', 'collected_data/_delete_form.html.twig', collected_datum, app.request.attributes.get('_route')) }}
+                            {{ include('collected_data/_delete_form.html.twig') }}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    
-    <div class="alert border-light alert-dismissible fade show" role="alert">
-      <div class="card">
-        <div class="card-footer">
-          <button id="printButton" class="btn btn-light bi bi-printer"> Imprimer</button> 
-          <button type="button" class="btn btn-light"><i class="bi bi-folder"> </i>Exporter en CSV</button>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      </div>
-    </div>
 </main>
 {% endblock %}

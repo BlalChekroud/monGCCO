@@ -23,7 +23,7 @@ class BirdSpeciesCountType extends AbstractType
                 },
                 // 'label' => 'Espèce',
                 'autocomplete' => true,
-                'placeholder' => '-- Choisir une espèce d\'oiseau -- Nom scientifique - Famille (Nom de famille) / Sous-famille / Tribe / Ordre d\'espèce',
+                'placeholder' => 'Nom scientifique - Famille (Nom de famille) / Sous-famille / Tribe / Ordre d\'espèce',
                 'label' => false,
 
             ])

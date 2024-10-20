@@ -26,6 +26,13 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/user/bird/species')]
 class BirdSpeciesController extends AbstractController
 {
+    private $birdSpeciesRepository;
+
+    public function __construct(BirdSpeciesRepository $birdSpeciesRepository)
+    {
+        $this->birdSpeciesRepository = $birdSpeciesRepository;
+    }
+    
     #[Route('/', name: 'app_bird_species_index', methods: ['GET', 'POST'])]
     public function index(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager): Response
     {
@@ -447,7 +454,29 @@ class BirdSpeciesController extends AbstractController
 
     //     return new JsonResponse(['imageUrl' => $imageUrl]);
     // }
+    // #[Route('/get-bird-image/{id}', name: 'get_bird_image', methods: ['GET'])]
+    // public function getBirdImage(BirdSpecies $birdSpecies): JsonResponse
+    // {
+    //     $imageUrl = $birdSpecies->getImage() ? $birdSpecies->getImage()->getImageUrl() : null;
+    
+    //     return new JsonResponse(['imageUrl' => $imageUrl]);
+    // }
 
+    #[Route('/{id}/image', name: 'bird_species_image', methods: ['GET'])]
+    public function getBirdImage($id): JsonResponse
+    {
+        $birdSpecies = $this->birdSpeciesRepository->find($id);
+
+        if (!$birdSpecies || !$birdSpecies->getImage()) {
+            return new JsonResponse(['image' => null], Response::HTTP_NOT_FOUND);
+        }
+
+        $imageUrl = $this->getParameter('vich_uploader.upload_directory') . '/' . $birdSpecies->getImage()->getName();
+        
+        return new JsonResponse(['image' => $imageUrl]);
+    }
+
+    
 
     #[Route('/{id}', name: 'app_bird_species_show', methods: ['GET'])]
     public function show(BirdSpecies $birdSpecy): Response

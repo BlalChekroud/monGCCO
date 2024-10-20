@@ -33,30 +33,30 @@
 {{ form_end(form) }}
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const groupMemberSelect = $('#group_member'); // Utilisation de jQuery pour interagir avec Select2
-    
-    if (groupMemberSelect.length) {
-        console.log('Elements found:', groupMemberSelect);
+  document.addEventListener('DOMContentLoaded', function() {
+      const groupMemberSelect = $('#group_member'); // Utilisation de jQuery pour interagir avec Select2
+      
+      if (groupMemberSelect.length) {
+          console.log('Elements found:', groupMemberSelect);
 
-        groupMemberSelect.select2().on('change', function() {
-            const selectedOptions = $(this).val();
-            console.log('Selected options:', selectedOptions);
-            
-            const leaderSelect = $('#leader');
-            leaderSelect.empty(); // Vide le select
+          groupMemberSelect.select2().on('change', function() {
+              const selectedOptions = $(this).val();
+              console.log('Selected options:', selectedOptions);
+              
+              const leaderSelect = $('#leader');
+              leaderSelect.empty(); // Vide le select
 
-            leaderSelect.append(new Option('-- Choisir le chef du groupe --', '')); // Option par défaut
+              leaderSelect.append(new Option('-- Choisir le chef du groupe --', '')); // Option par défaut
 
-            selectedOptions.forEach(option => {
-                leaderSelect.append(new Option(option.text, option.value)); // Ajouter les nouvelles options
-            });
+              selectedOptions.forEach(option => {
+                  leaderSelect.append(new Option(option.text, option.value)); // Ajouter les nouvelles options
+              });
 
-            console.log('Leader options:', leaderSelect.children());
-        });
-    } else {
-        console.error('Elements not found: groupMemberSelect or leaderSelect');
-    }
-});
+              console.log('Leader options:', leaderSelect.children());
+          });
+      } else {
+          console.error('Elements not found: groupMemberSelect or leaderSelect');
+      }
+  });
 
 </script>

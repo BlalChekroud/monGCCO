@@ -22,15 +22,22 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Informations sur les conditions d'environnement</h5>
+              <h5 class="card-title">Informations sur les conditions environnementales</h5>
 
               {{ include('environmental_conditions/_form.html.twig', {'button_label': ' Mise à jour'}) }}
 
             </div>
-            <div class="card-footer">
+            <div class="card-footer d-flex justify-content-between">
+              <div>
+                <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers la consultation des conditioons environnementales">Retour</a>
+                {% if environmental_condition.countingCampaign %}
+                  <a href="{{ path('app_counting_campaign_show', {'id': environmental_condition.countingCampaign.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-1" title="Détail de la campagne"> Campagne</a>
+                {% endif %}
+                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des campagnes</a>
+              </div>
               <div class="d-flex justify-content-end">
-                <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-offline-light btn-sm bi bi-arrow-return-left mx-2"> retour vers la liste</a>
-                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task"> Consultation des campagnes</a>
+                {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                {{ macros.action_buttons('app_environmental_conditions_new','app_environmental_conditions_show', 'app_environmental_conditions_edit', 'environmental_condition/_delete_form.html.twig', environmental_condition, app.request.attributes.get('_route'), false) }}
                 {{ include('environmental_conditions/_delete_form.html.twig') }}
               </div>
             </div>

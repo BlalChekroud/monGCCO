@@ -50,9 +50,10 @@
         {% if current_route != edit_path %}
             {% if current_route == show_path %}
                 <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="Imprimer"></button>
-                <a href="#" class="btn btn-outline-secondary btn-sm bi bi-folder me-2" title="Exporter en CSV"></a>
+                <button id="exportCSVButton" class="btn btn-outline-secondary btn-sm bi bi-folder" title="Exporter en CSV"></button>
             {% endif %}
             <a href="{{ path(edit_path, {'id': entit.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
         {% endif %}
     {% endif %}
+    <script src="{{ asset('./js/csv.js') }}"></script>
 {% endmacro %}

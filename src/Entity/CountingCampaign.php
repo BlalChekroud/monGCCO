@@ -151,6 +151,40 @@ class CountingCampaign
         }
         return $totalCollects;
     }
+    
+
+    /**
+     * Retourne le nombre total de comptages d'oiseaux pour chaque site dans cette campagne
+     *
+     * @return array
+     */
+    public function getTotalCountsPerSite(): array
+    {
+        // Tableau pour stocker le total des comptages par site
+        $totalCountsPerSite = [];
+
+        // Parcourir chaque groupe de site associé à la campagne
+        foreach ($this->getSiteAgentsGroups() as $siteAgentsGroup) {
+            // Récupérer le site associé au groupe
+            $site = $siteAgentsGroup->getSiteCollection();
+
+            // Initialiser le total des comptages pour ce site à 0
+            if (!isset($totalCountsPerSite[$site->getId()])) {
+                $totalCountsPerSite[$site->getId()] = 0;
+            }
+
+            // Parcourir les données collectées pour ce site
+            foreach ($site->getCollectedData() as $collectedData) {
+                // Parcourir les comptages d'espèces d'oiseaux
+                foreach ($collectedData->getBirdSpeciesCounts() as $birdSpeciesCount) {
+                    // Ajouter chaque comptage au total pour ce site
+                    $totalCountsPerSite[$site->getId()] += $birdSpeciesCount->getCount();
+                }
+            }
+        }
+
+        return $totalCountsPerSite;
+    }
 
 
     /**
