@@ -97,6 +97,11 @@ class CountingCampaignController extends AbstractController
                     return $this->redirectToRoute('app_counting_campaign_new');
                 }
 
+                // if ($countingCampaign->getNatureReserves()->isEmpty()) {
+                //     $this->addFlash('error', 'Vous devez sélectionner au moins une réserve naturelle.');
+                //     return $this->redirectToRoute('app_counting_campaign_new');
+                // }
+
                 $countingCampaign->setCreatedAt(new \DateTimeImmutable());
                 $countingCampaign->setCreatedBy($user);
                 // Générer et définir le nom de la campagne

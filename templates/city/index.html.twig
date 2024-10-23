@@ -89,7 +89,7 @@
         </section>
 
         {% if headers is defined and rows is defined %}
-            {{ form_macros.csv_modal(headers, rows, csvData, 'app_city_index', ['city', 'lat', 'lng', 'region', 'regionCode']) }}
+            {{ form_macros.csv_modal(headers, rows, csvData, 'app_city_index', ['city', 'lat', 'lng', 'region', 'regionCode'], ['country']) }}
         {% endif %}
 
     </main><!-- End #main -->

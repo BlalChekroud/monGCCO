@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle réserve naturelle{% endblock %}
+
+{% block body %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Ajouter une nouvelle réserve naturelle</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_nature_reserve_index') }}">Gestion des réserves</a></li>
+          <li class="breadcrumb-item active">Création</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Informations sur la nouvelle réserve naturelle</h5>
+
+              {{ include('nature_reserve/_form.html.twig') }}
+
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_nature_reserve_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des réserves naturelles">Retour</a>
+              <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-1"> Ajouter un site de collecte</a>
+              <a href="{{ path('app_agents_group_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer un groupe</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}

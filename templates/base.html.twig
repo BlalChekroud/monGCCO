@@ -447,6 +447,24 @@
               </a>
             </li>
           </ul>
+        </li><!-- End reserves Nav -->
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" data-bs-target="#reserves-nav" data-bs-toggle="collapse" href="#">
+            <i class="bi bi-tree"></i><span>Gestion des réserves</span><i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <ul id="reserves-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+            <li>
+              <a href="{{ path('app_nature_reserve_new') }}">
+                <i class="bi bi-circle"></i><span>Créer une réserve</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_nature_reserve_index') }}">
+                <i class="bi bi-circle"></i><span>Consultation des réserves</span>
+              </a>
+            </li>
+          </ul>
         </li><!-- End Tables Nav -->
 
         <li class="nav-item">

@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}NatureReserve{% endblock %}
+
+{% block body %}
+    <h1>NatureReserve</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ nature_reserve.id }}</td>
+            </tr>
+            <tr>
+                <th>ReserveName</th>
+                <td>{{ nature_reserve.reserveName }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ nature_reserve.createdAt ? nature_reserve.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ nature_reserve.updatedAt ? nature_reserve.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_nature_reserve_index') }}">back to list</a>
+
+    <a href="{{ path('app_nature_reserve_edit', {'id': nature_reserve.id}) }}">edit</a>
+
+    {{ include('nature_reserve/_delete_form.html.twig') }}
+{% endblock %}

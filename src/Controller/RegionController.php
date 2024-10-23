@@ -69,6 +69,7 @@ class RegionController extends AbstractController
             $processedRegions = []; // Tableau pour suivre les régions déjà traitées
             $invalidCount = 0; // Compteur de lignes non importées
             $invalidRows = []; // Tableau pour stocker les numéros des lignes invalides
+            $processedCountries = [];
     
             foreach ($rows as $lineNumber => $row) {
                 // Ignorer les lignes vides
@@ -122,16 +123,25 @@ class RegionController extends AbstractController
                 $countryRepository = $entityManager->getRepository(Country::class);
                 $existingCountry = $countryRepository->findOneBy(['name' => $countryName]);
     
+                // Vérifier si le pays a déjà été traité
                 if (!$existingCountry) {
-                    $country = new Country();
-                    $country->setName($countryName);
-                    $country->setIso2($iso2);
-                    $country->setCreatedAt(new \DateTimeImmutable());
-    
-                    $entityManager->persist($country);
-                    $existingCountry = $country; // Réassigner pour utiliser l'objet persisté
+                    // Si le pays n'existe pas, créez un nouveau pays
+                    if (!isset($processedCountries[$countryName])) {
+                        $country = new Country();
+                        $country->setName($countryName);
+                        $country->setIso2($iso2);
+                        $country->setCreatedAt(new \DateTimeImmutable());
+
+                        $entityManager->persist($country);
+                        $processedCountries[$countryName] = $country; // Marquer comme traité
+                        $existingCountry = $country; // Réassigner pour utiliser l'objet persisté
+                    } else {
+                        $existingCountry = $processedCountries[$countryName]; // Utiliser le pays déjà traité
+                    }
+                } else {
+                    $processedCountries[$countryName] = $existingCountry; // Marquer comme traité
                 }
-    
+                
                 // Créez et persistez une nouvelle région
                 $region = new Region();
                 $region->setName($regionName);

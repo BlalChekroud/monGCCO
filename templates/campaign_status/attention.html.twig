@@ -1,0 +1,60 @@
+<div class="modal-header bg-info">
+    <h5 class="modal-title bi bi-book"> Guide des États d'une Campagne de Comptage</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <h6>Introduction</h6>
+    <p>
+        Lors de la gestion des campagnes de comptage des oiseaux, une campagne peut traverser plusieurs états. Ces états permettent de suivre le cycle de vie d'une campagne, de sa planification à sa clôture ou annulation.
+    </p>
+    <h6>Les différents états et leurs significations :</h6>
+    <ol>
+        <li><strong>Planifiée</strong> : La campagne est définie, mais n'a pas encore commencé.
+            <ul>
+                <li><strong>Quand l'état est actif</strong> : La date de début de la campagne est dans le futur.</li>
+                <li><strong>Actions possibles</strong> : L'utilisateur peut préparer les sites et les équipes, mais la collecte de données ne peut pas encore commencer.</li>
+            </ul>
+        </li>
+        <li><strong>En cours</strong> : La campagne est actuellement en cours de réalisation.
+            <ul>
+                <li><strong>Quand l'état est actif</strong> : La date de début est atteinte, et la date de fin est encore à venir.</li>
+                 <li><strong>Actions possibles</strong> : Les collectes de données peuvent être réalisées par les équipes sur les sites assignés.</li>
+            </ul>
+        </li>
+        <li><strong>Terminée</strong> : La période de la campagne est terminée, mais elle n'est pas encore officiellement clôturée.
+            <ul>
+                <li><strong>Quand l'état est actif</strong> : La date de fin de la campagne est passée, mais des vérifications finales peuvent être en attente.</li>
+                <li><strong>Actions possibles</strong> : L'utilisateur peut examiner les données collectées avant de prendre des décisions finales.</li>
+            </ul>
+        </li>
+        <li><strong>Clôturée</strong> : La campagne est officiellement close.
+            <ul>
+                <li><strong>Quand l'état est actif</strong> : Toutes les données ont été vérifiées et validées, aucune autre action n'est possible.</li>
+            </ul>
+        </li>
+        <li><strong>Suspendue</strong> : La campagne est temporairement interrompue.
+            <ul>
+                <li><strong>Quand l'état est actif</strong> : La campagne a été mise en pause pour une raison quelconque (conditions météorologiques, etc.).</li>
+                <li><strong>Actions possibles</strong> : La campagne peut être reprise ou annulée selon les circonstances.</li>
+            </ul>
+        </li>
+        <li><strong>Annulée</strong> : La campagne a été annulée avant d'être clôturée.
+            <ul>
+                <li><strong>Quand l'état est actif</strong> : L'utilisateur ou un administrateur a décidé d'annuler la campagne.</li>
+                <li><strong>Actions possibles</strong> : Aucune collecte de données supplémentaire ne peut être effectuée.</li>
+            </ul>
+        </li>
+        <li><strong>Erreur</strong> : Un problème est survenu empêchant la réalisation correcte de la campagne.
+            <ul>
+                <li><strong>Quand l'état est actif</strong> : Un problème technique ou organisationnel a empêché la campagne d'avancer.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h6>Conseils :</h6>
+    <ul>
+        <li><strong>Clôturer une campagne :</strong> Assurez-vous que toutes les données sont collectées et validées avant de clôturer.</li>
+        <li><strong>Reprise d'une campagne suspendue :</strong> Elle peut être reprise une fois que les obstacles sont levés.</li>
+        <li><strong>Annulation :</strong> Soyez prudent, une campagne annulée ne pourra pas être reprise.</li>
+    </ul>
+</div>

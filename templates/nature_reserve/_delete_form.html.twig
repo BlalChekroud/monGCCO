@@ -1,0 +1,6 @@
+{% if is_granted('ROLE_ADMIN') %}
+    <form method="post" action="{{ path('app_nature_reserve_delete', {'id': nature_reserve.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ nature_reserve.id) }}">
+        <button class="btn btn-danger btn-sm bi bi-trash mx-2" title="Supprimer"></button>
+    </form>
+{% endif %}

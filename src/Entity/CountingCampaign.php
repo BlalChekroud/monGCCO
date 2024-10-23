@@ -53,9 +53,6 @@ class CountingCampaign
     #[ORM\JoinColumn(nullable: false)]
     private ?User $createdBy = null;
 
-    // #[ORM\Column(length: 10)]
-    // private ?string $campaignStatus = null;
-
     /**
      * @var Collection<int, SiteAgentsGroup>
      */
@@ -103,6 +100,7 @@ class CountingCampaign
         $campaignId = $this->getId();
 
         $this->campaignName = sprintf('%s %s-%s', implode(',',$uniqueregionCode) ,$startYear ,$campaignId);
+        // $this->campaignName = sprintf('%s-%s', $startYear ,$campaignId);
     }
 
 
@@ -546,5 +544,6 @@ class CountingCampaign
 
         return $this;
     }
+
 
 }

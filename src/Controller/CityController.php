@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Country;
 use App\Entity\Region;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -74,6 +75,7 @@ class CityController extends AbstractController
             $processedCities = []; // Tableau pour suivre les régions déjà traitées
             $invalidCount = 0; // Compteur de lignes non importées
             $invalidRows = []; // Tableau pour stocker les numéros des lignes invalides
+            $processedRegions = [];
     
             foreach ($rows as $lineNumber => $row) {
                 // Ignorer les lignes vides
@@ -101,6 +103,7 @@ class CityController extends AbstractController
                 $longitude = $data['lng'];
                 $regionName = $data['region'] ?? null;
                 $regionCode = $data['regionCode'] ?? null;
+                $country = $data['country'] ?? null;
     
                 if (empty($cityName) || empty($latitude) || empty($longitude) || empty($regionName) || empty($regionCode)) {
                     $invalidRows[] = $lineNumber + 2;
@@ -133,9 +136,17 @@ class CityController extends AbstractController
                     $region->setName($regionName);
                     $region->setRegionCode($regionCode);
                     $region->setCreatedAt(new \DateTimeImmutable());
-    
-                    $entityManager->persist($region);
-                    $existingRegion = $region; // Réassigner pour utiliser l'objet persisté
+                    // Récupérer le pays associé
+                    $countryRepository = $entityManager->getRepository(Country::class);
+                    $existingCountry = $countryRepository->findOneBy(['name' => $country]);
+        
+                    if ($existingCountry) {
+                        $region->setCountry($existingCountry);
+                        $entityManager->persist($region);
+                        $existingRegion = $region; // Réassigner pour utiliser l'objet persisté
+                    } else {
+                        $this->addFlash('info', "Absence de country pour la région : $regionName");
+                    }
                 }
     
                 // Créez et persistez une nouvelle ville

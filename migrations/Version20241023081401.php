@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241018175134 extends AbstractMigration
+final class Version20241023081401 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -39,6 +39,7 @@ final class Version20241018175134 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE iucn_red_list_category_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE logo_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE method_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE nature_reserve_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE quality_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE region_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE reset_password_request_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
@@ -142,6 +143,11 @@ final class Version20241018175134 extends AbstractMigration
         $this->addSql('CREATE TABLE method (id INT NOT NULL, label VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('COMMENT ON COLUMN method.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN method.updated_at IS \'(DC2Type:datetime_immutable)\'');
+        $this->addSql('CREATE TABLE nature_reserve (id INT NOT NULL, created_by_id INT NOT NULL, reserve_leader_id INT NOT NULL, reserve_name VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_763A1F7B03A8386 ON nature_reserve (created_by_id)');
+        $this->addSql('CREATE INDEX IDX_763A1F7C87FFE17 ON nature_reserve (reserve_leader_id)');
+        $this->addSql('COMMENT ON COLUMN nature_reserve.created_at IS \'(DC2Type:datetime_immutable)\'');
+        $this->addSql('COMMENT ON COLUMN nature_reserve.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE quality (id INT NOT NULL, label VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('COMMENT ON COLUMN quality.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN quality.updated_at IS \'(DC2Type:datetime_immutable)\'');
@@ -161,9 +167,10 @@ final class Version20241018175134 extends AbstractMigration
         $this->addSql('CREATE TABLE site_agents_group_agents_group (site_agents_group_id INT NOT NULL, agents_group_id INT NOT NULL, PRIMARY KEY(site_agents_group_id, agents_group_id))');
         $this->addSql('CREATE INDEX IDX_3B5B54BD7C3B27D6 ON site_agents_group_agents_group (site_agents_group_id)');
         $this->addSql('CREATE INDEX IDX_3B5B54BD72A1F93D ON site_agents_group_agents_group (agents_group_id)');
-        $this->addSql('CREATE TABLE site_collection (id INT NOT NULL, city_id INT NOT NULL, parent_site_id INT DEFAULT NULL, site_name VARCHAR(255) NOT NULL, site_code VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, national_site_code VARCHAR(255) DEFAULT NULL, international_site_code VARCHAR(255) DEFAULT NULL, lat_depart VARCHAR(255) NOT NULL, long_depart VARCHAR(255) NOT NULL, lat_fin VARCHAR(255) NOT NULL, long_fin VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE site_collection (id INT NOT NULL, city_id INT NOT NULL, parent_site_id INT DEFAULT NULL, nature_reserve_id INT DEFAULT NULL, site_name VARCHAR(255) NOT NULL, site_code VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, national_site_code VARCHAR(255) DEFAULT NULL, international_site_code VARCHAR(255) DEFAULT NULL, lat_depart VARCHAR(255) NOT NULL, long_depart VARCHAR(255) NOT NULL, lat_fin VARCHAR(255) NOT NULL, long_fin VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_DC44EAF78BAC62AF ON site_collection (city_id)');
         $this->addSql('CREATE INDEX IDX_DC44EAF784F56200 ON site_collection (parent_site_id)');
+        $this->addSql('CREATE INDEX IDX_DC44EAF7B56D1D28 ON site_collection (nature_reserve_id)');
         $this->addSql('COMMENT ON COLUMN site_collection.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN site_collection.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE tidal (id INT NOT NULL, label VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
@@ -229,6 +236,8 @@ final class Version20241018175134 extends AbstractMigration
         $this->addSql('ALTER TABLE environmental_conditions ADD CONSTRAINT FK_96C106D260B458C7 FOREIGN KEY (counting_campaign_id) REFERENCES counting_campaign (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE environmental_conditions ADD CONSTRAINT FK_96C106D2A76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE logo ADD CONSTRAINT FK_E48E9A133DA5256D FOREIGN KEY (image_id) REFERENCES image (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE nature_reserve ADD CONSTRAINT FK_763A1F7B03A8386 FOREIGN KEY (created_by_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE nature_reserve ADD CONSTRAINT FK_763A1F7C87FFE17 FOREIGN KEY (reserve_leader_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE region ADD CONSTRAINT FK_F62F176F92F3E70 FOREIGN KEY (country_id) REFERENCES country (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE reset_password_request ADD CONSTRAINT FK_7CE748AA76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE site_agents_group ADD CONSTRAINT FK_7A88312460B458C7 FOREIGN KEY (counting_campaign_id) REFERENCES counting_campaign (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -237,6 +246,7 @@ final class Version20241018175134 extends AbstractMigration
         $this->addSql('ALTER TABLE site_agents_group_agents_group ADD CONSTRAINT FK_3B5B54BD72A1F93D FOREIGN KEY (agents_group_id) REFERENCES agents_group (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE site_collection ADD CONSTRAINT FK_DC44EAF78BAC62AF FOREIGN KEY (city_id) REFERENCES city (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE site_collection ADD CONSTRAINT FK_DC44EAF784F56200 FOREIGN KEY (parent_site_id) REFERENCES site_collection (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE site_collection ADD CONSTRAINT FK_DC44EAF7B56D1D28 FOREIGN KEY (nature_reserve_id) REFERENCES nature_reserve (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE "user" ADD CONSTRAINT FK_8D93D6493DA5256D FOREIGN KEY (image_id) REFERENCES image (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 
@@ -263,6 +273,7 @@ final class Version20241018175134 extends AbstractMigration
         $this->addSql('DROP SEQUENCE iucn_red_list_category_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE logo_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE method_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE nature_reserve_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE quality_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE region_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE reset_password_request_id_seq CASCADE');
@@ -306,6 +317,8 @@ final class Version20241018175134 extends AbstractMigration
         $this->addSql('ALTER TABLE environmental_conditions DROP CONSTRAINT FK_96C106D260B458C7');
         $this->addSql('ALTER TABLE environmental_conditions DROP CONSTRAINT FK_96C106D2A76ED395');
         $this->addSql('ALTER TABLE logo DROP CONSTRAINT FK_E48E9A133DA5256D');
+        $this->addSql('ALTER TABLE nature_reserve DROP CONSTRAINT FK_763A1F7B03A8386');
+        $this->addSql('ALTER TABLE nature_reserve DROP CONSTRAINT FK_763A1F7C87FFE17');
         $this->addSql('ALTER TABLE region DROP CONSTRAINT FK_F62F176F92F3E70');
         $this->addSql('ALTER TABLE reset_password_request DROP CONSTRAINT FK_7CE748AA76ED395');
         $this->addSql('ALTER TABLE site_agents_group DROP CONSTRAINT FK_7A88312460B458C7');
@@ -314,6 +327,7 @@ final class Version20241018175134 extends AbstractMigration
         $this->addSql('ALTER TABLE site_agents_group_agents_group DROP CONSTRAINT FK_3B5B54BD72A1F93D');
         $this->addSql('ALTER TABLE site_collection DROP CONSTRAINT FK_DC44EAF78BAC62AF');
         $this->addSql('ALTER TABLE site_collection DROP CONSTRAINT FK_DC44EAF784F56200');
+        $this->addSql('ALTER TABLE site_collection DROP CONSTRAINT FK_DC44EAF7B56D1D28');
         $this->addSql('ALTER TABLE "user" DROP CONSTRAINT FK_8D93D6493DA5256D');
         $this->addSql('DROP TABLE agents_group');
         $this->addSql('DROP TABLE agents_group_user');
@@ -337,6 +351,7 @@ final class Version20241018175134 extends AbstractMigration
         $this->addSql('DROP TABLE iucn_red_list_category');
         $this->addSql('DROP TABLE logo');
         $this->addSql('DROP TABLE method');
+        $this->addSql('DROP TABLE nature_reserve');
         $this->addSql('DROP TABLE quality');
         $this->addSql('DROP TABLE region');
         $this->addSql('DROP TABLE reset_password_request');

@@ -20,7 +20,23 @@
             <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Listes</h5>
+                        <div class="d-flex justify-content-between">
+                            <h5 class="card-title">Listes</h5>
+                            <button type="button" class="btn btn-sm btn-info bi bi-book" data-bs-toggle="modal" data-bs-target="#largeModal"> Aide</button>
+                            
+                            <!-- Large Modal for AIDE -->
+                            <div class="modal fade" id="largeModal" tabindex="-1">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        {% include("campaign_status/attention.html.twig") %}
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-sm btn-secondary bi bi-x-lg" data-bs-dismiss="modal" title="Fermer"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                         <div id="printableArea">
                             <table class="table datatable">
                                 <thead>
@@ -66,6 +82,52 @@
             </div>
         </div>
     </section>
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Instructions pour la création des états de campagne</h5>
+
+                        <!-- Bouton pour ouvrir la popup -->
+                        <button type="button" class="btn btn-warning bi bi-exclamation-triangle-fill" data-bs-toggle="modal" data-bs-target="#campaignStatusModal">
+                            Voir les instructions
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Popup (fenêtre modale) -->
+    <div class="modal fade" id="campaignStatusModal" tabindex="-1" aria-labelledby="campaignStatusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="campaignStatusModalLabel">Attention: Ordre obligatoire des états de campagne</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Voici l'ordre <strong>obligatoire</strong> pour créer les états de campagne. Vous devez ajouter tous les sept pour garantir que l'application fonctionne correctement.</p>
+                    <ol>
+                        <li><strong>Planifiée</strong></li>
+                        <li><strong>En cours</strong></li>
+                        <li><strong>Terminée</strong></li>
+                        <li><strong>Clôturée</strong></li>
+                        <li><strong>Erreur</strong></li>
+                        <li><strong>Suspendue</strong></li>
+                        <li><strong>Annulée</strong></li>
+                    </ol>
+                    <p>Vous pouvez modifier les noms, mais ces sept états doivent être présents et dans cet ordre, sans quoi des erreurs pourraient survenir dans le système.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </main><!-- End #main -->
 {% endblock %}

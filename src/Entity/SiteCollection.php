@@ -84,6 +84,9 @@ class SiteCollection
     #[ORM\OneToMany(targetEntity: SiteAgentsGroup::class, mappedBy: 'siteCollection', orphanRemoval: true)]
     private Collection $siteAgentsGroups;
 
+    #[ORM\ManyToOne(inversedBy: 'siteCollections')]
+    private ?NatureReserve $natureReserve = null;
+
     public function __construct()
     {
         $this->collectedData = new ArrayCollection();
@@ -362,6 +365,18 @@ class SiteCollection
                 $siteAgentsGroup->setSiteCollection(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNatureReserve(): ?NatureReserve
+    {
+        return $this->natureReserve;
+    }
+
+    public function setNatureReserve(?NatureReserve $natureReserve): static
+    {
+        $this->natureReserve = $natureReserve;
 
         return $this;
     }

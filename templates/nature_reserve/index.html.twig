@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réserves naturelles{% endblock %}
+
+{% block body %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Consulter les réserves naturelles</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item active">Gestion des réserves</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Listes</h5>
+             <div id="printableArea">
+                <table class="table datatable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nom de la réserve naturelle</th>
+                            <th>Crée le</th>
+                            <th>Dernière mise à jour le</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for nature_reserve in nature_reserves %}
+                        <tr>
+                            <td>{{ nature_reserve.id }}</td>
+                            <td>{{ nature_reserve.reserveName }}</td>
+                            <td>{{ nature_reserve.createdAt ? nature_reserve.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ nature_reserve.updatedAt ? nature_reserve.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>
+                                <div class="d-flex justify-content-end">
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_nature_reserve_new','app_nature_reserve_show', 'app_nature_reserve_edit', 'nature_reserve/_delete_form.html.twig', nature_reserve, app.request.attributes.get('_route'), true) }}
+                                    {{ include('nature_reserve/_delete_form.html.twig') }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">Aucun enregistrement trouvé</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+             </div>          
+              
+            </div>
+            <div class="card-footer">
+                <a href="{{ path('app_nature_reserve_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Ajouter une réserve naturelle</a>
+                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des campagnes</a>
+                <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    {# {% import 'macros/form_macros.html.twig' as form_macros %}
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    {{ form_macros.csv_import_form(form, 'app_nature_reserve_index') }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if headers is defined and rows is defined %}
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_nature_reserve_index', ['reserveName', 'reserveLeader']) }}
+    {% endif %} #}
+
+  </main><!-- End #main -->
+{% endblock %}

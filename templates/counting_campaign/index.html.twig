@@ -22,7 +22,23 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Listes</h5>
+              <div class="d-flex justify-content-between">
+                <h5 class="card-title">Listes</h5>
+                
+                <button type="button" class="btn btn-sm btn-info bi bi-book" data-bs-toggle="modal" data-bs-target="#largeModal"> Aide</button>
+              </div>
+              
+               <!-- Large Modal for AIDE -->
+                <div class="modal fade" id="largeModal" tabindex="-1">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      {% include("campaign_status/attention.html.twig") %}
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-sm btn-secondary bi bi-x-lg" data-bs-dismiss="modal" title="Fermer"></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
               <div id="printableArea">
                 <!-- Table with stripped rows -->
@@ -91,7 +107,7 @@
                   <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Créer une campagne</a>
                   <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> Consultation des collectes</a>
                   <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> Consultation des conditions</a>
-                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Créer un site de collecte</a>
+                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Ajouter un site de collecte</a>
               </div>
               <div>
                 <button id="printButton" class="btn btn-sm btn-secondary bi bi-printer" title="Imprimer"></button>

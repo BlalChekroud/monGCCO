@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+// #[ORM\Table('user')]
 #[UniqueEntity(fields: ['email'], message: 'Cet e-mail n\'est pas disponible, essayer avec un autre')]
 #[Vich\Uploadable]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -99,6 +100,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Image $image = null;
 
+    /**
+     * @var Collection<int, NatureReserve>
+     */
+    #[ORM\OneToMany(targetEntity: NatureReserve::class, mappedBy: 'createdBy')]
+    private Collection $natureReserves;
+
+    /**
+     * @var Collection<int, NatureReserve>
+     */
+    #[ORM\OneToMany(targetEntity: NatureReserve::class, mappedBy: 'reserveLeader')]
+    private Collection $natureReservesLeader;
+
+
     public function __construct()
     {
         $this->agentsGroups = new ArrayCollection();
@@ -107,6 +121,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->collectedData = new ArrayCollection();
         $this->countingCampaigns = new ArrayCollection();
         $this->groupCreatedBy = new ArrayCollection();
+        $this->natureReserves = new ArrayCollection();
+        $this->natureReservesLeader = new ArrayCollection();
     }
 
 
@@ -443,5 +459,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, NatureReserve>
+     */
+    public function getNatureReserves(): Collection
+    {
+        return $this->natureReserves;
+    }
+
+    public function addNatureReserf(NatureReserve $natureReserf): static
+    {
+        if (!$this->natureReserves->contains($natureReserf)) {
+            $this->natureReserves->add($natureReserf);
+            $natureReserf->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNatureReserf(NatureReserve $natureReserf): static
+    {
+        if ($this->natureReserves->removeElement($natureReserf)) {
+            // set the owning side to null (unless already changed)
+            if ($natureReserf->getCreatedBy() === $this) {
+                $natureReserf->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, NatureReserve>
+     */
+    public function getNatureReservesLeader(): Collection
+    {
+        return $this->natureReservesLeader;
+    }
+
+    public function addNatureReservesLeader(NatureReserve $natureReservesLeader): static
+    {
+        if (!$this->natureReservesLeader->contains($natureReservesLeader)) {
+            $this->natureReservesLeader->add($natureReservesLeader);
+            $natureReservesLeader->setReserveLeader($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNatureReservesLeader(NatureReserve $natureReservesLeader): static
+    {
+        if ($this->natureReservesLeader->removeElement($natureReservesLeader)) {
+            // set the owning side to null (unless already changed)
+            if ($natureReservesLeader->getReserveLeader() === $this) {
+                $natureReservesLeader->setReserveLeader(null);
+            }
+        }
+
+        return $this;
+    }
+
 
 }

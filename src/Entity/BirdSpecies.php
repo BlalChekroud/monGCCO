@@ -21,6 +21,7 @@ class BirdSpecies
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $scientificName = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
