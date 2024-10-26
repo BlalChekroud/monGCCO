@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Groupes des agents{% endblock %}
+{% block title %}{{ 'agentsGroup.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Groupes des agents</h1>
+      <h1>{{ 'agentsGroup.title'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
-          <li class="breadcrumb-item active">Gestion des groupes</li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'agentsGroup.breadcrumb_management'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -20,9 +20,9 @@
         <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Listes</h5>
-             <div id="printableArea">
-              <!-- Table with stripped rows -->
+              <h5 class="card-title">{{ 'card_title'|trans }}</h5>
+              <div id="printableArea">
+                <!-- Table with stripped rows -->
                 <table class="table datatable">
                     <thead>
                         <tr>
@@ -47,7 +47,7 @@
                                                 {{ member.name }} {{ member.lastName }}
                                             </li>
                                         {% else %}
-                                            <p colspan="7">Aucun enregistrement trouvé</p>
+                                            <p colspan="7">{{ 'no_record_found'|trans }}</p>
                                     {% endfor %}
                                 </ol>
                             </td>
@@ -63,19 +63,18 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6">Aucun enregistrement trouvé</td>
+                            <td colspan="6">{{ 'no_record_found'|trans }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
-              <!-- End Table with stripped rows -->    
-             </div>          
-              
+                <!-- End Table with stripped rows -->    
+              </div>          
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_agents_group_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer un groupe</a>
-              <a href="{{ path('app_nature_reserve_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des réserves</a>
-              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des campagnes</a>
+              <a href="{{ path('app_agents_group_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{ 'create_group'|trans }}</a>
+              <a href="{{ path('app_nature_reserve_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{ 'consult_reserves'|trans }}</a>
+              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{ 'consult_campaigns'|trans }}</a>
             </div>
           </div>
 

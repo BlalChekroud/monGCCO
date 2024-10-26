@@ -21,6 +21,10 @@ services:
         tags:
             - { name: 'kernel.event_subscriber' }
 
+    App\EventListener\UserLocaleListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }
+
 
     # default configuration for services in *this* file
     _defaults:

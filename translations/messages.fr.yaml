@@ -1,0 +1,13 @@
+agentsGroup:
+  title: "Groupes des agents"
+  breadcrumb_management: "Gestion des groupes"
+
+breadcrumb_home: "Accueil"
+card_title: "Listes"
+create_group: "Créer un groupe"
+consult_reserves: "Consultation des réserves"
+consult_campaigns: "Consultation des campagnes"
+no_record_found: "Aucun enregistrement trouvé"
+
+vich_uploader.form_label.delete_confirm: 'Supprimer?'
+vich_uploader.link.download: Télécharger

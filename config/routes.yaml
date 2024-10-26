@@ -1,5 +1,21 @@
+# controllers:
+#     prefix: "{_locale}"
+#     requirements:
+#         _locale: en|fr|ar
+#     resource:
+#         path: ../src/Controller/
+#         namespace: App\Controller
+#     type: attribute
 controllers:
     resource:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+    
+# # Route personnalisée pour changer la langue
+# change_locale:
+#     path: /change-locale/{_locale}
+#     controller: App\Controller\LocaleController::changeLocale
+#     requirements:
+#         _locale: fr|en  # Limitez les choix à 'en' et 'fr'
+

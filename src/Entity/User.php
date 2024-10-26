@@ -112,6 +112,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: NatureReserve::class, mappedBy: 'reserveLeader')]
     private Collection $natureReservesLeader;
 
+    // #[ORM\Column(length: 255, nullable: true)]
+    // private ?string $locale = null;
+    #[ORM\Column(length: 255, options: ['default' => 'fr'])]
+    private string $locale = 'fr';
+
 
     public function __construct()
     {
@@ -516,6 +521,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $natureReservesLeader->setReserveLeader(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(?string $locale): static
+    {
+        $this->locale = $locale;
 
         return $this;
     }

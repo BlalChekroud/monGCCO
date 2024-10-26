@@ -1,0 +1,13 @@
+agentsGroup:
+  title: "Agents Groups"
+  breadcrumb_management: "Group Management"
+
+breadcrumb_home: "Home"
+card_title: "Lists"
+create_group: "Create a group"
+consult_reserves: "Consult Nature Reserves"
+consult_campaigns: "Consult Counting Campaigns"
+no_record_found: "No records found"
+
+vich_uploader.form_label.delete_confirm: 'Delete?'
+vich_uploader.link.download: Download

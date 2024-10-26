@@ -296,6 +296,19 @@
 
           </li><!-- End Messages Nav -->
 
+
+          {% set currentLocale = app.request.session.get('_locale', app.request.locale) %}
+          <li class="nav-item dropdown">
+
+            <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+              <i class="bi bi-translate"></i>
+              <span class="badge bg-light badge-number">{{ currentLocale }}</span>
+            </a><!-- End Messages Icon -->
+            {# {{ include('locale/index.html.twig') }} #}
+            
+          </li><!-- End languages Nav -->
+
+          
           <li class="nav-item dropdown pe-3">
 
             <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
