@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-        <title>{% block title %}Inscrire{% endblock %}</title>
+        <title>{% block title %}{{ 'register.page_title'|trans }}{% endblock %}</title>
         <meta content="" name="description">
         <meta content="" name="keywords">
 
@@ -49,9 +49,8 @@
                                 {% if logo and logo.image and logo.image.imageFilename %}
                                     <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgReg">
                                 {% else %}
-                                    <p>Aucune image disponible</p>
+                                    <p>{{ 'image.not_available'|trans }}</p>
                                 {% endif %}
-                                {# <span class="d-none d-lg-block">G.C.C.O.M</span> #}
                             </div><!-- End Logo -->
                             <h1 id="dynamic-text" class="d-none d-lg-block"></h1>
                         </div>
@@ -62,7 +61,7 @@
                                     {% if logo and logo.image and logo.image.imageFilename %}
                                         <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgLogo">
                                     {% else %}
-                                        <p>Aucune image disponible</p>
+                                        <p>{{ 'image.not_available'|trans }}</p>
                                     {% endif %}
                                 </a>
                             </div><!-- End Logo -->
@@ -72,9 +71,9 @@
                                 <div class="card-body">
 
                                     <div class="pt-4 pb-2">
-                                        <h5 class="card-title text-center pb-0 fs-4">Créer un Compte</h5>
-                                        <p class="text-center small">Entrer vos informations personnelles pour créer un compte</p>
-                                        <p class="d-flex justify-content-end my-4"><span class="requiredField">*</span><span class="small">champs obligatoires</span></p>
+                                        <h5 class="card-title text-center pb-0 fs-4">{{ 'register.form.title'|trans }}</h5>
+                                        <p class="text-center small">{{ 'register.form.subtitle'|trans }}</p>
+                                        <p class="d-flex justify-content-end my-4"><span class="requiredField">*</span><span class="small"><i>{{ 'register.form.required_note'|trans }}</i></span></p>
                                     </div>
 
                                     {% if form_errors(registrationForm) %}
@@ -85,60 +84,65 @@
 
                                     {{ form_start(registrationForm) }}
                                     <div class="col-12">
-                                        {{ form_label(registrationForm.name, 'Nom') }}<span class="requiredField">*</span>
+                                        {{ form_label(registrationForm.name, 'register.form.name'|trans) }}<span class="requiredField">*</span>
                                         {{ form_row(registrationForm.name) }}
-                                        <div class="invalid-feedback">Veuillez entrer votre nom !</div>
+                                        <div class="invalid-feedback">{{ 'register.form.name_placeholder'|trans }}</div>
                                     </div>
 
                                     <div class="col-12">
-                                        {{ form_label(registrationForm.lastName, 'Prénom') }}<span class="requiredField">*</span>
+                                        {{ form_label(registrationForm.lastName, 'register.form.last_name'|trans) }}<span class="requiredField">*</span>
                                         {{ form_row(registrationForm.lastName) }}
-                                        <div class="invalid-feedback">Veuillez entrer votre prénom !</div>
+                                        <div class="invalid-feedback">{{ 'register.form.last_name_placeholder'|trans }}</div>
                                     </div>
 
                                     <div class="col-12">
-                                        {{ form_label(registrationForm.phone, 'Numéro de téléphone') }}<span class="requiredField">*</span>
+                                        {{ form_label(registrationForm.phone, 'register.form.phone'|trans) }}<span class="requiredField">*</span>
                                         {{ form_row(registrationForm.phone) }}
-                                        <div class="invalid-feedback">Veuillez entrer votre numéro de téléphone !</div>
+                                        <div class="invalid-feedback">{{ 'register.form.phone_placeholder'|trans }}</div>
                                     </div>
 
                                     <div class="col-12">
-                                        <label for="yourUsername" class="form-label">E-mail<span class="requiredField">*</span></label>
+                                        <label for="yourUsername" class="form-label">{{ 'Email'|trans}}<span class="requiredField">*</span></label>
                                         <div class="input-group has-validation mb-3">
                                             <span class="input-group-text" id="inputGroupPrepend">@</span>
                                             {{ form_widget(registrationForm.email) }}
-                                            <div class="invalid-feedback">S'il vous plaît, entrez une adresse e-mail valide !</div>
+                                            <div class="invalid-feedback">{{ 'email_placeholder'|trans }}</div>
                                         </div>
                                     </div>
 
                                     <div class="col-12">
-                                        {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}<span class="requiredField">*</span>
+                                        {{ form_label(registrationForm.plainPassword, 'register.form.password'|trans) }}<span class="requiredField">*</span>
                                         {{ form_row(registrationForm.plainPassword) }}
-                                        <div class="invalid-feedback">S'il vous plaît, entrez votre mot de passe !</div>
+                                        <div class="invalid-feedback">{{ 'register.form.password_placeholder'|trans }}</div>
                                     </div>
 
                                     <div class="col-12">
-                                        {{ form_label(registrationForm.passwordConfirm, 'Confirmez votre mot de passe') }}<span class="requiredField">*</span>
+                                        {{ form_label(registrationForm.passwordConfirm, 'register.form.password_confirm'|trans) }}<span class="requiredField">*</span>
                                         {{ form_row(registrationForm.passwordConfirm) }}
-                                        <div class="invalid-feedback">S'il vous plaît, entrez votre mot de passe !</div>
+                                        <div class="invalid-feedback">{{ 'register.form.password_confirm_placeholder'|trans}}</div>
                                     </div>
 
                                     <div class="col-12">
                                         <div class="form-check">
+                                            {# {{ form_label(registrationForm.agreeTerms, 'register.form.agree_terms'|trans) }}<span class="requiredField">*</span> #}
                                             {{ form_row(registrationForm.agreeTerms) }}
-                                            {# <label class="form-check-label" for="acceptTerms"> J'accepte <a href="#">les termes et conditions </a></label> #}
-                                            <div class="invalid-feedback">Il faut accepter avant de soumettre.</div>
+                                            <div class="invalid-feedback">{{ 'register.form.agree_terms_error'|trans }}</div>
                                         </div>
                                     </div>
 
                                     <div class="col-12">
-                                        <button class="btn btn-primary w-100" type="submit">Inscrire</button>
+                                        <button class="btn btn-primary w-100" type="submit">{{ 'register.page_title'|trans }}</button>
                                     </div>
                                     <div class="col-12">
-                                        <p class="small mb-0 my-4">Vous avez déjà un compte ? <a href="{{ path('app_login')}}">Se connecter</a></p>
+                                        <p class="small mb-0 my-4">{{ 'register.form.Already_have_an_account'|trans}} <a href="{{ path('app_login')}}">{{ 'login_redirect'|trans }}</a></p>
                                     </div>
                                     {{ form_end(registrationForm) }}
 
+                                </div>
+                                <div class="card-footer d-flex justify-content-center">
+                                    <span class="me-2">{{ 'Language'|trans }} </span>
+                                    <a href="{{ path('change_locale_register', { '_locale': 'en' }) }}" class="mx-2">English</a> |
+                                    <a href="{{ path('change_locale_register', { '_locale': 'fr' }) }}" class="mx-2">Français</a>
                                 </div>
                             </div>
 

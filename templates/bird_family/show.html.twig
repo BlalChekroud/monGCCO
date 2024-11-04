@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Famille des espèces{% endblock %}
+{% block title %}{{ 'birdFamily.title'|trans }}{% endblock %}
 
 {% block body %}
 
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Détail d'une famille d'espèces</h1>
+      <h1>{{ 'birdFamily.details_of_a_species_family'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_bird_family_index') }}">Gestion des familles</a></li>
-          <li class="breadcrumb-item active">Détail</li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_bird_family_index') }}">{{ 'birdFamily.manage_families'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'show'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -23,39 +23,37 @@
                 <div class="card">
                     <div class="card-body">
                      <div id="printableArea">
-                        <h5 class="card-title">
-                            Détail
-                        </h5>
+                        <h5 class="card-title">{{ 'show'|trans }}</h5>
 
                         <table class="table">
                             <tbody>
                                 <tr>
-                                    <th>Nom de la famille :</th>
+                                    <th>{{ 'birdFamily.family_name'|trans }} :</th>
                                     <td>{{ bird_family.getFamilyName() }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Famille :</th>
+                                    <th>{{ 'birdFamily.family'|trans }} :</th>
                                     <td>{{ bird_family.getFamily() }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Ordre :</th>
+                                    <th>{{ 'birdFamily.order'|trans }} :</th>
                                     <td>{{ bird_family.getOrdre() }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Sous-famille :</th>
+                                    <th>{{ 'birdFamily.sub_family'|trans }} :</th>
                                     <td>{{ bird_family.getSubFamily() }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Tribu :</th>
+                                    <th>{{ 'birdFamily.tribe'|trans }} :</th>
                                     <td>{{ bird_family.getTribe() }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Créé le</th>
-                                    <td>{{ bird_family.createdAt ? bird_family.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                                    <th>{{ 'created_at'|trans }}</th>
+                                    <td>{{ bird_family.createdAt ? bird_family.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Dernière mise à jour le</th>
-                                    <td>{{ bird_family.updatedAt ? bird_family.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                                    <th>{{ 'Last_updated_at'|trans }}</th>
+                                    <td>{{ bird_family.updatedAt ? bird_family.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -66,8 +64,8 @@
                         <div class="row">
                             <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justify-content-between">
                                 <div>
-                                    <a href="{{ path('app_bird_family_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers consultation des famille">Retour</a>
-                                    <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une famille</a>
+                                    <a href="{{ path('app_bird_family_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'birdFamily.return_to_family_consultation'|trans }}">{{ 'back'|trans }}</a>
+                                    <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{ 'create_a_family'|trans }}</a>
                                 </div>
                                 <div class="d-flex justify-content-end">
                                     {% import 'macros/btn_actions_macros.html.twig' as macros %}

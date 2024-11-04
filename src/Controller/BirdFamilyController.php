@@ -14,12 +14,13 @@ use App\Repository\BirdFamilyRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/user/bird/family')]
 class BirdFamilyController extends AbstractController
 {
     #[Route('/', name: 'app_bird_family_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, BirdFamilyRepository $birdFamilyRepository, EntityManagerInterface $entityManager): Response
+    public function index(Request $request, BirdFamilyRepository $birdFamilyRepository, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
@@ -30,7 +31,7 @@ class BirdFamilyController extends AbstractController
     
             if ($csvFile) {
                 if (!$this->isGranted('ROLE_IMPORT')) {
-                    throw $this->createNotFoundException('Vous n\'avez pas l\'autorisation d\'importer des données.');
+                    throw $this->createNotFoundException($translator->trans('import_permission'));
                 }
     
                 $csvData = file_get_contents($csvFile->getPathname());
@@ -42,7 +43,7 @@ class BirdFamilyController extends AbstractController
 
                 // Vérifiez si la conversion a réussi
                 if (!mb_check_encoding($csvData, 'UTF-8')) {
-                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    $this->addFlash('error', $translator->trans('birdFamily.error.invalid_csv'));
                     return $this->redirectToRoute('app_bird_family_index');
                 }
 
@@ -148,13 +149,21 @@ class BirdFamilyController extends AbstractController
             // Affichez le nombre de lignes importées et non importées    
             try {
                 $entityManager->flush();
-                $this->addFlash('success', "$importedCount familles d'oiseaux ont été importées avec succès. $invalidCount lignes n'ont pas pu être importées.");
+                $this->addFlash('success', $translator->trans('birdFamily.msg.success_import', [
+                    '%importedCount%' => $importedCount,
+                    '%invalidCount%' => $invalidCount
+                ]));
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
+                $this->addFlash('error', $translator->trans('birdFamily.error.import', [
+                    '%message%' => $e->getMessage()
+                ]));
             }
             
             if ($invalidCount > 0) {
-                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+                $this->addFlash('error', $translator->trans('birdFamily.error.invalid_rows', [
+                    '%count%' => $invalidCount,
+                    '%invalidRows%' => implode(', ', $invalidRows),
+                ]));
             }
 
             return $this->redirectToRoute('app_bird_family_index');
@@ -169,19 +178,24 @@ class BirdFamilyController extends AbstractController
 
     #[Route('/new', name: 'app_bird_family_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         $birdFamily = new BirdFamily();
         $form = $this->createForm(BirdFamilyType::class, $birdFamily);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $birdFamily->setCreatedAt(new \DateTimeImmutable());
-            $entityManager->persist($birdFamily);
-            $entityManager->flush();
-            $this->addFlash('success', "Famille d'oiseaux a bien été crée");
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $birdFamily->setCreatedAt(new \DateTimeImmutable());
+                $entityManager->persist($birdFamily);
+                $entityManager->flush();
+                $this->addFlash('success', $translator->trans('birdFamily.msg.success_create'));
+    
+                return $this->redirectToRoute('app_bird_family_index', [], Response::HTTP_SEE_OTHER);
 
-            return $this->redirectToRoute('app_bird_family_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error', $translator->trans('birdFamily.error.creation_failed'));
+            }
         }
 
         return $this->render('bird_family/new.html.twig', [
@@ -201,17 +215,21 @@ class BirdFamilyController extends AbstractController
 
     #[Route('/{id}/edit', name: 'app_bird_family_edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
-    public function edit(Request $request, BirdFamily $birdFamily, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, BirdFamily $birdFamily, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         $form = $this->createForm(BirdFamilyType::class, $birdFamily);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $birdFamily->setUpdatedAt(new \DateTimeImmutable());
-            $entityManager->flush();
-            $this->addFlash('success', 'La famille a bien été modifié');
-
-            return $this->redirectToRoute('app_bird_family_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $birdFamily->setUpdatedAt(new \DateTimeImmutable());
+                $entityManager->flush();
+                $this->addFlash('success', $translator->trans('birdFamily.msg.success_update'));
+    
+                return $this->redirectToRoute('app_bird_family_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error', $translator->trans('birdFamily.error.modification_failed'));
+            }
         }
 
         return $this->render('bird_family/edit.html.twig', [
@@ -222,14 +240,16 @@ class BirdFamilyController extends AbstractController
 
     #[Route('/{id}', name: 'app_bird_family_delete', methods: ['POST'])]
     #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
-    public function delete(Request $request, BirdFamily $birdFamily, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, BirdFamily $birdFamily, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         $csrfToken = $request->request->get('_token'); // Utilisation de `request->request` pour obtenir le payload
     
         if ($this->isCsrfTokenValid('delete' . $birdFamily->getId(), $csrfToken)) {
             $entityManager->remove($birdFamily);
             $entityManager->flush();
-            $this->addFlash('success', "Famille d'espèce a bien été supprimée");
+            $this->addFlash('success', $translator->trans('birdFamily.msg.success_delete'));
+        } else {
+            $this->addFlash('error', $translator->trans('birdFamily.error.deletion_failed'));
         }
     
         return $this->redirectToRoute('app_bird_family_index', [], Response::HTTP_SEE_OTHER);

@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier une famille des espèces{% endblock %}
+{% block title %}{{ 'birdFamily.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Modifier cette famille d'espèces</h1>
+      <h1>{{ 'birdFamily.edit_this_family'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_bird_family_index') }}">Gestion des familles</a></li>
-          <li class="breadcrumb-item active">Modification</li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_bird_family_index') }}">{{ 'birdFamily.manage_families'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'modification'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -22,7 +22,7 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Les nouvelles informations de la famille</h5>
+              <h5 class="card-title">{{ 'birdFamily.the_new_informations'|trans }}</h5>
 
               {{ include('bird_family/_form.html.twig') }}
 
@@ -30,7 +30,7 @@
             <div class="card-footer">
               <div class="d-flex justify-content-between">
                 <div>
-                  <a href="{{ path('app_bird_family_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers consultation des famille">Retour</a>
+                  <a href="{{ path('app_bird_family_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'birdFamily.return_to_family_consultation'|trans }}">{{ 'back'|trans }}</a>
                 </div>
                 <div class="d-flex justify-content-end">
                   {% import 'macros/btn_actions_macros.html.twig' as macros %}

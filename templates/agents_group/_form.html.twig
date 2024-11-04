@@ -1,7 +1,7 @@
 {{ form_start(form) }}
     <div class="row mb-3">
       <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-        {{ form_label(form.groupMember, 'Les membres du groupe:') }}<span class="requiredField">*</span>
+        {{ form_label(form.groupMember, 'group_members'|trans ) }}<span class="requiredField">*</span>
       </div>
       <div class="col-sm-9 col-md-9 col-lg-9 col-xl-9">
         {{ form_widget(form.groupMember, { 'attr': {'id': 'group_member', 'class': 'form-control' } }) }}
@@ -11,7 +11,7 @@
 
     <div class="row mb-3">
       <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-        {{ form_label(form.leader, 'Chef du groupe:') }}<span class="requiredField">*</span>
+        {{ form_label(form.leader, 'group_leader'|trans ) }}<span class="requiredField">*</span>
       </div>
       <div id="leader-field" class="col-sm-9 col-md-9 col-lg-9 col-xl-9">
         {{ form_widget(form.leader, { 'attr': {'id': 'leader', 'class': 'form-control' } }) }}
@@ -21,7 +21,7 @@
 
     <div class="row mb-3">
       <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-        {{ form_label(form.country, 'Pays:') }}<span class="requiredField">*</span>
+        {{ form_label(form.country, 'country'|trans ) }}<span class="requiredField">*</span>
       </div>
       <div class="col-sm-9 col-md-9 col-lg-9 col-xl-9">
         {{ form_widget(form.country, { 'attr': {'class': 'form-control' } }) }}
@@ -32,7 +32,7 @@
     {{ macros.action_buttons('app_agents_group_new', 'app_agents_group_show', 'app_agents_group_edit', 'agents_group/_delete_form.html.twig', agents_group, app.request.attributes.get('_route')) }}
 {{ form_end(form) }}
 
-<script>
+{# <script>
   document.addEventListener('DOMContentLoaded', function() {
       const groupMemberSelect = $('#group_member'); // Utilisation de jQuery pour interagir avec Select2
       
@@ -59,4 +59,4 @@
       }
   });
 
-</script>
+</script> #}

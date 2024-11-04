@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Entity\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ImportCsvType;
@@ -34,7 +35,7 @@ class BirdSpeciesController extends AbstractController
     }
     
     #[Route('/', name: 'app_bird_species_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager): Response
+    public function index(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
@@ -45,7 +46,7 @@ class BirdSpeciesController extends AbstractController
 
             if ($csvFile) {
                 if (!$this->isGranted('ROLE_IMPORT')) {
-                    throw $this->createNotFoundException('Vous n\'avez pas l\'autorisation d\'importer des données.');
+                    throw $this->createNotFoundException($translator->trans('import_permission'));
                 }
 
                 $csvData = file_get_contents($csvFile->getPathname());
@@ -56,7 +57,7 @@ class BirdSpeciesController extends AbstractController
 
                 // Vérifiez si la conversion a réussi
                 if (!mb_check_encoding( $csvData, 'UTF-8')) {
-                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    $this->addFlash('error', $translator->trans('birdSpecies.error.invalid_encoding'));
                     return $this->redirectToRoute('app_country_index');
                 }
                 
@@ -186,13 +187,16 @@ class BirdSpeciesController extends AbstractController
             // Affichez le nombre de lignes importées et non importées    
             try {
                 $entityManager->flush();
-                $this->addFlash('success', "$importedCount espèces d'oiseaux ont été importées avec succès. $invalidCount lignes n'ont pas pu être importées.");
+                $this->addFlash('success', $translator->trans('birdSpecies.msg.success_import', ['%importedCount%' => $importedCount, '%invalidCount%' => $invalidCount]));
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
+                $this->addFlash('error', $translator->trans('birdSpecies.error.import', ['%message%' => $e->getMessage()]));
             }
             
             if ($invalidCount > 0) {
-                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+                $this->addFlash('error', $translator->trans('birdSpecies.error.invalid_lines', [
+                    '%invalidCount%' => $invalidCount,
+                    '%invalidRows%' => implode(', ', $invalidRows) // Conversion du tableau en chaîne
+                ]));
             }
             return $this->redirectToRoute('app_bird_species_index');
         }
@@ -399,38 +403,43 @@ class BirdSpeciesController extends AbstractController
 
     #[Route('/new', name: 'app_bird_species_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         $birdSpecy = new BirdSpecies();
         $form = $this->createForm(BirdSpeciesType::class, $birdSpecy);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $imageFile */
-            $imageFile = $form->get('image')['imageFile']->getData(); // Get the uploaded image
-
-            // Handle image upload only if a new image is provided
-            if ($imageFile) {
-                // If there's already an image, we need to update it
-                if ($birdSpecy->getImage()) {
-                    $image = $birdSpecy->getImage();
-                    $image->setCreatedAt(new \DateTimeImmutable());
-                    $image->setImageFile($imageFile); // Update with the new file
-                } else {
-                    // If there's no image yet, create a new Image entity
-                    $image = new Image;
-                    $image->setImageFile($imageFile);
-                    $image->setCreatedAt(new \DateTimeImmutable());
-                    $entityManager->persist($image);
-                    $birdSpecy->setImage($image); // Set the new image to the birdSpecy
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                /** @var UploadedFile $imageFile */
+                $imageFile = $form->get('image')['imageFile']->getData(); // Get the uploaded image
+    
+                // Handle image upload only if a new image is provided
+                if ($imageFile) {
+                    // If there's already an image, we need to update it
+                    if ($birdSpecy->getImage()) {
+                        $image = $birdSpecy->getImage();
+                        $image->setCreatedAt(new \DateTimeImmutable());
+                        $image->setImageFile($imageFile); // Update with the new file
+                    } else {
+                        // If there's no image yet, create a new Image entity
+                        $image = new Image;
+                        $image->setImageFile($imageFile);
+                        $image->setCreatedAt(new \DateTimeImmutable());
+                        $entityManager->persist($image);
+                        $birdSpecy->setImage($image); // Set the new image to the birdSpecy
+                    }
                 }
-            }
-            $birdSpecy->setCreatedAt(new \DateTimeImmutable());
-            $entityManager->persist($birdSpecy);
-            $entityManager->flush();
-            $this->addFlash('success', "Espèse d'oiseau a bien été crée");
+                $birdSpecy->setCreatedAt(new \DateTimeImmutable());
+                $entityManager->persist($birdSpecy);
+                $entityManager->flush();
+                $this->addFlash('success', $translator->trans('birdSpecies.msg.success_create'));
+    
+                return $this->redirectToRoute('app_bird_species_index', [], Response::HTTP_SEE_OTHER);
 
-            return $this->redirectToRoute('app_bird_species_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error', $translator->trans('birdSpecies.error.creation_failed'));
+            }
         }
 
         // $coverageForm = $this->createForm(CoverageType::class);
@@ -488,7 +497,7 @@ class BirdSpeciesController extends AbstractController
 
     #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}/edit', name: 'app_bird_species_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, BirdSpecies $birdSpecy, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, BirdSpecies $birdSpecy, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         
         $form = $this->createForm(BirdSpeciesType::class, $birdSpecy);
@@ -520,12 +529,12 @@ class BirdSpeciesController extends AbstractController
                 }
                 $birdSpecy->setUpdatedAt(new \DateTimeImmutable());
                 $entityManager->flush();
-                $this->addFlash('success', "L'espèse a bien été modifié");
+                $this->addFlash('success', $translator->trans('birdSpecies.msg.success_update'));
     
                 return $this->redirectToRoute('app_bird_species_index', [], Response::HTTP_SEE_OTHER);
             
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de modification de l\'espèse.');
+                $this->addFlash('error', $translator->trans('birdSpecies.error.modification_failed'));
             }
         }
 
@@ -537,14 +546,14 @@ class BirdSpeciesController extends AbstractController
 
     #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_bird_species_delete', methods: ['POST'])]
-    public function delete(Request $request, BirdSpecies $birdSpecy, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, BirdSpecies $birdSpecy, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         if ($this->isCsrfTokenValid('delete'.$birdSpecy->getId(), $request->getPayload()->get('_token'))) {
             $entityManager->remove($birdSpecy);
             $entityManager->flush();
-            $this->addFlash('success', "L'espèse a bien été supprimée");
+            $this->addFlash('success', $translator->trans('birdSpecies.msg.success_delete'));
         } else {
-            $this->addFlash('error','Une erreur s\'est produite lors de la suppression d\'espèse');
+            $this->addFlash('error', $translator->trans('birdSpecies.error.deletion_failed'));
         }
 
         return $this->redirectToRoute('app_bird_species_index', [], Response::HTTP_SEE_OTHER);

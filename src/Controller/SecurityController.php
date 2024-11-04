@@ -8,6 +8,7 @@ use App\Form\ImageType;
 // use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 // use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Monolog\DateTimeImmutable;
 use DateTime;
@@ -27,7 +28,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class SecurityController extends AbstractController
 {
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -35,10 +36,25 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        // Enregistrer la locale dans la session (facultatif)
+        $_locale = $request->getSession()->get('_locale', 'fr'); // valeur par défaut
+        $request->getSession()->set('_locale', $_locale);
+        
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
+    }
+
+    #[Route('/{_locale}/login', name: 'change_locale_login', requirements: ['_locale' => 'en|fr'])]
+    public function changeLocaleOut(EntityManagerInterface $entityManager, Request $request, $_locale): RedirectResponse
+    {
+        // Enregistrer la locale dans la session
+        $request->getSession()->set('_locale', $_locale);
+
+        // Rediriger l'utilisateur vers la page précédente
+        $referer = $request->headers->get('referer');
+        return new RedirectResponse($referer ?: $this->generateUrl('app_login'));
     }
 
     #[Route(path: '/user/logout', name: 'app_logout')]

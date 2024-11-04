@@ -1,13 +1,202 @@
-agentsGroup:
-  title: "Agents Groups"
-  breadcrumb_management: "Group Management"
-
+home_page: "Home page"
 breadcrumb_home: "Home"
 card_title: "Lists"
 create_group: "Create a group"
-consult_reserves: "Consult Nature Reserves"
-consult_campaigns: "Consult Counting Campaigns"
+create_a_family: 'Create a family'
+create_a_species: 'Create a species'
+add_a_country: 'Add a country'
+choose_bird_family: "-- Choose a Bird Family --"
+consult_reserves: "View reserves"
+consult_campaigns: "View campaigns"
+cousult_countries: "VIew country"
+cousult_species: "View species"
 no_record_found: "No records found"
+group_name: "Group name"
+group_members: "Group members"
+group_leader: "Group leader"
+created_at: "Created at"
+Last_updated_at: 'Last updated at'
+actions: "Actions"
+delete_confirm: "Are you sure you want to delete this item?"
+edit: "Edit"
+show: "Show"
+cancel: "Cancel"
+save: "Save"
+update: "Update"
+add: 'Add'
+modification: 'Modification'
+export_as_CSV: "Export as CSV"
+print: "Print"
+created_by: 'Created by'
+back: 'Back'
+
+csv_import_title: "Import a CSV File"
+csv_import_instruction: "Make sure your file contains the required columns."
+csv_preview_title: "CSV File Preview"
+close: "Close"
+note: "Note"
+columns: "The columns"
+are_mandatory: "are mandatory."
+are_optional: "are optional."
+missing_columns: "Missing columns"
+no_missing_columns: "No missing columns"
+import: "Import"
+import_permission: "You do not have permission to import data."
+access: "You do not have access."
+maxSizeMessage: "The file is too large. The maximum allowed size is 1024k."
+coverage_for_this_species: 'Coverage for this species'
+iucn_red_list_category: "IUCN Red List Category 2022"
+
+import_csv:
+  mimeTypesMessage: "Please upload a valid CSV file."
+  choose_file: "Choose a file"
+  no_file_chosen: "No file chosen"
+
+country: "Country"
+Select_the_country: "-- Select the country --"
 
 vich_uploader.form_label.delete_confirm: 'Delete?'
-vich_uploader.link.download: Download
+vich_uploader.link.download: 'Download'
+image:
+  insert: "Insert an image (JPG or PNG)"
+  not_available: 'No image available'
+  mimeTypesMessage: 'Please upload a valid image file (JPEG or PNG)'
+
+Log_in_to_your_account: 'Log in to your account'
+Enter_your_email_and_password_to_log_in: 'Enter your email & password to log in'
+You_are_logged_in_as: 'You are logged in as'
+Sign_out: 'Sign out'
+Email: 'Email'
+Please_enter_your_email: 'Please enter your email'
+Password: 'Password'
+Please_enter_your_password: 'Please enter your password!'
+Remember_me: 'Remember me'
+Log_in: 'Log in'
+Forgot_your_password: 'Forgot your password?'
+Do_not_have_an_account: "Don't have an account?"
+Create_an_account: 'Create an account'
+Language: 'Language:'
+login_redirect: "Log in"
+hidden_label: 'Hide'
+visible_label: 'Show'
+
+
+agentsGroup:
+  title: "Agent group management"
+  breadcrumb_management: "Group management"
+  delete_group: "Delete Group"
+  choose_group_leader: "-- Choose group leader --"
+  edit_agents_group: "Edit Agent Group"
+  edit_group: "Edit This Group"
+  manage_groups: "Manage Groups"
+  create_a_new_agent_group: 'Create a new agents group'
+  informations: 'Group information'
+  # Detail
+  details_of_an_agent_group: 'Details of an agent group'
+  return_to_agent_groups_consultation: 'Return to agent groups consultation'
+  # Edit
+  edit_this_group: 'Edit this group'
+  the_new_informations: 'The new group information'
+  error:
+    no_member_selected: "You must select at least one member to create an agents group."
+    leader_not_in_members: "The group leader must be among the selected members."
+    creation_failed: "An error occurred while creating the group."
+    modification_failed: "An error occurred while updating the group."
+    deletion_failed: "An error occurred while deleting the group."
+    access_denied: "You do not have access."
+    no_edit_permission: "You are not authorized to edit."
+    no_access_to_group: "You do not have access to this group."
+  msg:
+    created: "The group has been successfully created."
+    updated: "The group has been successfully updated."
+    deleted: "The group has been successfully deleted."
+
+birdFamily:
+  title: "Bird family management"
+  family_name: 'Family name'
+  family: 'Family'
+  sub_family: 'Subfamily'
+  order: 'Order'
+  tribe: 'Tribe'
+  delete_family: "Delete family"
+  create_a_new_species_family: "Create a new species family"
+  manage_families: 'Family management'
+  informations: 'Family information'
+  return_to_family_consultation: 'Return to family consultation'
+  details_of_a_species_family: "Details of a species family"
+  edit_this_family: 'Edit this species family'
+  the_new_informations: 'The new information of the family'
+  msg:
+    success_import: "%importedCount% bird families have been successfully imported. %invalidCount% lines could not be imported."
+    success_create: "Bird family has been created successfully."
+    success_update: "The family has been updated successfully."
+    success_delete: "Species family has been deleted successfully."
+  error:
+    import: "Error during import: %message%"
+    invalid_rows: "%count% lines could not be imported. Row numbers: %invalidRows%"
+    invalid_csv: "The CSV file contains invalid characters. Please check the file encoding."
+    creation_failed: "Failed to create the bird family."
+    modification_failed: "Failed to modify the bird family."
+    deletion_failed: "Failed to delete the bird family."
+
+birdSpecies:
+  title: "Bird species management"
+  title_add: "Add a bird species"
+  breadcrumb_manage: "Species management"
+  informations: "New bird species information"
+  return: "Back to bird species overview"
+  modal_birdlife_tax_treat_title: "Create a new BirdLife Taxonomic Treatment"
+  modal_iucn_title: "Create a new IUCN Red List Category 2022"
+  scientific_name: "Scientific Name"
+  french_name: "French Name"
+  vernacular_name: "Vernacular Name"
+  english_name: "English Name"
+  wi_species_code: "WI Species Code"
+  image: "Image"
+  authority: "Authority"
+  birdlife_tax_treat: "BirdLife Taxonomic Treatment"
+  common_name: "Common Name"
+  common_name_alt: "Alternative Common Names"
+  synonyms: "Synonyms"
+  taxonomic_sources: "Taxonomic Source(s)"
+  sis_rec_id: "sisRec ID"
+  spc_rec_id: "spcRec ID"
+  subspp_id: "subspp ID"
+  msg:
+    success_import: "%importedCount% bird species were successfully imported. %invalidCount% rows could not be imported."
+    success_create: "Bird species created successfully."
+    success_update: "Bird species was successfully updated."
+    success_delete: "Bird species was successfully deleted."
+  error:
+    creation_failed: "Failed to create the bird species"
+    modification_failed: "An error occurred while updating the species."
+    deletion_failed: "An error occurred while deleting the bird species."
+    invalid_lines: "%invalidCount% rows could not be imported. Row numbers: %invalidRows%"
+    import: "Error during import: %message%"
+    invalid_encoding: "The CSV file contains invalid characters. Please check the file encoding."
+
+register:
+  page_title: "Register"
+  form:
+    title: "Create an Account"
+    subtitle: "Enter your personal information to create an account"
+    required_field_note: "indicates required field."
+    name: "Name"
+    name_placeholder: "Please enter your name!"
+    last_name: "Last Name"
+    last_name_placeholder: "Please enter your last name!"
+    phone: "Phone Number"
+    phone_placeholder: "Please enter your phone number!"
+    email_placeholder: "Please enter a valid email address!"
+    password: "Password"
+    password_placeholder: "Please enter your password!"
+    password_confirm: "Confirm your password"
+    password_confirm_placeholder: "Please confirm your password!"
+    agree_terms: "I agree to the terms and conditions"
+    agree_terms_error: "You must agree before submitting."
+    submit_button: "Sign Up"
+    Already_have_an_account: "Already have an account?"
+
+# Error messages for form validation
+form_error:
+  general: "Please check the information and try again."

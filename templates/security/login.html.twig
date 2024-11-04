@@ -51,7 +51,8 @@
                       {% if logo and logo.image and logo.image.imageFilename %}
                           <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgLogo">
                       {% else %}
-                          <p>Aucune image disponible</p>
+                          <p>{{ 'image.not_available'|trans }}</p>
+                          
                       {% endif %}                      
                       {# <span class="d-none d-lg-block">Gestion des Campagnes de Comptage des Oiseaux Marins</span> #}
                     </a>
@@ -62,8 +63,8 @@
                     <div class="card-body">
 
                       <div class="pt-4 pb-2">
-                        <h5 class="card-title text-center pb-0 fs-4">Connexion à votre compte</h5>
-                        <p class="text-center small">Entrez votre e-mail & mot de passe pour vous connecter</p>
+                        <h5 class="card-title text-center pb-0 fs-4">{{ 'Log_in_to_your_account'|trans }}</h5>
+                        <p class="text-center small">{{ 'Enter_your_email_and_password_to_log _in'|trans }}</p>
                       </div>
 
                       <form method="post" class="row g-3 needs-validation" novalidate>
@@ -74,48 +75,54 @@
                         {% if app.user %}
                             <div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
                               <i class="bi bi-exclamation-triangle me-1"></i>
-                              Vous êtes connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>, <a href="{{ path('app_logout') }}">Déconnexion</a>
+                              {{ 'You_are_logged_in_as'|trans }} <strong>{{ app.user.userIdentifier }}</strong>, <a href="{{ path('app_logout') }}">{{ 'Sign_out'|trans }}</a>
                             </div>
                         {% endif %}
 
                         {% if not app.user %}
                           <div class="col-12">
-                            <label for="username" class="form-label">Email</label>
+                            <label for="username" class="form-label">{{ 'Email'|trans }}</label>
                             <div class="input-group has-validation">
                               <span class="input-group-text" id="inputGroupPrepend">@</span>
                               <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-                              <div class="invalid-feedback">Veuillez entrer votre E-mail</div>
+                              <div class="invalid-feedback">{{ 'Please_enter_your_email'|trans }}</div>
                             </div>
                           </div>
 
                           <div class="col-12">
-                            <label for="password" class="form-label">Mot de passe</label>
+                            <label for="password" class="form-label">{{ 'Password'|trans }}</label>
                             <div class="input-group has-validation">
                               <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
                             </div>                
-                            <div class="invalid-feedback">Veuillez entrer votre mot de passe!</div>
+                            <div class="invalid-feedback">{{ 'Please_enter_your_password'|trans }}</div>
                             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                           </div>
 
                           <div class="col-12">
                             <div class="form-check">
                               <input class="form-check-input" type="checkbox" name="_remember_me" value="true" id="rememberMe">
-                              <label class="form-check-label" for="rememberMe">Souvenir de moi</label>
+                              <label class="form-check-label" for="rememberMe">{{ 'Remember_me'|trans }}</label>
                             </div>
                           </div>
                           <div class="col-12">
-                            <button class="btn btn-primary w-100" type="submit">Connexion</button>
+                            <button class="btn btn-primary w-100" type="submit">{{ 'Log_in'|trans }}</button>
                           </div>
                           <div class="col-12">
-                            <a href="{{ path('app_forgot_password_request') }}">Mot de passe oublié ?</a>
+                            <a href="{{ path('app_forgot_password_request') }}">{{ 'Forgot_your_password'|trans }}</a>
                           </div>
                           <div class="col-12">
-                            <p class="small mb-0">Vous n'avez pas de compte ? <a href="{{ path('app_register')}}">Créer un compte</a></p>
+                            <p class="small mb-0">{{ 'Do_not_have_an_account'|trans }} <a href="{{ path('app_register')}}">{{ 'Create_an_account'|trans }}</a></p>
                           </div>
                         {% endif %}
                       </form>
 
                     </div>
+                    <div class="card-footer d-flex justify-content-center">
+                        <span class="me-2">{{ 'Language'|trans }} </span>
+                        <a href="{{ path('change_locale_login', { '_locale': 'en' }) }}" class="mx-2">English</a> |
+                        <a href="{{ path('change_locale_login', { '_locale': 'fr' }) }}" class="mx-2">Français</a>
+                    </div>
+
                   </div>
 
                 </div>

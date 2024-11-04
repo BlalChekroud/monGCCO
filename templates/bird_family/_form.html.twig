@@ -2,7 +2,7 @@
   
     <div class="row mb-3">
       <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
-        {{ form_label(form.familyName, 'Nom de famille') }}<span class="requiredField">*</span>
+        {{ form_label(form.familyName, 'birdFamily.family_name'|trans ) }}<span class="requiredField">*</span>
       </div>
       <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
         {{ form_widget(form.familyName, {'attr': {'class': 'form-control'}}) }}
@@ -11,7 +11,7 @@
     </div>
     <div class="row mb-3">
       <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
-        {{ form_label(form.ordre, 'Ordre') }}<span class="requiredField">*</span>
+        {{ form_label(form.ordre, 'birdFamily.order') }}<span class="requiredField">*</span>
       </div>
       <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
         {{ form_widget(form.ordre, {'attr': {'class': 'form-control'}}) }}
@@ -20,7 +20,7 @@
     </div>
     <div class="row mb-3">
       <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
-        {{ form_label(form.family, 'Famille') }}<span class="requiredField">*</span>
+        {{ form_label(form.family, 'birdFamily.family'|trans ) }}<span class="requiredField">*</span>
       </div>
       <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
         {{ form_widget(form.family, {'attr': {'class': 'form-control'}}) }}
@@ -29,7 +29,7 @@
     </div>
     <div class="row mb-3">
       <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
-        {{ form_label(form.subFamily, 'Sous-famille') }}
+        {{ form_label(form.subFamily, 'birdFamily.sub_family'|trans ) }}
       </div>
       <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
         {{ form_widget(form.subFamily, {'attr': {'class': 'form-control'}}) }}
@@ -37,7 +37,7 @@
     </div>
     <div class="row mb-3">
       <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
-        {{ form_label(form.tribe, 'Tribu') }}
+        {{ form_label(form.tribe, 'birdFamily.tribe'|trans ) }}
       </div>
       <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
         {{ form_widget(form.tribe, {'attr': {'class': 'form-control'}}) }}

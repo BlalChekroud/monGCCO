@@ -12,10 +12,15 @@ controllers:
         namespace: App\Controller
     type: attribute
     
-# # Route personnalisée pour changer la langue
-# change_locale:
-#     path: /change-locale/{_locale}
-#     controller: App\Controller\LocaleController::changeLocale
-#     requirements:
-#         _locale: fr|en  # Limitez les choix à 'en' et 'fr'
+# Route personnalisée pour changer la langue
+change_locale:
+    path: /change-locale/{_locale}
+    controller: App\Controller\HomeController::changeLocale
+    requirements:
+        _locale: fr|en  # Limitez les choix à 'en' et 'fr'
 
+change_out:
+    path: /change-out/{_locale}
+    controller: App\Controller\HomeController::changeOut
+    requirements:
+        _locale: fr|en  # Limitez les choix à 'en' et 'fr'

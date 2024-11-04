@@ -9,7 +9,7 @@
       <h1>Les pays</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
           <li class="breadcrumb-item active">Gestion des pays</li>
         </ol>
       </nav>
@@ -20,7 +20,7 @@
         <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Listes</h5>
+              <h5 class="card-title">{{ 'card_title'|trans }}</h5>
              <div id="printableArea">
                 <!-- Table with stripped rows -->
                 <table class="table datatable">

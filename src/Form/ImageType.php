@@ -2,8 +2,8 @@
 
 namespace App\Form;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Vich\UploaderBundle\Form\Type\VichImageType;
-// use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
 use App\Entity\Image;
 use Symfony\Component\Form\AbstractType;
@@ -12,19 +12,25 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ImageType extends AbstractType
 {
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('imageFile', VichImageType::class, [
-                'label' => 'Image (JPG ou PNG)',
+                'label' => $this->translator->trans('image.insert'),
                 'label_attr' => [
                     'class' => 'form-label mt-4'
                 ],
                 'mapped' => false,
                 'required' => true,
                 // 'download_uri' => false,
-                'delete_label' => 'Supprimer',
-                'download_label' => 'Télécharger',
+                'delete_label' => $this->translator->trans('vich_uploader.form_label.delete_confirm'),
+                'download_label' => $this->translator->trans('vich_uploader.link.download'),
                 'constraints' => [
                     new File([
                         'maxSize' => '1024k',
@@ -32,7 +38,8 @@ class ImageType extends AbstractType
                             'image/jpeg',
                             'image/png',
                         ],
-                        'mimeTypesMessage' => "Veuillez télécharger un fichier d'image valide (JPEG ou PNG)",
+                        'mimeTypesMessage' => $this->translator->trans('image.mimeTypesMessage'),
+                        'maxSizeMessage' => $this->translator->trans('maxSizeMessage'),
                     ])
                 ],
             ])

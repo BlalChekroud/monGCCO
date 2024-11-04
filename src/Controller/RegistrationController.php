@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -21,7 +22,12 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            
+            // Récupérer la locale depuis la session
+            $_locale = $request->getSession()->get('_locale', 'fr'); // valeur par défaut
+            $user->setLocale($_locale); // Définit la locale de l'utilisateur
             $user->setCreatedAt(new \DateTimeImmutable());
+            
             // encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
@@ -33,13 +39,27 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
+            // Optionnel : enregistrer la locale dans la session (facultatif)
+            $request->getSession()->set('_locale', $_locale);
+
             // do anything else you need here, like send an email
 
-            return $this->redirectToRoute('app_collected_data_index');
+            return $this->redirectToRoute('app_counting_campaign_index');
         }
 
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form,
         ]);
+    }
+
+    #[Route('/{_locale}/register', name: 'change_locale_register', requirements: ['_locale' => 'en|fr'])]
+    public function changeLocaleOut(EntityManagerInterface $entityManager, Request $request, $_locale): RedirectResponse
+    {
+        // Enregistrer la locale dans la session
+        $request->getSession()->set('_locale', $_locale);
+
+        // Rediriger l'utilisateur vers la page précédente
+        $referer = $request->headers->get('referer');
+        return new RedirectResponse($referer ?: $this->generateUrl('app_register'));
     }
 }

@@ -1,0 +1,14 @@
+agentsGroup:
+  error:
+    no_member_selected: "Vous devez sélectionner au moins un membre pour créer un groupe d'agents."
+    leader_not_in_members: "Le chef du groupe doit être parmi les membres sélectionnés."
+    creation_failed: "Une erreur s'est produite lors de la création du groupe."
+    modification_failed: "Une erreur s'est produite lors de la modification du groupe."
+    deletion_failed: "Une erreur s'est produite lors de la suppression du groupe."
+    access_denied: "Vous n'avez pas l'accès."
+    no_edit_permission: "Vous n'avez pas l'autorisation de modifier."
+    no_access_to_group: "Vous n'avez pas accès à ce groupe."
+  msg:
+    created: "Le groupe a bien été créé."
+    updated: "Le groupe a bien été modifié."
+    deleted: "Le groupe a bien été supprimé."

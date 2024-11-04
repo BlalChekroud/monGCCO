@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/user/agents/group')]
 class AgentsGroupController extends AbstractController
@@ -33,7 +34,7 @@ class AgentsGroupController extends AbstractController
 
     #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/new', name: 'app_agents_group_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         $agentsGroup = new AgentsGroup();
         $form = $this->createForm(AgentsGroupType::class, $agentsGroup);
@@ -42,11 +43,11 @@ class AgentsGroupController extends AbstractController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 if ($agentsGroup->getGroupMember()->isEmpty()) {
-                    $this->addFlash('error', 'Vous devez sélectionner au moins un membre pour créer un groupe d\'agents.');
+                    $this->addFlash('error', $translator->trans('agentsGroup.error.no_member_selected'));
                     return $this->redirectToRoute('app_agents_group_new');
                 }
                 if (!$agentsGroup->validateLeader()) {
-                    $this->addFlash('error', 'Le chef du groupe doit être parmi les membres sélectionnés.');
+                    $this->addFlash('error', $translator->trans('agentsGroup.error.leader_not_in_members'));
                     return $this->redirectToRoute('app_agents_group_new');
                 }
                 
@@ -61,11 +62,11 @@ class AgentsGroupController extends AbstractController
                 $agentsGroup->generateAgentsGroup();
                 // Flush again to save the updated group name
                 $entityManager->flush();
-                $this->addFlash('success', "Le groupe a bien été crée");
+                $this->addFlash('success', $translator->trans("agentsGroup.msg.created"));
     
                 return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de la création du groupe.');
+                $this->addFlash('error', $translator->trans('agentsGroup.error.creation_failed'));
             }
         }
 
@@ -76,7 +77,7 @@ class AgentsGroupController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_agents_group_show', methods: ['GET'])]
-    public function show(AgentsGroup $agentsGroup): Response
+    public function show(AgentsGroup $agentsGroup, TranslatorInterface $translator): Response
     {
         $user = $this->getUser();
 
@@ -87,19 +88,19 @@ class AgentsGroupController extends AbstractController
             ]);
             
         } else {
-            $this->addFlash('info', 'Vous n\'avez pas accès à ce groupe.');
+            $this->addFlash('info', $translator->trans('agentsGroup.msg.no_access_to_group'));
             return $this->redirectToRoute('app_agents_group_index');
         }
     }
 
     #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}/edit', name: 'app_agents_group_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, AgentsGroup $agentsGroup, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, AgentsGroup $agentsGroup, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         $user = $this->getUser();
         // Vérifiez si l'utilisateur est le leader du groupe ou un administrateur
         if ($user !== $agentsGroup->getLeader() && !$this->isGranted('ROLE_ADMIN')) {
-            $this->addFlash('info', 'Vous n\'avez pas l\'autorisation de modifier.');
+            $this->addFlash('info', $translator->trans('agentsGroup.msg.no_edit_permission'));
             return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -109,22 +110,22 @@ class AgentsGroupController extends AbstractController
         if ($form->isSubmitted()) {
             if($form->isValid()) {
                 if ($agentsGroup->getGroupMember()->isEmpty()) {
-                    $this->addFlash('error', 'Vous devez sélectionner au moins un membre pour créer un groupe d\'agents.');
+                    $this->addFlash('error', $translator->trans('agentsGroup.error.no_member_selected'));
                     return $this->redirectToRoute('app_agents_group_edit', ['id'=> $agentsGroup->getId()], Response::HTTP_SEE_OTHER);
                 }
                 if (!$agentsGroup->validateLeader()) {
-                    $this->addFlash('error', 'Le chef du groupe doit être parmi les membres sélectionnés.');
+                    $this->addFlash('error', $translator->trans('agentsGroup.error.leader_not_in_members'));
                     return $this->redirectToRoute('app_agents_group_edit', ['id'=> $agentsGroup->getId()], Response::HTTP_SEE_OTHER);
                 }
                 $agentsGroup->setUpdatedAt(new \DateTimeImmutable());
                 $agentsGroup->generateAgentsGroup();
                 $entityManager->flush();
-                $this->addFlash('success', "Le groupe a bien été modifié");
+                $this->addFlash('success', $translator->trans('agentsGroup.msg.updated'));
     
                 return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);
 
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de la modification du groupe.');
+                $this->addFlash('error', $translator->trans('agentsGroup.error.modification_failed'));
             }
         }
 
@@ -136,14 +137,14 @@ class AgentsGroupController extends AbstractController
 
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_agents_group_delete', methods: ['POST'])]
-    public function delete(Request $request, AgentsGroup $agentsGroup, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, AgentsGroup $agentsGroup, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         if ($this->isCsrfTokenValid('delete'.$agentsGroup->getId(), $request->getPayload()->get('_token'))) {
             $entityManager->remove($agentsGroup);
             $entityManager->flush();
-            $this->addFlash('success', "Le groupe a bien été supprimée");
+            $this->addFlash('success', $translator->trans('agentsGroup.msg.deleted'));
         } else {
-            $this->addFlash('error','Une erreur s\'est produite lors de la suppression du groupe');
+            $this->addFlash('error', $translator->trans('agentsGroup.error.deletion_failed'));
         }
 
         return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);

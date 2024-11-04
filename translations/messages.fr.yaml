@@ -1,13 +1,202 @@
-agentsGroup:
-  title: "Groupes des agents"
-  breadcrumb_management: "Gestion des groupes"
-
+home_page: "Page d'accueil"
 breadcrumb_home: "Accueil"
 card_title: "Listes"
 create_group: "Créer un groupe"
+create_a_family: "Créer une famille"
+create_a_species: 'Créer une espèce'
+add_a_country: 'Ajouter un pays'
+choose_bird_family: "-- Choisir une Famille d'Oiseaux --"
 consult_reserves: "Consultation des réserves"
 consult_campaigns: "Consultation des campagnes"
+cousult_countries: "Consultation des pays"
+cousult_species: 'Consultation des espèces'
 no_record_found: "Aucun enregistrement trouvé"
+group_name: "Nom du groupe"
+group_members: "Les membres du groupe"
+group_leader: "Chef du groupe"
+created_at: "Créé le"
+Last_updated_at: 'Dernière mise à jour le'
+actions: "Actions"
+delete_confirm: "Êtes-vous sûr de vouloir supprimer cet élément ?"
+edit: "Modifier"
+show: 'Détail'
+cancel: 'Annuler'
+save: 'Enregistrer'
+update: 'Mise à jour'
+add: 'Ajouter'
+modification: 'Modification'
+export_as_CSV: "Exporter en CSV"
+print: "Imprimer"
+created_by: 'Crée par'
+back: 'Retour'
+
+csv_import_title: "Importer un fichier CSV"
+csv_import_instruction: "Assurez-vous que votre fichier contient les colonnes nécessaires."
+csv_preview_title: "Aperçu du fichier CSV"
+close: "Fermer"
+note: "NB"
+columns: "Les colonnes"
+are_mandatory: "sont obligatoires."
+are_optional: "sont facultatives."
+missing_columns: "Colonnes manquantes"
+no_missing_columns: "Aucune colonne manquante"
+import: "Importer"
+import_permission: "Vous n'avez pas l'autorisation d'importer des données."
+access: "Vous n'avez pas l'accès."
+maxSizeMessage: "Le fichier est trop volumineux. La taille maximale autorisée est 1024k."
+coverage_for_this_species: 'Couverture pour cette espèce'
+iucn_red_list_category: "Catégorie de la liste rouge de l'UICN 2022"
+
+import_csv:
+  mimeTypesMessage: "Veuillez charger un fichier CSV valide."
+  choose_file: "Choisir un fichier"
+  no_file_chosen: "Aucun fichier choisi"
+
+country: "Pays"
+Select_the_country: "-- Choisir le pays --"
 
 vich_uploader.form_label.delete_confirm: 'Supprimer?'
-vich_uploader.link.download: Télécharger
+vich_uploader.link.download: 'Télécharger'
+image:
+  insert: "Insérer une image (JPG ou PNG)"
+  not_available: 'Aucune image disponible'
+  mimeTypesMessage: "Veuillez télécharger un fichier d'image valide (JPEG ou PNG)"
+
+Log_in_to_your_account: 'Connexion à votre compte'
+Enter_your_email_and_password_to_log _in: 'Entrez votre e-mail & mot de passe pour vous connecter'
+You_are_logged_in_as: 'Vous êtes connecté en tant que'
+Sign_out: 'Déconnexion'
+Email: 'E-mail'
+Please_enter_your_email: 'Veuillez entrer votre E-mail'
+Password: 'Mot de passe'
+Please_enter_your_password: 'Veuillez entrer votre mot de passe!'
+Remember_me: 'Souvenir de moi'
+Log_in: 'Connexion'
+Forgot_your_password: 'Mot de passe oublié ?'
+Do_not_have_an_account: "Vous n'avez pas de compte ?"
+Create_an_account: 'Créer un compte'
+Language: 'Langue :'
+login_redirect: "Se connecter"
+hidden_label: 'Masquer'
+visible_label: 'Afficher'
+
+
+agentsGroup:
+  title: "Gestion des groupes d'agents"
+  breadcrumb_management: "Gestion des groupes"
+  delete_group: "Supprimer le groupe"
+  choose_group_leader: "-- Choisir le chef du groupe --"
+  edit_agents_group: "Modifier groupe d'agents"
+  edit_group: "Modifier ce groupe"
+  manage_groups: "Gestion des groupes"
+  create_a_new_agent_group: "Créer un nouveau groupe d'agents"
+  informations: 'Les informations du groupe' 
+  # Detail
+  details_of_an_agent_group: "Détail d'un groupe d'agents"
+  return_to_agent_groups_consultation: "Retour vers la consultation des groupes d'agents"
+  # Modifier
+  edit_this_group: "Modifier ce groupe"
+  the_new_informations: "Les nouvelles informations du groupe"
+  error:
+    no_member_selected: "Vous devez sélectionner au moins un membre pour créer un groupe d'agents."
+    leader_not_in_members: "Le chef du groupe doit être parmi les membres sélectionnés."
+    creation_failed: "Une erreur s'est produite lors de la création du groupe."
+    modification_failed: "Une erreur s'est produite lors de la modification du groupe."
+    deletion_failed: "Une erreur s'est produite lors de la suppression du groupe."
+    access_denied: "Vous n'avez pas l'accès."
+    no_edit_permission: "Vous n'avez pas l'autorisation de modifier."
+    no_access_to_group: "Vous n'avez pas accès à ce groupe."
+  msg:
+    created: "Le groupe a bien été créé."
+    updated: "Le groupe a bien été modifié."
+    deleted: "Le groupe a bien été supprimé."
+
+birdFamily:
+  title: "Gestion de familles des oiseaux"
+  family_name: 'Nom de famille'
+  family: 'Famille'
+  sub_family: 'Sous famille'
+  order: 'Ordre'
+  tribe: 'Tribu'
+  delete_family: "Supprimer la famille"
+  create_a_new_species_family: "Créer une nouvelle famille d'espèces" 
+  manage_families: "Gestion des familles"
+  informations: "Les informations de la famille d'espèces" 
+  return_to_family_consultation: "Retour vers consultation des famille"
+  details_of_a_species_family: "Détail d'une famille d'espèces"
+  edit_this_family: "Modifier cette famille d'espèces"
+  the_new_informations: "Les nouvelles informations de la famille"
+  msg:
+    success_import: "%importedCount% familles d'oiseaux ont été importées avec succès. %invalidCount% lignes n'ont pas pu être importées."
+    success_create: "Famille d'oiseaux a bien été créée."
+    success_update: "La famille a bien été modifiée."
+    success_delete: "Famille d'espèce a bien été supprimée."
+  error:
+    import: "Erreur lors de l'importation : %message%"
+    invalid_rows: "%count% lignes n'ont pas pu être importées. Numéros des lignes : %invalidRows%"
+    invalid_csv: "Le fichier CSV contient des caractères non valides. Veuillez vérifier l'encodage du fichier."
+    creation_failed: "Échec de la création de la famille d'oiseaux."
+    modification_failed: "Échec de la modification de la famille d'oiseaux."
+    deletion_failed: "Échec de la suppression de la famille d'oiseaux."
+
+birdSpecies:
+  title: "Gestion des espèces d'oiseaux"
+  title_add: "Ajout d'une espèce d'oiseau"
+  breadcrumb_manage: "Gestion des espèces"
+  informations: "Les informations de la nouvelle espèce d'oiseau"
+  return: "Retour vers la consultation des espèces d'oiseaux"
+  modal_birdlife_tax_treat_title: "Créer un nouveau traitement taxonomique pour BirdLife"
+  modal_iucn_title: "Créer une nouvelle catégorie de la liste rouge de l'UICN 2022"
+  scientific_name: "Nom Scientifique"
+  french_name: "Nom français"
+  vernacular_name: "Nom vernaculaire"
+  english_name: "Nom anglais"
+  wi_species_code: "Code WI d'espèce"
+  image: "Image"
+  authority: "Autorité"
+  birdlife_tax_treat: "Traitement taxonomique de BirdLife"
+  common_name: "Nom commun"
+  common_name_alt: "Noms communs alternatifs"
+  synonyms: "Synonymes"
+  taxonomic_sources: "Source(s) Taxonomique"
+  sis_rec_id: "sisRec ID"
+  spc_rec_id: "spcRec ID"
+  subspp_id: "subspp ID"
+  msg:
+    success_import: "%importedCount% espèces d'oiseaux ont été importées avec succès. %invalidCount% lignes n'ont pas pu être importées."
+    success_create: "Espèce d'oiseau créée avec succès."
+    success_update: "L'espèce d'oiseau a bien été modifiée."
+    success_delete: "L'espèce d'oiseau a bien été supprimée."
+  error:
+    creation_failed: "Échec de la création de l'espèce d'oiseau"
+    modification_failed: "Une erreur s'est produite lors de la modification de l'espèce."
+    deletion_failed: "Une erreur s'est produite lors de la suppression de l'espèce d'oiseau."
+    invalid_lines: "%invalidCount% lignes n'ont pas pu être importées. Numéros des lignes : %invalidRows%"
+    import: "Erreur lors de l'importation : %message%"
+    invalid_encoding: "Le fichier CSV contient des caractères non valides. Veuillez vérifier l'encodage du fichier."
+
+register:
+  page_title: "Inscription"
+  form:
+    title: "Créer un Compte"
+    subtitle: "Entrer vos informations personnelles pour créer un compte"
+    required_field_note: "indique que le champ est obligatoire."
+    name: "Nom"
+    name_placeholder: "Veuillez entrer votre nom !"
+    last_name: "Prénom"
+    last_name_placeholder: "Veuillez entrer votre prénom !"
+    phone: "Numéro de téléphone"
+    phone_placeholder: "Veuillez entrer votre numéro de téléphone !"
+    email_placeholder: "Veuillez entrer une adresse e-mail valide !"
+    password: "Mot de passe"
+    password_placeholder: "Veuillez entrer votre mot de passe !"
+    password_confirm: "Confirmez votre mot de passe"
+    password_confirm_placeholder: "Veuillez entrer votre mot de passe !"
+    agree_terms: "J'accepte les termes et conditions"
+    agree_terms_error: "Il faut accepter avant de soumettre."
+    submit_button: "Inscrire"
+    Already_have_an_account: "Vous avez déjà un compte ?"
+  
+# Messages pour les erreurs de formulaire
+form_error:
+  general: "Veuillez vérifier les informations et réessayer."

@@ -76,7 +76,8 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
-                'label' => 'Accepter les termes et conditions',
+                'label' => "register.form.field_agree_terms",
+                'required' => true,
                 'constraints' => [
                     new IsTrue([
                         'message' => 'Vous devriez accepter nos termes.',
@@ -91,8 +92,8 @@ class RegistrationFormType extends AbstractType
                 // this is read and encoded in the controller
                 'mapped' => false,
                 'toggle' => true,
-                'hidden_label' => 'Masquer',
-                'visible_label' => 'Afficher',
+                'hidden_label' => 'hidden_label',
+                'visible_label' => 'visible_label',
                 // 'visible_icon' => null,
                 // 'hidden_icon' => null,
                 'label' => false,
@@ -116,8 +117,8 @@ class RegistrationFormType extends AbstractType
                 'mapped' => false,
                 'label' => false,
                 'toggle' => true,
-                'hidden_label' => 'Masquer',
-                'visible_label' => 'Afficher',
+                'hidden_label' => 'hidden_label',
+                'visible_label' => 'visible_label',
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez confirmer votre mot de passe']),
@@ -125,20 +126,6 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
         ;
-        // // Ajouter un écouteur d'événement pour la validation après la soumission du formulaire
-        // $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-        //     $form = $event->getForm();
-        //     $data = $form->getData();
-
-        //     // Obtiens les données des champs
-        //     $plainPassword = $form->get('plainPassword')->getData();
-        //     $passwordConfirm = $form->get('passwordConfirm')->getData();
-
-        //     // Vérifie si les mots de passe correspondent
-        //     if ($plainPassword !== $passwordConfirm) {
-        //         $form->get('passwordConfirm')->addError(new FormError('Les mots de passe ne correspondent pas.'));
-        //     }
-        // });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

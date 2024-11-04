@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Consultation des espèces{% endblock %}
+{% block title %}{{ 'birdSpecies.title'|trans }}{% endblock %}
 
 {% block body %}
 <main id="main" class="main">
@@ -9,7 +9,7 @@
       <h1>Espèces des oiseaux</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
           <li class="breadcrumb-item active">Gestion des espèces</li>
         </ol>
       </nav>
@@ -22,7 +22,7 @@
          <div id="printableArea">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Listes</h5>
+              <h5 class="card-title">{{ 'card_title'|trans }}</h5>
 
                   <!-- Table with stripped rows -->
                   <table class="table datatable">

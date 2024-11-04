@@ -2,7 +2,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.scientificName, 'Nom Scientifique') }}<span class="requiredField">*</span>
+      {{ form_label(form.scientificName, 'birdSpecies.scientific_name'|trans ) }}<span class="requiredField">*</span>
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.scientificName, {'attr': {'class': 'form-control'}}) }}
@@ -12,7 +12,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.frenchName, 'Nom français') }}<span class="explanation me-4"> (nom vernaculaire)</span>
+      {{ form_label(form.frenchName, 'birdSpecies.french_name'|trans ) }}<span class="explanation me-4"> ({{ 'birdSpecies.vernacular_name'|trans }})</span>
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.frenchName, {'attr': {'class': 'form-control'}}) }}
@@ -21,7 +21,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.englishName, 'Nom anglais') }}
+      {{ form_label(form.englishName, 'birdSpecies.english_name'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.englishName, {'attr': {'class': 'form-control'}}) }}
@@ -30,7 +30,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.wispeciescode, "Code WI d'espèse") }}
+      {{ form_label(form.wispeciescode, 'birdSpecies.wi_species_code'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.wispeciescode, {'attr': {'class': 'form-control'}}) }}
@@ -39,7 +39,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.image, 'Image') }}
+      {{ form_label(form.image, 'birdSpecies.image'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
@@ -48,7 +48,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.authority, 'Autorité') }}
+      {{ form_label(form.authority, 'birdSpecies.authority'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.authority, {'attr': {'class': 'form-control'}}) }}
@@ -70,7 +70,7 @@
         </select>
       </div>
       <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
-        <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#coverageModal"> Ajouter</button>
+        <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#coverageModal"> {{ 'add'|trans }}</button>
       </div>
   </div> #}
 
@@ -85,13 +85,13 @@
         {{ form_widget(form.coverage, {'attr': {'class': 'form-control'}}) }}
     </div>
     <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
-        <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#coverageModal">Ajouter</button>
+        <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#coverageModal">{{ 'add'|trans }}</button>
     </div>
   </div> #}
 
 
   <div class="row mb-3">
-      <label for="birdLifeTaxTreat" class="col-sm-3 col-md-3 col-lg-3 col-xl-3 col-form-label">Traitement taxonomique de BirdLife</label>
+      <label for="birdLifeTaxTreat" class="col-sm-3 col-md-3 col-lg-3 col-xl-3 col-form-label">{{ 'birdSpecies.birdlife_tax_treat'|trans }}</label>
       <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
           <select id="birdLifeTaxTreatDropdown" name="birdLifeTaxTreatDropdown" class="form-control">
               {% if form.birdLifeTaxTreat %}
@@ -100,12 +100,12 @@
           </select>
       </div>
       <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
-          <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#birdLifeTaxTreatModal"> Ajouter</button>
+          <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#birdLifeTaxTreatModal"> {{ 'add'|trans }}</button>
       </div>
   </div>
 
   <div class="row mb-3">
-      <label for="iucnRedListCategory" class="col-sm-3 col-md-3 col-lg-3 col-xl-3 col-form-label">Catégorie de la liste rouge de l'UICN 2022</label>
+      <label for="iucnRedListCategory" class="col-sm-3 col-md-3 col-lg-3 col-xl-3 col-form-label">{{ 'iucn_red_list_category'|trans }}</label>
       <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
           <select id="iucnRedListCategoryDropdown" name="iucnRedListCategoryDropdown" class="form-control">
               {% for option in form.iucnRedListCategory.vars.choices %}
@@ -114,13 +114,13 @@
           </select>
       </div>
       <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
-          <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#iucnRedListCategoryModal"> Ajouter</button>
+          <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#iucnRedListCategoryModal"> {{ 'add'|trans }}</button>
       </div>
   </div>
   
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.commonName, 'Nom commun') }}
+      {{ form_label(form.commonName, 'birdSpecies.common_name'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.commonName, {'attr': {'class': 'form-control'}}) }}
@@ -129,7 +129,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.commonNameAlt, 'Noms communs alternatifs') }}
+      {{ form_label(form.commonNameAlt, 'birdSpecies.common_name_alt'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.commonNameAlt, {'attr': {'class': 'form-control'}}) }}
@@ -138,7 +138,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.synonyms, 'Synonyms') }}
+      {{ form_label(form.synonyms, 'birdSpecies.synonyms'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.synonyms, {'attr': {'class': 'form-control'}}) }}
@@ -147,7 +147,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.taxonomicSources, 'Source(s) Taxonomique') }}
+      {{ form_label(form.taxonomicSources, 'birdSpecies.taxonomic_sources'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.taxonomicSources, {'attr': {'class': 'form-control'}}) }}
@@ -156,7 +156,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.sisRecId, 'sisRec ID') }}
+      {{ form_label(form.sisRecId, 'birdSpecies.sis_rec_id'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.sisRecId, {'attr': {'class': 'form-control'}}) }}
@@ -165,7 +165,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.spcRecId, 'spcRec ID') }}
+      {{ form_label(form.spcRecId, 'birdSpecies.spc_rec_id'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.spcRecId, {'attr': {'class': 'form-control'}}) }}
@@ -174,7 +174,7 @@
 
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-      {{ form_label(form.subsppId, 'subspp ID') }}
+      {{ form_label(form.subsppId, 'birdSpecies.subspp_id'|trans) }}
     </div>
     <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
       {{ form_widget(form.subsppId, {'attr': {'class': 'form-control'}}) }}

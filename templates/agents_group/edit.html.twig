@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier groupe d'agents{% endblock %}
+{% block title %}{{ 'agentsGroup.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Modifier ce groupe</h1>
+      <h1>{{ 'agentsGroup.edit_this_group'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_agents_group_index') }}">Gestion des groupes</a></li>
-          <li class="breadcrumb-item active">Modification</li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_agents_group_index') }}">{{ 'agentsGroup.breadcrumb_management'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'modification'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -22,14 +22,14 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Les nouvelles informations du groupe</h5>
+              <h5 class="card-title">{{ 'agentsGroup.the_new_informations'|trans }}</h5>
 
               {{ include('agents_group/_form.html.twig') }}
 
             </div>
             <div class="card-footer d-flex justify-content-between">
               <div>
-                <a href="{{ path('app_agents_group_index') }}" class="btn btn-outline-secondary btn-sm" title="Retour vers la consultation des groupes d'agents"> Retour</a>
+                <a href="{{ path('app_agents_group_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'agentsGroup.return_to_agent_groups_consultation'|trans }}">{{ 'back'|trans }}</a>
               </div>
               <div class="d-flex justify-content-end">
                 {% import 'macros/btn_actions_macros.html.twig' as macros %}

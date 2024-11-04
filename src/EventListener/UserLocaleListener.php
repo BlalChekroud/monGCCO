@@ -10,22 +10,34 @@ use Symfony\Component\Translation\LocaleSwitcher;
 
 final class UserLocaleListener
 {
+    // private $defaultLocale;
 
     public function __construct(
         private readonly Security $security,
-        private readonly LocaleSwitcher $localeSwitcher
-    ){
+        private readonly LocaleSwitcher $localeSwitcher,
+    ){}
 
-    }
+    // #[AsEventListener(event: KernelEvents::REQUEST)]
+    // public function onKernelRequest(RequestEvent $event): void
+    // {
+    //     $request = $event->getRequest();
+    //     $locale = $request->getSession()->get('_locale', 'en');  // 'en' comme langue par défaut
 
+    //     // Appliquer la langue choisie par l'utilisateur
+    //     $this->localeSwitcher->setLocale($locale);
+    // }
     #[AsEventListener(event: KernelEvents::REQUEST)]
     public function onKernelRequest(RequestEvent $event): void
     {
-        // Vérifie s'il y a un utilisateur authentifié
         $user = $this->security->getUser();
-        if ($user && $user instanceof User) {
-            // Récupère la locale de l'utilisateur et la définit dans la requête
+        if ($user instanceof User) {
+            // Si l'utilisateur est connecté, appliquez sa locale
             $this->localeSwitcher->setLocale($user->getLocale());
+        } else {
+            // Pour les utilisateurs non connectés, appliquez la locale de la session
+            $locale = $event->getRequest()->getSession()->get('_locale', 'fr');
+            $this->localeSwitcher->setLocale($locale);
         }
     }
+
 }

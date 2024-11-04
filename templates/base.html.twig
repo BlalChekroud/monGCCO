@@ -304,7 +304,19 @@
               <i class="bi bi-translate"></i>
               <span class="badge bg-light badge-number">{{ currentLocale }}</span>
             </a><!-- End Messages Icon -->
-            {# {{ include('locale/index.html.twig') }} #}
+
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
+              <li class="message-item">
+                  <a href="{{ path('change_locale', { '_locale': 'en' }) }}">English</a>
+              </li>
+              <li>
+                  <hr class="dropdown-divider">
+              </li>
+
+              <li class="message-item">
+                  <a href="{{ path('change_locale', { '_locale': 'fr' }) }}">Français</a>
+              </li>
+          </ul><!-- End languages Dropdown Items -->
             
           </li><!-- End languages Nav -->
 
@@ -388,7 +400,7 @@
         <li class="nav-item">
           <a class="nav-link " href="{{ path('home') }}">
             <i class="bi bi-grid"></i>
-            <span>Accueil</span>
+            <span>{{ 'breadcrumb_home'|trans }}</span>
           </a>
         </li><!-- End Dashboard Nav -->
       {# {% if is_granted('IS_AUTHENTICATED_FULLY') %} #}

@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil{% endblock %}
+{% block title %}{{ 'breadcrumb_home'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Page d'accueil</h1>
+      <h1>{{ 'home_page'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item active">
-            <a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a>
+            <a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a>
           </li>
         </ol>
       </nav>

@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Entity\AgentsGroup;
 use App\Entity\Country;
 use App\Entity\User;
@@ -16,6 +17,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AgentsGroupType extends AbstractType
 {
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -24,12 +31,12 @@ class AgentsGroupType extends AbstractType
                 'choice_label' => function (User $user) {
                     return $user->getName() . ' ' . $user->getLastName() . ' (' . $user->getEmail() . ')';
                 },
-                'label' => 'Choisir les membres du groupe<span class="requiredField">*</span>',
+                // 'label' => $this->translator->trans('choose_group_leader') . ' <span class="requiredField">*</span>',
                 'label_html' => true,
                 'multiple' => true,
                 'required' => true,
                 'autocomplete' => true,
-                'placeholder' => true,
+                'placeholder' => $this->translator->trans('agentsGroup.choose_group_leader'),
                 'attr' => ['id' => 'group_member']
             ])
             ->add('leader', EntityType::class, [
@@ -37,9 +44,9 @@ class AgentsGroupType extends AbstractType
                 'choice_label' => function (User $user) {
                     return $user->getName() . ' ' . $user->getLastName() . ' (' . $user->getEmail() . ')';
                 },
-                'label' => 'Chef du groupe<span class="requiredField">*</span>',
+                // 'label' => 'Chef du groupe<span class="requiredField">*</span>',
                 'label_html' => true,
-                'placeholder' => '-- Choisir le chef du groupe --',
+                'placeholder' =>  $this->translator->trans('agentsGroup.choose_group_leader'),
                 'autocomplete' => true,
             ])
             ->add('country', EntityType::class, [
@@ -47,9 +54,9 @@ class AgentsGroupType extends AbstractType
                 'choice_label' => function (Country $country) {
                     return $country->getName() . ' (' . $country->getIso2() . ')';
                 },
-                'label' => 'Pays<span class="requiredField">*</span>',
+                // 'label' => 'Pays<span class="requiredField">*</span>',
                 'label_html' => true,
-                'placeholder' => '-- Choisir le pays du groupe --',
+                'placeholder' => $this->translator->trans('Select_the_country'),
                 'required' => true,
                 'autocomplete' => true,
                 'query_builder' => function (CountryRepository $repository) {

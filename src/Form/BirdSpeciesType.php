@@ -3,22 +3,26 @@
 namespace App\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Validator\Constraints\File;
 use App\Entity\Coverage;
 use App\Entity\BirdLifeTaxTreat;
 use App\Entity\IucnRedListCategory;
 use App\Repository\BirdFamilyRepository;
-
 use App\Entity\BirdFamily;
 use App\Entity\BirdSpecies;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BirdSpeciesType extends AbstractType
 {
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -37,11 +41,16 @@ class BirdSpeciesType extends AbstractType
                 'class' => BirdFamily::class,
                 'autocomplete' => true,
                 'choice_label' => function (BirdFamily $birdFamily) {
-                    return $birdFamily->getFamily() . ' (' . $birdFamily->getFamilyName() . ') \ ' .$birdFamily->getSubFamily() . ' \ ' .$birdFamily->getTribe(). ' \ ' .$birdFamily->getOrdre();
+                    return $birdFamily->getFamily() . ' (' . $birdFamily->getFamilyName() . ' \ ' .$birdFamily->getSubFamily() . ' \ ' .$birdFamily->getTribe(). ' \ ' .$birdFamily->getOrdre(). ') ';
                 },
-                'label' => 'Famille (Nom de famille) \ Sous-famille \ Tribe \ Ordre d\'espèce<span class="requiredField">*</span>',
+                'label' => $this->translator->trans('birdFamily.family') . ' (' . 
+                    $this->translator->trans('birdFamily.family_name') . ' \\ ' . 
+                    $this->translator->trans('birdFamily.sub_family') . ' \\ ' . 
+                    $this->translator->trans('birdFamily.tribe') . ' \\ ' . 
+                    $this->translator->trans('birdFamily.order') . ') ' .
+                    '<span class="requiredField">*</span>',
                 'label_html' => true,
-                'placeholder' => 'Choisir une Famille d\'Oiseaux',
+                'placeholder' => $this->translator->trans('choose_bird_family'),
                 'required' => true,
                 'query_builder' => function (BirdFamilyRepository $repository) {
                     return $repository->createQueryBuilder('b')
@@ -67,11 +76,7 @@ class BirdSpeciesType extends AbstractType
             //         ])
             //     ],
             // ])
-            ->add('image', ImageType::class, [
-                'label' => 'Inserer une image<span class="requiredField">*</span>',
-                'label_html' => true,
-                'required' => false
-            ])
+            ->add('image', ImageType::class, [ 'required' => false ])
             ->add('authority',TextType::class, [
                 'required' => false,
                 'empty_data' => '',
@@ -79,7 +84,7 @@ class BirdSpeciesType extends AbstractType
             ->add('coverage', EntityType::class, [
                 'class' => Coverage::class,
                 'choice_label' => 'label',
-                'label' => 'Couverture pour cette espèce',
+                'label' => $this->translator->trans('coverage_for_this_species'),
                 // 'placeholder' => '',
                 'required' => false,
                 'attr' => ['class' => 'form-control']
@@ -112,7 +117,7 @@ class BirdSpeciesType extends AbstractType
             ->add('iucnRedListCategory', EntityType::class, [
                 'class' => IucnRedListCategory::class,
                 'choice_label' => 'label',
-                'label' => "Catégorie de la liste rouge de l'UICN 2022",
+                'label' => $this->translator->trans('iucn_red_list_category'),
                 // 'placeholder' => '',
                 'required' => false,
                 'attr' => ['class' => 'form-control', 'id' => 'iucnRedListCategoryDropdown']

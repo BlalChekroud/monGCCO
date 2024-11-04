@@ -2,6 +2,10 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Repository\CountingCampaignRepository;
 use App\Repository\LogoRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -12,76 +16,94 @@ use Symfony\Component\Routing\Attribute\Route;
 #[IsGranted('ROLE_USER')]
 class HomeController extends AbstractController
 {
+    #[Route('/{_locale}', name: 'change_locale', requirements: ['_locale' => 'en|fr'])]
+    public function changeLocale(EntityManagerInterface $entityManager, Request $request, $_locale): RedirectResponse
+    {
+        // Enregistrer la locale dans la session
+        $request->getSession()->set('_locale', $_locale);
+
+        // Si l'utilisateur est authentifié, met à jour son profil avec la langue choisie
+        $user = $this->getUser();
+        if ($user) {
+            $user->setLocale($_locale);
+            $entityManager->flush();
+        }
+
+        // Rediriger l'utilisateur vers la page précédente
+        $referer = $request->headers->get('referer');
+        return new RedirectResponse($referer ?: $this->generateUrl('home'));
+    }
+
     #[Route('/', name: 'home')]
     public function index(CountingCampaignRepository $countingCampaignRepository, LogoRepository $logoRepository): Response
-{
-    $logo = $logoRepository->findOneBy([]); // Fetch the logo
-    $campaigns = $countingCampaignRepository->findBy([], ['endDate' => 'ASC']);
+    {
+        $logo = $logoRepository->findOneBy([]); // Fetch the logo
+        $campaigns = $countingCampaignRepository->findBy([], ['endDate' => 'ASC']);
 
-    // Initialiser les tableaux pour les données des graphiques
-    $totalCounts = [];
-    $totalCollects = [];
-    $totalAgents = [];
-    $totalUniqueSpecies = [];
-    $categories = [];
-    
-    // Initialiser les tableaux pour les données du graphique
-    $siteNames = [];
-    $totalCountsSite = [];
-
-    // Récupérer la dernière campagne créée
-    $recentCampaign = $countingCampaignRepository->findMostRecentCampaign();
-    if (!$recentCampaign) {
-        $this->addFlash('warning', 'Aucune campagne trouvée.');
-        // return $this->redirectToRoute('home'); 
-    }
-    
-    // Utiliser la méthode pour récupérer les comptages par site
-    if ($recentCampaign !== null) {
-        $totalCountsBySite = $countingCampaignRepository->getTotalCountsBySite($recentCampaign);
+        // Initialiser les tableaux pour les données des graphiques
+        $totalCounts = [];
+        $totalCollects = [];
+        $totalAgents = [];
+        $totalUniqueSpecies = [];
+        $categories = [];
         
-        foreach ($totalCountsBySite as $siteData) {
-            $siteNames[] = $siteData['siteName']; // Récupérer les noms des sites
-            $totalCountsSite[] = $siteData['totalCounts']; // Récupérer le total des comptages par site
+        // Initialiser les tableaux pour les données du graphique
+        $siteNames = [];
+        $totalCountsSite = [];
+
+        // Récupérer la dernière campagne créée
+        $recentCampaign = $countingCampaignRepository->findMostRecentCampaign();
+        if (!$recentCampaign) {
+            $this->addFlash('warning', 'Aucune campagne trouvée.');
+            // return $this->redirectToRoute('home'); 
         }
+        
+        // Utiliser la méthode pour récupérer les comptages par site
+        if ($recentCampaign !== null) {
+            $totalCountsBySite = $countingCampaignRepository->getTotalCountsBySite($recentCampaign);
+            
+            foreach ($totalCountsBySite as $siteData) {
+                $siteNames[] = $siteData['siteName']; // Récupérer les noms des sites
+                $totalCountsSite[] = $siteData['totalCounts']; // Récupérer le total des comptages par site
+            }
+        }
+        
+        // Parcourir les campagnes pour extraire les données
+        foreach ($campaigns as $campaign) {
+            $totalCounts[] = $campaign->getTotalCountsCampaign();
+            $totalCollects[] = $campaign->getTotalCollects();
+            $totalAgents[] = $campaign->getTotalAgents();
+            $totalUniqueSpecies[] = $campaign->getTotalUniqueSpecies();
+            $categories[] = $campaign->getEndDate()->format('d-m-Y');
+
+        }
+
+
+
+
+
+        // Calculer les totaux
+        $totalBirds = array_sum($totalCounts);
+        $totalUniqueSpeciesCount = array_sum($totalUniqueSpecies);
+        $totalAgentsCount = array_sum($totalAgents);
+
+        // Passer les données au template
+        return $this->render('home/index.html.twig', [
+            'logo' => $logo,
+            'campaigns' => $campaigns,
+            'totalCollects' => $totalCollects,
+            'totalAgents' => $totalAgents,
+            'categories' => $categories,
+            'totalBirds' => $totalBirds,
+            'totalUniqueSpeciesCount' => $totalUniqueSpeciesCount,
+            'totalAgentsCount' => $totalAgentsCount,
+            'totalCounts' => $totalCounts,
+
+            'recentCampaign' => $recentCampaign,
+            'totalUniqueSpecies' => $totalUniqueSpecies,
+            'siteNames' => $siteNames,       // Les noms des sites
+            'totalCountsSite' => $totalCountsSite,   // Les totaux des oiseaux comptés
+        ]);
     }
-    
-    // Parcourir les campagnes pour extraire les données
-    foreach ($campaigns as $campaign) {
-        $totalCounts[] = $campaign->getTotalCountsCampaign();
-        $totalCollects[] = $campaign->getTotalCollects();
-        $totalAgents[] = $campaign->getTotalAgents();
-        $totalUniqueSpecies[] = $campaign->getTotalUniqueSpecies();
-        $categories[] = $campaign->getEndDate()->format('d-m-Y');
-
-    }
-
-
-
-
-
-    // Calculer les totaux
-    $totalBirds = array_sum($totalCounts);
-    $totalUniqueSpeciesCount = array_sum($totalUniqueSpecies);
-    $totalAgentsCount = array_sum($totalAgents);
-
-    // Passer les données au template
-    return $this->render('home/index.html.twig', [
-        'logo' => $logo,
-        'campaigns' => $campaigns,
-        'totalCollects' => $totalCollects,
-        'totalAgents' => $totalAgents,
-        'categories' => $categories,
-        'totalBirds' => $totalBirds,
-        'totalUniqueSpeciesCount' => $totalUniqueSpeciesCount,
-        'totalAgentsCount' => $totalAgentsCount,
-        'totalCounts' => $totalCounts,
-
-        'recentCampaign' => $recentCampaign,
-        'totalUniqueSpecies' => $totalUniqueSpecies,
-        'siteNames' => $siteNames,       // Les noms des sites
-        'totalCountsSite' => $totalCountsSite,   // Les totaux des oiseaux comptés
-    ]);
-}
 
 }

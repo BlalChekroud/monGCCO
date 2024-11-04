@@ -1,9 +1,9 @@
 {% macro csv_import_form(form, submit_action) %}
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Importer un fichier CSV</h5>
+        <h5 class="mb-0">{{ 'csv_import_title'|trans }}</h5>
         <div>
-            <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="Imprimer"></button>
-            <button id="exportCSVButton" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></button>
+            <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="{{ 'print'|trans }}"></button>
+            <button id="exportCSVButton" class="btn btn-secondary btn-sm bi bi-folder" title="{{ 'export_as_CSV'|trans }}"></button>
         </div>
     </div>
     <div class="card-body">
@@ -12,7 +12,7 @@
                 'attr': {'onchange': 'document.getElementById("csvForm").submit();'}
             }) }}
         {{ form_end(form) }}
-        <small class="form-text text-muted">Assurez-vous que votre fichier contient les colonnes nécessaires.</small>
+        <small class="form-text text-muted">{{ 'csv_import_instruction'|trans }}</small>
     </div>
 {% endmacro %}
 
@@ -22,28 +22,28 @@
         <div class="modal-dialog modal-xl modal-dialog-scrollable"> <!-- Changement ici pour agrandir la fenêtre -->
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="csvPreviewModalLabel">Aperçu du fichier CSV</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="csvPreviewModalLabel">{{ 'csv_preview_title'|trans }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'close'|trans }}"></button>
                 </div>
                 <div class="modal-body">
                     <p>
-                        <b>NB: </b><span>Les colonnes </span>
+                        <b>{{ 'note'|trans }}: </b><span>{{ 'columns'|trans }}</span>
                         {% for header in requiredHeaders %}
                             <code>{{ header }}, </code>
                         {% endfor %}
-                        <span>sont obligatoires.</span>
+                        <span>{{ 'are_mandatory'|trans }}</span>
                     </p>
                     {% if optionalHeaders|length > 0 %}
                         <p>
-                            <span>Les colonnes </span>
+                            <span>{{ 'columns'|trans }} </span>
                             {% for header in optionalHeaders %}
                                 <code>{{ header }}, </code>
                             {% endfor %}
-                            <span>sont facultatives.</span>
+                            <span>{{ 'are_optional'|trans }}</span>
                         </p>
                     {% endif %}
                     <!-- Afficher les colonnes manquantes -->
-                    <span class="text-danger">Colonnes manquantes :
+                    <span class="text-danger">{{ 'missing_columns'|trans }} :
                         {% set missingHeaders = [] %}
                         {% for requiredHeader in requiredHeaders %}
                             {% if requiredHeader not in headers %}
@@ -51,7 +51,7 @@
                             {% endif %}
                         {% endfor %}
                         {% if missingHeaders is empty %}
-                            <span>Aucune colonne manquante</span>
+                            <span>{{ 'no_missing_columns'|trans }}</span>
                         {% else %}
                             {% for missingHeader in missingHeaders %}
                                 <code>{{ missingHeader }}</code>{% if not loop.last %}, {% endif %}
@@ -89,9 +89,9 @@
                     <form method="post" action="{{ path(submit_action) }}">
                         <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
                         {% if missingHeaders is empty %}
-                            <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
+                            <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> {{ 'import'|trans }}</button>
                         {% endif %}
-                        <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
+                        <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> {{ 'cancel'|trans }}</button>
                     </form>
                 </div>
             </div>

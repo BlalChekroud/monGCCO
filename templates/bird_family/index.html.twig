@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Les familles des oiseaux{% endblock %}
+{% block title %}{{ 'birdFamily.title'|trans }}{% endblock %}
 
 {% block body %}
 
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Familles des oiseaux</h1>
+      <h1>{{ 'birdFamily.title'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
-          <li class="breadcrumb-item active">Gestion des Familles</li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'birdFamily.manage_families'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -21,18 +21,18 @@
         <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Listes</h5>
+              <h5 class="card-title">{{ 'card_title'|trans }}</h5>
              <div id="printableArea">
               <!-- Table with stripped rows -->
               <table class="table datatable">
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Nom de famille</th>
-                    <th>Famille</th>
-                    <th>Sous famille</th>
-                    <th>Date d'ajout</th>
-                    <th>Action</th>
+                    <th>{{ 'birdFamily.family_name'|trans }}</th>
+                    <th>{{ 'birdFamily.family'|trans }}</th>
+                    <th>{{ 'birdFamily.sub_family'|trans }}</th>
+                    <th>{{ 'created_at'|trans }}</th>
+                    <th>{{ 'actions'|trans }}</th>
                 </thead>
                 <tbody>
                 {% for bird_family in bird_families %}
@@ -52,7 +52,7 @@
                   </tr>
                 {% else %}
                   <tr>
-                    <td colspan="7">Aucun enregistrement trouvé</td>
+                    <td colspan="6">{{ 'no_record_found'|trans }}</td>
                   </tr>
                 {% endfor %}
                   
@@ -63,9 +63,9 @@
               
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer une famille</a>
-              <a href="{{ path('app_bird_species_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-3"> Consultation des espèces</a>
-              <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer nouvelle espèce</a>
+              <a href="{{ path('app_bird_family_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{ 'create_a_family'|trans }}</a>
+              <a href="{{ path('app_bird_species_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-3"> {{ 'cousult_species'|trans }}</a>
+              <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'create_a_species'|trans }}</a>
             </div>
           </div>
 

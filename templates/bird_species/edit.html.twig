@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modification espèce d'oiseau{% endblock %}
+{% block title %}{{ 'birdSpecies.title'|trans }}{% endblock %}
 
 {% block body %}
 <main id="main" class="main">
@@ -9,9 +9,9 @@
       <h1>Modifier espèce d'oiseau</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
           <li class="breadcrumb-item"><a href="{{ path('app_bird_species_index') }}">Gestion des espèces</a></li>
-          <li class="breadcrumb-item active">Modification</li>
+          <li class="breadcrumb-item active">{{ 'modification'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->

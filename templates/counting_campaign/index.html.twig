@@ -10,7 +10,7 @@
       <h1>Consultation des campagnes</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
           <li class="breadcrumb-item active">Gestion des campagnes</li>
         </ol>
       </nav>
@@ -23,7 +23,7 @@
           <div class="card">
             <div class="card-body">
               <div class="d-flex justify-content-between">
-                <h5 class="card-title">Listes</h5>
+                <h5 class="card-title">{{ 'card_title'|trans }}</h5>
                 
                 <button type="button" class="btn btn-sm btn-info bi bi-book" data-bs-toggle="modal" data-bs-target="#largeModal"> Aide</button>
               </div>

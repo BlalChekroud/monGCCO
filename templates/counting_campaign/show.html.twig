@@ -10,7 +10,7 @@
       <h1>Détail d'une campagne de comptage</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
           <li class="breadcrumb-item"><a href="{{ path('app_counting_campaign_index') }}">Gestion des campagnes</a></li>
           <li class="breadcrumb-item active">Détail</li>
         </ol>
@@ -213,6 +213,19 @@
                     <div class="card-footer d-flex justify-content-between">
                         <div>
                             <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers consultation des campagnes">Retour</a>
+                            {% if is_granted("ROLE_ADMIN") %}
+                                {% if counting_campaign.campaignStatus != statusSuspended and counting_campaign.campaignStatus != statusClosed %}
+                                    <a href="{{ path('app_counting_campaign_suspend', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-warning bi bi-pause-fill" onclick="return confirm('Êtes-vous sûr de vouloir mettre en suspens cette campagne ?');"> Mettre en suspens</a>
+                                {% elseif counting_campaign.campaignStatus == statusSuspended %}
+                                    <a href="{{ path('app_counting_campaign_suspend', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-warning bi bi-play-fill" title="Mettre fin au suspension de la campagne" onclick="return confirm('Êtes-vous sûr de vouloir reprendre cette campagne ?');">Reprendre</a>
+                                {% endif %}
+                                {% if counting_campaign.campaignStatus == statusFinished %}
+                                    <a href="{{ path('app_counting_campaign_close', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-primary bi bi-lock-fill" onclick="return confirm('Êtes-vous sûr de vouloir clôturer cette campagne ? Cette action n\'est pas réversible');"> Clôturer la campagne</a>
+                                {% endif %}
+                                {% if counting_campaign.campaignStatus != statusClosed %}
+                                    <a href="{{ path('app_counting_campaign_cancel', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-dark bi bi-x-lg" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette campagne ? Cette action n\'est pas réversible');"> Annuler la campagne</a>
+                                {% endif %}
+                            {% endif %}
                             {# {% if counting_campaign.campaignStatus == statusClosed %}
                                 <button type="button" class="btn btn-success btn-sm bi bi-check-circle mx-2" data-bs-toggle="modal" data-bs-target="#fullscreenModal"> Les détails de la campagne</button>
                             {% endif %} #}
@@ -253,21 +266,6 @@
                         </div><!-- End Accordion without outline borders -->
                     </div>
 
-                    {% if is_granted("ROLE_ADMIN") %}
-                        <div class="card-footer d-flex justify-content-between">
-                            {% if counting_campaign.campaignStatus != statusSuspended and counting_campaign.campaignStatus != statusClosed %}
-                                <a href="{{ path('app_counting_campaign_suspend', {'id': counting_campaign.id}) }}" class="btn btn-warning bi bi-pause-fill"> Mettre en suspens</a>
-                            {% elseif counting_campaign.campaignStatus == statusSuspended %}
-                                <a href="{{ path('app_counting_campaign_suspend', {'id': counting_campaign.id}) }}" class="btn btn-warning bi bi-play-fill" title="Mettre fin au suspension de la campagne">Reprendre</a>
-                            {% endif %}
-                            {% if counting_campaign.campaignStatus == statusFinished %}
-                                <a href="{{ path('app_counting_campaign_close', {'id': counting_campaign.id}) }}" class="btn btn-primary bi bi-lock-fill"> Clôturer la campagne</a>
-                            {% endif %}
-                            {% if counting_campaign.campaignStatus != statusClosed %}
-                                <a href="{{ path('app_counting_campaign_cancel', {'id': counting_campaign.id}) }}" class="btn btn-dark bi bi-x-lg" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette campagne ? Cette action n\'est pas réversible');"> Annuler la campagne</a>
-                            {% endif %}
-                        </div>
-                    {% endif %}
                 </div>
             
             </div>

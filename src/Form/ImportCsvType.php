@@ -2,16 +2,21 @@
 
 namespace App\Form;
 
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImportCsvType extends AbstractType
 {
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -31,8 +36,8 @@ class ImportCsvType extends AbstractType
                         'text/comma-separated-values',
                         'text/x-comma-separated-values',
                     ],
-                    'mimeTypesMessage' => 'Veuillez charger un fichier CSV valide',
-                    'maxSizeMessage' => 'Le fichier est trop volumineux. La taille maximale autorisée est 1024k.',
+                    'mimeTypesMessage' => $this->translator->trans('import_csv.mimeTypesMessage'),
+                    'maxSizeMessage' => $this->translator->trans('maxSizeMessage'),
                 ])
             ],
             'attr' => [
