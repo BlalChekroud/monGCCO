@@ -29,6 +29,12 @@ export_as_CSV: "Export as CSV"
 print: "Print"
 created_by: 'Created by'
 back: 'Back'
+install: "Install the app"
+app_description: "Seabird Counting Campaign Management"
+invalid_form: "Invalid form"
+delete_permission: 'You do not have permission to delete.'
+edit_permission: "You do not have permission to edit."
+member_of_a_group_assigned_to_this_site: "You are not a member of a group assigned to this site."
 
 csv_import_title: "Import a CSV File"
 csv_import_instruction: "Make sure your file contains the required columns."
@@ -79,6 +85,8 @@ Language: 'Language:'
 login_redirect: "Log in"
 hidden_label: 'Hide'
 visible_label: 'Show'
+no_role: 'No role'
+please_log_in_to_access_the_page: 'Please log in to access the page'
 
 
 agentsGroup:
@@ -110,6 +118,11 @@ agentsGroup:
     created: "The group has been successfully created."
     updated: "The group has been successfully updated."
     deleted: "The group has been successfully deleted."
+  notification:
+    added: "You have been added to the group %group% by user %user%."
+    edited: "You have been modified in the group %group% by user %user%."
+    deleted: "You have been deleted from the group %group% by user %user%."
+    removed: "You have been removed from the group %group% by user %user%."
 
 birdFamily:
   title: "Bird family management"
@@ -157,7 +170,7 @@ birdSpecies:
   birdlife_tax_treat: "BirdLife Taxonomic Treatment"
   common_name: "Common Name"
   common_name_alt: "Alternative Common Names"
-  synonyms: "Synonyms"
+  synonyms: "Synonymes"
   taxonomic_sources: "Taxonomic Source(s)"
   sis_rec_id: "sisRec ID"
   spc_rec_id: "spcRec ID"
@@ -174,6 +187,24 @@ birdSpecies:
     invalid_lines: "%invalidCount% rows could not be imported. Row numbers: %invalidRows%"
     import: "Error during import: %message%"
     invalid_encoding: "The CSV file contains invalid characters. Please check the file encoding."
+
+campaign:
+  cannot_be_modified: "The campaign with status %status% cannot be modified"
+
+collect:
+  please_create_the_environmental_conditions_for_this_site_first: "Please create the environmental conditions for this site first"
+
+notification:
+  all: "All notifications"
+  manage_notifications: 'Notification Management'
+  your_notifications: 'Your Notifications'
+  show_all_notifications: "Show all notifications."
+  view_all: 'View all'
+  you_have: "You have"
+  new_notification: "new notification(s)"
+  new_message: "new message(s)"
+  unread_notifications: "Unread Notifications"
+  mark_as_seen: "Mark as Seen"
 
 register:
   page_title: "Register"

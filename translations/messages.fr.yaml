@@ -29,6 +29,12 @@ export_as_CSV: "Exporter en CSV"
 print: "Imprimer"
 created_by: 'Crée par'
 back: 'Retour'
+install: "Installer l'application"
+app_description: "Gestion des campagnes de comptage des oiseaux marins"
+invalid_form: "Formulaire non valide"
+delete_permission: "Vous n'avez pas l'autorisation de supprimer."
+edit_permission: "Vous n'avez pas l'autorisation de modifier."
+member_of_a_group_assigned_to_this_site: "Vous n'êtes pas membre d'un groupe assigné à ce site"
 
 csv_import_title: "Importer un fichier CSV"
 csv_import_instruction: "Assurez-vous que votre fichier contient les colonnes nécessaires."
@@ -45,7 +51,7 @@ import_permission: "Vous n'avez pas l'autorisation d'importer des données."
 access: "Vous n'avez pas l'accès."
 maxSizeMessage: "Le fichier est trop volumineux. La taille maximale autorisée est 1024k."
 coverage_for_this_species: 'Couverture pour cette espèce'
-iucn_red_list_category: "Catégorie de la liste rouge de l'UICN 2022"
+iucn_red_list_category: "Catégorie de la liste rouge de l'IUCN 2022"
 
 import_csv:
   mimeTypesMessage: "Veuillez charger un fichier CSV valide."
@@ -63,7 +69,7 @@ image:
   mimeTypesMessage: "Veuillez télécharger un fichier d'image valide (JPEG ou PNG)"
 
 Log_in_to_your_account: 'Connexion à votre compte'
-Enter_your_email_and_password_to_log _in: 'Entrez votre e-mail & mot de passe pour vous connecter'
+Enter_your_email_and_password_to_log_in: 'Entrez votre e-mail & mot de passe pour vous connecter'
 You_are_logged_in_as: 'Vous êtes connecté en tant que'
 Sign_out: 'Déconnexion'
 Email: 'E-mail'
@@ -79,6 +85,8 @@ Language: 'Langue :'
 login_redirect: "Se connecter"
 hidden_label: 'Masquer'
 visible_label: 'Afficher'
+no_role: "Aucun rôle"
+please_log_in_to_access_the_page: "Veuillez vous connecter pour accéder à la page"
 
 
 agentsGroup:
@@ -110,6 +118,11 @@ agentsGroup:
     created: "Le groupe a bien été créé."
     updated: "Le groupe a bien été modifié."
     deleted: "Le groupe a bien été supprimé."
+  notification:
+    added: "Vous avez été ajouté au groupe %group% par l'utilisateur %user%."
+    edited: "Vous avez été modifié dans le groupe %group% par l'utilisateur %user%."
+    deleted: "Vous avez été supprimé du groupe %group% par l'utilisateur %user%."
+    removed: "Vous avez été retiré du groupe %group% par l'utilisateur %user%."
 
 birdFamily:
   title: "Gestion de familles des oiseaux"
@@ -146,7 +159,7 @@ birdSpecies:
   informations: "Les informations de la nouvelle espèce d'oiseau"
   return: "Retour vers la consultation des espèces d'oiseaux"
   modal_birdlife_tax_treat_title: "Créer un nouveau traitement taxonomique pour BirdLife"
-  modal_iucn_title: "Créer une nouvelle catégorie de la liste rouge de l'UICN 2022"
+  modal_iucn_title: "Créer une nouvelle catégorie de la liste rouge de l'IUCN 2022"
   scientific_name: "Nom Scientifique"
   french_name: "Nom français"
   vernacular_name: "Nom vernaculaire"
@@ -174,6 +187,24 @@ birdSpecies:
     invalid_lines: "%invalidCount% lignes n'ont pas pu être importées. Numéros des lignes : %invalidRows%"
     import: "Erreur lors de l'importation : %message%"
     invalid_encoding: "Le fichier CSV contient des caractères non valides. Veuillez vérifier l'encodage du fichier."
+
+campaign:
+  cannot_be_modified: "Une campagne %status% ne peut pas être modifiée"
+
+collect:
+  please_create_the_environmental_conditions_for_this_site_first: "Veuillez d'abord créer les conditions environnementales pour ce site."
+  
+notification:
+  all: "Toutes les notifications"
+  manage_notifications: "Gestion des notifications"
+  your_notifications: "Vos Notifications"
+  show_all_notifications: "Afficher toutes les notifications"
+  view_all: "Voir tout."
+  you_have: "Vous avez"
+  new_notification: "nouvelle(s) notification(s)"
+  new_message: "nouveau(x) message(s)"
+  unread_notifications: "Notifications non lues"
+  mark_as_seen: "Marquer comme vu"
 
 register:
   page_title: "Inscription"

@@ -24,7 +24,7 @@
                     {% if bird_specy.image %}
                         <img src="{{ vich_uploader_asset(bird_specy.image, 'imageFile') }}" alt="{{ bird_specy.frenchName }}" class="imgShow rounded mx-auto d-block">
                     {% else %}
-                        <p>Aucune image disponible</p>
+                        <p>{{ "image.not_available"|trans }}</p>
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">
@@ -78,11 +78,11 @@
                                     <td>{{ bird_specy.commonNameAlt }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Catégorie de la liste rouge de l'UICN 2022</th>
+                                    <th>Catégorie de la liste rouge de l'IUCN 2022</th>
                                     <td>{{ bird_specy.iucnRedListCategory }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Synonyms</th>
+                                    <th>Synonymes</th>
                                     <td>{{ bird_specy.synonyms }}</td>
                                 </tr>
                                 <tr>

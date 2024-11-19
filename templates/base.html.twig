@@ -27,7 +27,7 @@
 
     <!-- Template Main CSS File -->
     {# <link href="{{ asset('/styles/app.css') }}" rel="stylesheet"> #}
-
+    {# <link rel="manifest" href="{{ asset('manifest.json') }}"> #}
 
       <title>{% block title %}Welcome!{% endblock %}</title>
       <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
@@ -40,7 +40,6 @@
   </head>
 
   <body>
-
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -53,12 +52,9 @@
               <p>Aucune image disponible</p>
           {% endif %}
         </a>
-        <a href="{{ path('app_counting_campaign_index') }}">
-          <span class="d-none d-lg-block" style="font-size: 15px; margin-top: 15px;">
-            Gestion des campagnes
-            <p style="font-size: 11px;">
-              de comptage des oiseaux marins
-            </p>
+        <a href="{{ path('app_counting_campaign_index') }}"  class="text-center d-block">
+          <span class="d-none d-lg-block" style="font-size: 15px; margin-top: 6px;">
+            {{ 'app_description'|trans }}
           </span>
         </a>
         </div>
@@ -95,6 +91,7 @@
                             icon: "success",
                             title: "{{ message }}",
                             showConfirmButton: false,
+                            timerProgressBar: true,
                             timer: 3000
                         });
                     {% elseif type == 'warning' %}
@@ -125,6 +122,22 @@
                 {% endfor %}
             {% endfor %}
           </script>
+{# {% set notifications = app.flashes() %}
+<script>
+    {% for type, messages in notifications %}
+        {% for message in messages %}
+            Swal.fire({
+                position: "top-end",
+                icon: "{{ type == 'success' ? 'success' : (type == 'warning' ? 'warning' : (type == 'danger' ? 'error' : type)) }}",
+                title: "{{ type == 'success' ? message : (type == 'warning' ? 'Attention' : (type == 'danger' ? 'Danger' : 'Info')) }}",
+                text: "{{ message }}",
+                showConfirmButton: false,
+                timer: 3000
+            });
+        {% endfor %}
+    {% endfor %}
+</script> #}
+
           {# <script>
             document.addEventListener('DOMContentLoaded', (event) => {
               {% for type, messages in notifications %}
@@ -190,8 +203,8 @@
               </a><!-- End Notification Icon -->
               <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
                   <li class="dropdown-header">
-                      Vous avez {{ notifications|length }} nouvelle notification.
-                      <a href="{{ path('all_notifications') }}"><span class="badge rounded-pill bg-primary p-2 ms-2">Voir tout.</span></a>
+                      {{ 'notification.you_have'|trans }} {{ notifications|length }} {{ 'notification.new_notification'|trans }}
+                      {# <a href="{{ path('all_notifications') }}"><span class="badge rounded-pill bg-primary p-2 ms-2">Voir tout.</span></a> #}
                   </li>
                   <li>
                       <hr class="dropdown-divider">
@@ -224,13 +237,13 @@
                   {% endfor %}
                   
                   <li class="dropdown-footer">
-                      <a href="{{ path('all_notifications') }}">Afficher toutes les notifications</a>
+                      {# <a href="{{ path('all_notifications') }}">Afficher toutes les notifications</a> #}
                   </li>
               </ul><!-- End Notification Dropdown Items -->
           </li><!-- End Notification Nav -->
 
 
-          <li class="nav-item dropdown">
+          {# <li class="nav-item dropdown">
 
             <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
               <i class="bi bi-chat-left-text"></i>
@@ -294,9 +307,66 @@
 
             </ul><!-- End Messages Dropdown Items -->
 
-          </li><!-- End Messages Nav -->
+          </li><!-- End Messages Nav --> #}
+
+<li class="nav-item dropdown">
+    <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+        <i class="bi bi-chat-left-text"></i>
+        <span class="badge bg-success badge-number">{% if unreadNotifications %}{{ unreadNotifications }}{% endif %}</span>
+    </a><!-- End Messages Icon -->
+
+    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
+        <li class="dropdown-header">
+            {{ 'notification.you_have'|trans }} {{ unreadNotifications }} {{ 'notification.new_message'|trans }}
+            <a href="{{ path('all_notifications') }}"><span class="badge rounded-pill bg-primary p-2 ms-2">{{ 'notification.view_all'|trans }}</span></a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+
+        <li class="message-item">
+            <a href="#">
+                <div>
+                    <ul class="notifications-list">
+                        {% if app.user.notifications|length > 0 %}
+                            {% for notification in app.user.notifications|reverse %}
+                                <li class="notification-item">
+                                    <div class="notification-content">
+                                        <p class="notification-message {% if not notification.seen %} font-weight-bold {% endif %}">
+                                            {{ notification.message }}
+                                        </p>
+                                        <p class="notification-time">
+                                            {{ notification.createdAt ? notification.createdAt|date('d-m-Y H:i:s') : '' }} {{ notification.seen }}
+                                        </p>
+                                    </div>
+                                </li>
+                            {% else %}
+                                <li class="no-notifications">{{ 'no_record_found'|trans }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="no-notifications">{{ 'no_record_found'|trans }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+
+        <li class="dropdown-footer">
+            <a href="{{ path('all_notifications') }}">{{ 'notification.show_all_notifications'|trans }}</a>
+        </li>
+
+    </ul><!-- End Messages Dropdown Items -->
+</li><!-- End Messages Nav -->
 
 
+
+          <!-- Mode Nav -->
+          {# <li class="nav-item dropdown">
+              <button class="nav-link nav-icon" onclick="toggleMode()" id="modeButton"><span class="explanation">Changer de mode</span></button>
+
+              <script src="{{ asset('./js/mode.js') }}"></script>
+          </li> #}
+
+          <!-- Language Nav -->
           {% set currentLocale = app.request.session.get('_locale', app.request.locale) %}
           <li class="nav-item dropdown">
 
@@ -316,7 +386,7 @@
               <li class="message-item">
                   <a href="{{ path('change_locale', { '_locale': 'fr' }) }}">Français</a>
               </li>
-          </ul><!-- End languages Dropdown Items -->
+            </ul><!-- End languages Dropdown Items -->
             
           </li><!-- End languages Nav -->
 
@@ -342,7 +412,13 @@
               {% if app.user %}
                 <li class="dropdown-header">
                   <h6>{{ app.user.getName() }}</h6>
-                  <span>{{ app.user.getRoles()|join(', ') }}</span>
+                  <ul class="text-start">
+                    {% for role in app.user.getRoles() %}
+                      <li class="explanation">{{ role }}</li>
+                    {% else %}
+                      <span>{{ 'no_role'|trans }}</span>
+                    {% endfor %}
+                  </ul>
                 </li>
                 <li>
                   <hr class="dropdown-divider">
@@ -403,7 +479,8 @@
             <span>{{ 'breadcrumb_home'|trans }}</span>
           </a>
         </li><!-- End Dashboard Nav -->
-      {# {% if is_granted('IS_AUTHENTICATED_FULLY') %} #}
+        {# {% if is_granted('IS_AUTHENTICATED_FULLY') %} #}
+
       {% if app.user %}
         <li class="nav-item">
           <a  href="#" class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse">
@@ -605,7 +682,7 @@
 
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#users-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-people"></i><span>Utilisateurs</span><i class="bi bi-chevron-down ms-auto"></i>
+            <i class="bi bi-people"></i><span>Gestion des utilisateurs</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul id="users-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
@@ -615,7 +692,7 @@
             </li>
             <li>
               <a href="{{ path('app_agents_group_index') }}">
-                <i class="bi bi-circle"></i><span>Consultation des groupes</span>
+                <i class="bi bi-circle"></i><span>Consultation des groupes d'agents</span>
               </a>
             </li>
             <li>
@@ -656,6 +733,15 @@
         </li><!-- End parameters Nav -->
         {% endif %}
 
+
+        <!-- Installer Nav -->
+        {# <li class="nav-item">
+          <a class="nav-link collapsed" id="install" style="display: none;" data-bs-target="#install-nav" data-bs-toggle="collapse" href="#">
+            <i class="ri-install-line"></i>
+            <span>{{ 'install'|trans }}</span>
+          </a>
+        </li><!-- End users Nav --> #}
+        
         <li class="nav-heading">Pages</li>
 
         <li class="nav-item">
@@ -708,6 +794,24 @@
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <script src="{{ asset('./js/sweetalert2.all.js') }}"></script>
+    {# <script src="{{ asset('./offline.js') }}"></script> #}
+      <!-- Vendor JS Files -->
+    {# <script src="{{ asset('/vendor/apexcharts/apexcharts.min.js') }}"></script>
+    <script src="{{ asset('/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('/vendor/chart.js/chart.umd.js') }}"></script>
+    <script src="{{ asset('/vendor/echarts/echarts.min.js') }}"></script>
+    <script src="{{ asset('/vendor/quill/quill.js') }}"></script>
+    <script src="{{ asset('/vendor/simple-datatables/simple-datatables.js') }}"></script>
+    <script src="{{ asset('/vendor/tinymce/tinymce.min.js') }}"></script>
+    <script src="{{ asset('/vendor/php-email-form/validate.js') }}"></script> #}
+    
+    {# <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('../service-worker.js')
+                .then(reg => console.log("Service Worker enregistré", reg))
+                .catch(err => console.log("Erreur Service Worker", err));
+        }
+    </script> #}
 
   </body>
 

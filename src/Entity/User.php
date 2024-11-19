@@ -117,6 +117,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, options: ['default' => 'fr'])]
     private string $locale = 'fr';
 
+    /**
+     * @var Collection<int, Notification>
+     */
+    #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $notifications;
+
 
     public function __construct()
     {
@@ -128,6 +134,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->groupCreatedBy = new ArrayCollection();
         $this->natureReserves = new ArrayCollection();
         $this->natureReservesLeader = new ArrayCollection();
+        $this->notifications = new ArrayCollection();
     }
 
 
@@ -533,6 +540,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLocale(?string $locale): static
     {
         $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
+
+    public function addNotification(Notification $notification): static
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): static
+    {
+        if ($this->notifications->removeElement($notification)) {
+            // set the owning side to null (unless already changed)
+            if ($notification->getUser() === $this) {
+                $notification->setUser(null);
+            }
+        }
 
         return $this;
     }

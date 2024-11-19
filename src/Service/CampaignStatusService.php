@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\CountingCampaign;
 use App\Repository\CampaignStatusRepository;
 
 class CampaignStatusService
@@ -42,5 +43,20 @@ class CampaignStatusService
             'statusCancelled' => $statusCancelled,
             'statusIndexMap' => $statusIndexMap,
         ];
+    }
+
+    public function ensureCampaignIsEditable(CountingCampaign $campaign): bool
+    {
+        $statuses = $this->getCampaignStatuses();
+        $statusClosed = $statuses['statusClosed'];
+        $statusSuspended = $statuses['statusSuspended'];
+        $statusCancelled = $statuses['statusCancelled'];
+
+        if (in_array($campaign->getCampaignStatus(), [$statusClosed, $statusSuspended, $statusCancelled], true)) {
+            // Retourne false si la campagne n'est pas modifiable
+            return false;
+        }
+
+        return true;
     }
 }

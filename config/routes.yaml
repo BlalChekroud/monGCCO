@@ -24,3 +24,8 @@ change_out:
     controller: App\Controller\HomeController::changeOut
     requirements:
         _locale: fr|en  # Limitez les choix à 'en' et 'fr'
+
+# sync_campaign:
+#     path: /api/sync-campaign
+#     controller: App\Controller\CountingCampaignController::syncCampaign
+#     methods: POST

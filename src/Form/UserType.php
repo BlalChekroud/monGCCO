@@ -8,7 +8,6 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,8 +17,9 @@ class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('roles', ChoiceType::class, [
+        // Ajouter le champ 'roles' uniquement si 'show_roles' est vrai
+        if ($options['show_roles']) {
+            $builder->add('roles', ChoiceType::class, [
                 'choices' => [
                     'Utilisateur' => 'ROLE_USER',
                     'ROLE_VIEW' => 'ROLE_VIEW',
@@ -29,14 +29,16 @@ class UserType extends AbstractType
                     'ROLE_IMPORT' => 'ROLE_IMPORT',
                     'ROLE_SUPER_CREAT' => 'ROLE_SUPER_CREAT',
                     'Collecteur' => 'ROLE_COLLECTOR',
-                    'Chef d\'équipe' => 'ROLE_TEAMLEADER',
+                    // 'Chef d\'équipe' => 'ROLE_TEAMLEADER',
                     'Administrateur' => 'ROLE_ADMIN',
                     'Super Administrateur' => 'ROLE_SUPER_ADMIN',
                 ],
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Rôles',
-            ])
+            ]);
+        }
+        $builder
             ->add('image', ImageType::class, [
                 'label' => 'Inserer une image<span class="requiredField">*</span>',
                 'label_html' => true,
@@ -100,8 +102,8 @@ class UserType extends AbstractType
                 'hidden_label' => 'Masquer',
                 'visible_label' => 'Afficher',
                 'attr' => ['autocomplete' => 'new-password'],
-                'required' => true,
-                'constraints' => [
+                'required' => $options['require_password'],  // Rend le mot de passe facultatif pour les administrateurs
+                'constraints' => $options['require_password'] ? [
                     new NotBlank([
                         'message' => 'Veuillez saisir un mot de passe',
                     ]),
@@ -114,7 +116,7 @@ class UserType extends AbstractType
                     // new PasswordStrength(
                     //     minScore: PasswordStrength::STRENGTH_STRONG
                     // )
-                ],
+                ] : [],
             ])
         ;
     }
@@ -123,6 +125,8 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'show_roles' => false, // Par défaut, le champ de rôles est caché
+            'require_password' => true,  // Par défaut, le mot de passe est requis
         ]);
     }
 }

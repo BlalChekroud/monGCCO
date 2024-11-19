@@ -112,7 +112,7 @@ class BirdSpeciesType extends AbstractType
             //         'NT' => 'NT',
             //         'VU' => 'VU',
             //     ],
-            //     'label' => "Catégorie de la liste rouge de l'UICN 2022",
+            //     'label' => "Catégorie de la liste rouge de l'IUCN 2022",
             // ])
             ->add('iucnRedListCategory', EntityType::class, [
                 'class' => IucnRedListCategory::class,

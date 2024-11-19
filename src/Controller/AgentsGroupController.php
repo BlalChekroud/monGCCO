@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Service\NotificationService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\AgentsGroup;
 use App\Form\AgentsGroupType;
@@ -16,6 +18,41 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[Route('/user/agents/group')]
 class AgentsGroupController extends AbstractController
 {
+    private $notificationService;
+    public function __construct(
+        NotificationService $notificationService,
+        TranslatorInterface $translator,
+    ) {
+        $this->notificationService = $notificationService;
+        $this->translator = $translator;
+    }
+
+    // public function __construct(NotificationService $notificationService)
+    // {
+    //     $this->notificationService = $notificationService;
+    // }
+    
+    // Méthode pour ajouter une notification flash
+    // private function addUserNotification($action, $user, $group, TranslatorInterface $translator)
+    // {
+    //     $messageKey = match ($action) {
+    //         'add' => 'agentsGroup.notification.added',
+    //         'edit' => 'agentsGroup.notification.edited',
+    //         'delete' => 'agentsGroup.notification.deleted',
+    //         default => null
+    //     };
+
+    //     if ($messageKey) {
+    //         $parameters = [
+    //             '%user%' => $user->getEmail(),
+    //             '%group%' => $group->getGroupName(),
+    //         ];
+
+    //         // Utilisation du service de notification pour créer une notification
+    //         $this->notificationService->createNotification($messageKey, $parameters, $this->getUser(), $user);
+    //     }
+    // }
+
     #[Route('/', name: 'app_agents_group_index', methods: ['GET'])]
     public function index(AgentsGroupRepository $agentsGroupRepository): Response
     {
@@ -63,6 +100,15 @@ class AgentsGroupController extends AbstractController
                 // Flush again to save the updated group name
                 $entityManager->flush();
                 $this->addFlash('success', $translator->trans("agentsGroup.msg.created"));
+                
+                // Envoyer une notification pour chaque utilisateur ajouté dans le groupe
+                // foreach ($agentsGroup->getGroupMember() as $member) {
+                //     $this->addUserNotification('add', $member, $agentsGroup, $translator);
+                // }
+                // Exemple dans la méthode new() du contrôleur
+                foreach ($agentsGroup->getGroupMember() as $member) {
+                    $this->notificationService->sendNotification($member, 'add', $this->getUser(), $agentsGroup);
+                }
     
                 return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);
             } else {
@@ -104,6 +150,9 @@ class AgentsGroupController extends AbstractController
             return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        // Récupérer les membres actuels avant modification
+        $originalMembers = new ArrayCollection($agentsGroup->getGroupMember()->toArray());
+
         $form = $this->createForm(AgentsGroupType::class, $agentsGroup);
         $form->handleRequest($request);
 
@@ -117,11 +166,33 @@ class AgentsGroupController extends AbstractController
                     $this->addFlash('error', $translator->trans('agentsGroup.error.leader_not_in_members'));
                     return $this->redirectToRoute('app_agents_group_edit', ['id'=> $agentsGroup->getId()], Response::HTTP_SEE_OTHER);
                 }
+                
+                // Vérifier les utilisateurs supprimés
+                // foreach ($originalMembers as $member) {
+                //     if (!$agentsGroup->getGroupMember()->contains($member)) {
+                //         // Notification pour l'utilisateur supprimé
+                //         $this->notificationService->createNotification('delete', [
+                //             '%user%' => $member->getEmail(),
+                //             '%group%' => $agentsGroup->getGroupName()
+                //         ], $this->getUser(), $member);
+                //     }
+                // }
+                foreach ($originalMembers as $member) {
+                    if (!$agentsGroup->getGroupMember()->contains($member)) {
+                        $this->notificationService->sendNotification($member, 'remove', $this->getUser(), $agentsGroup);
+                    }
+                }
+
                 $agentsGroup->setUpdatedAt(new \DateTimeImmutable());
                 $agentsGroup->generateAgentsGroup();
                 $entityManager->flush();
                 $this->addFlash('success', $translator->trans('agentsGroup.msg.updated'));
     
+                // Notification pour les membres modifiés
+                foreach ($agentsGroup->getGroupMember() as $member) {
+                    $this->notificationService->sendNotification($member, 'edit', $this->getUser(), $agentsGroup);
+                }
+                
                 return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);
 
             } else {
@@ -140,6 +211,11 @@ class AgentsGroupController extends AbstractController
     public function delete(Request $request, AgentsGroup $agentsGroup, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         if ($this->isCsrfTokenValid('delete'.$agentsGroup->getId(), $request->getPayload()->get('_token'))) {
+            
+            foreach ($agentsGroup->getGroupMember() as $member) {
+                $this->notificationService->sendNotification($member, 'delete', $this->getUser(), $agentsGroup);
+            }
+
             $entityManager->remove($agentsGroup);
             $entityManager->flush();
             $this->addFlash('success', $translator->trans('agentsGroup.msg.deleted'));

@@ -1,4 +1,4 @@
-{% if is_granted('ROLE_ADMIN') %}
+{% if is_granted('ROLE_COLLECTOR') %}
 <form method="post" action="{{ path('app_collected_data_delete', {'id': collected_datum.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ collected_datum.id) }}">
     <button class="btn btn-danger btn-sm bi bi-trash mx-2" title="Supprimer"></button>

@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Repository\UserRepository;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Entity\AgentsGroup;
 use App\Entity\Country;
@@ -31,6 +32,10 @@ class AgentsGroupType extends AbstractType
                 'choice_label' => function (User $user) {
                     return $user->getName() . ' ' . $user->getLastName() . ' (' . $user->getEmail() . ')';
                 },
+                'query_builder' => function (UserRepository $repository) {
+                    return $repository->createQueryBuilder('b')
+                        ->orderBy('b.name', 'ASC');
+                },
                 // 'label' => $this->translator->trans('choose_group_leader') . ' <span class="requiredField">*</span>',
                 'label_html' => true,
                 'multiple' => true,
@@ -43,6 +48,10 @@ class AgentsGroupType extends AbstractType
                 'class' => User::class,
                 'choice_label' => function (User $user) {
                     return $user->getName() . ' ' . $user->getLastName() . ' (' . $user->getEmail() . ')';
+                },
+                'query_builder' => function (UserRepository $repository) {
+                    return $repository->createQueryBuilder('b')
+                        ->orderBy('b.name', 'ASC');
                 },
                 // 'label' => 'Chef du groupe<span class="requiredField">*</span>',
                 'label_html' => true,

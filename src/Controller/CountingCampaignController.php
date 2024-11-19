@@ -2,8 +2,16 @@
 
 namespace App\Controller;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use League\Csv\Writer;
 use App\Entity\EnvironmentalConditions;
+use App\Repository\AgentsGroupRepository;
+use App\Repository\BirdSpeciesCountRepository;
 use App\Repository\CampaignStatusRepository;
+use App\Repository\CollectedDataRepository;
+use App\Repository\EnvironmentalConditionsRepository;
+use App\Repository\SiteCollectionRepository;
 use App\Security\Voter\CountingCampaignVoter;
 use App\Service\CampaignStatusService;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -75,6 +83,57 @@ class CountingCampaignController extends AbstractController
     }
 
     
+    // #[Route('/api/sync-campaign', name: 'app_counting_campaign_sync', methods: ['POST'])]
+    // public function syncCampaign(CampaignStatusRepository $campaignStatusRepository, CountingCampaignRepository $countingCampaignRepository, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    // {
+    //     $data = json_decode($request->getContent(), true);
+    //     if (!$data) {
+    //         return new JsonResponse(['error' => 'Données invalides'], 400);
+    //     }
+
+    //     try {
+    //         foreach ($data as $campaignData) {
+    //             $campaign = $countingCampaignRepository->find($campaignData['id']);
+                
+    //             if (!$campaign) {
+    //                 $campaign = new CountingCampaign();
+    //             }
+
+    //             foreach ($campaign->getSiteAgentsGroups() as $siteAgentsGroup) {
+    //                 $siteAgentsGroup->setCountingCampaign($campaign);
+    //                 $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
+    //                 $entityManager->persist($siteAgentsGroup);
+    //             }
+
+    //             $campaign->setStartDate(new \DateTime($campaignData['startDate']));
+    //             $campaign->setEndDate(new \DateTime($campaignData['endDate']));
+                
+    //             $campaign->setCampaignName($campaignData['name']);
+    //             // Mettez à jour les autres champs nécessaires
+    //             $campaign->setCreatedAt(new \DateTimeImmutable($campaignData['createdAt']));
+    //             $campaign->setCreatedBy($campaignData['createdBy']);
+    //             // $campaign->generateCampaignName();
+    //             // Mettre à jour le statut de la campagne
+    //             $this->updateCampaignStatus($campaign, $campaignStatusRepository);
+    //             $entityManager->persist($campaign);
+    //             // $entityManager->flush();
+                    
+    //             // $campaign->generateCampaignName();
+    //             // $entityManager->flush();
+                    
+    //             $this->addFlash('success', "Campagne de comptage a bien été crée");
+    //             // $entityManager->persist($campaign);
+    //         }
+
+    //         $entityManager->flush();
+    //         return new JsonResponse(['status' => 'Campagnes synchronisées avec succès'], 200);
+    //     } catch (\Exception $e) {
+    //         return new JsonResponse(['error' => 'Erreur lors de la synchronisation'], 500);
+    //     }
+    // }
+
+    
+    
     #[IsGranted(CountingCampaignVoter::CREATE)]
     #[Route('/new', name: 'app_counting_campaign_new', methods: ['GET', 'POST'])]
     public function new(CampaignStatusRepository $campaignStatusRepository, Request $request, EntityManagerInterface $entityManager): Response
@@ -132,7 +191,16 @@ class CountingCampaignController extends AbstractController
 
     #[IsGranted(CountingCampaignVoter::VIEW, 'countingCampaign')]
     #[Route('/{id}', name: 'app_counting_campaign_show', methods: ['GET'])]
-    public function show(CampaignStatusRepository $campaignStatusRepository, CountingCampaignRepository $countingCampaignRepository, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
+    public function show(
+        BirdSpeciesCountRepository $birdSpeciesCountRepository,
+        EnvironmentalConditionsRepository $environmentalConditionsRepository, 
+        AgentsGroupRepository $agentsGroupRepository, 
+        CollectedDataRepository $collectedDataRepository, 
+        SiteCollectionRepository $siteCollectionRepository, 
+        CampaignStatusRepository $campaignStatusRepository, 
+        CountingCampaignRepository $countingCampaignRepository, 
+        CountingCampaign $countingCampaign, 
+        EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();  // Utilisateur actuel
 
@@ -162,22 +230,28 @@ class CountingCampaignController extends AbstractController
             }
         }
     
-        // Récupérer tous les SiteCollection associés aux groupes d'agents
+        // Récupérer tous les SiteCollection associés aux SiteAgentsGroups
         foreach ($siteAgentsGroups as $siteAgentsGroup) {
             $siteCollection = $siteAgentsGroup->getSiteCollection();
     
             if ($siteCollection) {
                 // Ajouter le site à la liste des sites
                 $sites[] = $siteCollection;
+
+                // Récupérer le total des comptages d'oiseaux pour ce site dans la campagne
+                $totalBirdCountsForSiteInCampaign[$siteCollection->getId()] = $siteCollectionRepository->getTotalBirdCountsForSiteInCampaign($siteCollection, $countingCampaign);
             }
         }
-    
+        
+
+        
         // Récupérer toutes les conditions environnementales pour les sites de la campagne en une seule requête
         if (!empty($sites)) {
             $conditions = $entityManager->getRepository(EnvironmentalConditions::class)->findBy([
                 'user' => $user,
                 'siteCollection' => $sites,
                 'countingCampaign' => $countingCampaign,
+                'collectedData' => null, // Ce filtre assure que collectedData est null (pas de collecte associée)
             ], ['createdAt' => 'DESC']);
     
             // Stocker les conditions par ID de SiteCollection
@@ -185,7 +259,27 @@ class CountingCampaignController extends AbstractController
                 $existingConditions[$condition->getSiteCollection()->getId()] = $condition;
             }
         }
-    
+
+        /**
+         * DES STATISTIQUES
+         */
+        // Récupérer les données collectées associées à la campagne
+        $collectedDataInCampaign = $collectedDataRepository->findByCountingCampaign($countingCampaign);
+        // Le nombre de collectes associées à la campagne
+        $totalCollectedDataCount = $countingCampaignRepository->countCollectedDataByCampaign($countingCampaign);
+        // Compter le nombre total d'agents participants à la campagne
+        $totalAgentsCount = $agentsGroupRepository->countAgentsByCountingCampaign($countingCampaign);
+        // Toutes les méthodes de collecte de la campagne
+        $methodsUsed = $countingCampaignRepository->getMethodsUsedInCampaign($countingCampaign);
+        // Récupérer les valeurs les plus choisies des conditions environnementales
+        $frequentConditions = $environmentalConditionsRepository->getMostFrequentEnvironmentalConditions($countingCampaign);
+        // Total d'oiseaux comptés de la campagne
+        $totalBirdsCountedInCampaign = $birdSpeciesCountRepository->countTotalBirdsInCampaign($countingCampaign);
+        $totalcountUniqueBirdSpeciesInCampaign = $birdSpeciesCountRepository->countUniqueBirdSpeciesInCampaign($countingCampaign);
+        // Les SiteCollections d'une campagne.
+        $siteCollectionsByCampaign = $siteCollectionRepository->getSiteCollectionsByCampaign($countingCampaign);
+        
+
         return $this->render('counting_campaign/show.html.twig', [
             'counting_campaign' => $countingCampaign,
             'existingConditions' => $existingConditions,  // Transmettre les conditions environnementales
@@ -194,10 +288,160 @@ class CountingCampaignController extends AbstractController
             'statusClosed' => $statusClosed,
             'statusSuspended' => $statusSuspended,
             'statusCancelled' => $statusCancelled,
-            'collections' => $countingCampaignRepository->getCollectedDataForCampaign($countingCampaign), // Récupérer les collectes associées à la campagne
+            'totalBirdCountsForSiteInCampaign' => $totalBirdCountsForSiteInCampaign, // Transmettre les total des oiseaux comptés 
+            'collectedDataInCampaign' => $collectedDataInCampaign,
+            'totalCollectedDataCount' => $totalCollectedDataCount,
+            'totalAgentsCount' => $totalAgentsCount,
+            'methodsUsed' => $methodsUsed,
+            'frequentConditions' => $frequentConditions,
+            'totalBirdsCountedInCampaign' => $totalBirdsCountedInCampaign,
+            'totalcountUniqueBirdSpeciesInCampaign' => $totalcountUniqueBirdSpeciesInCampaign,
+            'siteCollectionsByCampaign' => $siteCollectionsByCampaign,
+        ]);
+    }
+
+    // #[Route('/{id}/export', name: 'app_counting_campaign_export', methods: ['GET'])]
+    // public function exportCsv(
+    //     CountingCampaign $campaign,
+    //     SiteCollectionRepository $siteCollectionRepository,
+    //     ): Response
+    // {
+
+    //     $siteCollectionsByCampaign = $siteCollectionRepository->getSiteCollectionsByCampaign($campaign);
+
+    //     $data = [];
+    //     foreach ($siteCollectionsByCampaign as $site) {
+    //         foreach ($site->getCollectedData() as $collect) {
+    //             foreach ($collect->getBirdSpeciesCounts() as $speciesCount) {
+    //                 $data[] = [
+    //                     'Campaign' => $campaign->getCampaignName(),
+    //                     'Site' => $site->getSiteName(),
+    //                     'City' => $site->getCity()->getName(),
+    //                     'Region' => $site->getCity()->getRegion()->getName(),
+    //                     'Agent' => $collect->getCreatedBy()->getEmail(),
+    //                     'Species' => $speciesCount->getBirdSpecies()?->getScientificName() ?? 'Unknown', // Récupère le nom de l'espèce
+    //                     'Count' => $speciesCount->getCount(),
+    //                     'Method' => implode(',', $collect->getMethod()->map(fn($m) => $m->getLabel())->toArray()),
+    //                     'Date' => $collect->getCreatedAt()->format('d-m-Y H:i:s'),
+    //                 ];
+    //             }
+    //         }
+    //     }
+        
+    //     // Vérification si des données existent
+    //     if (empty($data)) {
+    //         $data[] = [
+    //             'Campaign' => $campaign->getCampaignName(),
+    //             'Site' => 'No data available',
+    //             'City' => 'N/A',
+    //             'Region' => 'N/A',
+    //             'Agent' => 'N/A',
+    //             'Species' => 'N/A',
+    //             'Count' => 'N/A',
+    //             'Method' => 'N/A',
+    //             'Date' => 'N/A',
+    //         ];
+    //     }
+
+    //     // Création du fichier CSV
+    //     $csv = Writer::createFromString('');
+    //     $csv->insertOne(array_keys($data[0])); // Ajout des en-têtes
+    //     $csv->insertAll($data); // Ajout des données
+
+    //     // Retourne la réponse HTTP avec le fichier à télécharger
+    //     return new Response($csv->toString(), 200, [
+    //         'Content-Type' => 'text/csv',
+    //         'Content-Disposition' => 'attachment; filename="campaign_export.csv"',
+    //     ]);
+    // }
+
+    #[Route('/{id}/export', name: 'app_counting_campaign_export', methods: ['GET'])]
+    public function exportCsv(
+        CountingCampaign $campaign,
+        SiteCollectionRepository $siteCollectionRepository
+    ): Response {
+        // Récupérer les données via la méthode du repository
+        $data = $siteCollectionRepository->getExportDataByCampaign($campaign);
+    
+        // Vérifier si des données existent
+        if (empty($data)) {
+            $data[] = [
+                'Campaign' => $campaign->getCampaignName(),
+                'Site' => 'No data available',
+                'City' => 'N/A',
+                'Region' => 'N/A',
+                'Agent' => 'N/A',
+                'Species' => 'N/A',
+                'Count' => 'N/A',
+                'Method' => 'N/A',
+                'Date' => 'N/A',
+            ];
+        }
+    
+        // Utilisation de League\Csv pour créer le fichier CSV
+        $csv = Writer::createFromString('');
+        $csv->insertOne(array_keys($data[0])); // Ajouter les en-têtes
+        $csv->insertAll($data); // Ajouter les lignes de données
+    
+        // Retourner la réponse HTTP avec le fichier CSV
+        return new Response($csv->toString(), 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="campaign_export.csv"',
         ]);
     }
     
+
+    // #[Route('/{id}/export', name: 'app_counting_campaign_export', methods: ['GET'])]
+    // public function exportExcel(
+    //     CountingCampaign $campaign,
+    //     SiteCollectionRepository $siteCollectionRepository
+    // ): Response {
+    //     $siteCollectionsByCampaign = $siteCollectionRepository->getSiteCollectionsByCampaign($campaign);
+    
+    //     // Initialisation des données
+    //     $data = [];
+    //     foreach ($siteCollectionsByCampaign as $site) {
+    //         foreach ($site->getCollectedData() as $collect) {
+    //             foreach ($collect->getBirdSpeciesCounts() as $speciesCount) {
+    //                 $data[] = [
+    //                     'Campaign' => $campaign->getCampaignName(),
+    //                     'Site' => $site->getSiteName(),
+    //                     'City' => $site->getCity()->getName(),
+    //                     'Region' => $site->getCity()->getRegion()->getName(),
+    //                     'Agent' => $collect->getCreatedBy()->getEmail(),
+    //                     'Species' => $speciesCount->getBirdSpecies()?->getScientificName() ?? 'Unknown', // Récupère le nom de l'espèce
+    //                     'Count' => $speciesCount->getCount(),
+    //                     'Method' => implode(', ', $collect->getMethod()->map(fn($m) => $m->getLabel())->toArray()),
+    //                     'Date' => $collect->getCreatedAt()->format('d-m-Y H:i:s'),
+    //                 ];
+    //             }
+    //         }
+    //     }
+    
+    //     // Création du fichier Excel
+    //     $spreadsheet = new Spreadsheet();
+    //     $sheet = $spreadsheet->getActiveSheet();
+    
+    //     // Ajout des en-têtes
+    //     $headers = array_keys($data[0]);
+    //     $sheet->fromArray($headers, null, 'A1'); // Ligne d'en-tête
+    
+    //     // Ajout des données
+    //     $sheet->fromArray($data, null, 'A2'); // Données (à partir de la ligne 2)
+    
+    //     // Écriture du fichier Excel
+    //     $writer = new Xlsx($spreadsheet);
+    //     $fileName = 'campaign_export.xlsx';
+    
+    //     // Préparer la réponse HTTP pour le téléchargement
+    //     $tempFilePath = tempnam(sys_get_temp_dir(), 'excel_');
+    //     $writer->save($tempFilePath);
+    
+    //     return new Response(file_get_contents($tempFilePath), 200, [
+    //         'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //         'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+    //     ]);
+    // }
 
     #[IsGranted(CountingCampaignVoter::EDIT, 'countingCampaign')]
     #[Route('/{id}/edit', name: 'app_counting_campaign_edit', methods: ['GET', 'POST'])]
@@ -435,7 +679,7 @@ class CountingCampaignController extends AbstractController
 
                 // Vérifier si les conditions environnementales sont associées à chaque collecte
                 if ($collectedData->getEnvironmentalConditions() == null) {
-                    $this->addFlash('warning', "Une collecte de données pour le site {$site->getSiteName()} n'a pas de conditions environnementales.");
+                    $this->addFlash('warning', "Une collecte de données {$collectedData->getId()} pour le site {$site->getSiteName()} n'a pas de conditions environnementales.");
                     return false;
                 }
 

@@ -263,10 +263,17 @@ class SiteCollectionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_site_collection_show', methods: ['GET'])]
-    public function show(SiteCollection $siteCollection): Response
+    public function show(SiteCollection $siteCollection, SiteCollectionRepository $siteCollectionRepository): Response
     {
+        // Récupère le nombre total d'oiseaux pour le site
+        $totalBirdCountsForSite = $siteCollectionRepository->getTotalBirdCountsForSite($siteCollection);
+        // Récupère le nombre d'espèces uniques pour le site
+        $uniqueSpeciesCount = $siteCollectionRepository->getUniqueBirdSpeciesCountForSite($siteCollection);
+
         return $this->render('site_collection/show.html.twig', [
             'site_collection' => $siteCollection,
+            'totalBirdCountsForSite' => $totalBirdCountsForSite,
+            'uniqueSpeciesCount' => $uniqueSpeciesCount,
         ]);
     }
 

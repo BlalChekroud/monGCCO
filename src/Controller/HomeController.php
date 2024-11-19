@@ -2,8 +2,14 @@
 
 namespace App\Controller;
 
+use App\Repository\AgentsGroupRepository;
+use App\Repository\BirdSpeciesCountRepository;
+use App\Repository\BirdSpeciesRepository;
+use App\Repository\CampaignStatusRepository;
+use App\Repository\CollectedDataRepository;
+use App\Repository\EnvironmentalConditionsRepository;
+use App\Repository\SiteCollectionRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Repository\CountingCampaignRepository;
@@ -35,74 +41,89 @@ class HomeController extends AbstractController
     }
 
     #[Route('/', name: 'home')]
-    public function index(CountingCampaignRepository $countingCampaignRepository, LogoRepository $logoRepository): Response
+    public function index(
+        BirdSpeciesRepository $birdSpeciesRepository,
+        BirdSpeciesCountRepository $birdSpeciesCountRepository,
+        EnvironmentalConditionsRepository $environmentalConditionsRepository, 
+        AgentsGroupRepository $agentsGroupRepository, 
+        CollectedDataRepository $collectedDataRepository, 
+        SiteCollectionRepository $siteCollectionRepository, 
+        CountingCampaignRepository $countingCampaignRepository, 
+        LogoRepository $logoRepository): Response
     {
         $logo = $logoRepository->findOneBy([]); // Fetch the logo
         $campaigns = $countingCampaignRepository->findBy([], ['endDate' => 'ASC']);
 
-        // Initialiser les tableaux pour les données des graphiques
-        $totalCounts = [];
-        $totalCollects = [];
-        $totalAgents = [];
-        $totalUniqueSpecies = [];
-        $categories = [];
         
-        // Initialiser les tableaux pour les données du graphique
-        $siteNames = [];
-        $totalCountsSite = [];
-
         // Récupérer la dernière campagne créée
         $recentCampaign = $countingCampaignRepository->findMostRecentCampaign();
         if (!$recentCampaign) {
             $this->addFlash('warning', 'Aucune campagne trouvée.');
             // return $this->redirectToRoute('home'); 
         }
-        
-        // Utiliser la méthode pour récupérer les comptages par site
-        if ($recentCampaign !== null) {
-            $totalCountsBySite = $countingCampaignRepository->getTotalCountsBySite($recentCampaign);
-            
-            foreach ($totalCountsBySite as $siteData) {
-                $siteNames[] = $siteData['siteName']; // Récupérer les noms des sites
-                $totalCountsSite[] = $siteData['totalCounts']; // Récupérer le total des comptages par site
+       
+        /**
+         * DES STATISTIQUES
+         */
+        // Récupérer les données collectées associées à la campagne
+        $collectedDataInCampaign = $collectedDataRepository->findByCountingCampaign($recentCampaign);
+        // Le nombre de collectes associées à la campagne
+        $totalCollectedDataCount = $countingCampaignRepository->countCollectedDataByCampaign($recentCampaign);
+        // Compter le nombre total d'agents participants à la campagne
+        $totalAgentsCount = $agentsGroupRepository->countAgentsByCountingCampaign($recentCampaign);
+        // Toutes les méthodes de collecte de la campagne
+        $methodsUsed = $countingCampaignRepository->getMethodsUsedInCampaign($recentCampaign);
+        // Total d'oiseaux comptés de la campagne
+        $totalBirdsCountedInCampaign = $birdSpeciesCountRepository->countTotalBirdsInCampaign($recentCampaign);
+        $totalcountUniqueBirdSpeciesInCampaign = $birdSpeciesCountRepository->countUniqueBirdSpeciesInCampaign($recentCampaign);
+        // Le nom de chaque campagne et le nombre total d'oiseaux comptés dans chaque campagne.
+        $totalBirdsCountByCampaign = $birdSpeciesCountRepository->getTotalBirdsCountByCampaign();
+        // Le nom de chaque campagne et le nombre total d'espèces d'oiseaux uniques comptées dans chaque campagne.
+        $totalUniqueBirdSpeciesCountByCampaign = $birdSpeciesCountRepository->getTotalUniqueBirdSpeciesCountByCampaign();
+        // Les SiteCollections d'une campagne.
+        $siteCollectionsByCampaign = $siteCollectionRepository->getSiteCollectionsByCampaign($recentCampaign);
+        //Le nombre total de comptages d'oiseaux pour un site spécifique dans une campagne de comptage
+        // $totalBirdCountsForSiteInCampaign = [];
+        // foreach ($siteCollectionsByCampaign as $site) {
+        //     $totalBirdCountsForSiteInCampaign[$site] = $siteCollectionRepository->getTotalBirdCountsForSiteInCampaign($site, $recentCampaign);
+        // }
+        // $totalBirdCountsForSiteInCampaign = $siteCollectionRepository->getTotalBirdCountsForSiteInCampaign($site, $recentCampaign);
+        // $totalBirdsCountPerSitesInCamapign = $countingCampaignRepository->getTotalBirdsCountPerSitesInCampaign($recentCampaign);
+        // Récupérer tous les SiteCollection associés aux groupes d'agents
+        foreach ($siteCollectionsByCampaign as $site) {    
+            if ($site) {
+                // Récupérer le total des comptages d'oiseaux pour ce site dans la campagne
+                $totalBirdsCountPerSitesInCamapign[$site->getId()] = $siteCollectionRepository->getTotalBirdCountsForSiteInCampaign($site, $recentCampaign);
+                $uniqueBirdSpeciesCountForSite[$site->getId()] = $siteCollectionRepository->getUniqueBirdSpeciesCountForSite($site);
+                $uniqueBirdSpeciesCountForSiteInCampaign[$site->getId()] = $siteCollectionRepository->getUniqueBirdSpeciesCountForSiteInCampaign($site, $recentCampaign);
             }
         }
-        
-        // Parcourir les campagnes pour extraire les données
-        foreach ($campaigns as $campaign) {
-            $totalCounts[] = $campaign->getTotalCountsCampaign();
-            $totalCollects[] = $campaign->getTotalCollects();
-            $totalAgents[] = $campaign->getTotalAgents();
-            $totalUniqueSpecies[] = $campaign->getTotalUniqueSpecies();
-            $categories[] = $campaign->getEndDate()->format('d-m-Y');
 
-        }
+        $topThreeBirdSpeciesInCampaign = $birdSpeciesCountRepository->getTopThreeBirdSpeciesInCampaignWithImages($recentCampaign);
 
-
-
-
-
-        // Calculer les totaux
-        $totalBirds = array_sum($totalCounts);
-        $totalUniqueSpeciesCount = array_sum($totalUniqueSpecies);
-        $totalAgentsCount = array_sum($totalAgents);
+        // Récupérer les valeurs les plus choisies des conditions environnementales
+        $frequentConditions = $environmentalConditionsRepository->getMostFrequentEnvironmentalConditions($recentCampaign);
 
         // Passer les données au template
         return $this->render('home/index.html.twig', [
             'logo' => $logo,
             'campaigns' => $campaigns,
-            'totalCollects' => $totalCollects,
-            'totalAgents' => $totalAgents,
-            'categories' => $categories,
-            'totalBirds' => $totalBirds,
-            'totalUniqueSpeciesCount' => $totalUniqueSpeciesCount,
-            'totalAgentsCount' => $totalAgentsCount,
-            'totalCounts' => $totalCounts,
-
             'recentCampaign' => $recentCampaign,
-            'totalUniqueSpecies' => $totalUniqueSpecies,
-            'siteNames' => $siteNames,       // Les noms des sites
-            'totalCountsSite' => $totalCountsSite,   // Les totaux des oiseaux comptés
+            'collectedDataInCampaign' => $collectedDataInCampaign,
+            'totalCollectedDataCount' => $totalCollectedDataCount,
+            'totalAgentsCount' => $totalAgentsCount,
+            'methodsUsed' => $methodsUsed,
+            'totalBirdsCountedInCampaign' => $totalBirdsCountedInCampaign,
+            'totalcountUniqueBirdSpeciesInCampaign' => $totalcountUniqueBirdSpeciesInCampaign,
+            'siteCollectionsByCampaign' => $siteCollectionsByCampaign,
+            'frequentConditions' => $frequentConditions,
+            'totalBirdsCountPerSitesInCamapign' => $totalBirdsCountPerSitesInCamapign,
+            'uniqueBirdSpeciesCountForSite' => $uniqueBirdSpeciesCountForSite,
+            'totalBirdsCountByCampaign' => $totalBirdsCountByCampaign,
+            'totalUniqueBirdSpeciesCountByCampaign' => $totalUniqueBirdSpeciesCountByCampaign,
+            'uniqueBirdSpeciesCountForSiteInCampaign' => $uniqueBirdSpeciesCountForSiteInCampaign,
+            'topThreeBirdSpeciesInCampaign' => $topThreeBirdSpeciesInCampaign,
+            'bird_species' => $birdSpeciesRepository->findAll()
         ]);
     }
 

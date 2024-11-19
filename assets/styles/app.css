@@ -69,6 +69,135 @@ h6.explanation {
 }
 
 /*--------------------------------------------------------------
+  # carousel-caption
+--------------------------------------------------------------*/
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Ajustez les valeurs et la couleur selon vos préférences */
+  color: white; /* Assurez-vous que la couleur du texte soit visible */
+}
+
+/* ----------------------------
+
+-------------------------------*/
+.notifications-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f4f7fb;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.notifications-header {
+  padding: 15px;
+  background-color: #40c0f3;
+  color: white;
+  text-align: center;
+  font-size: 18px;
+  border-radius: 15px 15px 0 0;
+  font-weight: bold;
+}
+
+.notifications-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-item {
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notification-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.notification-message {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.notification-time {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #888;
+}
+
+.no-notifications {
+  text-align: center;
+  font-size: 16px;
+  color: #888;
+  padding: 20px;
+}
+
+.card {
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.card-body {
+  padding: 0;
+}
+
+/*  */
+.messages {
+  max-height: 300px; /* Définir une hauteur maximale */
+  overflow-y: auto; /* Activer le défilement vertical si le contenu dépasse la hauteur */
+}
+
+.notifications-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.notification-item .notification-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.notification-item .notification-message {
+  font-size: 14px;
+}
+
+.notification-item .notification-time {
+  font-size: 12px;
+  color: #888;
+}
+
+
+.notification-message {
+  font-weight: normal;
+}
+
+.notification-message.font-weight-bold {
+  font-weight: bold;
+}
+
+/*  */
+
+/*--------------------------------------------------------------
   # site-agents-group-collection
 --------------------------------------------------------------*/
 #site-agents-group-collection {
@@ -1498,3 +1627,60 @@ h6.explanation {
     font-size: 13px;
     color: #012970;
   }
+
+/* Light mode styles */
+body.light-mode {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+body.light-mode .navbar, 
+body.light-mode .card {
+    background-color: #f8f9fa;
+    color: #000000;
+}
+
+body.light-mode .btn-primary {
+    background-color: #0d6efd;
+    color: #ffffff;
+}
+
+body.light-mode .btn-secondary {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+/* Ajout de styles de bordures et ombres */
+body.light-mode .card {
+    border-color: #e1e1e1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #e1e1e1;
+}
+
+body.dark-mode .navbar, 
+body.dark-mode .card {
+    background-color: #1f1f1f;
+    color: #e1e1e1;
+}
+
+body.dark-mode .btn-primary {
+    background-color: #bb86fc;
+    color: #000000;
+}
+
+body.dark-mode .btn-secondary {
+    background-color: #03dac6;
+    color: #000000;
+}
+
+/* Ajout de styles de bordures et ombres */
+body.dark-mode .card {
+    border-color: #333333;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}

@@ -20,11 +20,10 @@
             <tr>
                 <td>{{ image.id }}</td>
                 <td>
-                    {# {{ image.imageFilename }} #}
                     {% if image.imageFilename %}
                         <img src="{{ vich_uploader_asset(image, 'imageFile') }}" alt="image" class="imgIndex rounded mx-auto d-block">
                     {% else %}
-                        <p>Aucune image disponible</p>
+                        <p>{{ "image.not_available"|trans }}</p>
                     {% endif %}
                 </td>
                 <td>{{ image.createdAt ? image.createdAt|date('d-m-Y H:i:s') : '' }}</td>

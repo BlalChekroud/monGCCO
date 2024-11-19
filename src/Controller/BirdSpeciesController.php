@@ -37,6 +37,10 @@ class BirdSpeciesController extends AbstractController
     #[Route('/', name: 'app_bird_species_index', methods: ['GET', 'POST'])]
     public function index(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
+        // if ($this->getUser() !== $this->isGranted('IS_AUTHENTICATED_FULLY')) {
+        //     $this->addFlash('warning', $translator->trans('please_log_in_to_access_the_page'));
+        //     return $this->redirectToRoute('app_login');
+        // }
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
 

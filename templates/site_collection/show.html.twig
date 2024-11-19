@@ -111,6 +111,18 @@
                                         {% endif %}
                                     </td>
                                 </tr>
+                                <tr>
+                                    <th>Nombre d'espèces d'oiseaux uniques comptées</th>
+                                    <td>
+                                        {{ uniqueSpeciesCount ?? 0 }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Nombre total des oiseaux comptés</th>
+                                    <td>
+                                        {{ totalBirdCountsForSite ?? 0 }}
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

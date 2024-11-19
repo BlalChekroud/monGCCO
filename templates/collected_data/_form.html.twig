@@ -285,7 +285,7 @@
                 if (data.image) {
                     imageContainer.innerHTML = `<img src="${data.image}" alt="Oiseau" class="img-fluid rounded mx-auto d-block shadow-sm">`;
                 } else {
-                    imageContainer.innerHTML = `<p class="text-muted">Aucune image disponible</p>`;
+                    imageContainer.innerHTML = `<p class="text-muted">{{ "image.not_available"|trans }}</p>`;
                 }
             })
             .catch(error => {
@@ -328,7 +328,7 @@
                                                  alt="{{ birdSpeciesCountForm.birdSpecies.vars.data.frenchName }}" 
                                                  class="img-fluid rounded mx-auto d-block shadow-sm">
                                         {% else %}
-                                            <p class="text-muted">Aucune image disponible</p>
+                                            <p class="text-muted">{{ "image.not_available"|trans }}</p>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -457,7 +457,7 @@
                 if (data.image) {
                     imageContainer.innerHTML = `<img src="${data.image}" alt="Oiseau" class="img-fluid rounded mx-auto d-block shadow-sm">`;
                 } else {
-                    imageContainer.innerHTML = `<p class="text-muted">Aucune image disponible</p>`;
+                    imageContainer.innerHTML = `<p class="text-muted">{{ "image.not_available"|trans }}</p>`;
                 }
             })
             .catch(error => {

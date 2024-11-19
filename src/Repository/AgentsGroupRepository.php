@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\AgentsGroup;
+use App\Entity\CountingCampaign;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,6 +18,20 @@ class AgentsGroupRepository extends ServiceEntityRepository
         parent::__construct($registry, AgentsGroup::class);
     }
 
+    // Nombre total d'agents participants à une campagne de comptage
+    public function countAgentsByCountingCampaign(CountingCampaign $countingCampaign): int
+    {
+        return (int) $this->createQueryBuilder('g') // 'g' pour AgentsGroup
+            ->select('COUNT(DISTINCT m.id)') // Compter les ID uniques des membres
+            ->join('g.groupMember', 'm') // Joindre les membres du groupe
+            ->join('g.siteAgentsGroups', 's') // Joindre les sites associés
+            ->where('s.countingCampaign = :campaign') // Filtrer par la campagne de comptage
+            ->setParameter('campaign', $countingCampaign)
+            ->getQuery()
+            ->getSingleScalarResult(); // Récupérer le résultat sous forme scalaire
+    }
+
+    
     public function findByUser($user)
     {
         return $this->createQueryBuilder('a')

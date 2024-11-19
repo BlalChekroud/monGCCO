@@ -27,6 +27,7 @@
                 <table class="table datatable">
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>Nom du site</th>
                             <th>Ville</th>
                             <th>Région</th>
@@ -37,6 +38,7 @@
                     <tbody>
                     {% for site_collection in site_collections %}
                         <tr>
+                            <td>{{ site_collection.id }}</td>
                             <td>{{ site_collection.siteName }}</td>
                             <td>{{ site_collection.city.name }}</td>
                             <td>{{ site_collection.city.region.name }}</td>

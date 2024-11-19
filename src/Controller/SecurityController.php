@@ -76,51 +76,64 @@ class SecurityController extends AbstractController
     #[Route('/user/profile/{id}/edit', name: 'app_profile_edit', methods: ['GET', 'POST'])]
     public function edit(User $user, Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $hasher): Response
     {
+        // Rediriger si l'utilisateur n'est pas connecté
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
         }
     
+        // Autoriser l'utilisateur à modifier son propre profil ou si c'est un administrateur
         if ($this->getUser() !== $user && !$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('info', "Vous n'avez pas le droit de modifier ce compte.");
             return $this->redirectToRoute('home');
         }
 
-        $form = $this->createForm(UserType::class, $user);
+        // Création du formulaire
+        $form = $this->createForm(UserType::class, $user, [
+            // Limiter les rôles affichés dans le formulaire si l'utilisateur n'est pas un administrateur
+            'show_roles' => $this->isGranted('ROLE_ADMIN'),
+            'require_password' => !$this->isGranted('ROLE_ADMIN')  // Si l'administrateur est connecté, le mot de passe n'est pas requis
+        ]);
         $form->handleRequest($request);
     
         $formPassword = $this->createForm(EditPasswordType::class, $user);
         $formPassword->handleRequest($request);
     
         // Traitement du formulaire d'édition du profil
-        if ($form->isSubmitted() && $form->isValid()) {
-            if ($hasher->isPasswordValid($user, $form->get('password')->getData())) {
-    
-                $imageFile = $form->get('image')['imageFile']->getData(); // Get the uploaded image
-                // Handle image upload only if a new image is provided
-                if ($imageFile) {
-                    // If there's already an image, we need to update it
-                    if ($user->getImage()) {
-                        $image = $user->getImage();
-                        $image->setCreatedAt(new \DateTimeImmutable());
-                        $image->setImageFile($imageFile); // Update with the new file
-                    } else {
-                        // If there's no image yet, create a new Image entity
-                        $image = new Image();
-                        $image->setImageFile($imageFile);
-                        $image->setCreatedAt(new \DateTimeImmutable());
-                        $entityManager->persist($image);
-                        $user->setImage($image); // Set the new image to the user
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                if ($this->isGranted('ROLE_ADMIN') || ($hasher->isPasswordValid($user, $form->get('password')->getData()))) {
+        
+                    $imageFile = $form->get('image')['imageFile']->getData(); // Get the uploaded image
+                    // Handle image upload only if a new image is provided
+                    if ($imageFile) {
+                        // If there's already an image, we need to update it
+                        if ($user->getImage()) {
+                            $image = $user->getImage();
+                            $image->setCreatedAt(new \DateTimeImmutable());
+                            $image->setImageFile($imageFile); // Update with the new file
+                        } else {
+                            // If there's no image yet, create a new Image entity
+                            $image = new Image();
+                            $image->setImageFile($imageFile);
+                            $image->setCreatedAt(new \DateTimeImmutable());
+                            $entityManager->persist($image);
+                            $user->setImage($image); // Set the new image to the user
+                        }
                     }
+    
+                    $user->setUpdatedAt(new \DateTimeImmutable());
+                    
+                    $entityManager->flush();
+                    $this->addFlash('success', 'Les informations de votre compte ont été bien modifiées');
+                    return $this->redirectToRoute('app_profile_edit', ['id' => $user->getId()], Response::HTTP_SEE_OTHER);
+                } else {
+                    $this->addFlash('warning', 'Le mot de passe renseigné est incorrect.');
                 }
 
-                $user->setUpdatedAt(new \DateTimeImmutable());
-                
-                $entityManager->flush();
-                $this->addFlash('success', 'Les informations de votre compte ont été bien modifiées');
-                return $this->redirectToRoute('app_profile_edit', ['id' => $user->getId()], Response::HTTP_SEE_OTHER);
             } else {
-                $this->addFlash('warning', 'Le mot de passe renseigné est incorrect.');
+                $this->addFlash('error', $form->getErrors(true));
             }
+            
         }
     
         // Traitement du formulaire de changement de mot de passe
