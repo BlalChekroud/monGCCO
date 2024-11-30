@@ -4,6 +4,7 @@ card_title: "Lists"
 create_group: "Create a group"
 create_a_family: 'Create a family'
 create_a_species: 'Create a species'
+create_user_status: 'Create a user status'
 add_a_country: 'Add a country'
 choose_bird_family: "-- Choose a Bird Family --"
 consult_reserves: "View reserves"
@@ -35,6 +36,8 @@ invalid_form: "Invalid form"
 delete_permission: 'You do not have permission to delete.'
 edit_permission: "You do not have permission to edit."
 member_of_a_group_assigned_to_this_site: "You are not a member of a group assigned to this site."
+export_permission: 'You do not have permission to export.'
+msg_export_limit: "Export size too large. Please narrow your campaign or try a smaller selection."
 
 csv_import_title: "Import a CSV File"
 csv_import_instruction: "Make sure your file contains the required columns."
@@ -71,6 +74,8 @@ image:
 Log_in_to_your_account: 'Log in to your account'
 Enter_your_email_and_password_to_log_in: 'Enter your email & password to log in'
 You_are_logged_in_as: 'You are logged in as'
+You_are_already_logged_in_as: 'You are already logged in as : '
+Your_account_is_disabled: "Your account is disabled."
 Sign_out: 'Sign out'
 Email: 'Email'
 Please_enter_your_email: 'Please enter your email'
@@ -88,6 +93,11 @@ visible_label: 'Show'
 no_role: 'No role'
 please_log_in_to_access_the_page: 'Please log in to access the page'
 
+user:
+  msg:
+    deleted: "The user account has been successfully deleted."
+  error:
+    deletion_failed: "An error occurred while deleting the user account."
 
 agentsGroup:
   title: "Agent group management"
@@ -231,3 +241,19 @@ register:
 # Error messages for form validation
 form_error:
   general: "Please check the information and try again."
+
+userStatus:
+  title: "User Status Management"
+  breadcrumb_management: "Status Management"
+  label: 'Label'
+  delete_user_status: "Delete the status"
+  informations: "Status information"
+  return_to_user_status_consultation: "Back to user status overview"
+  msg:
+    created: "The status has been successfully created."
+    updated: "The status has been successfully updated."
+    deleted: "The status has been successfully deleted."
+  error:
+    creation_failed: "Failed to create the status."
+    modification_failed: "An error occurred while updating the status."
+    deletion_failed: "An error occurred while deleting the status."

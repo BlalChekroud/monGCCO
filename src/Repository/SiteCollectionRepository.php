@@ -108,35 +108,37 @@ class SiteCollectionRepository extends ServiceEntityRepository
     }
 
 
-    public function getExportDataByCampaign(CountingCampaign $campaign): array
-    {
-        $qb = $this->createQueryBuilder('siteCollection')
-            ->select(
-                'campaign.campaignName AS Campaign',
-                'siteCollection.siteName AS Site',
-                'city.name AS City',
-                'region.name AS Region',
-                'createdBy.email AS Agent',
-                'birdSpecies.scientificName AS Species',
-                'speciesCount.count AS Count',
-                'method.label AS Method',
-                'DATE_FORMAT(collectedData.createdAt, \'%d-%m-%Y %H:%i:%s\') AS Date' // Formatage de la date
-            )
-            ->join('siteCollection.siteAgentsGroups', 'site') // Relation entre SiteCollection et Site
-            ->join('site.countingCampaign', 'campaign') // Relation entre Site et CountingCampaign
-            ->join('siteCollection.city', 'city') // Relation entre SiteCollection et City
-            ->join('city.region', 'region') // Relation entre City et Region
-            ->join('siteCollection.collectedData', 'collectedData') // Relation entre SiteCollection et CollectedData
-            ->join('collectedData.createdBy', 'createdBy') // Relation entre CollectedData et CreatedBy
-            ->join('collectedData.birdSpeciesCounts', 'speciesCount') // Relation entre CollectedData et BirdSpeciesCounts
-            ->leftJoin('speciesCount.birdSpecies', 'birdSpecies') // Relation optionnelle pour BirdSpecies
-            ->leftJoin('collectedData.method', 'method') // Relation optionnelle pour Method
-            ->where('campaign = :campaign')
-            ->setParameter('campaign', $campaign)
-            ->orderBy('collectedData.createdAt', 'ASC');
+    // public function getExportDataByCampaign(CountingCampaign $campaign): array
+    // {
+    //     $qb = $this->createQueryBuilder('siteCollection')
+    //         ->select(
+    //             'campaign.campaignName AS Campaign',
+    //             'campaign.startDate AS startDate',
+    //             'campaign.endDate AS endDate',
+    //             'siteCollection.siteName AS Site',
+    //             'city.name AS City',
+    //             'region.name AS Region',
+    //             'createdBy.email AS Agent',
+    //             'birdSpecies.scientificName AS Species',
+    //             'speciesCount.count AS Count',
+    //             'method.label AS Method',
+    //             'collectedData.createdAt AS CreatedAt' // Récupère la date brute
+    //         )
+    //         ->join('siteCollection.siteAgentsGroups', 'site') // Relation entre SiteCollection et Site
+    //         ->join('site.countingCampaign', 'campaign') // Relation entre Site et CountingCampaign
+    //         ->join('siteCollection.city', 'city') // Relation entre SiteCollection et City
+    //         ->join('city.region', 'region') // Relation entre City et Region
+    //         ->join('siteCollection.collectedData', 'collectedData') // Relation entre SiteCollection et CollectedData
+    //         ->join('collectedData.createdBy', 'createdBy') // Relation entre CollectedData et CreatedBy
+    //         ->join('collectedData.birdSpeciesCounts', 'speciesCount') // Relation entre CollectedData et BirdSpeciesCounts
+    //         ->leftJoin('speciesCount.birdSpecies', 'birdSpecies') // Relation optionnelle pour BirdSpecies
+    //         ->leftJoin('collectedData.method', 'method') // Relation optionnelle pour Method
+    //         ->where('campaign = :campaign')
+    //         ->setParameter('campaign', $campaign)
+    //         ->orderBy('collectedData.createdAt', 'ASC');
     
-        return $qb->getQuery()->getArrayResult();
-    }
+    //     return $qb->getQuery()->getArrayResult();
+    // }
     
     
     //    /**

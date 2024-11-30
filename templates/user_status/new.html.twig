@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'userStatus.title'|trans }}{% endblock %}
+
+{% block body %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>{{ 'create_user_status'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_user_status_index') }}">{{ 'userStatus.breadcrumb_management'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'add'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'userStatus.informations'|trans }}</h5>
+
+              {{ include('user_status/_form.html.twig') }}
+
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_user_status_index') }}" class="btn btn-outline-secondary btn-sm" title="{{ 'userStatus.return_to_user_status_consultation'|trans }}"> {{ 'back'|trans }}</a>
+              <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{ 'cousult_countries'|trans }}</a>
+              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{ 'add_a_country'|trans }}</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}

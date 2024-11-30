@@ -13,8 +13,7 @@ class LogoType extends AbstractType
     {
         $builder
             ->add('image', ImageType::class, [
-                'label' => 'Inserer une image<span class="requiredField">*</span>',
-                'label_html' => true,
+                'label' => false,
             ])
         ;
     }

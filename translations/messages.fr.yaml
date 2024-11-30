@@ -4,6 +4,7 @@ card_title: "Listes"
 create_group: "Créer un groupe"
 create_a_family: "Créer une famille"
 create_a_species: 'Créer une espèce'
+create_user_status: "Créer un statut d'utilisateur"
 add_a_country: 'Ajouter un pays'
 choose_bird_family: "-- Choisir une Famille d'Oiseaux --"
 consult_reserves: "Consultation des réserves"
@@ -35,6 +36,8 @@ invalid_form: "Formulaire non valide"
 delete_permission: "Vous n'avez pas l'autorisation de supprimer."
 edit_permission: "Vous n'avez pas l'autorisation de modifier."
 member_of_a_group_assigned_to_this_site: "Vous n'êtes pas membre d'un groupe assigné à ce site"
+export_permission: "Vous n'avez pas l'autorisation d'exporter."
+msg_export_limit: "La taille de l'exportation est trop grande. Veuillez restreindre votre campagne ou essayer une sélection plus petite."
 
 csv_import_title: "Importer un fichier CSV"
 csv_import_instruction: "Assurez-vous que votre fichier contient les colonnes nécessaires."
@@ -71,6 +74,8 @@ image:
 Log_in_to_your_account: 'Connexion à votre compte'
 Enter_your_email_and_password_to_log_in: 'Entrez votre e-mail & mot de passe pour vous connecter'
 You_are_logged_in_as: 'Vous êtes connecté en tant que'
+You_are_already_logged_in_as: 'Vous êtes déjà connecté en tant que : '
+Your_account_is_disabled: "Votre compte est désactivé."
 Sign_out: 'Déconnexion'
 Email: 'E-mail'
 Please_enter_your_email: 'Veuillez entrer votre E-mail'
@@ -88,6 +93,11 @@ visible_label: 'Afficher'
 no_role: "Aucun rôle"
 please_log_in_to_access_the_page: "Veuillez vous connecter pour accéder à la page"
 
+user:
+  msg:
+    deleted: "Le compte utilisateur a bien été supprimé."
+  error:
+    deletion_failed: "Une erreur s'est produite lors de la suppression du compte utilisateur."
 
 agentsGroup:
   title: "Gestion des groupes d'agents"
@@ -231,3 +241,19 @@ register:
 # Messages pour les erreurs de formulaire
 form_error:
   general: "Veuillez vérifier les informations et réessayer."
+
+userStatus:
+  title: "Gestion des statuts d'utilisateur"
+  breadcrumb_management: "Gestion des statuts"
+  label: 'Libellé'
+  delete_user_status: "Supprimer le statut"
+  informations: "Les informations du statut"
+  return_to_user_status_consultation: "Retour vers la consultation des statuts d'utilisateur"
+  msg:
+    created: "Le statut a bien été créé."
+    updated: "Le statut a bien été modifié."
+    deleted: "Le statut a bien été supprimé."
+  error:
+    creation_failed: "Échec de la création du statut"
+    modification_failed: "Une erreur s'est produite lors de la modification du statut."
+    deletion_failed: "Une erreur s'est produite lors de la suppression du statut."

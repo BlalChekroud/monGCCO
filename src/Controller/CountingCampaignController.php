@@ -5,6 +5,7 @@ namespace App\Controller;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use League\Csv\Writer;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Entity\EnvironmentalConditions;
 use App\Repository\AgentsGroupRepository;
 use App\Repository\BirdSpeciesCountRepository;
@@ -23,6 +24,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/user/counting/campaign')]
 class CountingCampaignController extends AbstractController
@@ -300,39 +302,96 @@ class CountingCampaignController extends AbstractController
         ]);
     }
 
-    // #[Route('/{id}/export', name: 'app_counting_campaign_export', methods: ['GET'])]
-    // public function exportCsv(
-    //     CountingCampaign $campaign,
-    //     SiteCollectionRepository $siteCollectionRepository,
-    //     ): Response
-    // {
 
-    //     $siteCollectionsByCampaign = $siteCollectionRepository->getSiteCollectionsByCampaign($campaign);
+    #[Route('/{id}/export', name: 'app_counting_campaign_export', methods: ['GET'])]
+    public function exportCsv(
+        CountingCampaign $campaign,
+       CountingCampaignRepository $countingCampaignRepository,
+        TranslatorInterface $translator
+    ): Response {
+        // Vérification des autorisations
+        if (!$this->isGranted('ROLE_EXPORT')) {
+            $this->addFlash('warning', $translator->trans('export_permission'));
+            return $this->redirectToRoute('app_counting_campaign_show', ['id' => $campaign->getId()]);
+        }
 
-    //     $data = [];
-    //     foreach ($siteCollectionsByCampaign as $site) {
-    //         foreach ($site->getCollectedData() as $collect) {
-    //             foreach ($collect->getBirdSpeciesCounts() as $speciesCount) {
-    //                 $data[] = [
-    //                     'Campaign' => $campaign->getCampaignName(),
-    //                     'Site' => $site->getSiteName(),
-    //                     'City' => $site->getCity()->getName(),
-    //                     'Region' => $site->getCity()->getRegion()->getName(),
-    //                     'Agent' => $collect->getCreatedBy()->getEmail(),
-    //                     'Species' => $speciesCount->getBirdSpecies()?->getScientificName() ?? 'Unknown', // Récupère le nom de l'espèce
-    //                     'Count' => $speciesCount->getCount(),
-    //                     'Method' => implode(',', $collect->getMethod()->map(fn($m) => $m->getLabel())->toArray()),
-    //                     'Date' => $collect->getCreatedAt()->format('d-m-Y H:i:s'),
-    //                 ];
-    //             }
-    //         }
-    //     }
+        // Récupérer les données à exporter
+        $data = $countingCampaignRepository->getExportDataByCampaign($campaign);
         
-    //     // Vérification si des données existent
+        // Limite le nombre de données à exporter (par exemple, pas plus de 1000 sites)
+        // $maxExportSize = 1000;
+        // if (count($data) > $maxExportSize) {
+        //     $this->addFlash('warning', $translator->trans('msg_export_limit'));
+        //     return $this->redirectToRoute('app_counting_campaign_show', ['id' => $campaign->getId()]);
+        // }
+    
+        // Créer la réponse avec un flux
+        $response = new StreamedResponse(function () use ($data) {
+            // Ouvrir le flux pour écrire dans le fichier CSV
+            $handle = fopen('php://output', 'w');
+    
+            if (!empty($data)) {
+                // Ajouter les en-têtes
+                fputcsv($handle, array_keys($data[0]), ';');
+    
+                // Ajouter les lignes de données
+                foreach ($data as $row) {
+                    // Appliquer le format aux dates et encoder les caractères
+                    $row['CreatedAt'] = $row['CreatedAt']->format('d-m-Y H:i:s');
+                    $row['startDate'] = $row['startDate']->format('d-m-Y H:i:s');
+                    $row['endDate'] = $row['endDate']->format('d-m-Y H:i:s');
+                    $row['Site'] = mb_convert_encoding($row['Site'], 'UTF-8', 'auto');
+                    $row['City'] = mb_convert_encoding($row['City'], 'UTF-8', 'auto');
+                    $row['Region'] = mb_convert_encoding($row['Region'], 'UTF-8', 'auto');
+                    $row['AgentName'] = mb_convert_encoding($row['AgentName'], 'UTF-8', 'auto');
+                    $row['AgentLastName'] = mb_convert_encoding($row['AgentLastName'], 'UTF-8', 'auto');
+                    $row['Species'] = mb_convert_encoding($row['Species'], 'UTF-8', 'auto');
+                    $row['Method'] = mb_convert_encoding($row['Method'], 'UTF-8', 'auto');
+    
+                    fputcsv($handle, $row, ';');
+                }
+            } else {
+                // Ajouter une ligne vide si aucune donnée
+                fputcsv($handle, ['No data available'], ';');
+            }
+    
+            fclose($handle); // Fermer le fichier après l'export
+        });
+    
+        // Définir les headers pour forcer le téléchargement du fichier CSV
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="campaign_export.csv"');
+    
+        return $response;
+    }
+    
+    
+    
+    // #[Route('/export', name: 'app_counting_campaign_export_all', methods: ['GET'])]
+    // public function exportCsvForAllCampaigns(
+    //     CountingCampaignRepository $countingCampaignRepository
+    // ): Response {
+    //     $data = $countingCampaignRepository->getExportDataForAllCampaigns();
+    
+    //     foreach ($data as &$row) {
+    //         // Appliquer le format aux dates
+    //         $row['CreatedAt'] = $row['CreatedAt']->format('d-m-Y H:i:s');
+    //         $row['startDate'] = $row['startDate']->format('d-m-Y H:i:s');
+    //         $row['endDate'] = $row['endDate']->format('d-m-Y H:i:s');
+    
+    //         // Convertir les champs en UTF-8
+    //         $row['Site'] = mb_convert_encoding($row['Site'], 'UTF-8', 'auto');
+    //         $row['City'] = mb_convert_encoding($row['City'], 'UTF-8', 'auto');
+    //         $row['Region'] = mb_convert_encoding($row['Region'], 'UTF-8', 'auto');
+    //         $row['Agent'] = mb_convert_encoding($row['Agent'], 'UTF-8', 'auto');
+    //         $row['Species'] = mb_convert_encoding($row['Species'], 'UTF-8', 'auto');
+    //         $row['Method'] = mb_convert_encoding($row['Method'], 'UTF-8', 'auto');
+    //     }
+    
     //     if (empty($data)) {
     //         $data[] = [
-    //             'Campaign' => $campaign->getCampaignName(),
-    //             'Site' => 'No data available',
+    //             'Campaign' => 'No data available',
+    //             'Site' => 'N/A',
     //             'City' => 'N/A',
     //             'Region' => 'N/A',
     //             'Agent' => 'N/A',
@@ -342,53 +401,17 @@ class CountingCampaignController extends AbstractController
     //             'Date' => 'N/A',
     //         ];
     //     }
-
-    //     // Création du fichier CSV
+    
     //     $csv = Writer::createFromString('');
-    //     $csv->insertOne(array_keys($data[0])); // Ajout des en-têtes
-    //     $csv->insertAll($data); // Ajout des données
-
-    //     // Retourne la réponse HTTP avec le fichier à télécharger
+    //     $csv->setDelimiter(';');
+    //     $csv->insertOne(array_keys($data[0])); // Ajouter les en-têtes
+    //     $csv->insertAll($data); // Ajouter les lignes de données
+    
     //     return new Response($csv->toString(), 200, [
-    //         'Content-Type' => 'text/csv',
-    //         'Content-Disposition' => 'attachment; filename="campaign_export.csv"',
+    //         'Content-Type' => 'text/csv; charset=UTF-8',
+    //         'Content-Disposition' => 'attachment; filename="campaigns_export.csv"',
     //     ]);
     // }
-
-    #[Route('/{id}/export', name: 'app_counting_campaign_export', methods: ['GET'])]
-    public function exportCsv(
-        CountingCampaign $campaign,
-        SiteCollectionRepository $siteCollectionRepository
-    ): Response {
-        // Récupérer les données via la méthode du repository
-        $data = $siteCollectionRepository->getExportDataByCampaign($campaign);
-    
-        // Vérifier si des données existent
-        if (empty($data)) {
-            $data[] = [
-                'Campaign' => $campaign->getCampaignName(),
-                'Site' => 'No data available',
-                'City' => 'N/A',
-                'Region' => 'N/A',
-                'Agent' => 'N/A',
-                'Species' => 'N/A',
-                'Count' => 'N/A',
-                'Method' => 'N/A',
-                'Date' => 'N/A',
-            ];
-        }
-    
-        // Utilisation de League\Csv pour créer le fichier CSV
-        $csv = Writer::createFromString('');
-        $csv->insertOne(array_keys($data[0])); // Ajouter les en-têtes
-        $csv->insertAll($data); // Ajouter les lignes de données
-    
-        // Retourner la réponse HTTP avec le fichier CSV
-        return new Response($csv->toString(), 200, [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="campaign_export.csv"',
-        ]);
-    }
     
 
     // #[Route('/{id}/export', name: 'app_counting_campaign_export', methods: ['GET'])]
@@ -741,13 +764,10 @@ class CountingCampaignController extends AbstractController
         // Si le statut n'est pas "Clôturée" (4ème position)
         if (!$currentStatus || $currentStatus !== $campaignStatuses[3]) {
             if ($startDate > $now) {
-                // Campagne à venir -> Statut "Planifiée" (1ère position)
                 $newStatus = $campaignStatuses[0]; // "Planifiée"
             } elseif ($startDate <= $now && $endDate >= $now) {
-                // Campagne en cours -> Statut "En cours" (2ème position)
                 $newStatus = $campaignStatuses[1]; // "En cours"
             } elseif ($endDate < $now) {
-                // Campagne terminée -> Statut "Terminée" (3ème position)
                 $newStatus = $campaignStatuses[2]; // "Terminée"
             } else {
                 // Statut d'erreur (5ème position)

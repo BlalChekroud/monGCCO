@@ -71,14 +71,6 @@ class LogoController extends AbstractController
     }
 
 
-    #[Route('/{id}', name: 'app_logo_show', methods: ['GET'])]
-    public function show(Logo $logo): Response
-    {
-        return $this->render('logo/show.html.twig', [
-            'logo' => $logo,
-        ]);
-    }
-
     #[Route('/{id}/edit', name: 'app_logo_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Logo $logo, EntityManagerInterface $entityManager): Response
     {

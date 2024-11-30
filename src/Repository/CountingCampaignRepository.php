@@ -171,6 +171,81 @@ class CountingCampaignRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function getExportDataByCampaign(CountingCampaign $campaign): array
+    {
+        $qb = $this->createQueryBuilder('campaign')
+            ->select(
+                'DISTINCT campaign.campaignName AS Campaign', // Utilisez DISTINCT pour éviter les doublons
+                'campaign.startDate AS startDate',
+                'campaign.endDate AS endDate',
+                'siteCollection.siteName AS Site',
+                'city.name AS City',
+                'region.name AS Region',
+                'createdBy.name AS AgentName',
+                'createdBy.lastName AS AgentLastName',
+                'birdSpecies.scientificName AS Species',
+                'speciesCount.count AS Count',
+                'method.label AS Method',
+                'collectedData.createdAt AS CreatedAt' // Récupère la date brute
+            )
+            // Joins pour lier les entités avec CountingCampaign
+            ->join('campaign.siteAgentsGroups', 'sag') // CountingCampaign -> SiteAgentsGroups
+            ->join('sag.siteCollection', 'siteCollection') // SiteAgentsGroup -> SiteCollection
+            ->leftJoin('siteCollection.city', 'city') // SiteCollection -> City
+            ->leftJoin('city.region', 'region') // City -> Region
+    
+            // Joins pour lier les données collectées et les espèces d'oiseaux
+            ->join('siteCollection.collectedData', 'collectedData') // SiteCollection -> CollectedData
+            ->leftJoin('collectedData.createdBy', 'createdBy') // CollectedData -> CreatedBy
+            ->leftJoin('collectedData.birdSpeciesCounts', 'speciesCount') // CollectedData -> BirdSpeciesCounts
+            ->leftJoin('speciesCount.birdSpecies', 'birdSpecies') // BirdSpeciesCounts -> BirdSpecies
+            ->leftJoin('collectedData.method', 'method') // CollectedData -> Method
+    
+            // Joins pour lier les conditions environnementales liées à la campagne
+            ->join('siteCollection.environmentalConditions', 'environmentalCondition') // SiteCollection -> EnvironmentalConditions
+            ->join('environmentalCondition.countingCampaign', 'ecCampaign') // EnvironmentalCondition -> CountingCampaign
+    
+            // Filtrer les données spécifiques à la campagne
+            ->where('campaign = :campaign') // Ne récupère que les données pour la campagne spécifique
+            ->andWhere('ecCampaign = :campaign') // Assurez-vous que la condition environnementale est associée à cette campagne
+            ->setParameter('campaign', $campaign)
+    
+            // Trier les résultats par date de création des données collectées
+            ->orderBy('collectedData.createdAt', 'ASC');
+    
+        return $qb->getQuery()->getArrayResult();
+    }
+    
+    // public function getExportDataForAllCampaigns(): array
+    // {
+    //     $qb = $this->createQueryBuilder('campaign')
+    //         ->select(
+    //             'campaign.campaignName AS Campaign',
+    //             'campaign.startDate AS startDate',
+    //             'campaign.endDate AS endDate',
+    //             'siteCollection.siteName AS Site',
+    //             'city.name AS City',
+    //             'region.name AS Region',
+    //             'createdBy.email AS Agent',
+    //             'birdSpecies.scientificName AS Species',
+    //             'speciesCount.count AS Count',
+    //             'method.label AS Method',
+    //             'collectedData.createdAt AS CreatedAt' // Récupère la date brute
+    //         )
+    //         ->join('campaign.siteCollections', 'siteCollection') // Relation entre CountingCampaign et SiteCollection
+    //         ->join('siteCollection.city', 'city') // Relation entre SiteCollection et City
+    //         ->join('city.region', 'region') // Relation entre City et Region
+    //         ->join('siteCollection.collectedData', 'collectedData') // Relation entre SiteCollection et CollectedData
+    //         ->join('collectedData.createdBy', 'createdBy') // Relation entre CollectedData et CreatedBy
+    //         ->join('collectedData.birdSpeciesCounts', 'speciesCount') // Relation entre CollectedData et BirdSpeciesCounts
+    //         ->leftJoin('speciesCount.birdSpecies', 'birdSpecies') // Relation optionnelle pour BirdSpecies
+    //         ->leftJoin('collectedData.method', 'method') // Relation optionnelle pour Method
+    //         ->orderBy('collectedData.createdAt', 'ASC');
+
+    //     return $qb->getQuery()->getArrayResult();
+    // }
+
+    
 
     // public function getCollectedDataForCampaign(CountingCampaign $campaign)
     // {

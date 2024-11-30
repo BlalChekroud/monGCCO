@@ -1,6 +1,4 @@
-<!-- Body du modal -->
-{# <div class="modal-body"> #}
-    {# <div id="printableArea" class="explanation"> #}
+<div id="printableArea">
     <!-- Détails de la campagne -->
     <table class="table table-hover table-striped">
         <tr><td><strong>Nom :</strong></td><td>{{ counting_campaign.campaignName }}</td></tr>
@@ -30,14 +28,12 @@
             <tr>
                 <td><i class="bi bi-person-fill text-success"></i> Nombre total d'agents participants</td>
                 <td>
-                    {# <span class="badge bg-success">{{ counting_campaign.getTotalAgents() }}</span> #}
                     <span class="badge bg-success">{{ totalAgentsCount ?? 0 }}</span>
                 </td>
             </tr>
             <tr>
                 <td><i class="bi bi-file-earmark-bar-graph-fill text-primary"></i> Nombre total de collectes</td>
                 <td>
-                    {# <span class="badge bg-primary">{{ counting_campaign.getTotalCollects() }}</span> #}
                     <span class="badge bg-primary">{{ totalCollectedDataCount ?? 0 }}</span>
                 </td>
             </tr>
@@ -70,7 +66,6 @@
     <h6 class="mt-4"><i class="bi bi-geo-alt-fill"></i> Sites et collectes :</h6>
     {% if counting_campaign.siteAgentsGroups|length > 0 %}
         <ol>
-        {# {% set totalCountsPerSite = counting_campaign.getTotalCountsPerSite() %} #}
         {% for siteAgentsGroup in counting_campaign.siteAgentsGroups %}
             {% set site = siteAgentsGroup.siteCollection %}
             <div class="site-section mb-4">
@@ -107,8 +102,6 @@
                                     <p class="text-muted">Aucun groupe trouvé pour ce site.</p>
                                 {% endif %}
                             </td>
-                            {# // A CORRIGER #}
-                            {# <td class="d-flex justify-content-center"><span class="badge bg-info"><h5>{{ totalCountsPerSite[site.id] ?? 0 }}</h5></span></td> #}
                             <td class="d-flex justify-content-center"><span class="badge bg-info"><h5>{{ totalBirdCountsForSiteInCampaign[site.id] ?? 0 }}</h5></span></td>
                         </tr>
                     </tbody>
@@ -222,8 +215,8 @@
             <p class="fw-bold fs-4">{{ totalcountUniqueBirdSpeciesInCampaign ?? 0 }}</p>
         </div>
     </div>
+</div>
     <button onclick="window.print()" class="btn btn-sm btn-outline-secondary bi bi-printer" title="Imprimer"></button>
-    <button id="exportCSVButton" class="btn btn-sm btn-outline-secondary bi bi-folder" title="Exporter en CSV"></button>
-    {# </div> #}
-{# </div> #}
+    {# <a href="{{ path('app_counting_campaign_export', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-outline-secondary bi bi-folder me-3" title="Exporter en CSV"></a> #}
+
 

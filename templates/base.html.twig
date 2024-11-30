@@ -122,21 +122,21 @@
                 {% endfor %}
             {% endfor %}
           </script>
-{# {% set notifications = app.flashes() %}
-<script>
-    {% for type, messages in notifications %}
-        {% for message in messages %}
-            Swal.fire({
-                position: "top-end",
-                icon: "{{ type == 'success' ? 'success' : (type == 'warning' ? 'warning' : (type == 'danger' ? 'error' : type)) }}",
-                title: "{{ type == 'success' ? message : (type == 'warning' ? 'Attention' : (type == 'danger' ? 'Danger' : 'Info')) }}",
-                text: "{{ message }}",
-                showConfirmButton: false,
-                timer: 3000
-            });
-        {% endfor %}
-    {% endfor %}
-</script> #}
+          {# {% set notifications = app.flashes() %}
+          <script>
+              {% for type, messages in notifications %}
+                  {% for message in messages %}
+                      Swal.fire({
+                          position: "top-end",
+                          icon: "{{ type == 'success' ? 'success' : (type == 'warning' ? 'warning' : (type == 'danger' ? 'error' : type)) }}",
+                          title: "{{ type == 'success' ? message : (type == 'warning' ? 'Attention' : (type == 'danger' ? 'Danger' : 'Info')) }}",
+                          text: "{{ message }}",
+                          showConfirmButton: false,
+                          timer: 3000
+                      });
+                  {% endfor %}
+              {% endfor %}
+          </script> #}
 
           {# <script>
             document.addEventListener('DOMContentLoaded', (event) => {
@@ -242,7 +242,6 @@
               </ul><!-- End Notification Dropdown Items -->
           </li><!-- End Notification Nav -->
 
-
           {# <li class="nav-item dropdown">
 
             <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
@@ -309,55 +308,53 @@
 
           </li><!-- End Messages Nav --> #}
 
-<li class="nav-item dropdown">
-    <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-        <i class="bi bi-chat-left-text"></i>
-        <span class="badge bg-success badge-number">{% if unreadNotifications %}{{ unreadNotifications }}{% endif %}</span>
-    </a><!-- End Messages Icon -->
+          <li class="nav-item dropdown">
+              <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                  <i class="bi bi-chat-left-text"></i>
+                  <span class="badge bg-success badge-number">{% if unreadNotifications %}{{ unreadNotifications }}{% endif %}</span>
+              </a><!-- End Messages Icon -->
 
-    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
-        <li class="dropdown-header">
-            {{ 'notification.you_have'|trans }} {{ unreadNotifications }} {{ 'notification.new_message'|trans }}
-            <a href="{{ path('all_notifications') }}"><span class="badge rounded-pill bg-primary p-2 ms-2">{{ 'notification.view_all'|trans }}</span></a>
-        </li>
-        <li><hr class="dropdown-divider"></li>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
+                  <li class="dropdown-header">
+                      {{ 'notification.you_have'|trans }} {{ unreadNotifications }} {{ 'notification.new_message'|trans }}
+                      <a href="{{ path('all_notifications') }}"><span class="badge rounded-pill bg-primary p-2 ms-2">{{ 'notification.view_all'|trans }}</span></a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
 
-        <li class="message-item">
-            <a href="#">
-                <div>
-                    <ul class="notifications-list">
-                        {% if app.user.notifications|length > 0 %}
-                            {% for notification in app.user.notifications|reverse %}
-                                <li class="notification-item">
-                                    <div class="notification-content">
-                                        <p class="notification-message {% if not notification.seen %} font-weight-bold {% endif %}">
-                                            {{ notification.message }}
-                                        </p>
-                                        <p class="notification-time">
-                                            {{ notification.createdAt ? notification.createdAt|date('d-m-Y H:i:s') : '' }} {{ notification.seen }}
-                                        </p>
-                                    </div>
-                                </li>
-                            {% else %}
-                                <li class="no-notifications">{{ 'no_record_found'|trans }}</li>
-                            {% endfor %}
-                        {% else %}
-                            <li class="no-notifications">{{ 'no_record_found'|trans }}</li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </a>
-        </li>
-        <li><hr class="dropdown-divider"></li>
+                  <li class="message-item">
+                      <a href="#">
+                          <div>
+                              <ul class="notifications-list">
+                                  {% if app.user.notifications|length > 0 %}
+                                      {% for notification in app.user.notifications|reverse %}
+                                          <li class="notification-item">
+                                              <div class="notification-content">
+                                                  <p class="notification-message {% if not notification.seen %} font-weight-bold {% endif %}">
+                                                      {{ notification.message }}
+                                                  </p>
+                                                  <p class="notification-time">
+                                                      {{ notification.createdAt ? notification.createdAt|date('d-m-Y H:i:s') : '' }} {{ notification.seen }}
+                                                  </p>
+                                              </div>
+                                          </li>
+                                      {% else %}
+                                          <li class="no-notifications">{{ 'no_record_found'|trans }}</li>
+                                      {% endfor %}
+                                  {% else %}
+                                      <li class="no-notifications">{{ 'no_record_found'|trans }}</li>
+                                  {% endif %}
+                              </ul>
+                          </div>
+                      </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
 
-        <li class="dropdown-footer">
-            <a href="{{ path('all_notifications') }}">{{ 'notification.show_all_notifications'|trans }}</a>
-        </li>
+                  <li class="dropdown-footer">
+                      <a href="{{ path('all_notifications') }}">{{ 'notification.show_all_notifications'|trans }}</a>
+                  </li>
 
-    </ul><!-- End Messages Dropdown Items -->
-</li><!-- End Messages Nav -->
-
-
+              </ul><!-- End Messages Dropdown Items -->
+          </li><!-- End Messages Nav -->
 
           <!-- Mode Nav -->
           {# <li class="nav-item dropdown">
@@ -371,8 +368,7 @@
           <li class="nav-item dropdown">
 
             <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-              <i class="bi bi-translate"></i>
-              <span class="badge bg-light badge-number">{{ currentLocale }}</span>
+              <span class="badge bg-light">{{ currentLocale }}</span>
             </a><!-- End Messages Icon -->
 
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
@@ -726,7 +722,12 @@
             </li>
             <li>
               <a href="{{ path('app_campaign_status_index') }}">
-                <i class="bi bi-circle"></i><span>Statuts des campagnes</span>
+                <i class="bi bi-circle"></i><span>Statuts de la campagne</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_user_status_index') }}">
+                <i class="bi bi-circle"></i><span>Statuts d'utilisateur</span>
               </a>
             </li>
           </ul>

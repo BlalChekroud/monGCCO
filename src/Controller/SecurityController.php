@@ -6,9 +6,12 @@ use App\Entity\Image;
 use App\Form\ImageType;
 // use App\Repository\ImageRepository;
 // use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 // use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Monolog\DateTimeImmutable;
 use DateTime;
@@ -28,13 +31,29 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class SecurityController extends AbstractController
 {
     #[Route(path: '/login', name: 'app_login')]
-    public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
+    public function login(Request $request, AuthenticationUtils $authenticationUtils, Security $security, TranslatorInterface $translator): Response
     {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
-
+        
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
+        
+        // Vérifier si l'utilisateur est déjà authentifié
+        if ($security->getUser()) {
+            $user = $security->getUser();
+
+            // Vérifier si le statut de l'utilisateur est "Inactif"
+            if ($user->getUserStatus()->getLabel() !== 'Actif') {
+                // Ajouter un message flash et rediriger vers la déconnexion
+                $this->addFlash('warning', $translator->trans('Your_account_is_disabled'));
+                return $this->redirectToRoute('app_logout');
+            } else {
+                // Si l'utilisateur est actif, afficher un message d'information
+                $this->addFlash('info', $translator->trans('You_are_already_logged_in_as') . ' ' . $lastUsername);
+                return $this->redirectToRoute('home');
+            }
+        }
 
         // Enregistrer la locale dans la session (facultatif)
         $_locale = $request->getSession()->get('_locale', 'fr'); // valeur par défaut
@@ -60,10 +79,12 @@ class SecurityController extends AbstractController
     #[Route(path: '/user/logout', name: 'app_logout')]
     public function logout(): void
     {
-        throw new \LogicException('Ce champ de méthode peut être vide - il sera intercepté par la clé de déconnexion de votre pare-feu.');
+        // throw new \LogicException('Ce champ de méthode peut être vide - il sera intercepté par la clé de déconnexion de votre pare-feu.');
+        throw new \LogicException('Vous étes déconnecté.');
+        // $this->addFlash('warning','Vous étes déconnecté.');
     }
 
-    #[Route('/profile', name: 'app_profile', methods: ['GET'])]
+    #[Route('/admin/profile', name: 'app_profile', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
         return $this->render('security/profile.html.twig', [
@@ -81,6 +102,12 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
     
+        // Vérifier si l'utilisateur est actif avant de permettre l'édition
+        if ($this->getUser()->getUserStatus()->getLabel() !== 'Actif') {
+            // throw new CustomUserMessageAuthenticationException('Votre compte est désactivé.');
+            $this->addFlash('warning','Votre compte est désactivé.');
+            return $this->redirectToRoute('app_logout');
+        }
         // Autoriser l'utilisateur à modifier son propre profil ou si c'est un administrateur
         if ($this->getUser() !== $user && !$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('info', "Vous n'avez pas le droit de modifier ce compte.");
@@ -124,7 +151,7 @@ class SecurityController extends AbstractController
                     $user->setUpdatedAt(new \DateTimeImmutable());
                     
                     $entityManager->flush();
-                    $this->addFlash('success', 'Les informations de votre compte ont été bien modifiées');
+                    $this->addFlash('success', 'Les informations du compte ont été bien modifiées');
                     return $this->redirectToRoute('app_profile_edit', ['id' => $user->getId()], Response::HTTP_SEE_OTHER);
                 } else {
                     $this->addFlash('warning', 'Le mot de passe renseigné est incorrect.');
@@ -157,6 +184,23 @@ class SecurityController extends AbstractController
             'form' => $form->createView(),
             'formPassword' => $formPassword->createView(),
         ]);
+    }
+
+
+    #[IsGranted('ROLE_SUPER_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
+    #[Route('/admin/profile/{id}', name: 'app_user_delete', methods: ['POST'])]
+    public function delete(Request $request, User $user, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->get('_token'))) {
+
+            $entityManager->remove($user);
+            $entityManager->flush();
+            $this->addFlash('success', $translator->trans('user.msg.deleted'));
+        } else {
+            $this->addFlash('error', $translator->trans('user.error.deletion_failed'));
+        }
+
+        return $this->redirectToRoute('app_profile', [], Response::HTTP_SEE_OTHER);
     }
 
 

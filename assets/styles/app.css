@@ -331,6 +331,13 @@ h6.explanation {
 
 /* Page Detail*/
 @media print {
+  .hidden-print,
+  .hidden-print * {
+    display: none !important;
+  }
+}
+
+@media print {
   body {
     font-family: "Arial", sans-serif;
     color: #333;

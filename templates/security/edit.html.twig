@@ -79,6 +79,10 @@
                       <div class="col-lg-9 col-md-8">{{ user.getLastName() }}</div>
                     </div>
                     <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Etat du compte</div>
+                      <div class="col-lg-9 col-md-8">{{ user.userStatus.label ?? '' }}</div>
+                    </div>
+                    <div class="row">
                       <div class="col-lg-3 col-md-4 label">Rôle</div>
                       <div class="col-lg-9 col-md-8">{{ user.getRoles()|join(', ') }}</div>
                     </div>
@@ -119,6 +123,12 @@
                       </div>
                     </div>
                     {% if is_granted('ROLE_ADMIN') %}
+                    <div class="row mb-3">
+                      <label for="userStatus" class="col-md-4 col-lg-3 col-form-label">Etat du compte</label>
+                      <div class="col-md-8 col-lg-9">
+                        {{ form_widget(form.userStatus, {'attr': {'class': 'form-control'}}) }}
+                      </div>
+                    </div>
                     <div class="row mb-3">
                       <label for="roles" class="col-md-4 col-lg-3 col-form-label">Rôles</label>
                       <div class="col-md-8 col-lg-9">

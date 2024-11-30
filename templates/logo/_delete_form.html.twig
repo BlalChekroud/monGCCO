@@ -1,10 +1,11 @@
 {# <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> #}
-{% if is_granted('ROLE_DELETE') %}
+{% if is_granted('ROLE_SUPER_ADMIN') %}
 <form id="delete-form" method="post" action="{{ path('app_logo_delete', {'id': logo.id}) }}">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ logo.id) }}">
     <button type="button" onclick="confirmDelete()" class="btn btn-danger btn-sm bi bi-trash mx-2" title="Supprimer le logo"></button>
 </form>
-{% endif %}<script>
+{% endif %}
+<script>
     function confirmDelete() {
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {

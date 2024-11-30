@@ -73,7 +73,7 @@
                                     <div class="pt-4 pb-2">
                                         <h5 class="card-title text-center pb-0 fs-4">{{ 'register.form.title'|trans }}</h5>
                                         <p class="text-center small">{{ 'register.form.subtitle'|trans }}</p>
-                                        <p class="d-flex justify-content-end my-4"><span class="requiredField">*</span><span class="small"><i>{{ 'register.form.required_note'|trans }}</i></span></p>
+                                        <p class="d-flex justify-content-end my-4"><span class="requiredField">*</span><span class="small"><i>{{ 'register.form.required_field_note'|trans }}</i></span></p>
                                     </div>
 
                                     {% if form_errors(registrationForm) %}
@@ -102,7 +102,7 @@
                                     </div>
 
                                     <div class="col-12">
-                                        <label for="yourUsername" class="form-label">{{ 'Email'|trans}}<span class="requiredField">*</span></label>
+                                        <label for="yourEmail" class="form-label">{{ 'Email'|trans}}<span class="requiredField">*</span></label>
                                         <div class="input-group has-validation mb-3">
                                             <span class="input-group-text" id="inputGroupPrepend">@</span>
                                             {{ form_widget(registrationForm.email) }}
@@ -125,7 +125,12 @@
                                     <div class="col-12">
                                         <div class="form-check">
                                             {# {{ form_label(registrationForm.agreeTerms, 'register.form.agree_terms'|trans) }}<span class="requiredField">*</span> #}
-                                            {{ form_row(registrationForm.agreeTerms) }}
+                                            <div class="d-flex justify-content-start">
+                                                {{ form_row(registrationForm.agreeTerms) }}
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable">
+                                                    <label for="agreeTerms" class="form-label">{{ 'register.form.agree_terms'|trans}}<span class="requiredField">*</span></label>
+                                                </a>
+                                            </div>
                                             <div class="invalid-feedback">{{ 'register.form.agree_terms_error'|trans }}</div>
                                         </div>
                                     </div>
@@ -145,6 +150,27 @@
                                     <a href="{{ path('change_locale_register', { '_locale': 'fr' }) }}" class="mx-2">Français</a>
                                 </div>
                             </div>
+
+                            <!-- Modal Dialog Scrollable -->
+                            <div class="modal fade" id="modalDialogScrollable" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title">Conditions Générales d'Utilisation (CGU) de l'Application GCCOM</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                    Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+                                    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                                    This content should appear at the bottom after you scroll.
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    {# <button type="button" class="btn btn-primary">Save changes</button> #}
+                                    </div>
+                                </div>
+                                </div>
+                            </div><!-- End Modal Dialog Scrollable-->
 
                         </div>
                     </div>

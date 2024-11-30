@@ -162,18 +162,19 @@ class BirdSpeciesController extends AbstractController
                 // Créez et persistez une nouvelle espèce d'oiseaux
                 $birdSpecy = new BirdSpecies();
                 $birdSpecy->setScientificName($scientificName);
-                $birdSpecy->setFrenchName($data['French name'] ?? null);
-                $birdSpecy->setEnglishName($data['English name'] ?? null);
-                $birdSpecy->setWispeciescode($data['Wispeciescode'] ?? null);
-                $birdSpecy->setAuthority($data['Authority'] ?? null);
+                $birdSpecy->setFrenchName($data['French name'] ?? '');
+                $birdSpecy->setEnglishName($data['English name'] ?? '');
+                $birdSpecy->setWispeciescode($data['Wispeciescode'] ?? '');
+                $birdSpecy->setAuthority($data['Authority'] ?? '');
                 $birdSpecy->setCreatedAt(new \DateTimeImmutable());
-                $birdSpecy->setCommonName($data['Common name'] ?? null);
-                $birdSpecy->setCommonNameAlt($data['Alternative common names'] ?? null);
-                $birdSpecy->setSynonyms($data['Synonyms'] ?? null);
-                $birdSpecy->setTaxonomicSources($data['Taxonomic source'] ?? null);
-                $birdSpecy->setSisRecId($data['SISRecID'] ?? null);
-                $birdSpecy->setSpcRecId($data['SpcRecID'] ?? null);
-                $birdSpecy->setSubsppId($data['SubsppID'] ?? null);
+                $birdSpecy->setCommonName($data['Common name'] ?? '');
+                $birdSpecy->setCommonNameAlt($data['Alternative common names'] ?? '');
+                $birdSpecy->setSynonyms($data['Synonyms'] ?? '');
+                $birdSpecy->setTaxonomicSources($data['Taxonomic source'] ?? '');
+                $birdSpecy->setSisRecId($data['SISRecID'] ?? 0);
+                if ($data['SpcRecID'] == null || !$data['SpcRecID']){ $birdSpecy->setSpcRecId(0);} else { $birdSpecy->setSpcRecId($data['SpcRecID']); }
+                // $birdSpecy->setSpcRecId($data['SpcRecID'] ?? 0);
+                $birdSpecy->setSubsppId($data['SubsppID'] ?? '');
 
                 $birdSpecy->setBirdFamily($existingFamily ?? null);
                 // $birdSpecy->setCoverage($coverage ?? null);

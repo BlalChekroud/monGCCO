@@ -25,6 +25,9 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.request }
 
+    # App\Security\UserStatusChecker:
+    #     tags: ['security.user_checker']
+
 
     # default configuration for services in *this* file
     _defaults:

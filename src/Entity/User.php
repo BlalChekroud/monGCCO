@@ -123,6 +123,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $notifications;
 
+    #[ORM\ManyToOne(inversedBy: 'status')]
+    // #[ORM\JoinColumn(nullable: false)]
+    // , options: ['default' => 'Actif']
+    private ?UserStatus $userStatus = null;
+
 
     public function __construct()
     {
@@ -570,6 +575,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $notification->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUserStatus(): ?UserStatus
+    {
+        return $this->userStatus;
+    }
+
+    public function setUserStatus(?UserStatus $userStatus): static
+    {
+        $this->userStatus = $userStatus;
 
         return $this;
     }

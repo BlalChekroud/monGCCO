@@ -31,8 +31,8 @@
                                         <turbo-frame id="logo_{{ logo.id }}">
                                             <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgLogoShow rounded mx-auto d-block">
                                             <div class="d-flex justify-content-end">
-                                                {% import 'macros/btn_actions_macros.html.twig' as macros %}
-                                                {{ macros.action_buttons('app_logo_show','app_logo_edit', 'logo/_delete_form.html.twig', logo, app.request.attributes.get('_route')) }}
+                                               <a href="{{ path('app_logo_edit', {'id': logo.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="{{ 'edit'|trans }}"></a>
+                                                {{ include('logo/_delete_form.html.twig') }}
                                             </div>
                                         </turbo-frame>
                                     {% else %}

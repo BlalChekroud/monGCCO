@@ -1,0 +1,366 @@
+home_page: "الصفحة الرئيسية"
+breadcrumb_home: "الرئيسية"
+card_title: "القوائم"
+create_group: "إنشاء مجموعة"
+create_a_family: 'إنشاء عائلة'
+create_a_species: 'إنشاء نوع'
+create_user_status: 'إنشاء حالة مستخدم'
+add_a_country: 'إضافة دولة'
+choose_bird_family: "-- اختر عائلة الطيور --"
+consult_reserves: "عرض المحميات"
+consult_campaigns: "عرض الحملات"
+cousult_countries: "عرض الدول"
+cousult_species: "عرض الأنواع"
+no_record_found: "لم يتم العثور على سجلات"
+group_name: "اسم المجموعة"
+group_members: "أعضاء المجموعة"
+group_leader: "قائد المجموعة"
+created_at: "تاريخ الإنشاء"
+Last_updated_at: 'آخر تحديث'
+actions: "الإجراءات"
+delete_confirm: "هل أنت متأكد أنك تريد حذف هذا العنصر؟"
+edit: "تعديل"
+show: "عرض"
+cancel: "إلغاء"
+save: "حفظ"
+update: "تحديث"
+add: 'إضافة'
+modification: 'تعديل'
+export_as_CSV: "تصدير كملف CSV"
+print: "طباعة"
+created_by: 'أنشئ بواسطة'
+back: 'رجوع'
+install: "تثبيت التطبيق"
+app_description: "إدارة حملات إحصاء الطيور البحرية"
+invalid_form: "النموذج غير صالح"
+delete_permission: 'ليس لديك إذن بالحذف.'
+edit_permission: "ليس لديك إذن بالتعديل."
+member_of_a_group_assigned_to_this_site: "أنت لست عضوًا في مجموعة مخصصة لهذا الموقع."
+export_permission: 'ليس لديك إذن بالتصدير.'
+msg_export_limit: "حجم التصدير كبير جدًا. يرجى تقليل حجم الحملة أو المحاولة بتحديد أصغر."
+
+csv_import_title: "استيراد ملف CSV"
+csv_import_instruction: "تأكد من أن ملفك يحتوي على الأعمدة المطلوبة."
+csv_preview_title: "معاينة ملف CSV"
+close: "إغلاق"
+note: "ملاحظة"
+columns: "الأعمدة"
+are_mandatory: "إلزامية."
+are_optional: "اختيارية."
+missing_columns: "الأعمدة المفقودة"
+no_missing_columns: "لا توجد أعمدة مفقودة"
+import: "استيراد"
+import_permission: "ليس لديك إذن باستيراد البيانات."
+access: "ليس لديك إذن بالوصول."
+maxSizeMessage: "الملف كبير جدًا. الحجم الأقصى المسموح به هو 1024 كيلوبايت."
+coverage_for_this_species: 'التغطية لهذا النوع'
+iucn_red_list_category: "فئة القائمة الحمراء للاتحاد الدولي لحفظ الطبيعة 2022"
+
+import_csv:
+  mimeTypesMessage: "يرجى تحميل ملف CSV صالح."
+  choose_file: "اختر ملفًا"
+  no_file_chosen: "لم يتم اختيار ملف"
+
+country: "الدولة"
+Select_the_country: "-- اختر الدولة --"
+
+vich_uploader.form_label.delete_confirm: 'حذف؟'
+vich_uploader.link.download: 'تحميل'
+image:
+  insert: "إدراج صورة (JPG أو PNG)"
+  not_available: 'لا توجد صورة متوفرة'
+  mimeTypesMessage: 'يرجى تحميل ملف صورة صالح (JPEG أو PNG)'
+
+Log_in_to_your_account: 'تسجيل الدخول إلى حسابك'
+Enter_your_email_and_password_to_log_in: 'أدخل بريدك الإلكتروني وكلمة المرور لتسجيل الدخول'
+You_are_logged_in_as: 'تم تسجيل الدخول باسم'
+You_are_already_logged_in_as: 'أنت مسجل بالفعل باسم: '
+Your_account_is_disabled: "حسابك معطل."
+Sign_out: 'تسجيل الخروج'
+Email: 'البريد الإلكتروني'
+Please_enter_your_email: 'يرجى إدخال بريدك الإلكتروني'
+Password: 'كلمة المرور'
+Please_enter_your_password: 'يرجى إدخال كلمة المرور الخاصة بك!'
+Remember_me: 'تذكرني'
+Log_in: 'تسجيل الدخول'
+Forgot_your_password: 'نسيت كلمة المرور؟'
+Do_not_have_an_account: "ليس لديك حساب؟"
+Create_an_account: 'إنشاء حساب'
+Language: 'اللغة:'
+login_redirect: "تسجيل الدخول"
+hidden_label: 'إخفاء'
+visible_label: 'عرض'
+no_role: 'بدون دور'
+please_log_in_to_access_the_page: 'يرجى تسجيل الدخول للوصول إلى الصفحة'
+
+user:
+  msg:
+    deleted: "تم حذف حساب المستخدم بنجاح."
+  error:
+    deletion_failed: "حدث خطأ أثناء حذف حساب المستخدم."
+
+agentsGroup:
+  title: "إدارة مجموعة الوكلاء"
+  breadcrumb_management: "إدارة المجموعات"
+  delete_group: "حذف المجموعة"
+  choose_group_leader: "-- اختر قائد المجموعة --"
+  edit_agents_group: "تعديل مجموعة الوكلاء"
+  edit_group: "تعديل هذه المجموعة"
+  manage_groups: "إدارة المجموعات"
+  create_a_new_agent_group: 'إنشاء مجموعة وكلاء جديدة'
+  informations: 'معلومات المجموعة'
+  # Detail
+  details_of_an_agent_group: 'تفاصيل مجموعة الوكلاء'
+  return_to_agent_groups_consultation: 'الرجوع إلى عرض المجموعات'
+  # Edit
+  edit_this_group: 'تعديل هذه المجموعة'
+  the_new_informations: 'المعلومات الجديدة للمجموعة'
+  error:
+    no_member_selected: "يجب اختيار عضو واحد على الأقل لإنشاء مجموعة وكلاء."
+    leader_not_in_members: "يجب أن يكون قائد المجموعة ضمن الأعضاء المحددين."
+    creation_failed: "حدث خطأ أثناء إنشاء المجموعة."
+    modification_failed: "حدث خطأ أثناء تعديل المجموعة."
+    deletion_failed: "حدث خطأ أثناء حذف المجموعة."
+    access_denied: "ليس لديك إذن."
+    no_edit_permission: "غير مسموح لك بالتعديل."
+    no_access_to_group: "ليس لديك وصول إلى هذه المجموعة."
+  msg:
+    created: "تم إنشاء المجموعة بنجاح."
+    updated: "تم تحديث المجموعة بنجاح."
+    deleted: "تم حذف المجموعة بنجاح."
+  notification:
+    added: "تمت إضافتك إلى المجموعة %group% من قبل المستخدم %user%."
+    edited: "تم تعديلك في المجموعة %group% من قبل المستخدم %user%."
+    deleted: "تم حذفك من المجموعة %group% من قبل المستخدم %user%."
+    removed: "تمت إزالتك من المجموعة %group% من قبل المستخدم %user%."
+
+birdFamily:
+  title: "إدارة عائلات الطيور"
+  family_name: "اسم العائلة"
+  family: "العائلة"
+  sub_family: "العائلة الفرعية"
+  order: "الرتبة"
+  tribe: "القبيلة"
+  delete_family: "حذف العائلة"
+  create_a_new_species_family: "إنشاء عائلة جديدة للأنواع"
+  manage_families: "إدارة العائلات"
+  informations: "معلومات العائلة"
+  return_to_family_consultation: "العودة إلى استعراض العائلة"
+  details_of_a_species_family: "تفاصيل عائلة الأنواع"
+  edit_this_family: "تعديل عائلة الأنواع"
+  the_new_informations: "المعلومات الجديدة للعائلة"
+  msg:
+    success_import: "تم استيراد %importedCount% من عائلات الطيور بنجاح. لم يتم استيراد %invalidCount% من السطور."
+    success_create: "تم إنشاء عائلة الطيور بنجاح."
+    success_update: "تم تحديث العائلة بنجاح."
+    success_delete: "تم حذف عائلة الأنواع بنجاح."
+  error:
+    import: "خطأ أثناء الاستيراد: %message%"
+    invalid_rows: "لم يتم استيراد %count% من السطور. أرقام السطور: %invalidRows%"
+    invalid_csv: "ملف CSV يحتوي على أحرف غير صالحة. يرجى التحقق من ترميز الملف."
+    creation_failed: "فشل في إنشاء عائلة الطيور."
+    modification_failed: "فشل في تعديل عائلة الطيور."
+    deletion_failed: "فشل في حذف عائلة الطيور."
+
+birdSpecies:
+  title: "إدارة أنواع الطيور"
+  title_add: "إضافة نوع جديد من الطيور"
+  breadcrumb_manage: "إدارة الأنواع"
+  informations: "معلومات النوع الجديد"
+  return: "العودة إلى استعراض أنواع الطيور"
+  modal_birdlife_tax_treat_title: "إنشاء تصنيف جديد من BirdLife"
+  modal_iucn_title: "إنشاء تصنيف جديد لـ IUCN 2022"
+  scientific_name: "الاسم العلمي"
+  french_name: "الاسم الفرنسي"
+  vernacular_name: "الاسم الشائع"
+  english_name: "الاسم الإنجليزي"
+  wi_species_code: "رمز الأنواع (WI)"
+  image: "صورة"
+  authority: "المرجع"
+  birdlife_tax_treat: "تصنيف BirdLife"
+  common_name: "الاسم العام"
+  common_name_alt: "الأسماء العامة البديلة"
+  synonyms: "المرادفات"
+  taxonomic_sources: "المصادر التصنيفية"
+  sis_rec_id: "معرف sisRec"
+  spc_rec_id: "معرف spcRec"
+  subspp_id: "معرف subspp"
+  msg:
+    success_import: "تم استيراد %importedCount% من أنواع الطيور بنجاح. لم يتم استيراد %invalidCount% من السطور."
+    success_create: "تم إنشاء نوع الطيور بنجاح."
+    success_update: "تم تحديث نوع الطيور بنجاح."
+    success_delete: "تم حذف نوع الطيور بنجاح."
+  error:
+    creation_failed: "فشل في إنشاء نوع الطيور."
+    modification_failed: "حدث خطأ أثناء تحديث النوع."
+    deletion_failed: "حدث خطأ أثناء حذف نوع الطيور."
+    invalid_lines: "لم يتم استيراد %invalidCount% من السطور. أرقام السطور: %invalidRows%"
+    import: "خطأ أثناء الاستيراد: %message%"
+    invalid_encoding: "ملف CSV يحتوي على أحرف غير صالحة. يرجى التحقق من ترميز الملف."
+
+campaign:
+  cannot_be_modified: "لا يمكن تعديل الحملة بحالة %status%"
+
+collect:
+  please_create_the_environmental_conditions_for_this_site_first: "يرجى إنشاء الظروف البيئية لهذا الموقع أولاً"
+
+notification:
+  all: "جميع الإشعارات"
+  manage_notifications: "إدارة الإشعارات"
+  your_notifications: "إشعاراتك"
+  show_all_notifications: "عرض جميع الإشعارات."
+  view_all: "عرض الكل"
+  you_have: "لديك"
+  new_notification: "إشعار جديد"
+  new_message: "رسالة جديدة"
+  unread_notifications: "الإشعارات غير المقروءة"
+  mark_as_seen: "تحديد كمقروء"
+
+register:
+  page_title: "التسجيل"
+  form:
+    title: "إنشاء حساب"
+    subtitle: "أدخل معلوماتك الشخصية لإنشاء حساب"
+    required_field_note: "يشير إلى الحقول المطلوبة."
+    name: "الاسم"
+    name_placeholder: "يرجى إدخال اسمك!"
+    last_name: "اسم العائلة"
+    last_name_placeholder: "يرجى إدخال اسم العائلة!"
+    phone: "رقم الهاتف"
+    phone_placeholder: "يرجى إدخال رقم هاتفك!"
+    email_placeholder: "يرجى إدخال بريد إلكتروني صالح!"
+    password: "كلمة المرور"
+    password_placeholder: "يرجى إدخال كلمة المرور!"
+    password_confirm: "تأكيد كلمة المرور"
+    password_confirm_placeholder: "يرجى تأكيد كلمة المرور!"
+    agree_terms: "أوافق على الشروط والأحكام"
+    agree_terms_error: "يجب الموافقة قبل الإرسال."
+    submit_button: "إنشاء حساب"
+    Already_have_an_account: "هل لديك حساب بالفعل؟"
+
+# Error messages for form validation
+form_error:
+  general: "يرجى التحقق من المعلومات والمحاولة مرة أخرى."
+
+userStatus:
+  title: "إدارة حالات المستخدم"
+  breadcrumb_management: "إدارة الحالات"
+  label: "التسمية"
+  delete_user_status: "حذف الحالة"
+  informations: "معلومات الحالة"
+  return_to_user_status_consultation: "العودة إلى استعراض حالات المستخدم"
+  msg:
+    created: "تم إنشاء الحالة بنجاح."
+    updated: "تم تحديث الحالة بنجاح."
+    deleted: "تم حذف الحالة بنجاح."
+  error:
+    creation_failed: "فشل في إنشاء الحالة."
+    modification_failed: "حدث خطأ أثناء تحديث الحالة."
+    deletion_failed: "حدث خطأ أثناء حذف الحالة."
+
+
+
+
+
+# site:
+#   # Form
+#   new_site_form: "نموذج موقع جديد"
+#   add_a_site: "إضافة موقع"
+#   edit_a_site: "تعديل موقع"
+#   country: "الدولة"
+#   city: "المدينة"
+#   reserve: "المحمية"
+#   coordinates: "الإحداثيات"
+#   latitude: "خط العرض"
+#   longitude: "خط الطول"
+#   description: "الوصف"
+#   add_description: "إضافة وصف"
+#   actions: "الإجراءات"
+#   # Messages
+#   msg:
+#     created: "تم إنشاء الموقع بنجاح."
+#     updated: "تم تحديث الموقع بنجاح."
+#     deleted: "تم حذف الموقع بنجاح."
+#   error:
+#     creation_failed: "حدث خطأ أثناء إنشاء الموقع."
+#     modification_failed: "حدث خطأ أثناء تعديل الموقع."
+#     deletion_failed: "حدث خطأ أثناء حذف الموقع."
+
+# bird_family:
+#   breadcrumb: "عائلات الطيور"
+#   create_a_family: "إنشاء عائلة طيور"
+#   edit_a_family: "تعديل عائلة طيور"
+#   view_all_families: "عرض جميع عائلات الطيور"
+#   msg:
+#     created: "تم إنشاء عائلة الطيور بنجاح."
+#     updated: "تم تحديث عائلة الطيور بنجاح."
+#     deleted: "تم حذف عائلة الطيور بنجاح."
+
+# bird_species:
+#   breadcrumb: "أنواع الطيور"
+#   create_a_species: "إنشاء نوع طيور"
+#   edit_a_species: "تعديل نوع طيور"
+#   view_all_species: "عرض جميع أنواع الطيور"
+#   msg:
+#     created: "تم إنشاء نوع الطيور بنجاح."
+#     updated: "تم تحديث نوع الطيور بنجاح."
+#     deleted: "تم حذف نوع الطيور بنجاح."
+
+# campaign:
+#   breadcrumb: "الحملات"
+#   create_a_campaign: "إنشاء حملة"
+#   edit_a_campaign: "تعديل حملة"
+#   view_all_campaigns: "عرض جميع الحملات"
+#   msg:
+#     created: "تم إنشاء الحملة بنجاح."
+#     updated: "تم تحديث الحملة بنجاح."
+#     deleted: "تم حذف الحملة بنجاح."
+
+# environmental_conditions:
+#   breadcrumb: "الظروف البيئية"
+#   create_a_condition: "إنشاء حالة بيئية"
+#   edit_a_condition: "تعديل حالة بيئية"
+#   view_all_conditions: "عرض جميع الحالات البيئية"
+#   msg:
+#     created: "تم إنشاء الحالة البيئية بنجاح."
+#     updated: "تم تحديث الحالة البيئية بنجاح."
+#     deleted: "تم حذف الحالة البيئية بنجاح."
+
+# notification:
+#   mark_as_read: "تحديد كمقروء"
+#   mark_all_as_read: "تحديد الكل كمقروء"
+#   unread_notifications: "الإشعارات غير المقروءة"
+#   no_notifications: "لا توجد إشعارات"
+#   new_notification: "إشعار جديد"
+#   you_have_new_notifications: "لديك %count% إشعار جديد."
+
+# pagination:
+#   previous: "السابق"
+#   next: "التالي"
+
+# error:
+#   access_denied: "تم رفض الوصول"
+#   not_found: "العنصر غير موجود"
+#   invalid_data: "البيانات المدخلة غير صالحة"
+#   unexpected_error: "حدث خطأ غير متوقع. يرجى المحاولة لاحقاً."
+
+# success:
+#   action_completed: "تمت العملية بنجاح."
+#   item_saved: "تم حفظ العنصر بنجاح."
+
+# loading: "جارٍ التحميل..."
+# confirm: "تأكيد"
+# retry: "إعادة المحاولة"
+# return_to_dashboard: "الرجوع إلى لوحة التحكم"
+
+# dashboard:
+#   welcome: "مرحباً بك في لوحة التحكم"
+#   statistics: "الإحصائيات"
+#   active_campaigns: "الحملات النشطة"
+#   bird_species_count: "عدد أنواع الطيور"
+#   users: "المستخدمون"
+#   notifications: "الإشعارات"
+
+# footer:
+#   copyright: "حقوق الطبع والنشر © %year%. جميع الحقوق محفوظة."
+#   powered_by: "مدعوم من WingWatch"

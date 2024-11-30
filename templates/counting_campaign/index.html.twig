@@ -70,7 +70,7 @@
                         5: 'secondary',   
                         6: 'dark'       
                     } %}
-                    {% for counting_campaign in counting_campaigns %}
+                    {% for counting_campaign in counting_campaigns|reverse %}
                       <tr>
                         <td>{{ counting_campaign.id }}</td>
                         <td><a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" title="Détail">{{ counting_campaign.campaignName }}</a></td>
@@ -105,13 +105,14 @@
             <div class="card-footer d-flex justify-content-between">
               <div class="d-flex justify-content-end">
                   <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Créer une campagne</a>
+                  <a href="{{ path('app_agents_group_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> Consultation des groupes</a>
                   <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> Consultation des collectes</a>
                   <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="Voir la liste des conditions environnementales"> Consultation des conditions</a>
                   <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Ajouter un site de collecte</a>
               </div>
               <div>
                 <button id="printButton" class="btn btn-sm btn-secondary bi bi-printer" title="Imprimer"></button>
-                <button id="exportCSVButton" class="btn btn-sm btn-secondary bi bi-folder" title="Exporter en CSV"></button>
+                {# <a href="{{ path('app_counting_campaign_export_all') }}" class="btn btn-sm btn-outline-secondary bi bi-folder" title="Exporter en CSV"></a> #}
               </div>
             </div>
 

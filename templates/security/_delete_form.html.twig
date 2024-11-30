@@ -1,16 +1,10 @@
-{% if is_granted('ROLE_ADMIN') %}
-    <form method="post" action="{{ path('app_bird_family_delete', {'id': bird_family.id}) }}" onsubmit="return confirm('{{ 'delete_confirm'|trans }}');">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bird_family.id) }}">
-        <button class="btn btn-danger btn-sm bi bi-trash-fill mx-2" title="{{ 'birdFamily.delete_family'|trans }}"></button>
-    </form>
-{% endif %}
-{# <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> #}
-{# {% if is_granted('ROLE_DELETE') %}
-<form id="delete-form" method="post" action="{{ path('app_bird_family_delete', {'id': bird_family.id}) }}">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bird_family.id) }}">
-    <button type="button" class="btn-action btn btn-outline-danger btn-sm bi bi-x-circle-fill mx-1" onclick="confirmDelete()"> Supprimer</button>
+{% if is_granted('ROLE_SUPER_ADMIN') %}
+<form id="delete-form" method="post" action="{{ path('app_user_delete', {'id': user.id}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+    <button type="button" onclick="confirmDelete()" class="btn btn-danger btn-sm bi bi-trash mx-2" title="Supprimer ce compte d'utilisateur"></button>
 </form>
-{% endif %}<script>
+{% endif %}
+<script>
     function confirmDelete() {
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
@@ -22,7 +16,7 @@
 
         swalWithBootstrapButtons.fire({
             title: 'Êtes-vous sûr ?',
-            text: 'Vous ne pourrez pas revenir en arrière !',
+            text: "La suppression du compte entraînera également la suppression de tout ce qui a été créé par cet utilisateur. Vous ne pourrez pas revenir en arrière !",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Oui, supprimer !',
@@ -40,10 +34,10 @@
             } else if (result.dismiss === Swal.DismissReason.cancel) {
                 swalWithBootstrapButtons.fire({
                     title: 'Annulé',
-                    text: 'Votre élément est toujours en sécurité :)',
+                    text: 'Votre élément est toujours en sécurité 🙂',
                     icon: 'error'
                 });
             }
         });
     }
-</script> #}
+</script>

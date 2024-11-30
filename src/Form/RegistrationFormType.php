@@ -1,15 +1,13 @@
 <?php
 
 namespace App\Form;
+
 use App\Validator\PasswordMatch;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Validator\Constraints\IsFalse;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormError;
-
+use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -22,6 +20,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class RegistrationFormType extends AbstractType
 {
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -76,7 +80,9 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
-                'label' => "register.form.field_agree_terms",
+                // 'label' => $this->translator->trans('register.form.agree_terms') ."<span class='requiredField'>*</span>",
+                'label' => false,
+                // 'label_html' => true,
                 'required' => true,
                 'constraints' => [
                     new IsTrue([
