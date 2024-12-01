@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\CollectedData;
 use App\Entity\CountingCampaign;
+
 use App\Entity\User;
+
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -29,6 +31,7 @@ class CollectedDataRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
 
     public function getLeaderByCollectedData(CollectedData $collectedData): ?array
     {
@@ -72,7 +75,7 @@ class CollectedDataRepository extends ServiceEntityRepository
     }
        
        
-    
+
     //    /**
     //     * @return CollectedData[] Returns an array of CollectedData objects
     //     */

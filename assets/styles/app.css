@@ -1637,13 +1637,14 @@ h6.explanation {
 
 /* Light mode styles */
 body.light-mode {
-    background-color: #ffffff;
+    /* background-color: #ffffff; */
     color: #000000;
 }
 
 body.light-mode .navbar, 
 body.light-mode .card {
-    background-color: #f8f9fa;
+    background-color: #ffffff;
+    box-shadow: 0px 0 30px rgba(1, 41, 112, 0.1);
     color: #000000;
 }
 

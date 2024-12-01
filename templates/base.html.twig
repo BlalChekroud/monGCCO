@@ -357,11 +357,11 @@
           </li><!-- End Messages Nav -->
 
           <!-- Mode Nav -->
-          {# <li class="nav-item dropdown">
+          <li class="nav-item dropdown">
               <button class="nav-link nav-icon" onclick="toggleMode()" id="modeButton"><span class="explanation">Changer de mode</span></button>
 
               <script src="{{ asset('./js/mode.js') }}"></script>
-          </li> #}
+          </li>
 
           <!-- Language Nav -->
           {% set currentLocale = app.request.session.get('_locale', app.request.locale) %}
@@ -736,12 +736,13 @@
 
 
         <!-- Installer Nav -->
-        {# <li class="nav-item">
+        <li class="nav-item">
           <a class="nav-link collapsed" id="install" style="display: none;" data-bs-target="#install-nav" data-bs-toggle="collapse" href="#">
             <i class="ri-install-line"></i>
             <span>{{ 'install'|trans }}</span>
+            <script src="{{ asset('./js/offline.js') }}"></script>
           </a>
-        </li><!-- End users Nav --> #}
+        </li><!-- End users Nav -->
         
         <li class="nav-heading">Pages</li>
 
@@ -796,6 +797,7 @@
 
     <script src="{{ asset('./js/sweetalert2.all.js') }}"></script>
     {# <script src="{{ asset('./offline.js') }}"></script> #}
+
       <!-- Vendor JS Files -->
     {# <script src="{{ asset('/vendor/apexcharts/apexcharts.min.js') }}"></script>
     <script src="{{ asset('/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>

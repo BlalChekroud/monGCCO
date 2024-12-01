@@ -124,6 +124,18 @@ class HomeController extends AbstractController
             'uniqueBirdSpeciesCountForSiteInCampaign' => $uniqueBirdSpeciesCountForSiteInCampaign,
             'topThreeBirdSpeciesInCampaign' => $topThreeBirdSpeciesInCampaign,
             'bird_species' => $birdSpeciesRepository->findAll()
+
+            // 'totalCollects' => $totalCollects,
+            // 'totalAgents' => $totalAgents,
+            // 'categories' => $categories,
+            // 'totalBirds' => $totalBirds,
+            // 'totalUniqueSpeciesCount' => $totalUniqueSpeciesCount,
+            // 'totalAgentsCount' => $totalAgentsCount,
+            // 'totalCounts' => $totalCounts,
+
+            // 'totalUniqueSpecies' => $totalUniqueSpecies,
+            // 'siteNames' => $siteNames,       // Les noms des sites
+            // 'totalCountsSite' => $totalCountsSite,   // Les totaux des oiseaux comptés
         ]);
     }
 
