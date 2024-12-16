@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'language.title'|trans }}{% endblock %}
+
+{% block body %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>{{ 'language.create_a_new_language'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_language_index') }}">{{ 'language.manage_language'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'add'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'language.informations'|trans }}</h5>
+
+              {{ include('language/_form.html.twig') }}
+
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_language_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'language.return_to_language_consultation'|trans }}">{{ 'back'|trans }}</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}

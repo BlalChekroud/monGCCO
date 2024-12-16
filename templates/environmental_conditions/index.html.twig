@@ -36,7 +36,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {% for environmental_condition in environmental_conditions %}
+                    {% for environmental_condition in environmental_conditions|reverse %}
                         <tr>
                             <td>{{ environmental_condition.id }}</td>
                             <td>{{ environmental_condition.siteCollection.siteName }}</td>

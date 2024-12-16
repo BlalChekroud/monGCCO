@@ -3,6 +3,7 @@
 namespace App\Service\EventSubscriber;
 // namespace App\EventSubscriber;
 
+use App\Repository\LanguageRepository;
 use App\Repository\LogoRepository;
 use App\Repository\NotificationRepository;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -16,13 +17,15 @@ class LogoSubscriber implements EventSubscriberInterface
     private $logoRepository;
     private $notificationRepository;
     private $security;
+    private $languageRepository;
 
-    public function __construct(Environment $twig, LogoRepository $logoRepository, NotificationRepository $notificationRepository, Security $security)
+    public function __construct(Environment $twig, LogoRepository $logoRepository, NotificationRepository $notificationRepository, Security $security, LanguageRepository $languageRepository)
     {
         $this->twig = $twig;
         $this->logoRepository = $logoRepository;
         $this->notificationRepository = $notificationRepository;
         $this->security = $security;
+        $this->languageRepository = $languageRepository;
     }
 
     public function onKernelController(ControllerEvent $event)
@@ -30,6 +33,8 @@ class LogoSubscriber implements EventSubscriberInterface
         $logo = $this->logoRepository->findOneBy([]); // Récupère le premier logo
         $this->twig->addGlobal('logo', $logo); // Injecte la variable globale
         
+        $languages = $this->languageRepository->findAll();
+        $this->twig->addGlobal('languages', $languages);
         $user = $this->security->getUser();
         // Vérifier si l'utilisateur est authentifié
         if ($user) {

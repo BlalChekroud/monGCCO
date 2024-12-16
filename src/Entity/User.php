@@ -15,7 +15,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-// #[ORM\Table('user')]
 #[UniqueEntity(fields: ['email'], message: 'Cet e-mail n\'est pas disponible, essayer avec un autre')]
 #[Vich\Uploadable]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -52,7 +51,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $lastName = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 15)]
     private ?string $phone = null;
 
     #[ORM\Column(nullable: true)]
@@ -112,11 +111,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: NatureReserve::class, mappedBy: 'reserveLeader')]
     private Collection $natureReservesLeader;
 
-    // #[ORM\Column(length: 255, nullable: true)]
-    // private ?string $locale = null;
-    #[ORM\Column(length: 255, options: ['default' => 'fr'])]
-    private string $locale = 'fr';
-
     /**
      * @var Collection<int, Notification>
      */
@@ -127,6 +121,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // #[ORM\JoinColumn(nullable: false)]
     // , options: ['default' => 'Actif']
     private ?UserStatus $userStatus = null;
+
+    #[ORM\ManyToOne(inversedBy: 'language')]
+    private ?Language $language = null;
 
 
     public function __construct()
@@ -142,6 +139,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->notifications = new ArrayCollection();
     }
 
+    public function isEqualTo(UserInterface $user): bool
+    {
+        if (!$user instanceof self) {
+            return false;
+        }
+
+        return $this->getId() === $user->getId() &&
+               $this->getUserStatus()->getLabel() === $user->getUserStatus()->getLabel();
+    }
 
     public function getId(): ?int
     {
@@ -537,18 +543,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getLocale(): ?string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(?string $locale): static
-    {
-        $this->locale = $locale;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Notification>
      */
@@ -587,6 +581,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUserStatus(?UserStatus $userStatus): static
     {
         $this->userStatus = $userStatus;
+
+        return $this;
+    }
+
+    public function getLanguage(): ?Language
+    {
+        return $this->language;
+    }
+
+    public function setLanguage(?Language $language): static
+    {
+        $this->language = $language;
 
         return $this;
     }

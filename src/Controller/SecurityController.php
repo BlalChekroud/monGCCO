@@ -39,21 +39,21 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
         
-        // Vérifier si l'utilisateur est déjà authentifié
-        if ($security->getUser()) {
-            $user = $security->getUser();
+        // // Vérifier si l'utilisateur est déjà authentifié
+        // if ($security->getUser()) {
+        //     $user = $security->getUser();
 
-            // Vérifier si le statut de l'utilisateur est "Inactif"
-            if ($user->getUserStatus()->getLabel() !== 'Actif') {
-                // Ajouter un message flash et rediriger vers la déconnexion
-                $this->addFlash('warning', $translator->trans('Your_account_is_disabled'));
-                return $this->redirectToRoute('app_logout');
-            } else {
-                // Si l'utilisateur est actif, afficher un message d'information
-                $this->addFlash('info', $translator->trans('You_are_already_logged_in_as') . ' ' . $lastUsername);
-                return $this->redirectToRoute('home');
-            }
-        }
+        //     // Vérifier si le statut de l'utilisateur est "Inactif"
+        //     if ($user->getUserStatus()->getLabel() !== 'Actif') {
+        //         // Ajouter un message flash et rediriger vers la déconnexion
+        //         $this->addFlash('warning', $translator->trans('Your_account_is_disabled'));
+        //         return $this->redirectToRoute('app_logout');
+        //     } else {
+        //         // Si l'utilisateur est actif, afficher un message d'information
+        //         $this->addFlash('info', $translator->trans('You_are_already_logged_in_as') . ' ' . $lastUsername);
+        //         return $this->redirectToRoute('home');
+        //     }
+        // }
 
         // Enregistrer la locale dans la session (facultatif)
         $_locale = $request->getSession()->get('_locale', 'fr'); // valeur par défaut
@@ -65,12 +65,20 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route('/{_locale}/login', name: 'change_locale_login', requirements: ['_locale' => 'en|fr'])]
+    #[Route('/{_locale}/login', name: 'change_locale_login', requirements: ['_locale' => '[a-zA-Z]{2}'])]
     public function changeLocaleOut(EntityManagerInterface $entityManager, Request $request, $_locale): RedirectResponse
     {
         // Enregistrer la locale dans la session
         $request->getSession()->set('_locale', $_locale);
 
+        // // Obtenir le référent ou définir une redirection par défaut
+        // $referer = $request->headers->get('referer');
+        // if (!$referer || strpos($referer, $this->generateUrl('change_locale_login')) !== false) {
+        //     $referer = $this->generateUrl('app_login');
+        // }
+
+        // return new RedirectResponse($referer);
+        
         // Rediriger l'utilisateur vers la page précédente
         $referer = $request->headers->get('referer');
         return new RedirectResponse($referer ?: $this->generateUrl('app_login'));

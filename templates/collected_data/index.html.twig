@@ -36,7 +36,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {% for collected_datum in collected_datas %}
+                    {% for collected_datum in collected_datas|reverse %}
                         <tr>
                             <td>{{ collected_datum.id }}</td>
                             <td>{{ collected_datum.createdBy.name }} {{ collected_datum.createdBy.lastName }}</td>

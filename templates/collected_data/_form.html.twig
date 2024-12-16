@@ -206,6 +206,18 @@
     // Compteur d'index pour chaque élément ajouté dynamiquement
     var index = collectionHolder.children.length;
 
+// Fonction pour trier les options dans les champs de sélection
+    function sortBirdSpeciesDropdowns() {
+        const birdSpeciesSelects = document.querySelectorAll('select[name*="[birdSpecies]"]');
+
+        birdSpeciesSelects.forEach(select => {
+            const options = Array.from(select.options);
+            options.sort((a, b) => a.text.localeCompare(b.text)); // Tri alphabétique par le texte
+            select.innerHTML = ''; // Réinitialiser les options
+            options.forEach(option => select.appendChild(option));
+        });
+    }
+
     // Fonction pour ajouter une nouvelle espèce d'oiseau
     addButton.addEventListener('click', function () {
         var newForm = collectionHolder.dataset.prototype;
@@ -214,7 +226,7 @@
         var formDiv = document.createElement('div');
         formDiv.classList.add('row', 'mb-3', 'birdSpeciesCountsContainer-item');
         formDiv.innerHTML = `
-            <div class="col-sm-5 col-md-5 col-lg-5 mb-5">${newForm}</div>
+            {# <div class="col-sm-5 col-md-5 col-lg-5 mb-5">${newForm}</div> #}
             {# <div class="col-sm-2 col-md-2 col-lg-2 mb-2">
                 <div class="input-group">
                     <div class="input-group-prepend">
@@ -226,11 +238,20 @@
                     </div>
                 </div>
             </div> #}
-            <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+            {# <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
                 <button type="button" class="btn btn-danger bi bi-trash btn-sm remove-birdSpeciesCount" title="Supprimer"></button>
+            </div> #}
+            <div class="row">
+                <div class="col-sm-8 col-md-8 col-lg-8 mb-8">${newForm}</div>
+                <div class="col-sm-3 col-md-3 col-lg-3 mb-3">
+                    <button type="button" class="btn btn-danger bi bi-trash btn-sm remove-birdSpeciesCount" title="Supprimer"></button>
+                </div>
             </div>
         `;
         collectionHolder.appendChild(formDiv);
+
+        // Trier les options après l'ajout
+        sortBirdSpeciesDropdowns();
 
         // Ajouter les événements pour l'incrémentation et la suppression au nouveau formulaire
         attachIncreaseDecreaseListeners(formDiv);
@@ -292,6 +313,9 @@
                 console.error('Erreur:', error);
             });
     }
+
+    // Trier les options au chargement de la page
+    sortBirdSpeciesDropdowns();
 </script>
 
 

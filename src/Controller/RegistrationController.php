@@ -32,7 +32,7 @@ class RegistrationController extends AbstractController
             
             // Récupérer la locale depuis la session
             $_locale = $request->getSession()->get('_locale', 'fr'); // valeur par défaut
-            $user->setLocale($_locale); // Définit la locale de l'utilisateur
+            $user->setLanguage($_locale); // Définit la locale de l'utilisateur
             $user->setCreatedAt(new \DateTimeImmutable());
             
             // encode the plain password
@@ -59,7 +59,7 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    #[Route('/{_locale}/register', name: 'change_locale_register', requirements: ['_locale' => 'en|fr'])]
+    #[Route('/{_locale}/register', name: 'change_locale_register', requirements: ['_locale' => '[a-zA-Z]{2}'])]
     public function changeLocaleOut(EntityManagerInterface $entityManager, Request $request, $_locale): RedirectResponse
     {
         // Enregistrer la locale dans la session

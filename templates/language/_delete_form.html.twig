@@ -1,0 +1,6 @@
+{% if is_granted('ROLE_SUPER_ADMIN') %}
+    <form method="post" action="{{ path('app_language_delete', {'id': language.id}) }}" onsubmit="return confirm('{{ 'delete_confirm'|trans }}');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ language.id) }}">
+        <button class="btn btn-danger btn-sm bi bi-trash-fill mx-2" title="{{ 'birdFamily.delete_family'|trans }}"></button>
+    </form>
+{% endif %}

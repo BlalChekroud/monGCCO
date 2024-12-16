@@ -75,7 +75,8 @@ Log_in_to_your_account: 'Connexion à votre compte'
 Enter_your_email_and_password_to_log_in: 'Entrez votre e-mail & mot de passe pour vous connecter'
 You_are_logged_in_as: 'Vous êtes connecté en tant que'
 You_are_already_logged_in_as: 'Vous êtes déjà connecté en tant que : '
-Your_account_is_disabled: "Votre compte est désactivé."
+inactive_account_cannot_log_in: "Votre compte est inactif. Vous ne pouvez pas vous connecter."
+# Your_account_is_disabled: "Votre compte est désactivé."
 Sign_out: 'Déconnexion'
 Email: 'E-mail'
 Please_enter_your_email: 'Veuillez entrer votre E-mail'
@@ -203,7 +204,25 @@ campaign:
 
 collect:
   please_create_the_environmental_conditions_for_this_site_first: "Veuillez d'abord créer les conditions environnementales pour ce site."
-  
+
+language:
+  name: 'Nom'
+  iso2: 'Code ISO2'
+  title: "Gestion des langues"
+  create_a_new_language: "Créer une nouvelle langue"
+  manage_language: "Gérer les langues"
+  informations: "Informations sur la langue"
+  return_to_language_consultation: "Retour à la consultation des langues"
+  delete_language: "Supprimer la langue"
+  msg:
+    created: "La langue a été créée avec succès."
+    updated: "La langue a été mise à jour avec succès."
+    deleted: "La langue a été supprimée avec succès."
+  error:
+    creation_failed: "Échec de la création de la langue."
+    modification_failed: "Une erreur s'est produite lors de la mise à jour de la langue."
+    deletion_failed: "Une erreur s'est produite lors de la suppression de la langue."
+
 notification:
   all: "Toutes les notifications"
   manage_notifications: "Gestion des notifications"

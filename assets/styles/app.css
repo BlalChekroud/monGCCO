@@ -237,8 +237,12 @@ h6.explanation {
 }
 
 .imgLogoShow {
-  width: 50%;
-  height: 50%;
+  /* width: 50%;
+  height: 50%; */
+  max-width: 300px; /* Largeur maximale en pixels */
+  max-height: 300px; /* Hauteur maximale en pixels */
+  object-fit: contain; /* Conserve les proportions de l'image */
+  margin: 10px auto; /* Ajoute un espace autour de l'image */
 }
 
 /*--------------------------------------------------------------

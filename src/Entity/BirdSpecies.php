@@ -279,24 +279,24 @@ class BirdSpecies
         return $this->collectedData;
     }
 
-    // public function getImageUrl(): ?string
-    // {
-    //     return $this->imageFilename ? '/uploads/bird_images/' . $this->imageFilename : null;
-    // }
-    
     /**
      * Retourne l'URL de l'image de l'espèce.
      */
     public function getImageUrl(): ?string
     {
-        if ($this->image) {
-            // Utilise VichUploader pour générer l'URL de l'image
-            return $this->uploaderHelper->asset($this->image, 'imageFile');
-        }
-
-        // Retourne null si aucune image n'est associée
-        return null;
+        return $this->image ? '/uploads/bird_images/' . $this->image : null;
     }
+    
+    // public function getImageUrl(): ?string
+    // {
+    //     if ($this->image) {
+    //         // Utilise VichUploader pour générer l'URL de l'image
+    //         return $this->uploaderHelper->asset($this->image, 'imageFile');
+    //     }
+
+    //     // Retourne null si aucune image n'est associée
+    //     return null;
+    // }
 
     public function addCollectedData(CollectedData $collectedData): static
     {

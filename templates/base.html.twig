@@ -9,7 +9,9 @@
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="{{ asset('/img/favicon.png') }}" rel="icon">
+    <link href="{{ asset('/img/favicon.png') }}" rel="icon" type="image/png">
+    <link href="{{ asset('/img/favicon.ico') }}" rel="icon" type="image/x-icon">
+
     <link href="{{ asset('/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
@@ -333,7 +335,7 @@
                                                       {{ notification.message }}
                                                   </p>
                                                   <p class="notification-time">
-                                                      {{ notification.createdAt ? notification.createdAt|date('d-m-Y H:i:s') : '' }} {{ notification.seen }}
+                                                      {{ notification.createdAt ? notification.createdAt|date('d-m-Y H:i:s') : '' }}
                                                   </p>
                                               </div>
                                           </li>
@@ -358,7 +360,7 @@
 
           <!-- Mode Nav -->
           <li class="nav-item dropdown">
-              <button class="nav-link nav-icon" onclick="toggleMode()" id="modeButton"><span class="explanation">Changer de mode</span></button>
+              <button class="nav-link nav-icon" onclick="toggleMode()" id="modeButton"><span class="bx bxs-brightness-half"></span></button>
 
               <script src="{{ asset('./js/mode.js') }}"></script>
           </li>
@@ -366,13 +368,12 @@
           <!-- Language Nav -->
           {% set currentLocale = app.request.session.get('_locale', app.request.locale) %}
           <li class="nav-item dropdown">
-
             <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
               <span class="badge bg-light">{{ currentLocale }}</span>
             </a><!-- End Messages Icon -->
 
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
-              <li class="message-item">
+              {# <li class="message-item">
                   <a href="{{ path('change_locale', { '_locale': 'en' }) }}">English</a>
               </li>
               <li>
@@ -381,7 +382,14 @@
 
               <li class="message-item">
                   <a href="{{ path('change_locale', { '_locale': 'fr' }) }}">Français</a>
-              </li>
+              </li> #}
+              {% for language in languages %}
+                  <li>
+                      <a class="dropdown-item" href="{{ path('change_locale', { '_locale': language.iso2 }) }}">
+                          {{ language.name }}
+                      </a>
+                  </li>
+              {% endfor %}
             </ul><!-- End languages Dropdown Items -->
             
           </li><!-- End languages Nav -->
@@ -728,6 +736,11 @@
             <li>
               <a href="{{ path('app_user_status_index') }}">
                 <i class="bi bi-circle"></i><span>Statuts d'utilisateur</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_language_index') }}">
+                <i class="bi bi-circle"></i><span>Langues</span>
               </a>
             </li>
           </ul>

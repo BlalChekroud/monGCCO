@@ -117,11 +117,56 @@
                       </form>
 
                     </div>
+                    {# <div class="card-footer d-flex justify-content-center">
+                      <!-- Language Nav -->
+                      {% set currentLocale = app.request.session.get('_locale', app.request.locale) %}
+                      <span class="me-2">{{ 'Language'|trans }} </span>
+                      <li class="nav-item dropdown">
+                        <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                          <span class="badge bg-light">{{ currentLocale }}</span>
+                        </a><!-- End Messages Icon -->
+
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
+                          {% for language in languages %}
+                            <a class="dropdown-item" href="{{ path('change_locale_login', { '_locale': language.iso2 }) }}">
+                              {{ language.name }}
+                            </a>
+                          {% endfor %}
+                        </ul><!-- End languages Dropdown Items -->
+                          
+                      </li><!-- End languages Nav -->
+                    </div> #}
                     <div class="card-footer d-flex justify-content-center">
                         <span class="me-2">{{ 'Language'|trans }} </span>
                         <a href="{{ path('change_locale_login', { '_locale': 'en' }) }}" class="mx-2">English</a> |
-                        <a href="{{ path('change_locale_login', { '_locale': 'fr' }) }}" class="mx-2">Français</a>
+                        <a href="{{ path('change_locale_login', { '_locale': 'fr' }) }}" class="mx-2">Français</a> |
+                        <a href="{{ path('change_locale_login', { '_locale': 'ar' }) }}" class="mx-2">اللغة العربية</a>
                     </div>
+                    {# <div class="card-footer d-flex justify-content-center align-items-center">
+                      <!-- Language Navigation -->
+                      {% set currentLocale = app.request.session.get('_locale', app.request.locale) %}
+                      <span class="me-2">{{ 'Language'|trans }}</span>
+
+                      <div class="dropdown">
+                        <a class="btn btn-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          {{ currentLocale }}
+                        </a>
+
+                        <ul class="dropdown-menu">
+                          {% if languages is not empty %}
+                            {% for language in languages %}
+                              <li>
+                                <a class="dropdown-item" href="{{ path('change_locale_login', { '_locale': language.iso2 }) }}">
+                                  {{ language.name }}
+                                </a>
+                              </li>
+                            {% endfor %}
+                          {% else %}
+                            <li class="dropdown-item text-muted">{{ 'No languages available'|trans }}</li>
+                          {% endif %}
+                        </ul>
+                      </div>
+                    </div> #}
 
                   </div>
 

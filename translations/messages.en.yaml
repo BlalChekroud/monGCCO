@@ -75,7 +75,8 @@ Log_in_to_your_account: 'Log in to your account'
 Enter_your_email_and_password_to_log_in: 'Enter your email & password to log in'
 You_are_logged_in_as: 'You are logged in as'
 You_are_already_logged_in_as: 'You are already logged in as : '
-Your_account_is_disabled: "Your account is disabled."
+inactive_account_cannot_log_in: "Your account is inactive. You cannot log in."
+# Your_account_is_disabled: "Your account is disabled."
 Sign_out: 'Sign out'
 Email: 'Email'
 Please_enter_your_email: 'Please enter your email'
@@ -203,6 +204,24 @@ campaign:
 
 collect:
   please_create_the_environmental_conditions_for_this_site_first: "Please create the environmental conditions for this site first"
+
+language:
+  name: 'name'
+  iso2: 'Iso2 Code'
+  title: "Language management"
+  create_a_new_language: "Create a new language"
+  manage_language: "Manage language"
+  informations: "Language informations"
+  return_to_language_consultation: "Return to language consultation"
+  delete_language: 'Delete language'
+  msg:
+    created: "The language has been successfully created."
+    updated: "The language has been successfully updated."
+    deleted: "The language has been successfully deleted."
+  error:
+    creation_failed: "Failed to create the language."
+    modification_failed: "An error occurred while updating the language."
+    deletion_failed: "An error occurred while deleting the language."
 
 notification:
   all: "All notifications"

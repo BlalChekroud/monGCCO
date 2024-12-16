@@ -24,6 +24,11 @@ services:
     App\EventListener\UserLocaleListener:
         tags:
             - { name: kernel.event_listener, event: kernel.request }
+            
+    App\Security\UserChecker:
+        autowire: true
+        autoconfigure: true
+        public: false
 
     # App\Security\UserStatusChecker:
     #     tags: ['security.user_checker']

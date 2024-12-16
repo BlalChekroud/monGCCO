@@ -35,7 +35,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {% for agents_group in agents_groups %}
+                    {% for agents_group in agents_groups|reverse %}
                         <tr>
                             <td>{{ agents_group.id }}</td>
                             <td>{{ agents_group.groupName }}</td>

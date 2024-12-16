@@ -67,15 +67,16 @@ Select_the_country: "-- اختر الدولة --"
 vich_uploader.form_label.delete_confirm: 'حذف؟'
 vich_uploader.link.download: 'تحميل'
 image:
-  insert: "إدراج صورة (JPG أو PNG)"
+  insert: "(JPG أو PNG)إدراج صورة"
   not_available: 'لا توجد صورة متوفرة'
-  mimeTypesMessage: 'يرجى تحميل ملف صورة صالح (JPEG أو PNG)'
+  mimeTypesMessage: '(JPEG أو PNG) يرجى تحميل ملف صورة صالح'
 
 Log_in_to_your_account: 'تسجيل الدخول إلى حسابك'
 Enter_your_email_and_password_to_log_in: 'أدخل بريدك الإلكتروني وكلمة المرور لتسجيل الدخول'
 You_are_logged_in_as: 'تم تسجيل الدخول باسم'
 You_are_already_logged_in_as: 'أنت مسجل بالفعل باسم: '
-Your_account_is_disabled: "حسابك معطل."
+inactive_account_cannot_log_in: "حسابك غير نشط. لا يمكنك تسجيل الدخول."
+# Your_account_is_disabled: "حسابك معطل."
 Sign_out: 'تسجيل الخروج'
 Email: 'البريد الإلكتروني'
 Please_enter_your_email: 'يرجى إدخال بريدك الإلكتروني'
@@ -203,6 +204,24 @@ campaign:
 
 collect:
   please_create_the_environmental_conditions_for_this_site_first: "يرجى إنشاء الظروف البيئية لهذا الموقع أولاً"
+
+language:
+  name: "الاسم"
+  iso2: "كود ISO2"
+  title: "إدارة اللغات"
+  create_a_new_language: "إنشاء لغة جديدة"
+  manage_language: "إدارة اللغات"
+  informations: "معلومات اللغة"
+  return_to_language_consultation: "العودة إلى استعراض اللغات"
+  delete_language: "حذف اللغة"
+  msg:
+    created: "تم إنشاء اللغة بنجاح."
+    updated: "تم تحديث اللغة بنجاح."
+    deleted: "تم حذف اللغة بنجاح."
+  error:
+    creation_failed: "فشل إنشاء اللغة."
+    modification_failed: "حدث خطأ أثناء تحديث اللغة."
+    deletion_failed: "حدث خطأ أثناء حذف اللغة."
 
 notification:
   all: "جميع الإشعارات"
