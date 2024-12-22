@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Exporter\ExcelOpenSpoutExporter;
+use App\Form\ExportType;
+use App\Service\ExportService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Entity\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -29,20 +32,48 @@ class BirdSpeciesController extends AbstractController
 {
     private $birdSpeciesRepository;
 
-    public function __construct(BirdSpeciesRepository $birdSpeciesRepository)
+    public function __construct(private readonly ExcelOpenSpoutExporter $exporter, BirdSpeciesRepository $birdSpeciesRepository)
     {
         $this->birdSpeciesRepository = $birdSpeciesRepository;
     }
     
     #[Route('/', name: 'app_bird_species_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
+    public function index(ExportService $exportService, Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         // if ($this->getUser() !== $this->isGranted('IS_AUTHENTICATED_FULLY')) {
         //     $this->addFlash('warning', $translator->trans('please_log_in_to_access_the_page'));
         //     return $this->redirectToRoute('app_login');
         // }
+        
+        // Formulaire d'importation
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
+        // Formulaire d'exportation
+        $formExport = $this->createForm(ExportType::class);
+        $formExport->handleRequest($request);
+
+        if ($formExport->isSubmitted() && $formExport->isValid()) {
+            $columnNames = ['Scientific Name', 'French Name', 'English Name', 'WI Specy Code', 'Family Name', 'Family', 'Created at'];
+            $birdSpecies = $birdSpeciesRepository->findAll();
+    
+            $data = [];
+            foreach ($birdSpecies as $birdSpecy) {
+                $data[] = [
+                    $birdSpecy->getScientificName(),
+                    $birdSpecy->getFrenchName(),
+                    $birdSpecy->getEnglishName(),
+                    $birdSpecy->getWispeciescode(),
+                    $birdSpecy->getBirdFamily()->getFamilyName(),
+                    $birdSpecy->getBirdFamily()->getFamily(),
+                    $birdSpecy->getCreatedAt()->format('d-m-Y H:i:s'),
+                ];
+            }
+    
+            $format = $formExport->get('format')->getData();
+            $fileName = sprintf("bird_species_export_%s", date('d-m-Y_His'));
+    
+            return $exportService->export($columnNames, $data, $format, $fileName);
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $csvFile */
@@ -77,6 +108,7 @@ class BirdSpeciesController extends AbstractController
                     'headers' => $headers,
                     'rows' => $rows,
                     'csvData' => $csvData,
+                    'formExport' => $formExport->createView(),
                 ]);
             }
         }
@@ -209,9 +241,51 @@ class BirdSpeciesController extends AbstractController
         return $this->render('bird_species/index.html.twig', [
             'bird_species' => $birdSpeciesRepository->findAll(),
             'form' => $form->createView(),
+            'formExport' => $formExport->createView(),
         ]);
     }
 
+    // # VALIDE #
+    // #[Route('/export', name: 'app_bird_species_export')]
+    // public function export(Request $request, BirdSpeciesRepository $birdSpeciesRepository): Response
+    // {
+    //     $form = $this->createForm(ExportType::class)
+    //                 ->handleRequest($request);
+
+    //     if ($form->isSubmitted() && $form->isValid()) {
+    //         $columnNames = ['Scientific Name', 'French Name', 'Created at'];
+    //         $birdSpecies = $birdSpeciesRepository->findAll();
+            
+    //         // Prepare an array to store the data rows
+    //         $data = [];
+    //         foreach ($birdSpecies as $birdSpecy) {
+    //             // Extract data from the BirdSpecies entity and map it to an array
+    //             $row = [
+    //                 $birdSpecy->getScientificName(),
+    //                 $birdSpecy->getFrenchName(),
+    //                 $birdSpecy->getCreatedAt()->format('Y-m-d H:i:s'),
+    //             ];
+                
+    //             // Add the row to the array of rows
+    //             $data[] = $row;
+    //         }
+
+    //         /** @var ExportFormat $format */
+    //         $format = $form->get('format')->getData();
+
+    //         $response = new StreamedResponse(fn () => $this->exporter->export($columnNames, $data, $format));
+            
+    //         $response->headers->set('Content-Type', $format->contentType());
+            
+    //         return $response;
+    //     }
+
+    //     return $this->render('bird_species/export.html.twig', [
+    //         'formExport' => $form->createView(),
+    //     ]);
+    // }
+
+    
     // #[Route('/', name: 'app_bird_species_index', methods: ['GET', 'POST'])]
     // public function index(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager): Response
     // {
@@ -485,18 +559,42 @@ class BirdSpeciesController extends AbstractController
             return new JsonResponse(['image' => null], Response::HTTP_NOT_FOUND);
         }
 
-        $imageUrl = $this->getParameter('vich_uploader.upload_directory') . '/' . $birdSpecies->getImage()->getName();
+        $imageUrl = $this->getParameter('vich_uploader.upload_directory') . '/' . $birdSpecies->getImage()->getImageFile();
         
         return new JsonResponse(['image' => $imageUrl]);
     }
 
-    
 
-    #[Route('/{id}', name: 'app_bird_species_show', methods: ['GET'])]
-    public function show(BirdSpecies $birdSpecy): Response
+    #[Route('/{id}', name: 'app_bird_species_show', methods: ['GET', 'POST'])]
+    public function show(ExportService $exportService, Request $request, BirdSpecies $birdSpecy): Response
     {
+        // Formulaire d'exportation
+        $formExport = $this->createForm(ExportType::class);
+        $formExport->handleRequest($request);
+
+        if ($formExport->isSubmitted() && $formExport->isValid()) {
+            $columnNames = ['Nom scientifique', 'Nom en Français', 'Nom en Englais', "Code WI d'espèce", 'Nom de Famille', 'Famille', 'créé le'];
+
+            // Les données doivent être encapsulées dans un tableau multidimensionnel
+            $data = [
+                [
+                    $birdSpecy->getScientificName(),
+                    $birdSpecy->getFrenchName(),
+                    $birdSpecy->getEnglishName(),
+                    $birdSpecy->getWispeciescode(),
+                    $birdSpecy->getBirdFamily()->getFamilyName(),
+                    $birdSpecy->getBirdFamily()->getFamily(),
+                    $birdSpecy->getCreatedAt()->format('d-m-Y H:i:s'),
+                ]
+            ];
+            $format = $formExport->get('format')->getData();
+            $fileName = sprintf("bird_specy_export_%s", date('d-m-Y_His'));
+    
+            return $exportService->export($columnNames, $data, $format, $fileName);
+        }
         return $this->render('bird_species/show.html.twig', [
             'bird_specy' => $birdSpecy,
+            'formExport' => $formExport->createView(),
         ]);
     }
 

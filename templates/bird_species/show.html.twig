@@ -6,12 +6,12 @@
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Espèce d'oiseau</h1>
+      <h1>{{ 'birdSpecies.title'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_bird_species_index') }}">Gestion des espèces</a></li>
-          <li class="breadcrumb-item active">Détail</li>
+          <li class="breadcrumb-item"><a href="{{ path('app_bird_species_index') }}">{{ 'birdSpecies.bird_species'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'show'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -27,30 +27,28 @@
                         <p>{{ "image.not_available"|trans }}</p>
                     {% endif %}
                     <div class="card-body">
-                        <h5 class="card-title">
-                            Détail
-                        </h5>
+                        <h5 class="card-title">{{ 'show'|trans }}</h5>
 
                         <table class="table">
                             <tbody>
                                 <tr>
-                                    <th>Nom Scientifique</th>
+                                    <th>{{ 'birdSpecies.scientific_name'|trans }}</th>
                                     <td>{{ bird_specy.scientificName }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Nom français <h6>(nom vernaculaire)</h6></th>
+                                    <th>{{ 'birdSpecies.french_name'|trans }} <h6>({{ 'birdSpecies.vernacular_name'|trans }})</h6></th>
                                     <td>{{ bird_specy.frenchName }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Nom anglais</th>
+                                    <th>{{ 'birdSpecies.english_name'|trans }}</th>
                                     <td>{{ bird_specy.englishName }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Code WI d'espèce</th>
+                                    <th>{{ 'birdSpecies.wi_species_code'|trans }}</th>
                                     <td>{{ bird_specy.wispeciescode }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Autorité</th>
+                                    <th>{{ 'birdSpecies.authority'|trans }}</th>
                                     <td>{{ bird_specy.authority }}</td>
                                 </tr>
                                 {# <tr>
@@ -58,67 +56,67 @@
                                     <td>{{ bird_specy.coverage }}</td>
                                 </tr> #}
                                 <tr>
-                                    <th>Créé le</th>
+                                    <th>{{ 'created_at'|trans }}</th>
                                     <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Dernière mise à jour le</th>
+                                    <th>{{ 'Last_updated_at'|trans }}</th>
                                     <td>{{ bird_specy.updatedAt ? bird_specy.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Traitement taxonomique de BirdLife</th>
+                                    <th>{{ 'birdSpecies.birdlife_tax_treat'|trans }}</th>
                                     <td>{{ bird_specy.birdLifeTaxTreat }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Nom commun</th>
+                                    <th>{{ 'birdSpecies.common_name'|trans }}</th>
                                     <td>{{ bird_specy.commonName }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Noms communs alternatifs</th>
+                                    <th>{{ 'birdSpecies.common_name_alt'|trans }}</th>
                                     <td>{{ bird_specy.commonNameAlt }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Catégorie de la liste rouge de l'IUCN 2022</th>
+                                    <th>{{ 'iucn_red_list_category'|trans }}</th>
                                     <td>{{ bird_specy.iucnRedListCategory }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Synonymes</th>
+                                    <th>{{ 'birdSpecies.synonyms'|trans }}</th>
                                     <td>{{ bird_specy.synonyms }}</td>
                                 </tr>
                                 <tr>
-                                    <th> Source(s) Taxonomique</th>
+                                    <th>{{ 'birdSpecies.taxonomic_sources'|trans }}</th>
                                     <td>{{ bird_specy.taxonomicSources }}</td>
                                 </tr>
                                 <tr>
-                                    <th>sisRec ID</th>
+                                    <th>{{ 'birdSpecies.sis_rec_id'|trans }}</th>
                                     <td>{{ bird_specy.sisRecId }}</td>
                                 </tr>
                                 <tr>
-                                    <th>spcRec ID</th>
+                                    <th>{{ 'birdSpecies.spc_rec_id'|trans }}</th>
                                     <td>{{ bird_specy.spcRecId }}</td>
                                 </tr>
                                 <tr>
-                                    <th>subspp ID</th>
+                                    <th>{{ 'birdSpecies.subspp_id'|trans }}</th>
                                     <td>{{ bird_specy.subsppId }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Famille</th>
+                                    <th>{{ 'birdFamily.family'|trans }}</th>
                                     <td>{{ bird_specy.birdFamily.family }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Nom de famille</th>
+                                    <th>{{ 'birdFamily.family_name'|trans }}</th>
                                     <td>{{ bird_specy.birdFamily.familyname }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Sous-famille</th>
+                                    <th>{{ 'birdFamily.sub_family'|trans }}</th>
                                     <td>{{ bird_specy.birdFamily.subFamily }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Tribu</th>
+                                    <th>{{ 'birdFamily.tribe'|trans }}</th>
                                     <td>{{ bird_specy.birdFamily.tribe }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Ordre</th>
+                                    <th>{{ 'birdFamily.order'|trans }}</th>
                                     <td>{{ bird_specy.birdFamily.ordre }}</td>
                                 </tr>
                             </tbody>
@@ -129,8 +127,8 @@
                         <div class="row">
                             <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justify-content-between">
                                 <div>
-                                    <a href="{{ path('app_bird_species_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des espèces d'oiseaux">Retour</a>
-                                    <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Créer une espèce</a>
+                                    <a href="{{ path('app_bird_species_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'birdSpecies.return'|trans }}">{{ 'back'|trans }}</a>
+                                    <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{ 'create_a_species'|trans }}</a>
                                 </div>
                                 <div class="d-flex justify-content-end">
                                     {% import 'macros/btn_actions_macros.html.twig' as macros %}
@@ -145,6 +143,30 @@
 
                 </div>
               </div>
+            </div>
+        </div>
+    </section>
+    <section class="section py-4">
+        <div class="container">
+            <div class="card shadow border-0">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <!-- Export Section -->
+                        <div class="col-lg-6 bg-light">
+                            <div class="p-4 text-center">
+                                <h5 class="text-dark mb-3">
+                                    <i class="bi bi-download me-2 text-primary"></i>{{ 'Export Bird Species Data'|trans }}
+                                </h5>
+                                <p class="text-muted mb-4 explanation">
+                                    {{ 'Export Bird Species Data Description'|trans }}
+                                </p>
+                                <div class="d-inline-block">
+                                    {{ form(formExport, { attr: { class: 'btn-group' } }) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

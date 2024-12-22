@@ -1,6 +1,6 @@
 {% if is_granted('ROLE_ADMIN') %}
-    <form method="post" action="{{ path('app_bird_species_delete', {'id': bird_specy.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+    <form method="post" action="{{ path('app_bird_species_delete', {'id': bird_specy.id}) }}" onsubmit="return confirm('{{ 'delete_confirm'|trans }}');">
         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bird_specy.id) }}">
-        <button class="btn btn-danger btn-sm bi bi-trash mx-2" title="Supprimer"></button>
+        <button class="btn btn-danger btn-sm bi bi-trash mx-2" title="{{ 'birdSpecies.delete_specy'|trans }}"></button>
     </form>
 {% endif %}

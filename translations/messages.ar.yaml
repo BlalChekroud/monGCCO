@@ -2,8 +2,8 @@ home_page: "الصفحة الرئيسية"
 breadcrumb_home: "الرئيسية"
 card_title: "القوائم"
 create_group: "إنشاء مجموعة"
-create_a_family: 'إنشاء عائلة'
-create_a_species: 'إنشاء نوع'
+create_a_family: 'إنشاء عائلة طيور'
+create_a_species: 'إنشاء نوع من الطيور'
 create_user_status: 'إنشاء حالة مستخدم'
 add_a_country: 'إضافة دولة'
 choose_bird_family: "-- اختر عائلة الطيور --"
@@ -26,7 +26,11 @@ save: "حفظ"
 update: "تحديث"
 add: 'إضافة'
 modification: 'تعديل'
-export_as_CSV: "تصدير كملف CSV"
+'export data to file': "تصدير البيانات إلى ملف"
+'Import Bird Species Data': "استيراد بيانات أنواع الطيور"
+# 'Import Bird Species Data Description': "قم بسهولة برفع بيانات أنواع الطيور بتنسيق CSV لتحديث سجلاتك."
+'Export Bird Species Data': "تصدير بيانات أنواع الطيور"
+'Export Bird Species Data Description': "اختر تنسيقًا لتنزيل بيانات أنواع الطيور مباشرة."
 print: "طباعة"
 created_by: 'أنشئ بواسطة'
 back: 'رجوع'
@@ -38,10 +42,11 @@ edit_permission: "ليس لديك إذن بالتعديل."
 member_of_a_group_assigned_to_this_site: "أنت لست عضوًا في مجموعة مخصصة لهذا الموقع."
 export_permission: 'ليس لديك إذن بالتصدير.'
 msg_export_limit: "حجم التصدير كبير جدًا. يرجى تقليل حجم الحملة أو المحاولة بتحديد أصغر."
+"choose export format": "اختر التنسيق للتصدير"
 
-csv_import_title: "استيراد ملف CSV"
+csv_import_title: "CSV استيراد ملف"
 csv_import_instruction: "تأكد من أن ملفك يحتوي على الأعمدة المطلوبة."
-csv_preview_title: "معاينة ملف CSV"
+csv_preview_title: "CSV معاينة ملف"
 close: "إغلاق"
 note: "ملاحظة"
 columns: "الأعمدة"
@@ -68,7 +73,7 @@ vich_uploader.form_label.delete_confirm: 'حذف؟'
 vich_uploader.link.download: 'تحميل'
 image:
   insert: "(JPG أو PNG)إدراج صورة"
-  not_available: 'لا توجد صورة متوفرة'
+  not_available: 'لا تتوفر صورة'
   mimeTypesMessage: '(JPEG أو PNG) يرجى تحميل ملف صورة صالح'
 
 Log_in_to_your_account: 'تسجيل الدخول إلى حسابك'
@@ -143,7 +148,7 @@ birdFamily:
   order: "الرتبة"
   tribe: "القبيلة"
   delete_family: "حذف العائلة"
-  create_a_new_species_family: "إنشاء عائلة جديدة للأنواع"
+  create_a_new_species_family: "إنشاء عائلة جديدة للطيور"
   manage_families: "إدارة العائلات"
   informations: "معلومات العائلة"
   return_to_family_consultation: "العودة إلى استعراض العائلة"
@@ -165,8 +170,9 @@ birdFamily:
 
 birdSpecies:
   title: "إدارة أنواع الطيور"
+  bird_species: "أنواع الطيور"
   title_add: "إضافة نوع جديد من الطيور"
-  breadcrumb_manage: "إدارة الأنواع"
+  delete_specy: "حذف نوع الطيور"
   informations: "معلومات النوع الجديد"
   return: "العودة إلى استعراض أنواع الطيور"
   modal_birdlife_tax_treat_title: "إنشاء تصنيف جديد من BirdLife"

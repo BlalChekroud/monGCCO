@@ -2,8 +2,8 @@ home_page: "Page d'accueil"
 breadcrumb_home: "Accueil"
 card_title: "Listes"
 create_group: "Créer un groupe"
-create_a_family: "Créer une famille"
-create_a_species: 'Créer une espèce'
+create_a_family: "Créer une famille d'oiseaux"
+create_a_species: "Créer une espèce d'oiseaux"
 create_user_status: "Créer un statut d'utilisateur"
 add_a_country: 'Ajouter un pays'
 choose_bird_family: "-- Choisir une Famille d'Oiseaux --"
@@ -26,7 +26,11 @@ save: 'Enregistrer'
 update: 'Mise à jour'
 add: 'Ajouter'
 modification: 'Modification'
-export_as_CSV: "Exporter en CSV"
+'export data to file': "Exporter les données dans un fichier"
+'Import Bird Species Data': "Importer les données des espèces d'oiseaux"
+# 'Import Bird Species Data Description': "Téléchargez facilement les données des espèces d'oiseaux au format CSV pour mettre à jour vos enregistrements."
+'Export Bird Species Data': "Exporter les données des espèces d'oiseaux"
+'Export Bird Species Data Description': "Choisissez un format pour télécharger directement les données des espèces d'oiseaux."
 print: "Imprimer"
 created_by: 'Crée par'
 back: 'Retour'
@@ -38,6 +42,7 @@ edit_permission: "Vous n'avez pas l'autorisation de modifier."
 member_of_a_group_assigned_to_this_site: "Vous n'êtes pas membre d'un groupe assigné à ce site"
 export_permission: "Vous n'avez pas l'autorisation d'exporter."
 msg_export_limit: "La taille de l'exportation est trop grande. Veuillez restreindre votre campagne ou essayer une sélection plus petite."
+"choose export format": "Choisissez le format à exporter"
 
 csv_import_title: "Importer un fichier CSV"
 csv_import_instruction: "Assurez-vous que votre fichier contient les colonnes nécessaires."
@@ -165,7 +170,9 @@ birdFamily:
 
 birdSpecies:
   title: "Gestion des espèces d'oiseaux"
+  bird_species: "Espèces des oiseaux"
   title_add: "Ajout d'une espèce d'oiseau"
+  delete_specy: "Supprimer l'espèce d'oiseau"
   breadcrumb_manage: "Gestion des espèces"
   informations: "Les informations de la nouvelle espèce d'oiseau"
   return: "Retour vers la consultation des espèces d'oiseaux"

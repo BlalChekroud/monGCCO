@@ -2,8 +2,8 @@ home_page: "Home page"
 breadcrumb_home: "Home"
 card_title: "Lists"
 create_group: "Create a group"
-create_a_family: 'Create a family'
-create_a_species: 'Create a species'
+create_a_family: 'Create a bird family'
+create_a_species: 'Create a bird species'
 create_user_status: 'Create a user status'
 add_a_country: 'Add a country'
 choose_bird_family: "-- Choose a Bird Family --"
@@ -26,7 +26,11 @@ save: "Save"
 update: "Update"
 add: 'Add'
 modification: 'Modification'
-export_as_CSV: "Export as CSV"
+'export data to file': "Export data to a file"
+'Import Bird Species Data': "Import Bird Species Data"
+# 'Import Bird Species Data Description': "Easily upload bird species data in CSV format to update your records."
+'Export Bird Species Data': "Export Bird Species Data"
+'Export Bird Species Data Description': "Select a format to download bird species data directly."
 print: "Print"
 created_by: 'Created by'
 back: 'Back'
@@ -38,6 +42,7 @@ edit_permission: "You do not have permission to edit."
 member_of_a_group_assigned_to_this_site: "You are not a member of a group assigned to this site."
 export_permission: 'You do not have permission to export.'
 msg_export_limit: "Export size too large. Please narrow your campaign or try a smaller selection."
+"choose export format": "Choose the format to export"
 
 csv_import_title: "Import a CSV File"
 csv_import_instruction: "Make sure your file contains the required columns."
@@ -164,8 +169,10 @@ birdFamily:
     deletion_failed: "Failed to delete the bird family."
 
 birdSpecies:
-  title: "Bird species management"
+  title: "Bird species"
+  bird_species: "Bird species management"
   title_add: "Add a bird species"
+  delete_specy: "Delete bird species"
   breadcrumb_manage: "Species management"
   informations: "New bird species information"
   return: "Back to bird species overview"

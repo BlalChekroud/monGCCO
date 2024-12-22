@@ -16,6 +16,20 @@ class BirdSpeciesRepository extends ServiceEntityRepository
         parent::__construct($registry, BirdSpecies::class);
     }
 
+    // /**
+    //  * Récupère toutes les entités BirdSpecies avec leurs informations complètes.
+    //  *
+    //  * @return BirdSpecies[] Returns an array of BirdSpecies objects
+    //  */
+    // public function findAllBirdSpecies(): array
+    // {
+    //     return $this->createQueryBuilder('b')
+    //         ->select('b') // Optionnel, utilisé pour préciser les colonnes
+    //         ->orderBy('b.id', 'ASC') // Optionnel, pour trier les résultats
+    //         ->getQuery()
+    //         ->getResult();
+    // }
+
     //    /**
     //     * @return BirdSpecies[] Returns an array of BirdSpecies objects
     //     */
