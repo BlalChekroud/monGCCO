@@ -16,11 +16,11 @@
                 <td>{{ iucn_red_list_category.label }}</td>
             </tr>
             <tr>
-                <th>Créé le</th>
+                <th>{{ 'created_at'|trans }}</th>
                 <td>{{ iucn_red_list_category.createdAt ? iucn_red_list_category.createdAt|date('d-m-Y H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>Dernière mise à jour le</th>
+                <th>{{ 'Last_updated_at'|trans }}</th>
                 <td>{{ iucn_red_list_category.updatedAt ? iucn_red_list_category.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
             </tr>
         </tbody>

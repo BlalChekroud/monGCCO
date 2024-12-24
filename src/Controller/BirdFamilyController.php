@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Form\ExportType;
+use App\Service\ExportService;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ImportCsvType;
@@ -10,7 +12,6 @@ use App\Form\BirdFamilyType;
 use App\Entity\BirdFamily;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\BirdFamilyRepository;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,11 +21,35 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class BirdFamilyController extends AbstractController
 {
     #[Route('/', name: 'app_bird_family_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, BirdFamilyRepository $birdFamilyRepository, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
+    public function index(ExportService $exportService, Request $request, BirdFamilyRepository $birdFamilyRepository, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
     
+        $formExport = $this->createForm(ExportType::class);
+        $formExport->handleRequest($request);
+
+        if ($formExport->isSubmitted() && $formExport->isValid()) {
+            $columnNames = ['Nom de Famille', 'Famille', 'Sous famille', 'Tribu', 'Ordre', 'Créé le'];
+            $birdFamilies = $birdFamilyRepository->findAll();
+
+            $data = [];
+            foreach ($birdFamilies as $birdFamily) {
+                $data[] = [
+                    $birdFamily->getFamilyName(),
+                    $birdFamily->getFamily(),
+                    $birdFamily->getSubFamily(),
+                    $birdFamily->getTribe(),
+                    $birdFamily->getOrdre(),
+                    $birdFamily->getCreatedAt()->format('d-m-Y H:i:s'),
+                ];
+            }
+            $format = $formExport->get('format')->getData();
+            $fileName = sprintf("bird_families_export_%s", date('d-m-Y_His'));
+    
+            return $exportService->export($columnNames, $data, $format, $fileName);
+        }
+        
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $csvFile */
             $csvFile = $form->get('csvFile')->getData();
@@ -61,6 +86,7 @@ class BirdFamilyController extends AbstractController
                     'headers' => $headers,
                     'rows' => $rows,
                     'csvData' => $csvData,
+                    'formExport' => $formExport->createView(),
                 ]);
             }
         }
@@ -172,6 +198,7 @@ class BirdFamilyController extends AbstractController
         return $this->render('bird_family/index.html.twig', [
             'bird_families' => $birdFamilyRepository->findAll(),
             'form' => $form->createView(),
+            'formExport' => $formExport->createView(),
         ]);
     }
 
@@ -205,11 +232,35 @@ class BirdFamilyController extends AbstractController
     }
 
 
-    #[Route('/{id}', name: 'app_bird_family_show', methods: ['GET'])]
-    public function show(BirdFamily $birdFamily): Response
+    #[Route('/{id}', name: 'app_bird_family_show', methods: ['GET', 'POST'])]
+    public function show(ExportService $exportService, Request $request, BirdFamily $birdFamily): Response
     {
+        // Formulaire d'exportation
+        $formExport = $this->createForm(ExportType::class);
+        $formExport->handleRequest($request);
+
+        if ($formExport->isSubmitted() && $formExport->isValid()) {
+            $columnNames = ['Nom de Famille', 'Famille', 'Sous famille', 'Tribu', 'Ordre', 'Créé le'];
+
+            // Les données doivent être encapsulées dans un tableau multidimensionnel
+            $data = [
+                [
+                    $birdFamily->getFamilyName(),
+                    $birdFamily->getFamily(),
+                    $birdFamily->getSubFamily(),
+                    $birdFamily->getTribe(),
+                    $birdFamily->getOrdre(),
+                    $birdFamily->getCreatedAt()->format('d-m-Y H:i:s'),
+                ]
+            ];
+            $format = $formExport->get('format')->getData();
+            $fileName = sprintf("bird_family_export_%s", date('d-m-Y_His'));
+    
+            return $exportService->export($columnNames, $data, $format, $fileName);
+        }
         return $this->render('bird_family/show.html.twig', [
             'bird_family' => $birdFamily,
+            'formExport' => $formExport->createView(),
         ]);
     }
 

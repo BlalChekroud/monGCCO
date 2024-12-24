@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Campagne de comptage{% endblock %}
+{% block title %}{{ 'campaign.title'|trans }}{% endblock %}
 
 {% block body %}
 
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Détail d'une campagne de comptage</h1>
+      <h1>{{ 'campaign.campaign_details'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_counting_campaign_index') }}">Gestion des campagnes</a></li>
-          <li class="breadcrumb-item active">Détail</li>
+          <li class="breadcrumb-item"><a href="{{ path('app_counting_campaign_index') }}">{{ 'campaign.manage'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'show'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -24,21 +24,21 @@
                 <div class="card">
                     <div class="card-body">
                         {# <div id="printableArea"> #}
-                            <h5 class="card-title">Détail</h5>
+                            <h5 class="card-title">{{ 'show'|trans }}</h5>
                             <div class="text-end my-4">
                                 {% set currentDate = "now"|date('Y-m-d H:i:s') %}
                                 {% if counting_campaign.startDate|date('Y-m-d H:i:s') > currentDate %}
-                                    <i class="text-warning bi bi-exclamation-triangle"></i><code> Vous ne pouvez pas commencer à collecter avant : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }} <i class="text-warning bi bi-exclamation-triangle"></i></code>
+                                    <i class="text-warning bi bi-exclamation-triangle"></i><code> {{ 'campaign.cannot_start_collecting_before'|trans }} : {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }} <i class="text-warning bi bi-exclamation-triangle"></i></code>
                                 {% endif %}
                             </div>
                             <table class="table">
                                 <tbody>
                                     <tr>
-                                        <th>Nom de la campagne</th>
+                                        <th>{{ 'campaign.campaign_name'|trans }}</th>
                                         <td>{{ counting_campaign.campaignName }}</td>
                                     </tr>
                                     <tr>
-                                        <th>État de la campagne</th>
+                                        <th>{{'campaign.status'|trans }}</th>
                                         <td>
                                             {% set status_classes = {
                                                 0: 'primary',   
@@ -58,31 +58,31 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>Date de début</th>
+                                        <th>{{ 'campaign.start_date'|trans }}</th>
                                         <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Date de fin</th>
+                                        <th>{{ 'campaign.end_date'|trans }}</th>
                                         <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y H:i:s') : '' }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Crée le</th>
+                                        <th>{{ 'created_at'|trans }}</th>
                                         <td>{{ counting_campaign.createdAt ? counting_campaign.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Dernière mise à jour le</th>
+                                        <th>{{ 'Last_updated_at'|trans }}</th>
                                         <td>{{ counting_campaign.updatedAt ? counting_campaign.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Crée par</th>
+                                        <th>{{ 'created_by'|trans}}</th>
                                         <td>{{ counting_campaign.createdBy.name }} {{ counting_campaign.createdBy.lastName }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Description</th>
+                                        <th>{{ 'description'|trans }}</th>
                                         <td>{{ counting_campaign.description }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Sites et Groupes</th>
+                                        <th>{{ 'campaign.sites_and_groups'|trans }}</th>
                                         <td>
                                             {# {% if counting_campaign.siteAgentsGroups|length > 0 %} #}
                                             {% if siteCollectionsByCampaign %}
@@ -125,43 +125,43 @@
                                                                                             {# Vérifiez si `collectedData` est défini et vide pour la condition #}
                                                                                             {# {% if condition and not condition.collectedData  %} #}
                                                                                             {% if condition is defined and condition and not condition.collectedData %}
-                                                                                                <a href="{{ path('app_collected_data_new', {'campaignId': counting_campaign.id, 'siteId': site.id}) }}" class="btn btn-success btn-sm" title="Commencez à collecter"> Collecter des données
+                                                                                                <a href="{{ path('app_collected_data_new', {'campaignId': counting_campaign.id, 'siteId': site.id}) }}" class="btn btn-success btn-sm" title="{{ 'campaign.start_collecting'|trans }}"> {{ 'campaign.collect_data'|trans }}
                                                                                                     <i class="bi bi-arrow-bar-right">
                                                                                                         <div class="spinner-grow spinner-grow-sm text-light" role="status"></div>
                                                                                                     </i>
                                                                                                 </a>
                                                                                             {% else %}
-                                                                                                <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-outline-success btn-sm my-2" title="Ajouter les conditions environnementales puis commencer à collecter">
-                                                                                                    Ajouter Conditions Environnementales de collecte
+                                                                                                <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-outline-success btn-sm my-2" title="{{ 'campaign.add_conditions_then_start_collecting'|trans }}">
+                                                                                                    {{ 'campaign.add_environmental_conditions'|trans }}
                                                                                                 </a>
                                                                                             {% endif %}
                                                                                         {% else %}
                                                                                             {# Aucune condition environnementale n'existe encore pour ce site #}
                                                                                             <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-outline-success btn-sm my-2" title="Ajouter les conditions environnementales puis commencer à collecter">
-                                                                                                Ajouter Conditions Environnementales de collecte
+                                                                                                {{ 'campaign.add_environmental_conditions'|trans }}
                                                                                             </a>
                                                                                         {% endif %}
                                                                                     {% endif %}
                                                                                 {% else %}
                                                                                     <code>
                                                                                         <i class="text-warning bi bi-exclamation-triangle"></i> 
-                                                                                        Vous ne pouvez pas commencer à collecter avant : 
+                                                                                        {{ 'campaign.cannot_start_collecting_before'|trans }} : 
                                                                                         {{ counting_campaign.startDate ? counting_campaign.startDate|date('Y-m-d H:i:s') : '' }}
                                                                                         <i class="text-warning bi bi-exclamation-triangle"></i>
                                                                                     </code>
                                                                                 {% endif %}
                                                                             {% else %}
-                                                                                <i class="text-warning bi bi-exclamation-triangle me-1"> Cette partie est réservée pour les agents du site</i>
+                                                                                <i class="text-warning bi bi-exclamation-triangle me-1"> {{ 'campaign.reserved_for_site_agents'|trans }}</i>
                                                                             {% endif %}
                                                                         {% endif %}
 
                                                                     </div>
-                                                                    <h6>Groupes d'agents associés :</h6>
+                                                                    <h6>{{ 'campaign.associated_agent_groups'|trans }} :</h6>
                                                                     {% if siteAgentsGroup.agentsGroup|length > 0 %}
                                                                         {% for group in siteAgentsGroup.agentsGroup %}
                                                                             <ul>
                                                                                 <li>
-                                                                                    <h6>{{ group.groupName }} (Chef : {{ group.leader.name }} {{ group.leader.lastName }})</h6>
+                                                                                    <h6>{{ group.groupName }} ({{ 'campaign.leader'|trans }} : {{ group.leader.name }} {{ group.leader.lastName }})</h6>
                                                                                     <ul>
                                                                                         {% for agent in group.groupMember %}
                                                                                             <li>{{ agent.name }} {{ agent.lastName }}</li>
@@ -171,7 +171,7 @@
                                                                             </ul>
                                                                         {% endfor %}
                                                                     {% else %}
-                                                                        <span>Aucun groupe trouvé</span>
+                                                                        <span>{{ 'campaign.no_group_found'|trans }}</span>
                                                                     {% endif %}
                                                                 </div>
                                                             </div>
@@ -179,7 +179,7 @@
                                                     {% endfor %}
                                                 </div>
                                             {% else %}
-                                                <span>Aucun site trouvé</span>
+                                                <span>{{ 'campaign.no_site_found'|trans }}</span>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -190,24 +190,24 @@
                     
                     <div class="card-footer d-flex justify-content-between">
                         <div>
-                            <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers consultation des campagnes">Retour</a>
+                            <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'campaign.back_to_campaign_consultation'|trans }}">{{ 'back'|trans }}</a>
                             
                             {% if is_granted("ROLE_ADMIN") %}
                                 {% if counting_campaign.campaignStatus != statusSuspended and counting_campaign.campaignStatus != statusClosed %}
-                                    <a href="{{ path('app_counting_campaign_suspend', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-warning bi bi-pause-fill" onclick="return confirm('Êtes-vous sûr de vouloir mettre en suspens cette campagne ?');"> Mettre en suspens</a>
+                                    <a href="{{ path('app_counting_campaign_suspend', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-warning bi bi-pause-fill" onclick="return confirm('{{ 'campaign.confirm_suspend'|trans }}');"> {{ 'campaign.suspend'|trans }}</a>
                                 {% elseif counting_campaign.campaignStatus == statusSuspended %}
-                                    <a href="{{ path('app_counting_campaign_suspend', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-warning bi bi-play-fill" title="Mettre fin au suspension de la campagne" onclick="return confirm('Êtes-vous sûr de vouloir reprendre cette campagne ?');">Reprendre</a>
+                                    <a href="{{ path('app_counting_campaign_suspend', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-warning bi bi-play-fill" onclick="return confirm('{{ 'campaign.confirm_resume'|trans }}');" title="{{ 'campaign.end_campaign_suspension'|trans }}">{{ 'campaign.resume'|trans }}</a>
                                 {% endif %}
                                 {% if counting_campaign.campaignStatus == statusFinished %}
-                                    <a href="{{ path('app_counting_campaign_close', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-success bi bi-lock-fill" onclick="return confirm('Êtes-vous sûr de vouloir clôturer cette campagne ? Cette action n\'est pas réversible');"> Clôturer la campagne</a>
+                                    <a href="{{ path('app_counting_campaign_close', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-success bi bi-lock-fill" onclick="return confirm('{{ 'campaign.confirm_close'|trans }}');"> {{ 'campaign.close_campaign'|trans }}</a>
                                 {% endif %}
                                 {% if counting_campaign.campaignStatus != statusClosed %}
-                                    <a href="{{ path('app_counting_campaign_cancel', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-dark bi bi-x-lg" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette campagne ? Cette action n\'est pas réversible');"> Annuler la campagne</a>
+                                    <a href="{{ path('app_counting_campaign_cancel', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-dark bi bi-x-lg" onclick="return confirm('{{ 'campaign.confirm_cancel'|trans }}');"> {{ 'campaign.cancel_campaign'|trans }}</a>
                                 {% endif %}
                             {% endif %}
                         </div>
                         <div class="d-flex justify-content-end">
-                            <a href="{{ path('app_counting_campaign_export', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-outline-secondary bi bi-folder me-3" title="Exporter en CSV"></a>
+                            {# <a href="{{ path('app_counting_campaign_export', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-outline-secondary bi bi-folder me-3" title="Exporter en CSV"></a> #}
                             {% import 'macros/btn_actions_macros.html.twig' as macros %}
                             {{ macros.action_buttons('app_counting_campaign_new','app_counting_campaign_show', 'app_counting_campaign_edit', 'counting_campaign/_delete_form.html.twig', counting_campaign, app.request.attributes.get('_route'), true) }}
                             {{ include('counting_campaign/_delete_form.html.twig') }}
@@ -230,7 +230,7 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="flush-headingOne">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                                        <h6 class="mt-4"><i class="bi bi-info-circle-fill text-info"></i> Détails de la campagne</h6>
+                                        <h6 class="mt-4"><i class="bi bi-info-circle-fill text-info"></i> {{ 'campaign.campaign_details'|trans }}</h6>
                                     </button>
                                 </h2>
                                 <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
@@ -250,5 +250,9 @@
         </div>
 
     </section>
+    
+    {% import 'macros/show_export_macros.html.twig' as macros %}
+
+    {{ macros.export_section(formExport, 'Export counting campaign Data') }}
 </main>
 {% endblock %}

@@ -81,5 +81,10 @@
             </div>
         </div>
     </section>
+    <section class="section py-4">
+    {% import 'macros/show_export_macros.html.twig' as macros %}
+
+    {{ macros.export_section(formExport, 'Export Bird Family Data') }}
+
 </main>
 {% endblock %}

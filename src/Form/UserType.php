@@ -36,6 +36,7 @@ class UserType extends AbstractType
                     'ROLE_CREAT' => 'ROLE_CREAT',
                     'ROLE_DELETE' => 'ROLE_DELETE',
                     'ROLE_IMPORT' => 'ROLE_IMPORT',
+                    'ROLE_EXPORT' => 'ROLE_EXPORT',
                     'ROLE_SUPER_CREAT' => 'ROLE_SUPER_CREAT',
                     'Collecteur' => 'ROLE_COLLECTOR',
                     // 'Chef d\'équipe' => 'ROLE_TEAMLEADER',

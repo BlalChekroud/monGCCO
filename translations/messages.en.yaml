@@ -26,13 +26,19 @@ save: "Save"
 update: "Update"
 add: 'Add'
 modification: 'Modification'
-'export data to file': "Export data to a file"
+'Export Data Description': "Choose a format to download the data."
 'Import Bird Species Data': "Import Bird Species Data"
-# 'Import Bird Species Data Description': "Easily upload bird species data in CSV format to update your records."
 'Export Bird Species Data': "Export Bird Species Data"
-'Export Bird Species Data Description': "Select a format to download bird species data directly."
+'Import Bird Family Data': "Import Bird Family Data"
+'Export Bird Family Data': "Export Bird Family Data"
+'Export counting campaign Data': "Export counting campaign data"
+export_format:
+  csv: "CSV (Comma-Separated Values)"
+  xlsx: "Excel (XLSX)"
+  ods: "OpenDocument Spreadsheet (ODS)"
 print: "Print"
 created_by: 'Created by'
+collector: "Collector"
 back: 'Back'
 install: "Install the app"
 app_description: "Seabird Counting Campaign Management"
@@ -42,7 +48,9 @@ edit_permission: "You do not have permission to edit."
 member_of_a_group_assigned_to_this_site: "You are not a member of a group assigned to this site."
 export_permission: 'You do not have permission to export.'
 msg_export_limit: "Export size too large. Please narrow your campaign or try a smaller selection."
-"choose export format": "Choose the format to export"
+"choose export format": "-- Choose the format to export --"
+help: 'Help'
+status: "Status"
 
 csv_import_title: "Import a CSV File"
 csv_import_instruction: "Make sure your file contains the required columns."
@@ -58,8 +66,9 @@ import: "Import"
 import_permission: "You do not have permission to import data."
 access: "You do not have access."
 maxSizeMessage: "The file is too large. The maximum allowed size is 1024k."
-coverage_for_this_species: 'Coverage for this species'
+coverage: 'Coverage for this species'
 iucn_red_list_category: "IUCN Red List Category 2022"
+birdlife_tax_treat: "BirdLife Taxonomic Treatment"
 
 import_csv:
   mimeTypesMessage: "Please upload a valid CSV file."
@@ -98,12 +107,6 @@ hidden_label: 'Hide'
 visible_label: 'Show'
 no_role: 'No role'
 please_log_in_to_access_the_page: 'Please log in to access the page'
-
-user:
-  msg:
-    deleted: "The user account has been successfully deleted."
-  error:
-    deletion_failed: "An error occurred while deleting the user account."
 
 agentsGroup:
   title: "Agent group management"
@@ -185,7 +188,6 @@ birdSpecies:
   wi_species_code: "WI Species Code"
   image: "Image"
   authority: "Authority"
-  birdlife_tax_treat: "BirdLife Taxonomic Treatment"
   common_name: "Common Name"
   common_name_alt: "Alternative Common Names"
   synonyms: "Synonymes"
@@ -208,10 +210,92 @@ birdSpecies:
 
 campaign:
   cannot_be_modified: "The campaign with status %status% cannot be modified"
+  title: "Campaign Management"
+  manage: "Manage Campaigns"
+  campaign_name: "Campaign Name"
+  start_date: "Start Date"
+  end_date: "End Date"
+  create_campaign: "Create a Campaign"
+  cannot_start_collecting_before: "You cannot start collecting before"
+  status: "Campaign Status"
+  created_by: "Created by"
+  sites_and_groups: "Sites and Groups"
+  start_collecting: "Start Collecting"
+  collect_data: "Collect Data"
+  add_conditions_then_start_collecting: "Add environmental conditions then start collecting"
+  add_environmental_conditions: "Add Environmental Conditions"
+  reserved_for_site_agents: "This section is reserved for site agents"
+  associated_agent_groups: "Associated Agent Groups:"
+  leader: "Leader:"
+  no_group_found: "No group found"
+  no_site_found: "No site found"
+  back_to_campaign_consultation: "Back to Campaign Consultation"
+  confirm_suspend: "Are you sure you want to suspend this campaign?"
+  suspend: "Suspend"
+  end_campaign_suspension: "End campaign suspension"
+  confirm_resume: "Are you sure you want to resume this campaign?"
+  resume: "Resume"
+  confirm_close: "Are you sure you want to close this campaign? This action is irreversible"
+  close_campaign: "Close Campaign"
+  confirm_cancel: "Are you sure you want to cancel this campaign? This action is irreversible"
+  cancel_campaign: "Cancel Campaign"
+  campaign_details: "Counting Campaign Details"
+
+description: "Description"
+disturbed: "Disturbed"
+none: "None"
+ice_cover: "Ice Cover"
+tidal: "Tidal"
+water_condition: "Water Condition"
+type: "Type"
+quality: "Quality"
+methods: "Method(s)"
+no_method: "No method"
+weather: "Weather"
+ice: "Ice"
+water: "Water"
+
+campaign_statistics:
+  title: "Campaign Statistics"
+  statistic: "Statistic"
+  value: "Value"
+  sites_involved: "Number of sites involved"
+  total_agents_participating: "Total agents participating"
+  total_collections: "Total collections"
+  most_frequent_conditions: "Most Frequent Environmental Conditions"
+  weather_conditions: "Weather Conditions"
+  methods_used: "Methods Used"
+  sites_and_collections: "Sites and Collections"
+  total_birds_counted: "Total Birds Counted"
+  no_agents_assigned: "No agents assigned"
+  no_groups_found: "No groups found for this site"
+  collection_number: "Collection Number"
+  counting: "Counting"
+  environmental_conditions: "Environmental Conditions"
+  observed_species: "Observed Bird Species"
+  no_species_observed: "No species observed"
+  total: "Total"
+  no_sites_found: "No sites found for this campaign"
+species_statistics:
+  total_species_counted: "Total Count Per Species"
+  species: "Species"
+  total_count: "Total Count"
+  no_species_observed: "No species observed in this campaign"
+overall_totals:
+  general_count_total: "Overall Total Count in Campaign"
+  unique_species_observed: "Total Unique Species Observed"
 
 collect:
   please_create_the_environmental_conditions_for_this_site_first: "Please create the environmental conditions for this site first"
+  view_collections: "View Collections"
 
+condition:
+  list_environmental_conditions: "View List of Environmental Conditions"
+  view_conditions: "View Environmental Conditions"
+
+group:
+  view_groups: "View Groups"
+  
 language:
   name: 'name'
   iso2: 'Iso2 Code'
@@ -267,6 +351,16 @@ register:
 # Error messages for form validation
 form_error:
   general: "Please check the information and try again."
+
+site_collection:
+  add_collection_site: "Add a Collection Site"
+  site: "Site"
+
+user:
+  msg:
+    deleted: "The user account has been successfully deleted."
+  error:
+    deletion_failed: "An error occurred while deleting the user account."
 
 userStatus:
   title: "User Status Management"

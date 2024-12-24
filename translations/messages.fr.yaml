@@ -26,13 +26,19 @@ save: 'Enregistrer'
 update: 'Mise à jour'
 add: 'Ajouter'
 modification: 'Modification'
-'export data to file': "Exporter les données dans un fichier"
+'Export Data Description': "Choisissez un format pour télécharger les données."
 'Import Bird Species Data': "Importer les données des espèces d'oiseaux"
-# 'Import Bird Species Data Description': "Téléchargez facilement les données des espèces d'oiseaux au format CSV pour mettre à jour vos enregistrements."
 'Export Bird Species Data': "Exporter les données des espèces d'oiseaux"
-'Export Bird Species Data Description': "Choisissez un format pour télécharger directement les données des espèces d'oiseaux."
+'Import Bird Family Data': "Importer les données d'une famille d'oiseaux"
+'Export Bird Family Data': "Exporter les données d'une famille d'oiseaux"
+'Export counting campaign Data': "Exporter les données de la campagne de comptage"
+export_format:
+  csv: "CSV (Valeurs séparées par des virgules)"
+  xlsx: "Excel (XLSX)"
+  ods: "OpenDocument Spreadsheet (ODS)"
 print: "Imprimer"
-created_by: 'Crée par'
+created_by: 'Créé par'
+collector: "Collecteur"
 back: 'Retour'
 install: "Installer l'application"
 app_description: "Gestion des campagnes de comptage des oiseaux marins"
@@ -42,7 +48,9 @@ edit_permission: "Vous n'avez pas l'autorisation de modifier."
 member_of_a_group_assigned_to_this_site: "Vous n'êtes pas membre d'un groupe assigné à ce site"
 export_permission: "Vous n'avez pas l'autorisation d'exporter."
 msg_export_limit: "La taille de l'exportation est trop grande. Veuillez restreindre votre campagne ou essayer une sélection plus petite."
-"choose export format": "Choisissez le format à exporter"
+"choose export format": "-- Choisissez le format à exporter --"
+help: 'Aide'
+status: "État"
 
 csv_import_title: "Importer un fichier CSV"
 csv_import_instruction: "Assurez-vous que votre fichier contient les colonnes nécessaires."
@@ -58,8 +66,9 @@ import: "Importer"
 import_permission: "Vous n'avez pas l'autorisation d'importer des données."
 access: "Vous n'avez pas l'accès."
 maxSizeMessage: "Le fichier est trop volumineux. La taille maximale autorisée est 1024k."
-coverage_for_this_species: 'Couverture pour cette espèce'
+coverage: 'Couverture pour cette espèce'
 iucn_red_list_category: "Catégorie de la liste rouge de l'IUCN 2022"
+birdlife_tax_treat: "Traitement taxonomique de BirdLife"
 
 import_csv:
   mimeTypesMessage: "Veuillez charger un fichier CSV valide."
@@ -98,12 +107,6 @@ hidden_label: 'Masquer'
 visible_label: 'Afficher'
 no_role: "Aucun rôle"
 please_log_in_to_access_the_page: "Veuillez vous connecter pour accéder à la page"
-
-user:
-  msg:
-    deleted: "Le compte utilisateur a bien été supprimé."
-  error:
-    deletion_failed: "Une erreur s'est produite lors de la suppression du compte utilisateur."
 
 agentsGroup:
   title: "Gestion des groupes d'agents"
@@ -185,7 +188,6 @@ birdSpecies:
   wi_species_code: "Code WI d'espèce"
   image: "Image"
   authority: "Autorité"
-  birdlife_tax_treat: "Traitement taxonomique de BirdLife"
   common_name: "Nom commun"
   common_name_alt: "Noms communs alternatifs"
   synonyms: "Synonymes"
@@ -208,9 +210,91 @@ birdSpecies:
 
 campaign:
   cannot_be_modified: "Une campagne %status% ne peut pas être modifiée"
+  title: "Gestion des campagnes de comptage"
+  manage: "Gestion des campagnes"
+  campaign_name: "Nom de la campagne"
+  start_date: "Date de début"
+  end_date: "Date de fin"
+  create_campaign: "Créer une campagne"
+  detail_counting_campaign: "Détail d'une campagne de comptage"
+  cannot_start_collecting_before: "Vous ne pouvez pas commencer à collecter avant"
+  status: "État de la campagne"
+  sites_and_groups: "Sites et Groupes"
+  start_collecting: "Commencez à collecter"
+  collect_data: "Collecter des données"
+  add_conditions_then_start_collecting: "Ajouter les conditions environnementales puis commencer à collecter"
+  add_environmental_conditions: "Ajouter Conditions Environnementales de collecte"
+  reserved_for_site_agents: "Cette partie est réservée pour les agents du site"
+  associated_agent_groups: "Groupes d'agents associés"
+  leader: "Chef"
+  no_group_found: "Aucun groupe trouvé"
+  no_site_found: "Aucun site trouvé"
+  back_to_campaign_consultation: "Retour vers consultation des campagnes"
+  confirm_suspend: "Êtes-vous sûr de vouloir mettre en suspens cette campagne ?"
+  suspend: "Mettre en suspens"
+  end_campaign_suspension: "Mettre fin à la suspension de la campagne"
+  confirm_resume: "Êtes-vous sûr de vouloir reprendre cette campagne ?"
+  resume: "Reprendre"
+  confirm_close: "Êtes-vous sûr de vouloir clôturer cette campagne ? Cette action n'est pas réversible"
+  close_campaign: "Clôturer la campagne"
+  confirm_cancel: "Êtes-vous sûr de vouloir annuler cette campagne ? Cette action n'est pas réversible"
+  cancel_campaign: "Annuler la campagne"
+  campaign_details: "Détails de la campagne"
+
+description: "Description"
+disturbed: "Disturbé(e)"
+none: "Aucune"
+ice_cover: "Couverture de Glace"
+tidal: "Marée"
+water_condition: "État de l'Eau"
+type: "Type"
+quality: "Qualité"
+methods: "Méthode(s)"
+no_method: "Aucune méthode"
+weather: "Météo"
+ice: "Glace"
+water: "Eaux"
+
+campaign_statistics:
+  title: "Statistiques de la campagne"
+  statistic: "Statistique"
+  value: "Valeur"
+  sites_involved: "Nombre de sites impliqués"
+  total_agents_participating: "Nombre total d'agents participants"
+  total_collections: "Nombre total de collectes"
+  most_frequent_conditions: "Conditions environnementales les plus fréquentes"
+  weather_conditions: "Conditions Météorologiques"
+  methods_used: "Méthodes de collecte utilisées"
+  sites_and_collections: "Sites et collectes"
+  total_birds_counted: "Nombre total des oiseaux comptés"
+  no_agents_assigned: "Aucun agent assigné"
+  no_groups_found: "Aucun groupe trouvé pour ce site"
+  collection_number: "Collecte numéro"
+  counting: "Comptage"
+  environmental_conditions: "Conditions Environnementales"
+  observed_species: "Espèces d'oiseaux observées"
+  no_species_observed: "Aucune espèce observée"
+  total: "Total"
+  no_sites_found: "Aucun site trouvé pour cette campagne"
+species_statistics:
+  total_species_counted: "Nombre total compté pour chaque espèce"
+  species: "Espèce"
+  total_count: "Nombre total"
+  no_species_observed: "Aucune espèce observée dans cette campagne"
+overall_totals:
+  general_count_total: "Total général des comptages dans la campagne"
+  unique_species_observed: "Total d'espèces uniques observées"
 
 collect:
   please_create_the_environmental_conditions_for_this_site_first: "Veuillez d'abord créer les conditions environnementales pour ce site."
+  view_collections: "Consultation des collectes"
+
+condition:
+  list_environmental_conditions: "Voir la liste des conditions environnementales"
+  view_conditions: "Consultation des environnementales"
+
+group:
+  view_groups: "Consultation des groupes"
 
 language:
   name: 'Nom'
@@ -267,6 +351,16 @@ register:
 # Messages pour les erreurs de formulaire
 form_error:
   general: "Veuillez vérifier les informations et réessayer."
+
+site_collection:
+  add_collection_site: "Ajouter un site de collecte"
+  site: "Site"
+
+user:
+  msg:
+    deleted: "Le compte utilisateur a bien été supprimé."
+  error:
+    deletion_failed: "Une erreur s'est produite lors de la suppression du compte utilisateur."
 
 userStatus:
   title: "Gestion des statuts d'utilisateur"

@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Enum\ExportFormat;
 use App\Exporter\ExcelOpenSpoutExporter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportService
 {
@@ -34,4 +35,5 @@ class ExportService
             'Content-Disposition' => sprintf('attachment; filename="%s.%s"', $fileName, $format->extension()),
         ]);
     }
+    
 }

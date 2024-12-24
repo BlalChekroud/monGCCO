@@ -17,6 +17,42 @@ class CountingCampaignRepository extends ServiceEntityRepository
         parent::__construct($registry, CountingCampaign::class);
     }
 
+    // Récupère les données de campagne de comptage pour l'exportation
+    public function getBirdSpeciesDataForCampaign(int $campaignId): array
+    {
+        $qb = $this->createQueryBuilder('cc')
+            ->select(
+                'cc.campaignName',
+                'cc.startDate',
+                'cc.endDate',
+                'cc.description',
+                'cc.createdAt',
+                'cc.updatedAt',
+                'creator.email AS createdBy',
+                'city.name AS cityName',
+                'site.siteName',
+                'cd.createdAt AS collectedDate',
+                'cd.createdBy AS collectedBy',
+                'bs.scientificName',
+                'bs.wispeciesCode',
+                'bsc.count AS birdCount'
+            )
+            ->innerJoin('cc.siteAgentsGroups', 'sag')
+            ->innerJoin('sag.siteCollection', 'site')
+            ->innerJoin('site.city', 'city')
+            ->innerJoin('site.collectedData', 'cd')
+            ->innerJoin('cd.birdSpeciesCounts', 'bsc')
+            ->innerJoin('bsc.birdSpecies', 'bs')
+            ->innerJoin('cc.createdBy', 'creator')
+            ->where('cc.id = :campaignId')
+            ->setParameter('campaignId', $campaignId)
+            ->orderBy('city.name', 'ASC')
+            ->addOrderBy('site.siteName', 'ASC')
+            ->addOrderBy('bs.scientificName', 'ASC');
+    
+        return $qb->getQuery()->getResult();
+    }    
+
     // /**
     //  * Récupère le nombre total de comptages d'oiseaux pour chaque site dans une campagne de comptage spécifique.
     //  *

@@ -37,11 +37,11 @@
                                     <td>{{ site_collection.siteCode }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Crée le</th>
+                                    <th>{{ 'created_at'|trans }}</th>
                                     <td>{{ site_collection.createdAt ? site_collection.createdAt|date('D-m-y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Dernière mise à jour le</th>
+                                    <th>{{ 'Last_updated_at'|trans }}</th>
                                     <td>{{ site_collection.updatedAt ? site_collection.updatedAt|date('D-m-y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>

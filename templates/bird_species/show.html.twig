@@ -18,7 +18,7 @@
 
     <section class="section">
         <div class="row">
-            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
               <div id="printableArea">
                 <div class="card">
                     {% if bird_specy.image %}
@@ -51,10 +51,10 @@
                                     <th>{{ 'birdSpecies.authority'|trans }}</th>
                                     <td>{{ bird_specy.authority }}</td>
                                 </tr>
-                                {# <tr>
-                                    <th>Couverture</th>
+                                <tr>
+                                    <th>{{ 'coverage'|trans }}</th>
                                     <td>{{ bird_specy.coverage }}</td>
-                                </tr> #}
+                                </tr>
                                 <tr>
                                     <th>{{ 'created_at'|trans }}</th>
                                     <td>{{ bird_specy.createdAt ? bird_specy.createdAt|date('Y-m-d H:i:s') : '' }}</td>
@@ -64,7 +64,7 @@
                                     <td>{{ bird_specy.updatedAt ? bird_specy.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>{{ 'birdSpecies.birdlife_tax_treat'|trans }}</th>
+                                    <th>{{ 'birdlife_tax_treat'|trans }}</th>
                                     <td>{{ bird_specy.birdLifeTaxTreat }}</td>
                                 </tr>
                                 <tr>
@@ -135,7 +135,6 @@
                                     {{ macros.action_buttons('app_bird_species_new', 'app_bird_species_show', 'app_bird_species_edit', 'bird_species/_delete_form.html.twig', bird_specy, app.request.attributes.get('_route')) }}
                                     {{ include('bird_species/_delete_form.html.twig') }}
                                     <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="Imprimer"></button>
-                                    <a href="#" class="btn btn-outline-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
                                 </div>
                             </div>
                         </div>
@@ -146,30 +145,9 @@
             </div>
         </div>
     </section>
-    <section class="section py-4">
-        <div class="container">
-            <div class="card shadow border-0">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <!-- Export Section -->
-                        <div class="col-lg-6 bg-light">
-                            <div class="p-4 text-center">
-                                <h5 class="text-dark mb-3">
-                                    <i class="bi bi-download me-2 text-primary"></i>{{ 'Export Bird Species Data'|trans }}
-                                </h5>
-                                <p class="text-muted mb-4 explanation">
-                                    {{ 'Export Bird Species Data Description'|trans }}
-                                </p>
-                                <div class="d-inline-block">
-                                    {{ form(formExport, { attr: { class: 'btn-group' } }) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {% import 'macros/show_export_macros.html.twig' as macros %}
+
+    {{ macros.export_section(formExport, 'Export Bird Species Data') }}
 </main>
 
 {% endblock %}

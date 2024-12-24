@@ -31,8 +31,8 @@
                             <th>Collecteur</th>
                             <th>Site de collecte</th>
                             <th>Nombre total</th>
-                            <th>Crée le</th>
-                            <th>Actions</th>
+                            <th>{{ 'created_at'|trans }}</th>
+                            <th>{{ 'actions'|trans }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -59,7 +59,7 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6">Aucun enregistrement trouvé</td>
+                            <td colspan="6">{{ 'no_record_found'|trans }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -69,7 +69,7 @@
               <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="Voir la liste des campagnes de comptage"> Consultation des campagnes</a>
               <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="Voir la liste des conditions environnementales"> Consultation des conditions</a>
               {# <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm ri-database-line"> Créer une collecte</a> #}
-              <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une campagne</a>
+              <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{ 'campaign.create_campaign'|trans }}</a>
             </div>
           </div>
 

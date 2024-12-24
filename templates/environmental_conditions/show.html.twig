@@ -55,11 +55,11 @@
                                     </td>
                                 </tr
                                 <tr>
-                                    <th>Crée le</th>
+                                    <th>{{ 'created_at'|trans }}</th>
                                     <td>{{ environmental_condition.createdAt ? environmental_condition.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Dernière mise à jour le</th>
+                                    <th>{{ 'Last_updated_at'|trans }}</th>
                                     <td>{{ environmental_condition.updatedAt ? environmental_condition.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                                 </tr>
                             </tbody>

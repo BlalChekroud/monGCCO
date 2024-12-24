@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -17,6 +18,8 @@ final class UserLocaleListener
         private readonly Security $security,
         private readonly LocaleSwitcher $localeSwitcher,
         private readonly RouterInterface $router,
+        private readonly LoggerInterface $logger, // Optionnel
+        private readonly string $defaultLocale = 'fr'
     ) {}
 
     #[AsEventListener(event: KernelEvents::REQUEST)]
@@ -24,7 +27,12 @@ final class UserLocaleListener
     {
         $user = $this->security->getUser();
     
-        if ($user instanceof User) {    
+        if ($user instanceof User) {  
+            if ($user->getUserStatus() === null || $user->getUserStatus()->getLabel() === null) {
+                // Log or handle unexpected status
+                return;
+            }
+              
             if ($user->getUserStatus()->getLabel() !== 'Actif') {
                 // Déconnexion de l'utilisateur
                 // $this->security->logout();
@@ -33,20 +41,22 @@ final class UserLocaleListener
                 $logoutUrl = $this->router->generate('app_logout');
     
                 // Redirection vers la page de déconnexion
-                $response = new RedirectResponse($logoutUrl);
-                $event->setResponse($response);
+                $this->logger?->warning('User inactive, redirecting to logout.');
+                $event->setResponse(new RedirectResponse($logoutUrl));
                 return;
             }
     
             // Si l'utilisateur est connecté, appliquez sa locale
-            $language = $user->getLanguage();
+            $language = $user->getLanguage()?->getIso2();
     
-            if ($language !== null) {
-                $this->localeSwitcher->setLocale($language->getIso2());
+            if ($language) {
+                $this->logger?->info('Applying user locale: ' . $language);
+                $this->localeSwitcher->setLocale($language);
             }
         } else {
             // Pour les utilisateurs non connectés
-            $locale = $event->getRequest()->getSession()->get('_locale', 'fr');
+            $locale = $event->getRequest()->getSession()->get('_locale', $this->defaultLocale);
+            $this->logger?->info('Applying default locale: ' . $locale);
             $this->localeSwitcher->setLocale($locale);
         }
     }

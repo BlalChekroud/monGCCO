@@ -63,11 +63,11 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Crée le</th>
+                                    <th>{{ 'created_at'|trans }}</th>
                                     <td>{{ country.createdAt ? country.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Dernière mise à jour le</th>
+                                    <th>{{ 'Last_updated_at'|trans }}</th>
                                     <td>{{ country.updatedAt ? country.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                             </tbody>

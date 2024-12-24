@@ -91,7 +91,7 @@
                                 {% else %}
                                     <tr>
                                         <th style="width: 30%; white-space: nowrap;">Conditions d'environnement</th>
-                                        <td>Aucun enregistrement trouvé</td>
+                                        <td>{{ 'no_record_found'|trans }}</td>
                                     </tr>
                                 {% endif %}
                                 <tr>
@@ -138,11 +138,11 @@
                                     <td style="width: 70%;">{{ collected_datum.method|join('<br> ')|raw }}</td>
                                 </tr>
                                 <tr>
-                                    <th style="width: 30%; white-space: nowrap;">Crée le</th>
+                                    <th style="width: 30%; white-space: nowrap;">{{ 'created_at'|trans }}</th>
                                     <td style="width: 70%;">{{ collected_datum.createdAt ? collected_datum.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th style="width: 30%; white-space: nowrap;">Dernière mise à jour le</th>
+                                    <th style="width: 30%; white-space: nowrap;">{{ 'Last_updated_at'|trans }}</th>
                                     <td style="width: 70%;">{{ collected_datum.updatedAt ? collected_datum.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                                 </tr>
                             </tbody>

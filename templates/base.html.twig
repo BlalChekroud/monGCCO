@@ -539,12 +539,12 @@
 
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-layout-text-window-reverse"></i><span>Gestion des campagnes</span><i class="bi bi-chevron-down ms-auto"></i>
+            <i class="bi bi-layout-text-window-reverse"></i><span>{{ 'campaign.manage'|trans }}</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="{{ path('app_counting_campaign_new') }}">
-                <i class="bi bi-circle"></i><span>Créer une campagne</span>
+                <i class="bi bi-circle"></i><span>{{ 'campaign.create_campaign'|trans }}</span>
               </a>
             </li>
             <li>

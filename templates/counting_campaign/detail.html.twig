@@ -1,56 +1,56 @@
 <div id="printableArea">
     <!-- Détails de la campagne -->
     <table class="table table-hover table-striped">
-        <tr><td><strong>Nom :</strong></td><td>{{ counting_campaign.campaignName }}</td></tr>
-        <tr><td><strong>Date de début :</strong></td><td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</td></tr>
-        <tr><td><strong>Date de fin :</strong></td><td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y H:i:s') : '' }}</td></tr>
-        <tr><td><strong>État :</strong></td><td>{{ counting_campaign.campaignStatus }}</td></tr>
-        <tr><td><strong>Créé le :</strong></td><td>{{ counting_campaign.createdAt ? counting_campaign.createdAt|date('d-m-Y H:i:s') : '' }}</td></tr>
-        <tr><td><strong>Dernière mise à jour :</strong></td><td>{{ counting_campaign.updatedAt ? counting_campaign.updatedAt|date('d-m-Y H:i:s') : '' }}</td></tr>
-        <tr><td><strong>Description :</strong></td><td>{{ counting_campaign.description }}</td></tr>
-        <tr><td><strong>Créé par :</strong></td><td>{{ counting_campaign.createdBy.getEmail }}</td></tr>
+        <tr><td><strong>{{ 'campaign.campaign_name'|trans }} :</strong></td><td>{{ counting_campaign.campaignName ?? '' }}</td></tr>
+        <tr><td><strong>{{ 'campaign.start_date'|trans }} :</strong></td><td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}</td></tr>
+        <tr><td><strong>{{ 'campaign.end_date'|trans }} :</strong></td><td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y H:i:s') : '' }}</td></tr>
+        <tr><td><strong>{{ 'campaign.status'|trans }} :</strong></td><td>{{ counting_campaign.campaignStatus }}</td></tr>
+        <tr><td><strong>{{ 'created_at'|trans }} :</strong></td><td>{{ counting_campaign.createdAt ? counting_campaign.createdAt|date('d-m-Y H:i:s') : '' }}</td></tr>
+        <tr><td><strong>{{ 'Last_updated_at'|trans }} :</strong></td><td>{{ counting_campaign.updatedAt ? counting_campaign.updatedAt|date('d-m-Y H:i:s') : '' }}</td></tr>
+        <tr><td><strong>{{ 'description'|trans }} :</strong></td><td>{{ counting_campaign.description }}</td></tr>
+        <tr><td><strong>{{ 'created_by'|trans }} :</strong></td><td>{{ counting_campaign.createdBy.getEmail }}</td></tr>
     </table>
 
     <!-- Statistiques de la campagne -->
-    <h6 class="mt-4"><i class="bi bi-bar-chart-line-fill"></i> Statistiques de la campagne :</h6>
+    <h6 class="mt-4"><i class="bi bi-bar-chart-line-fill"></i> {{ 'campaign_statistics.title'|trans }} :</h6>
     <table class="table table-hover table-bordered table-striped table-sm">
         <thead class="table-dark">
             <tr>
-                <th>Statistique</th>
-                <th>Valeur</th>
+                <th>{{ 'campaign_statistics.statistic'|trans }}</th>
+                <th>{{ 'campaign_statistics.value'|trans }}</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><i class="bi bi-geo-alt-fill text-warning"></i> Nombre de sites impliqués</td>
+                <td><i class="bi bi-geo-alt-fill text-warning"></i> {{ 'campaign_statistics.sites_involved'|trans }}</td>
                 <td><span class="badge bg-info">{{ counting_campaign.siteAgentsGroups|length }}</span></td>
             </tr>
             <tr>
-                <td><i class="bi bi-person-fill text-success"></i> Nombre total d'agents participants</td>
+                <td><i class="bi bi-person-fill text-success"></i> {{ 'campaign_statistics.total_agents_participating'|trans }}</td>
                 <td>
                     <span class="badge bg-success">{{ totalAgentsCount ?? 0 }}</span>
                 </td>
             </tr>
             <tr>
-                <td><i class="bi bi-file-earmark-bar-graph-fill text-primary"></i> Nombre total de collectes</td>
+                <td><i class="bi bi-file-earmark-bar-graph-fill text-primary"></i> {{ 'campaign_statistics.total_collections'|trans }}</td>
                 <td>
                     <span class="badge bg-primary">{{ totalCollectedDataCount ?? 0 }}</span>
                 </td>
             </tr>
             <tr>
-                <td><i class="bi bi-cloud-sun-fill"></i> Conditions Environnementales les plus fréquentes</td>
+                <td><i class="bi bi-cloud-sun-fill"></i> {{ 'campaign_statistics.most_frequent_conditions'|trans }}</td>
                 <td>
                     <ul>
-                        <li>Disturbé(e) : {{ frequentConditions.disturbed ?? 'Aucune' }}</li>
-                        <li>Couverture de Glace : {{ frequentConditions.ice ?? 'Aucune' }}</li>
-                        <li>Marée : {{ frequentConditions.tidal ?? 'Aucune' }}</li>
-                        <li>État de l'Eau : {{ frequentConditions.water ?? 'Aucune' }}</li>
-                        <li>Conditions Météorologiques : {{ frequentConditions.weather ?? 'Aucune' }}</li>
+                        <li>{{ 'disturbed'|trans }} : {{ frequentConditions.disturbed ?? 'Aucune' }}</li>
+                        <li>{{ 'ice_cover'|trans }} : {{ frequentConditions.ice ?? 'Aucune' }}</li>
+                        <li>{{ 'tidal'|trans }} : {{ frequentConditions.tidal ?? 'Aucune' }}</li>
+                        <li>{{ 'water_condition'|trans }} : {{ frequentConditions.water ?? 'Aucune' }}</li>
+                        <li>{{ 'campaign_statistics.weather_conditions'|trans }} : {{ frequentConditions.weather ?? 'Aucune' }}</li>
                     </ul>
                 </td>
             </tr>
             <tr>
-                <td><i class="bi bi-list-ol"></i> Méthodes de collecte utilisées</td>
+                <td><i class="bi bi-list-ol"></i> {{ 'campaign_statistics.methods_used'|trans }}</td>
                 <td>
                     <ul>
                         {% for method in methodsUsed %}
@@ -63,22 +63,22 @@
     </table>
 
     <!-- Sites et collectes -->
-    <h6 class="mt-4"><i class="bi bi-geo-alt-fill"></i> Sites et collectes :</h6>
+    <h6 class="mt-4"><i class="bi bi-geo-alt-fill"></i> {{ 'campaign_statistics.sites_and_collections'|trans }} :</h6>
     {% if counting_campaign.siteAgentsGroups|length > 0 %}
         <ol>
         {% for siteAgentsGroup in counting_campaign.siteAgentsGroups %}
             {% set site = siteAgentsGroup.siteCollection %}
             <div class="site-section mb-4">
                 <h6 class="mb-3">
-                    <li> <i class="bi bi-geo-alt-fill text-warning me-2"></i>Site : {{ site.siteName }} ({{ site.city.name }} / {{ site.city.region.name }})</li>
+                    <li> <i class="bi bi-geo-alt-fill text-warning me-2"></i>{{ 'site_collection.site'|trans }} : {{ site.siteName }} ({{ site.city.name }} / {{ site.city.region.name }})</li>
                 </h6>
                 <!-- Active Table -->
                 <table class="table table-borderless">
                     <thead class="table-dark">
                         <tr>
                             {# <th scope="col">#</th> #}
-                            <th scope="col"><i class="bi bi-people-fill"></i> Groupes d'agents associés</th>
-                            <th scope="col"><i class="bi bi-file-earmark-bar-graph-fill"></i> Nombre total des oiseaux comptés</th>
+                            <th scope="col"><i class="bi bi-people-fill"></i> {{ 'campaign.associated_agent_groups'|trans }}</th>
+                            <th scope="col"><i class="bi bi-file-earmark-bar-graph-fill"></i> {{ 'campaign_statistics.total_birds_counted'|trans }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -88,18 +88,18 @@
                                 {% if siteAgentsGroup.agentsGroup|length > 0 %}
                                     <ul>
                                         {% for group in siteAgentsGroup.agentsGroup %}
-                                            <li>{{ group.groupName }}; (Chef: {{ group.leader.getEmail }})</li>
+                                            <li>{{ group.groupName }}; ({{ 'campaign.leader'|trans }}: {{ group.leader.getEmail }})</li>
                                             <ul>
                                                 {% for agent in group.groupMember %}
                                                     <li>{{ agent.getEmail }} ({{ agent.name }} {{ agent.lastName }})</li>
                                                 {% else %}
-                                                    <li>Aucun agent assigné</li>
+                                                    <li>{{ 'campaign_statistics.no_agents_assigned'|trans }}</li>
                                                 {% endfor %}
                                             </ul>
                                         {% endfor %}
                                     </ul>
                                 {% else %}
-                                    <p class="text-muted">Aucun groupe trouvé pour ce site.</p>
+                                    <p class="text-muted">{{ 'campaign_statistics.no_groups_found'|trans }}.</p>
                                 {% endif %}
                             </td>
                             <td class="d-flex justify-content-center"><span class="badge bg-info"><h5>{{ totalBirdCountsForSiteInCampaign[site.id] ?? 0 }}</h5></span></td>
@@ -111,13 +111,13 @@
                 <!-- Collectes de ce site -->
                 {% for collect in site.collectedData %}
                     {% if collect.countingCampaign == counting_campaign %}
-                        <h6 class="mt-3"><i class="bi bi-file-earmark-bar-graph-fill"></i> Collecte n<sup>o</sup>: {{ collect.id }} - Collecteur: {{ collect.createdBy.getEmail }}</h6>
+                        <h6 class="mt-3"><i class="bi bi-file-earmark-bar-graph-fill"></i> {{ 'campaign_statistics.collection_number'|trans }}: {{ collect.id }} - {{ 'collector'|trans }}: {{ collect.createdBy.getEmail }}</h6>
                         <table class="table table-bordered table-sm">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>Comptage</th>
-                                    <th>Conditions Environnementales</th>
-                                    <th>Espèces d'oiseaux observées</th>
+                                    <th>{{ 'campaign_statistics.counting'|trans }}</th>
+                                    <th>{{ 'campaign_statistics.environmental_conditions'|trans }}</th>
+                                    <th>{{ 'campaign_statistics.observed_species'|trans }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -125,15 +125,15 @@
                                     <!-- Collecte -->
                                     <td>
                                         <ul>
-                                            <li><strong>Type:</strong> {{ collect.countType.label }}</li>
-                                            <li><strong>Qualité:</strong> {{ collect.quality.label }}</li>
+                                            <li><strong>{{ 'type'|trans }} : </strong> {{ collect.countType.label }}</li>
+                                            <li><strong>{{ 'quality'|trans }} : </strong> {{ collect.quality.label }}</li>
                                         </ul>
-                                        <span><i class="bi bi-list-ol"></i><strong> Méthode(s):</strong>
+                                        <span><i class="bi bi-list-ol"></i><strong> {{ 'methods'|trans }}:</strong>
                                             <ul>
                                                 {% for method in collect.method %}
                                                     <li>{{ method.label }}</li>
                                                 {% else %}
-                                                    <span class="text-muted">Aucune méthode</span>
+                                                    <span class="text-muted">{{ 'no_method'|trans }}</span>
                                                 {% endfor %}
                                             </ul>
                                         </span>
@@ -141,11 +141,11 @@
                                     <!-- Conditions Environnementales -->
                                     <td>
                                         <ul>
-                                            <li><strong>Disturbé(e):</strong> {{ collect.environmentalConditions.disturbed ?? '' }}</li>
-                                            <li><strong>Météo:</strong> {{ collect.environmentalConditions.weather.label ?? '' }}</li>
-                                            <li><strong>Glace:</strong> {{ collect.environmentalConditions.ice.label ?? '' }}</li>
-                                            <li><strong>Marée:</strong> {{ collect.environmentalConditions.tidal.label ?? '' }}</li>
-                                            <li><strong>Eaux:</strong> {{ collect.environmentalConditions.water.label ?? '' }}</li>
+                                            <li><strong>{{ 'disturbed'|trans }}:</strong> {{ collect.environmentalConditions.disturbed ?? '' }}</li>
+                                            <li><strong>{{ 'weather'|trans }}:</strong> {{ collect.environmentalConditions.weather.label ?? '' }}</li>
+                                            <li><strong>{{ 'ice'|trans }}:</strong> {{ collect.environmentalConditions.ice.label ?? '' }}</li>
+                                            <li><strong>{{ 'tidal'|trans }}:</strong> {{ collect.environmentalConditions.tidal.label ?? '' }}</li>
+                                            <li><strong>{{ 'water'|trans }}:</strong> {{ collect.environmentalConditions.water.label ?? '' }}</li>
                                         </ul>
                                     </td>
                                     <!-- Espèces d'oiseaux observées -->
@@ -155,11 +155,11 @@
                                                 {% for species, count in collect.getCountBySpecies %}
                                                     <li>{{ species }}: {{ count }}</li>
                                                 {% else %}
-                                                    <li class="text-muted">Aucune espèce observée</li>
+                                                    <li class="text-muted">{{ 'campaign_statistics.no_species_observed'|trans }}</li>
                                                 {% endfor %}
                                                 <strong>Total:</strong> <span class="badge bg-success">{{ collect.totalCount }}</span>
                                             {% else %}
-                                                <li class="text-muted">Aucune espèce observée</li>
+                                                <li class="text-muted">{{ 'campaign_statistics.no_species_observed'|trans }}</li>
                                             {% endif %}
                                         </ul>
                                     </td>
@@ -172,16 +172,16 @@
         {% endfor %}
         </ol>
     {% else %}
-        <p class="text-muted">Aucun site trouvé pour cette campagne.</p>
+        <p class="text-muted">{{ 'campaign_statistics.no_sites_found'|trans }}.</p>
     {% endif %}
 
     <!-- Nombre total compté pour chaque espèce -->
-    <h6 class="mt-4"><i class="bi bi-bar-chart-line-fill"></i> Nombre total compté pour chaque espèce :</h6>
+    <h6 class="mt-4"><i class="bi bi-bar-chart-line-fill"></i> {{ 'species_statistics.total_species_counted'|trans }} :</h6>
     <table class="table table-hover table-bordered table-striped table-sm">
         <thead class="table-dark">
             <tr>
-                <th>Espèce</th>
-                <th>Nombre total</th>
+                <th>{{ 'species_statistics.species'|trans }}</th>
+                <th>{{ 'species_statistics.total_count'|trans }}</th>
             </tr>
         </thead>
         <tbody>
@@ -193,7 +193,7 @@
             {% else %}
                 <tr>
                     <td colspan="2" class="text-center text-muted">
-                        <i class="bi bi-exclamation-circle"></i> Aucune espèce observée dans cette campagne
+                        <i class="bi bi-exclamation-circle"></i> {{ 'species_statistics.no_species_observed'|trans }}
                     </td>
                 </tr>
             {% endfor %}
@@ -204,19 +204,17 @@
     <div class="alert alert-primary mt-4 d-flex justify-content-between">
         <div>
             <h6 class="mb-0">
-                <i class="bi bi-bar-chart-fill"></i> Total général des comptages dans la campagne :
+                <i class="bi bi-bar-chart-fill"></i> {{ 'overall_totals.general_count_total'|trans }} :
             </h6>
             <p class="fw-bold fs-4">{{ totalBirdsCountedInCampaign ?? 0 }}</p>
         </div>
         <div>
             <h6 class="mb-0">
-                <i class="bx bxs-bar-chart-square"></i> Total d'espèces uniques observées :
+                <i class="bx bxs-bar-chart-square"></i> {{ 'overall_totals.unique_species_observed'|trans }} :
             </h6>
             <p class="fw-bold fs-4">{{ totalcountUniqueBirdSpeciesInCampaign ?? 0 }}</p>
         </div>
     </div>
 </div>
-    <button onclick="window.print()" class="btn btn-sm btn-outline-secondary bi bi-printer" title="Imprimer"></button>
+    <button onclick="window.print()" class="btn btn-sm btn-outline-secondary bi bi-printer" title="{{ 'print'|trans }}"></button>
     {# <a href="{{ path('app_counting_campaign_export', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-outline-secondary bi bi-folder me-3" title="Exporter en CSV"></a> #}
-
-

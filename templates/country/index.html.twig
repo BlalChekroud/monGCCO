@@ -29,8 +29,8 @@
                             <th>Pays</th>
                             <th>Iso2</th>
                             <th>Les régions</th>
-                            <th>Crée le</th>
-                            <th>Actions</th>
+                            <th>{{ 'created_at'|trans }}</th>
+                            <th>{{ 'actions'|trans }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -69,7 +69,7 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="7">Aucun enregistrement trouvé</td>
+                            <td colspan="7">{{ 'no_record_found'|trans }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>

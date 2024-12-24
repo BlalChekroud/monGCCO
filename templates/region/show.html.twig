@@ -53,11 +53,11 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Crée le</th>
+                                    <th>{{ 'created_at'|trans }}</th>
                                     <td>{{ region.createdAt ? region.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Dernière mise à jour le</th>
+                                    <th>{{ 'Last_updated_at'|trans }}</th>
                                     <td>{{ region.updatedAt ? region.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                             </tbody>

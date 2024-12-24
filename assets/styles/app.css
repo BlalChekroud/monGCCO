@@ -38,6 +38,9 @@
     font-family: "Nunito", sans-serif;
   }
   
+  table tbody th {
+    width: 30%; white-space: nowrap;
+  }
 .requiredField {
   font-size: 0.75rem; /* Taille de l'étoile, ajustez selon vos besoins */
   color: red; /* Couleur de l'étoile */
@@ -77,7 +80,7 @@ h6.explanation {
 }
 
 /* ----------------------------
-
+  # Notifications
 -------------------------------*/
 .notifications-container {
   width: 100%;

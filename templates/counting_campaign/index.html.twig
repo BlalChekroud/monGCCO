@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Consultation des campagnes{% endblock %}
+{% block title %}{{ 'campaign.title'|trans }}{% endblock %}
 
 {% block body %}
 
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Consultation des campagnes</h1>
+      <h1>{{ 'campaign.title'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item active">Gestion des campagnes</li>
+          <li class="breadcrumb-item active">{{ 'campaign.manage'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -25,7 +25,7 @@
               <div class="d-flex justify-content-between">
                 <h5 class="card-title">{{ 'card_title'|trans }}</h5>
                 
-                <button type="button" class="btn btn-sm btn-info bi bi-book" data-bs-toggle="modal" data-bs-target="#largeModal"> Aide</button>
+                <button type="button" class="btn btn-sm btn-info bi bi-book" data-bs-toggle="modal" data-bs-target="#largeModal"> {{ 'help'|trans }}</button>
               </div>
               
                <!-- Large Modal for AIDE -->
@@ -34,7 +34,7 @@
                     <div class="modal-content">
                       {% include("campaign_status/attention.html.twig") %}
                       <div class="modal-footer">
-                          <button type="button" class="btn btn-sm btn-secondary bi bi-x-lg" data-bs-dismiss="modal" title="Fermer"></button>
+                          <button type="button" class="btn btn-sm btn-secondary bi bi-x-lg" data-bs-dismiss="modal" title="{{ 'close'|trans }}"></button>
                       </div>
                     </div>
                   </div>
@@ -46,11 +46,11 @@
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Campagne</th>
-                      <th>Date de début</th>
-                      <th>Date de fin</th>
-                      <th>Etat</th>
-                      <th>Actions</th>
+                      <th>{{ 'campaign.campaign_name'|trans }}</th>
+                      <th>{{ 'campaign.start_date'|trans }}</th>
+                      <th>{{ 'campaign.end_date'|trans }}</th>
+                      <th>{{ 'campaign.status'|trans }}</th>
+                      <th>{{ 'actions'|trans }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -73,7 +73,7 @@
                     {% for counting_campaign in counting_campaigns|reverse %}
                       <tr>
                         <td>{{ counting_campaign.id }}</td>
-                        <td><a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" title="Détail">{{ counting_campaign.campaignName }}</a></td>
+                        <td><a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" title="{{ 'show'|trans }}">{{ counting_campaign.campaignName }}</a></td>
                         <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y') : '' }}</td>
                         <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y') : '' }}</td>
                         <td>
@@ -94,7 +94,7 @@
                       </tr>
                     {% else %}
                       <tr>
-                        <td colspan="7">Aucun enregistrement trouvé</td>
+                        <td colspan="7">{{ 'no_record_found'|trans }}</td>
                       </tr>
                     {% endfor %}
                     </tbody>
@@ -104,15 +104,14 @@
             </div>
             <div class="card-footer d-flex justify-content-between">
               <div class="d-flex justify-content-end">
-                  <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Créer une campagne</a>
-                  <a href="{{ path('app_agents_group_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> Consultation des groupes</a>
-                  <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> Consultation des collectes</a>
-                  <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="Voir la liste des conditions environnementales"> Consultation des conditions</a>
-                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Ajouter un site de collecte</a>
+                  <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> {{ 'campaign.create_campaign'|trans }}</a>
+                  <a href="{{ path('app_agents_group_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> {{ 'group.view_groups'|trans }}</a>
+                  <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> {{ 'collect.view_collections'|trans }}</a>
+                  <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="{{ 'condition.list_environmental_conditions'|trans }}"> {{ 'condition.view_conditions'|trans }}</a>
+                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> {{ 'site_collection.add_collection_site'|trans }}</a>
               </div>
               <div>
-                <button id="printButton" class="btn btn-sm btn-secondary bi bi-printer" title="Imprimer"></button>
-                {# <a href="{{ path('app_counting_campaign_export_all') }}" class="btn btn-sm btn-outline-secondary bi bi-folder" title="Exporter en CSV"></a> #}
+                <button id="printButton" class="btn btn-sm btn-secondary bi bi-printer" title="{{ 'print'|trans }}"></button>
               </div>
             </div>
 
@@ -121,5 +120,8 @@
         </div>
       </div>
     </section>
+    {% import 'macros/show_export_macros.html.twig' as macros %}
+
+    {{ macros.export_section(formExport, 'Export counting campaign Data') }}
 </main><!-- End #main -->
 {% endblock %}

@@ -26,13 +26,19 @@ save: "حفظ"
 update: "تحديث"
 add: 'إضافة'
 modification: 'تعديل'
-'export data to file': "تصدير البيانات إلى ملف"
+'Export Data Description': "اختر تنسيقًا لتنزيل البيانات."
 'Import Bird Species Data': "استيراد بيانات أنواع الطيور"
-# 'Import Bird Species Data Description': "قم بسهولة برفع بيانات أنواع الطيور بتنسيق CSV لتحديث سجلاتك."
 'Export Bird Species Data': "تصدير بيانات أنواع الطيور"
-'Export Bird Species Data Description': "اختر تنسيقًا لتنزيل بيانات أنواع الطيور مباشرة."
+'Import Bird Family Data': "استيراد بيانات عائلة الطيور"
+'Export Bird Family Data': "تصدير بيانات عائلة الطيور"
+'Export counting campaign Data': "تصدير بيانات حملة العد"
+export_format:
+  csv: "CSV (قيم مفصولة بفواصل)"
+  xlsx: "إكسل (XLSX)"
+  ods: "جدول بيانات OpenDocument (ODS)"
 print: "طباعة"
 created_by: 'أنشئ بواسطة'
+collector: "الجامع"
 back: 'رجوع'
 install: "تثبيت التطبيق"
 app_description: "إدارة حملات إحصاء الطيور البحرية"
@@ -42,7 +48,9 @@ edit_permission: "ليس لديك إذن بالتعديل."
 member_of_a_group_assigned_to_this_site: "أنت لست عضوًا في مجموعة مخصصة لهذا الموقع."
 export_permission: 'ليس لديك إذن بالتصدير.'
 msg_export_limit: "حجم التصدير كبير جدًا. يرجى تقليل حجم الحملة أو المحاولة بتحديد أصغر."
-"choose export format": "اختر التنسيق للتصدير"
+"choose export format": "-- اختر التنسيق للتصدير --"
+help: 'مساعدة'
+status: "حالة الحملة"
 
 csv_import_title: "CSV استيراد ملف"
 csv_import_instruction: "تأكد من أن ملفك يحتوي على الأعمدة المطلوبة."
@@ -58,8 +66,9 @@ import: "استيراد"
 import_permission: "ليس لديك إذن باستيراد البيانات."
 access: "ليس لديك إذن بالوصول."
 maxSizeMessage: "الملف كبير جدًا. الحجم الأقصى المسموح به هو 1024 كيلوبايت."
-coverage_for_this_species: 'التغطية لهذا النوع'
+coverage: 'التغطية لهذا النوع'
 iucn_red_list_category: "فئة القائمة الحمراء للاتحاد الدولي لحفظ الطبيعة 2022"
+birdlife_tax_treat: "تصنيف BirdLife"
 
 import_csv:
   mimeTypesMessage: "يرجى تحميل ملف CSV صالح."
@@ -98,12 +107,6 @@ hidden_label: 'إخفاء'
 visible_label: 'عرض'
 no_role: 'بدون دور'
 please_log_in_to_access_the_page: 'يرجى تسجيل الدخول للوصول إلى الصفحة'
-
-user:
-  msg:
-    deleted: "تم حذف حساب المستخدم بنجاح."
-  error:
-    deletion_failed: "حدث خطأ أثناء حذف حساب المستخدم."
 
 agentsGroup:
   title: "إدارة مجموعة الوكلاء"
@@ -173,6 +176,7 @@ birdSpecies:
   bird_species: "أنواع الطيور"
   title_add: "إضافة نوع جديد من الطيور"
   delete_specy: "حذف نوع الطيور"
+  breadcrumb_manage: "إدارة الأنواع"
   informations: "معلومات النوع الجديد"
   return: "العودة إلى استعراض أنواع الطيور"
   modal_birdlife_tax_treat_title: "إنشاء تصنيف جديد من BirdLife"
@@ -184,7 +188,6 @@ birdSpecies:
   wi_species_code: "رمز الأنواع (WI)"
   image: "صورة"
   authority: "المرجع"
-  birdlife_tax_treat: "تصنيف BirdLife"
   common_name: "الاسم العام"
   common_name_alt: "الأسماء العامة البديلة"
   synonyms: "المرادفات"
@@ -206,10 +209,92 @@ birdSpecies:
     invalid_encoding: "ملف CSV يحتوي على أحرف غير صالحة. يرجى التحقق من ترميز الملف."
 
 campaign:
-  cannot_be_modified: "لا يمكن تعديل الحملة بحالة %status%"
+  cannot_be_modified: "%status% لا يمكن تعديل الحملة بحالة"
+  title: "إدارة حملات العدّ"
+  manage: "إدارة الحملات"
+  campaign_name: "اسم الحملة"
+  start_date: "تاريخ البدء"
+  end_date: "تاريخ الانتهاء"
+  status: "الحالة"
+  create_campaign: "إنشاء حملة"
+  cannot_start_collecting_before: "لا يمكنك البدء في جمع البيانات قبل"
+  created_by: "أنشئت بواسطة"
+  sites_and_groups: "المواقع والمجموعات"
+  start_collecting: "ابدأ الجمع"
+  collect_data: "جمع البيانات"
+  add_conditions_then_start_collecting: "أضف الظروف البيئية ثم ابدأ الجمع"
+  add_environmental_conditions: "إضافة ظروف بيئية"
+  reserved_for_site_agents: "هذا القسم مخصص لوكلاء الموقع"
+  associated_agent_groups: "المجموعات المرتبطة :"
+  leader: "القائد:"
+  no_group_found: "لم يتم العثور على مجموعة"
+  no_site_found: "لم يتم العثور على موقع"
+  back_to_campaign_consultation: "العودة إلى استشارة الحملات"
+  confirm_suspend: "هل أنت متأكد من أنك تريد تعليق هذه الحملة؟"
+  suspend: "تعليق"
+  end_campaign_suspension: "إنهاء تعليق الحملة"
+  confirm_resume: "هل أنت متأكد من أنك تريد استئناف هذه الحملة؟"
+  resume: "استئناف"
+  confirm_close: "هل أنت متأكد من أنك تريد إنهاء هذه الحملة؟ هذا الإجراء غير قابل للتراجع"
+  close_campaign: "إنهاء الحملة"
+  confirm_cancel: "هل أنت متأكد من أنك تريد إلغاء هذه الحملة؟ هذا الإجراء غير قابل للتراجع"
+  cancel_campaign: "إلغاء الحملة"
+  campaign_details: "تفاصيل حملة العد"
+
+description: "الوصف"
+disturbed: "مضطرب"
+none: "لا شيء"
+ice_cover: "غطاء جليدي"
+tidal: "المد والجزر"
+water_condition: "حالة المياه"
+type: "النوع"
+quality: "الجودة"
+methods: "الطريقة/الطرق"
+no_method: "لا توجد طريقة"
+weather: "الطقس"
+ice: "الجليد"
+water: "المياه"
+
+campaign_statistics:
+  title: "إحصائيات الحملة"
+  statistic: "إحصائية"
+  value: "القيمة"
+  sites_involved: "عدد المواقع المشاركة"
+  total_agents_participating: "إجمالي المشاركين"
+  total_collections: "إجمالي الجمع"
+  most_frequent_conditions: "أكثر الظروف البيئية تكرارًا"
+  weather_conditions: "الظروف الجوية"
+  methods_used: "الطرق المستخدمة"
+  sites_and_collections: "المواقع والجمع"
+  total_birds_counted: "إجمالي الطيور المعدودة"
+  no_agents_assigned: "لم يتم تعيين وكلاء"
+  no_groups_found: "لم يتم العثور على مجموعات لهذا الموقع"
+  collection_number: "رقم الجمع"
+  counting: "العد"
+  environmental_conditions: "الظروف البيئية"
+  observed_species: "الأنواع المرصودة"
+  no_species_observed: "لم يتم رصد أي أنواع"
+  total: "الإجمالي"
+  no_sites_found: "لم يتم العثور على مواقع لهذه الحملة"
+species_statistics:
+  total_species_counted: "إجمالي العدد لكل نوع"
+  species: "الأنواع"
+  total_count: "الإجمالي"
+  no_species_observed: "لم يتم رصد أي أنواع في هذه الحملة"
+overall_totals:
+  general_count_total: "الإجمالي العام للعد في الحملة"
+  unique_species_observed: "إجمالي الأنواع الفريدة المرصودة"
 
 collect:
   please_create_the_environmental_conditions_for_this_site_first: "يرجى إنشاء الظروف البيئية لهذا الموقع أولاً"
+  view_collections: "عرض البيانات المجمعة"
+  
+condition:
+  list_environmental_conditions: "عرض قائمة الشروط البيئية"
+  view_conditions: "عرض الشروط البيئية"
+
+group:
+  view_groups: "عرض المجموعات"
 
 language:
   name: "الاسم"
@@ -266,6 +351,16 @@ register:
 # Error messages for form validation
 form_error:
   general: "يرجى التحقق من المعلومات والمحاولة مرة أخرى."
+
+site_collection:
+  add_collection_site: "إضافة موقع جمع البيانات"
+  site: "الموقع"
+  
+user:
+  msg:
+    deleted: "تم حذف حساب المستخدم بنجاح."
+  error:
+    deletion_failed: "حدث خطأ أثناء حذف حساب المستخدم."
 
 userStatus:
   title: "إدارة حالات المستخدم"

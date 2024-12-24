@@ -60,7 +60,7 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="9">Aucun enregistrement trouvé</td>
+                            <td colspan="9">{{ 'no_record_found'|trans }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -84,57 +84,7 @@
     </section>
         
     {% import 'macros/form_macros.html.twig' as form_macros %}
-
-    {# <section class="section">
-        <div class="card">
-          <div class="row">
-            <div class="col-lg-8">
-              {{ form_macros.csv_import_form(form, 'app_bird_species_index') }}
-            </div>
-            <div class="col-lg-4">
-              <label class="d-flex justify-content-center">{{ 'export data to file'|trans }}</label>
-              {{ form(formExport)}}
-            </div>
-          </div>
-        </div>
-    </section> #}
-    <section class="section py-4">
-        <div class="container">
-            <div class="card shadow border-0">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <!-- Import Section -->
-                        <div class="col-lg-6">
-                            <div class="p-4">
-                                <h5 class="text-dark mb-3">
-                                    <i class="bi bi-upload me-2 text-primary"></i>{{ 'Import Bird Species Data'|trans }}
-                                </h5>
-                                {# <p class="text-muted mb-4">
-                                    {{ 'Import Bird Species Data Description'|trans }}
-                                </p> #}
-                                {{ form_macros.csv_import_form(form, 'app_bird_species_index') }}
-                            </div>
-                        </div>
-
-                        <!-- Export Section -->
-                        <div class="col-lg-6 bg-light">
-                            <div class="p-4 text-center">
-                                <h5 class="text-dark mb-3">
-                                    <i class="bi bi-download me-2 text-primary"></i>{{ 'Export Bird Species Data'|trans }}
-                                </h5>
-                                <p class="text-muted mb-4 explanation">
-                                    {{ 'Export Bird Species Data Description'|trans }}
-                                </p>
-                                <div class="d-inline-block">
-                                    {{ form(formExport, { attr: { class: 'btn-group' } }) }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {{ form_macros.csv_import_form(form, 'app_bird_species_index', formExport, 'Import Bird Species Data', 'Export Bird Species Data') }}
 
 
     {% if headers is defined and rows is defined %}
