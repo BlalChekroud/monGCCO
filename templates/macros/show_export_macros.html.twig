@@ -1,23 +1,25 @@
 {% macro export_section(formExport, title) %}
-<section class="section py-4">
-    <div class="container">
-        <div class="row align-items-center">
-            <!-- Export Section -->
-            <div class="col-lg-6 bg-light">
-                <div class="card shadow border-0">
-                    <div class="card-body">
-                        <div class="p-4 text-center">
-                            <h5 class="text-dark mb-3">
-                                <i class="bi bi-download me-2 text-primary"></i>{{ title|trans }}
-                            </h5>
-                            <div class="d-inline-block">
-                                {{ form(formExport, { attr: { class: 'btn-group' } }) }}
+    {% if is_granted('ROLE_EXPORT') %}
+        <section class="section py-4">
+            <div class="container">
+                <div class="row align-items-center">
+                    <!-- Export Section -->
+                    <div class="col-lg-6 bg-light">
+                        <div class="card shadow border-0">
+                            <div class="card-body">
+                                <div class="p-4 text-center">
+                                    <h5 class="text-dark mb-3">
+                                        <i class="bi bi-download me-2 text-primary"></i>{{ title|trans }}
+                                    </h5>
+                                    <div class="d-inline-block">
+                                        {{ form(formExport, { attr: { class: 'btn-group' } }) }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
+        </section>
+    {% endif %}
 {% endmacro %}

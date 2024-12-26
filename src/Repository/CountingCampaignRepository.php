@@ -25,6 +25,7 @@ class CountingCampaignRepository extends ServiceEntityRepository
                 'cc.campaignName',
                 'cc.startDate',
                 'cc.endDate',
+                'status.label AS campaignStatus',
                 'cc.description',
                 'cc.createdAt',
                 'cc.updatedAt',
@@ -32,26 +33,70 @@ class CountingCampaignRepository extends ServiceEntityRepository
                 'city.name AS cityName',
                 'site.siteName',
                 'cd.createdAt AS collectedDate',
-                'cd.createdBy AS collectedBy',
+                'collector.email AS collectedBy',
                 'bs.scientificName',
-                'bs.wispeciesCode',
-                'bsc.count AS birdCount'
+                'bs.wispeciescode', // Vérifiez que ce champ correspond exactement à la base de données
+                'SUM(bsc.count) AS totalBirdCount' // Total des comptages pour chaque espèce
             )
             ->innerJoin('cc.siteAgentsGroups', 'sag')
             ->innerJoin('sag.siteCollection', 'site')
             ->innerJoin('site.city', 'city')
             ->innerJoin('site.collectedData', 'cd')
+            ->innerJoin('cd.environmentalConditions', 'ec')
+            ->innerJoin('cd.createdBy', 'collector')
             ->innerJoin('cd.birdSpeciesCounts', 'bsc')
             ->innerJoin('bsc.birdSpecies', 'bs')
             ->innerJoin('cc.createdBy', 'creator')
-            ->where('cc.id = :campaignId')
+            ->innerJoin('cc.campaignStatus', 'status')
+            ->where('cc.id = :campaignId') // Associer la campagne spécifiée
+            ->andWhere('ec.countingCampaign = :campaignId') // Garantir que les collectedData appartiennent à cette campagne
+            ->andWhere('sag.countingCampaign = :campaignId') // Garantir que les siteCollections appartiennent à cette campagne
             ->setParameter('campaignId', $campaignId)
+            ->groupBy('bs.id', 'cd.id') // Grouper par espèce et collecte
             ->orderBy('city.name', 'ASC')
             ->addOrderBy('site.siteName', 'ASC')
             ->addOrderBy('bs.scientificName', 'ASC');
+        
+        // Exécuter la requête pour récupérer les résultats
+        $result = $qb->getQuery()->getArrayResult();
+        
+        // Formatage des dates dans les résultats
+        foreach ($result as &$row) {
+            $row['startDate'] = $row['startDate'] ? $row['startDate']->format('d-m-Y H:i:s') : null;
+            $row['endDate'] = $row['endDate'] ? $row['endDate']->format('d-m-Y H:i:s') : null;
+            $row['createdAt'] = $row['createdAt'] ? $row['createdAt']->format('d-m-Y H:i:s') : null;
+            $row['updatedAt'] = $row['updatedAt'] ? $row['updatedAt']->format('d-m-Y H:i:s') : null;
+            $row['collectedDate'] = $row['collectedDate'] ? $row['collectedDate']->format('d-m-Y H:i:s') : null;
+        }
+        
+        return $result;
+    }
+        
     
+    /**
+     * Retourne le nombre total pour chaque espèce dans une campagne.
+     *
+     * @param int $campaignId L'ID de la campagne
+     * @return array
+     */
+    public function getTotalCountBySpecies(int $campaignId): array
+    {
+        $qb = $this->createQueryBuilder('cc')
+            ->select(
+                'bs.scientificName AS species',
+                'SUM(bsc.count) AS totalCount'
+            )
+            ->innerJoin('cc.environmentalConditions', 'ec')
+            ->innerJoin('ec.collectedData', 'cd')
+            ->innerJoin('cd.birdSpeciesCounts', 'bsc')
+            ->innerJoin('bsc.birdSpecies', 'bs')
+            ->where('cc.id = :campaignId')
+            ->setParameter('campaignId', $campaignId)
+            ->groupBy('bs.id')
+            ->orderBy('bs.scientificName', 'ASC');
+
         return $qb->getQuery()->getResult();
-    }    
+    }
 
     // /**
     //  * Récupère le nombre total de comptages d'oiseaux pour chaque site dans une campagne de comptage spécifique.

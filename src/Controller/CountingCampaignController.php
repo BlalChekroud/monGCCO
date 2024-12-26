@@ -37,11 +37,13 @@ class CountingCampaignController extends AbstractController
 {
     private $campaignStatusService;
     private $exportService;
+    private $translator;
 
-    public function __construct(CampaignStatusService $campaignStatusService, ExportService $exportService)
+    public function __construct(CampaignStatusService $campaignStatusService, ExportService $exportService, TranslatorInterface $translator)
     {
         $this->campaignStatusService = $campaignStatusService;
         $this->exportService = $exportService;
+        $this->translator = $translator;
     }
 
     #[Route('/', name: 'app_counting_campaign_index', methods: ['GET','POST'])]
@@ -367,46 +369,22 @@ class CountingCampaignController extends AbstractController
         // Les SiteCollections d'une campagne.
         $siteCollectionsByCampaign = $siteCollectionRepository->getSiteCollectionsByCampaign($countingCampaign);
         
+        $totalCountBySpecies = $countingCampaignRepository->getTotalCountBySpecies($countingCampaign->getId());
 
         // Exporter les données de la campagne
         $formExport = $this->createForm(ExportType::class)
                             ->handleRequest($request);
 
         if ($formExport->isSubmitted() && $formExport->isValid()) {
+            if (!$this->isGranted('ROLE_EXPORT')) {
+                $this->addFlash('warning', $this->translator->trans('export_permission'));
+                return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()]);
+            }
+
         $columnNames = ['Nom de la campagne', 'Date de début', 'Date de fin', 'Etat de la campagne', 'Description', 'Créé le', 'Dernière mise à jour', 'Créé par',
          'Ville', 'Nom du site', 'Date de collecte', 'Collecté par', 'Nom de l\'espèce', 'Code de l\'espèce', 'Nombre d\'oiseaux'];
          
-        //  $data = $countingCampaignRepository->getBirdSpeciesDataForCampaign($countingCampaign->getId());
-        #STATISTIQUES
-        $data = [];
-        foreach ($siteCollectionsByCampaign as $site) {
-            foreach ($collectedDataInCampaign as $collectedData) {
-                foreach ($collectedData->getBirdSpeciesCounts() as $birdSpeciesCount) {
-                    // foreach ($birdSpeciesCount->getBirdSpecies() as $birdSpecy) {
-                        $birdSpecy = $birdSpeciesCount->getBirdSpecies();
-                        $data[] = [
-                            $countingCampaign->getCampaignName() ?? '',
-                            $countingCampaign->getStartDate()?->format('d-m-Y H:i:s') ?? null,
-                            $countingCampaign->getEndDate()?->format('d-m-Y H:i:s') ?? null,
-                            $countingCampaign->getCampaignStatus()?->getLabel() ?? '',
-                            $countingCampaign->getDescription() ?? '',
-                            $countingCampaign->getCreatedAt()?->format('d-m-Y H:i:s') ?? null,
-                            $countingCampaign->getUpdatedAt()?->format('d-m-Y H:i:s') ?? null,
-                            $countingCampaign->getCreatedBy()?->getEmail() ?? '',
-                            $site->getCity()?->getName() ?? '',
-                            $site->getSiteName() ?? '',
-                            $collectedData->getCreatedAt()?->format('d-m-Y H:i:s') ?? '',
-                            $collectedData->getCreatedBy()?->getEmail() ?? '',
-                            $birdSpecy->getScientificName() ?? '',
-                            $birdSpecy->getWispeciescode() ?? '',
-                            $birdSpeciesCount->getCount() ?? '',
-                        ];
-                    // }
-                }
-            }
-        }
-        dd($data);
-
+         $data = $countingCampaignRepository->getBirdSpeciesDataForCampaign($countingCampaign->getId());
 
         $format = $formExport->get('format')->getData();
         $fileName = sprintf("Counting_campaign_export_%s", date('d-m-Y_His'));
@@ -432,6 +410,7 @@ class CountingCampaignController extends AbstractController
             'totalcountUniqueBirdSpeciesInCampaign' => $totalcountUniqueBirdSpeciesInCampaign,
             'siteCollectionsByCampaign' => $siteCollectionsByCampaign,
             'formExport' => $formExport->createView(),
+            'totalCountBySpecies' => $totalCountBySpecies,
         ]);
     }
 

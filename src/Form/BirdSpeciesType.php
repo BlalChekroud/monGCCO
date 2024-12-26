@@ -84,7 +84,7 @@ class BirdSpeciesType extends AbstractType
             ->add('coverage', EntityType::class, [
                 'class' => Coverage::class,
                 'choice_label' => 'label',
-                'label' => $this->translator->trans('coverage_for_this_species'),
+                'label' => $this->translator->trans('coverage'),
                 // 'placeholder' => '',
                 'required' => false,
                 'attr' => ['class' => 'form-control']
