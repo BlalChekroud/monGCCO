@@ -7,6 +7,7 @@ create_a_species: 'Create a bird species'
 create_user_status: 'Create a user status'
 add_a_country: 'Add a country'
 choose_bird_family: "-- Choose a Bird Family --"
+consult_families: "View families"
 consult_reserves: "View reserves"
 consult_campaigns: "View campaigns"
 cousult_countries: "VIew country"
@@ -31,7 +32,24 @@ modification: 'Modification'
 'Export Bird Species Data': "Export Bird Species Data"
 'Import Bird Family Data': "Import Bird Family Data"
 'Export Bird Family Data': "Export Bird Family Data"
+'Import counting campaign Data': "Import counting campaign data"
 'Export counting campaign Data': "Export counting campaign data"
+'Import countries Data': "Import countries Data"
+'Export countries Data': "Export countries Data"
+'Import agents group Data': "Import agents group Data"
+'Export agents group Data': "Export agents group Data"
+'Import cities Data': "Import cities Data"
+'Export cities Data': "Export cities Data"
+'Import collected Data': "Import collected Data"
+'Export collected Data': "Export collected Data"
+'Export environmental conditions Data': "Export environmental conditions Data"
+'Import nature reserves Data': "Import nature reserves Data"
+'Export nature reserves Data': "Export nature reserves Data"
+'Import sites collection Data': "Import sites collection Data"
+'Export sites collection Data': "Export sites collection Data"
+'Import regions Data': "Import regions Data"
+'Export regions Data': "Export regions Data"
+
 export_format:
   csv: "CSV (Comma-Separated Values)"
   xlsx: "Excel (XLSX)"

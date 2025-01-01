@@ -18,3 +18,4 @@ import './vendor/php-email-form/validate.js';
 
 import './js/complement.js';
 import './js/main.js';
+// import './js/sweetalert2.all.js';

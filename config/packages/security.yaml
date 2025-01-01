@@ -25,7 +25,7 @@ security:
                 path: app_logout
                 # where to redirect after logout
                 # target: app_any_route
-            user_checker: App\Security\UserChecker
+            user_checker: App\Security\Voter\UserChecker
 
             remember_me:
                 secret: '%kernel.secret%'

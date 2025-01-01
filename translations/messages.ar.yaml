@@ -7,6 +7,7 @@ create_a_species: 'إنشاء نوع من الطيور'
 create_user_status: 'إنشاء حالة مستخدم'
 add_a_country: 'إضافة دولة'
 choose_bird_family: "-- اختر عائلة الطيور --"
+consult_families: "عرض العائلات"
 consult_reserves: "عرض المحميات"
 consult_campaigns: "عرض الحملات"
 cousult_countries: "عرض الدول"
@@ -31,7 +32,24 @@ modification: 'تعديل'
 'Export Bird Species Data': "تصدير بيانات أنواع الطيور"
 'Import Bird Family Data': "استيراد بيانات عائلة الطيور"
 'Export Bird Family Data': "تصدير بيانات عائلة الطيور"
+'Import counting campaign Data': "استيراد بيانات حملة العد"
 'Export counting campaign Data': "تصدير بيانات حملة العد"
+'Import countries Data': "استيراد بيانات الدول"
+'Export countries Data': "تصدير بيانات الدول"
+'Import agents group Data': "استيراد بيانات مجموعات الوكلاء"
+'Export agents group Data': "تصدير بيانات مجموعات الوكلاء"
+'Import cities Data': "استيراد بيانات المدن"
+'Export cities Data': "تصدير بيانات المدن"
+'Import collected Data': "استيراد البيانات المجمعة"
+'Export collected Data': "تصدير البيانات المجمعة"
+'Export environmental conditions Data': "تصدير بيانات الظروف البيئية"
+'Import nature reserves Data': "استيراد بيانات المحميات الطبيعية"
+'Export nature reserves Data': "تصدير بيانات المحميات الطبيعية"
+'Import sites collection Data': "استيراد بيانات مواقع الجمع "
+'Export sites collection Data': "تصدير بيانات مواقع الجمع"
+'Import regions Data': "استيراد بيانات الأقاليم"
+'Export regions Data': "تصدير بيانات الأقاليم"
+
 export_format:
   csv: "CSV (قيم مفصولة بفواصل)"
   xlsx: "إكسل (XLSX)"

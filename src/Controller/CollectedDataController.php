@@ -252,7 +252,7 @@ class CollectedDataController extends AbstractController
         $site = $collectedDatum->getSiteCollection();
         $environmentalConditions = $collectedDatum->getEnvironmentalConditions();
         
-        if ($this->getUser() !== $collectedDatum->getCreatedBy() && !$this->isGranted('ROLE_EDIT')){
+        if ($this->getUser() !== $collectedDatum->getCreatedBy() && !$this->isGranted('ROLE_SUPER_ADMIN')) {
             $this->addFlash('error', $translator->trans('edit_permission'));
             return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
         }

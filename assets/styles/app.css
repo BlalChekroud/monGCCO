@@ -1351,10 +1351,10 @@ h6.explanation {
     font-size: 14px;
   }
   
-  .dashboard .top-selling .table thead {
+  /* .dashboard .top-selling .table thead {
     background: #f6f6fe;
   }
-  
+   */
   .dashboard .top-selling .table thead th {
     border: 0;
   }

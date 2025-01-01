@@ -1,6 +1,6 @@
 {
-    "name": "GCCOM",
-    "short_name": "GCCOM App",
+    "name": "GCCOM App",
+    "short_name": "GCCOM",
     "start_url": "/",
     "display": "standalone",
     "orientation": "any",

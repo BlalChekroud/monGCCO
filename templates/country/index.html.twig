@@ -92,16 +92,8 @@
     </section>
 
     {% import 'macros/form_macros.html.twig' as form_macros %}
+    {{ form_macros.csv_import_form(form, 'app_country_index', formExport, 'Import countries Data', 'Export countries Data') }}
 
-    <section class="section">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    {{ form_macros.csv_import_form(form, 'app_country_index') }}
-                </div>
-            </div>
-        </div>
-    </section>
 
     {% if headers is defined and rows is defined %}
         {{ form_macros.csv_modal(headers, rows, csvData, 'app_country_index', ['country', 'iso2']) }}

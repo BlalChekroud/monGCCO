@@ -25,7 +25,9 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.request }
             
-    App\Security\UserChecker:
+    # App\Security\UserChecker:
+    App\Security\Voter\UserChecker:
+        tags: ['security.voter']
         autowire: true
         autoconfigure: true
         public: false

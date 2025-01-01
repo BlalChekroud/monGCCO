@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Form\ExportType;
+use App\Service\ExportService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ImportCsvType;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -13,16 +15,49 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/user/country')]
 // #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class CountryController extends AbstractController
 {
+    private $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     #[Route('/', name: 'app_country_index', methods: ['GET', 'POST'])]
-    public function index(CountryRepository $countryRepository, Request $request, EntityManagerInterface $entityManager): Response
+    public function index(ExportService $exportService, CountryRepository $countryRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
+
+        $formExport = $this->createForm(ExportType::class);
+        $formExport->handleRequest($request);
+
+        if ($formExport->isSubmitted() && $formExport->isValid()) {
+            if (!$this->isGranted('ROLE_EXPORT')) {
+                $this->addFlash('warning', $this->translator->trans('export_permission'));
+                return $this->redirectToRoute('app_country_index');
+            }
+            $columnNames = ['Pays', 'Iso2', 'Ajouter le'];
+            $countries = $countryRepository->findAll();
+
+            $data = [];
+            foreach ($countries as $country) {
+                $data[] = [
+                    $country->getName(),
+                    $country->getIso2(),
+                    $country->getCreatedAt()->format('d-m-Y H:i:s'),
+                ];
+            }
+            $format = $formExport->get('format')->getData();
+            $fileName = sprintf("Countries_export_%s", date('d-m-Y_His'));
+    
+            return $exportService->export($columnNames, $data, $format, $fileName);
+        }
     
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $csvFile */
@@ -58,6 +93,7 @@ class CountryController extends AbstractController
                     'headers' => $headers,
                     'rows' => $rows,
                     'csvData' => $csvData,
+                    'formExport' => $formExport->createView(),
                 ]);
             }
         }
@@ -152,6 +188,7 @@ class CountryController extends AbstractController
         return $this->render('country/index.html.twig', [
             'countries' => $countryRepository->findAll(),
             'form' => $form->createView(),
+            'formExport' => $formExport->createView(),
         ]);
     }
     
