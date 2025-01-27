@@ -10,7 +10,7 @@
 
     <!-- Favicons -->
     <link href="{{ asset('/img/favicon.png') }}" rel="icon" type="image/png">
-    <link href="{{ asset('/img/favicon.ico') }}" rel="icon" type="image/x-icon">
+    {# <link href="{{ asset('/img/favicon.ico') }}" rel="icon" type="image/x-icon"> #}
 
     <link href="{{ asset('/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
@@ -29,22 +29,35 @@
 
     <!-- Template Main CSS File -->
     {# <link href="{{ asset('/styles/app.css') }}" rel="stylesheet"> #}
-    <link rel="manifest" href="{{ asset('manifest.json') }}">
-    <script src="{{ asset('./js/offline.js') }}"></script>
-    <script>
+    <link rel="manifest" href="{{ asset('manifest.json') }}"/>
+    {# <script src="{{ asset('./js/offline.js') }}"></script> #}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.all.min.js"></script>
+    {# <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('../service-worker.js')
                 .then(reg => console.log("Service Worker enregistré", reg))
                 .catch(err => console.log("Erreur Service Worker", err));
         }
+    </script> #}
+    <script>
+      window.addEventListener('load', () => {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('../sw.js')
+            {# .then(reg => console.log("Service Worker enregistré", reg))
+            .catch(err => console.log("Erreur Service Worker", err)); #}
+        }
+      });
     </script>
+
+    {# <script src="/js/indexeddb.js"></script>
+    <script src="/js/sync.js"></script> #}
 
       <title>{% block title %}Welcome!{% endblock %}</title>
       <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
       {% block stylesheets %}
       {% endblock %}
 
-      {% block javascripts %}
+      {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
       {% endblock %}
   </head>
@@ -815,7 +828,7 @@
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-    <script src="{{ asset('./js/sweetalert2.all.js') }}"></script>
+    {# <script src="{{ asset('./js/sweetalert2.all.js') }}"></script> #}
     {# <script src="{{ asset('./offline.js') }}"></script> #}
 
       <!-- Vendor JS Files -->

@@ -3,7 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mode hors ligne</title>
+    <title>Formulaire hors ligne</title>
+    <script src="/js/db.js" defer></script>
+    <script src="/js/form-handler.js" defer></script>
+    <script src="/js/sync.js" defer></script>
+</head>
+<body>
+    <form>
+        <label for="siteCollection">Site :</label>
+        <input type="text" id="siteCollection" name="siteCollection" required><br>
+
+        <label for="weatherEffect">Effet météo :</label>
+        <input type="text" id="weatherEffect" name="weatherEffect" required><br>
+
+        <label for="waterState">État de l'eau :</label>
+        <input type="text" id="waterState" name="waterState" required><br>
+
+        <label for="quality">Qualité :</label>
+        <input type="text" id="quality" name="quality" required><br>
+
+        <label for="method">Méthode :</label>
+        <input type="text" id="method" name="method" required><br>
+
+        <div class="specy-group">
+            <label>Espèce :</label>
+            <input type="text" class="specy" required>
+            <label>Nombre :</label>
+            <input type="number" class="count" required>
+        </div>
+        
+        <button type="submit">Soumettre</button>
+    </form>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vous êtes hors ligne</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,5 +62,115 @@
 <body>
     <h1>Vous êtes hors ligne</h1>
     <p>Impossible de charger le contenu. Veuillez vérifier votre connexion Internet.</p>
+    
+    <div class="card mx-auto" style="max-width: 800px;">
+        <div class="card-body">
+            <h5 class="card-title mb-4">Informations sur les conditions environnementales</h5>
+
+            <form class="row g-3">
+                
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="siteCollection" placeholder="Site">
+                        <label for="siteCollection">Site de collecte</label>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="weatherEffect" placeholder="Weather">
+                        <label for="weatherEffect">Effets des conditions météorologiques</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="waterState" placeholder="Water">
+                        <label for="waterState">État des eaux</label>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Informations sur la nouvelle collection</h5>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input type="number" class="form-control" id="quality" placeholder="Qualité">
+                        <label for="quality">Qualité</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="method" placeholder="Méthode">
+                        <label for="method">Méthode(s) utilisées</label>
+                    </div>
+                </div>
+
+                <div class="container my-4">
+                    <h6>Espèces observées</h6>
+                    <div id="speciesContainer" class="mb-3">
+
+                        <div class="row mb-3 specy-group">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control specy" id="birdName" placeholder="Nom ou Code d'oiseau">
+                                    <label for="birdName">Code ou Nom d'oiseau</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control count" id="birdCount" placeholder="Nombre">
+                                    <label for="birdCount">Nombre</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-center">
+                                <button class="btn btn-danger btn-remove" type="button">Supprimer</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="addSpecyBtn" class="btn btn-primary" type="button">Ajouter une espèce</button>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Soumettre</button>
+                    <button type="reset" class="btn btn-secondary">Réinitialiser</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("addSpecyBtn").addEventListener("click", function () {
+            const container = document.getElementById("speciesContainer");
+
+            const newGroup = document.createElement("div");
+            newGroup.className = "row mb-3 specy-group";
+            newGroup.innerHTML = `
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control specy" placeholder="Nom ou Code d'oiseau">
+                        <label>Code ou Nom d'oiseau</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input type="number" class="form-control count" placeholder="Nombre">
+                        <label>Nombre</label>
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex align-items-center">
+                    <button class="btn btn-danger btn-remove" type="button">Supprimer</button>
+                </div>
+            `;
+
+            container.appendChild(newGroup);
+
+            newGroup.querySelector(".btn-remove").addEventListener("click", function () {
+                newGroup.remove();
+            });
+        });
+
+        document.querySelectorAll(".btn-remove").forEach((button) => {
+            button.addEventListener("click", function () {
+                button.closest(".specy-group").remove();
+            });
+        });
+    </script>
 </body>
-</html>
+</html> -->

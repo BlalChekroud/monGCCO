@@ -1,30 +1,29 @@
-import IndexedDBService from './indexeddb.js';
+// Ce fichier gère la synchronisation des données locales avec le serveur lorsqu'une connexion est disponible.
 
-const dbService = new IndexedDBService("WingWatchDB");
+window.addEventListener("online", function () {
+    const transaction = db.transaction(["environmentalConditions"], "readonly");
+    const store = transaction.objectStore("environmentalConditions");
 
-export const syncData = async () => {
-    const entities = ["Campaign", "BirdSpecies", "CollectedData"]; // Liste des entités à synchroniser
+    const request = store.getAll();
 
-    for (const entity of entities) {
-        const localData = await dbService.getAll(entity);
-
-        if (localData.length > 0) {
-            fetch(`/api/sync/${entity.toLowerCase()}`, {
+    request.onsuccess = function () {
+        const offlineData = request.result;
+        if (offlineData.length > 0) {
+            // Envoyer les données au serveur
+            fetch("/api/sync", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(localData),
+                body: JSON.stringify(offlineData),
             })
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log(`${entity} synchronisé :`, data);
-
-                    // Nettoyer les données locales après la synchronisation
-                    dbService.clear(entity);
-                })
-                .catch((err) => console.error(`Erreur de synchronisation pour ${entity} :`, err));
+            .then((response) => response.json())
+            .then(() => {
+                // Effacer les données locales après synchronisation
+                const deleteTransaction = db.transaction(["environmentalConditions"], "readwrite");
+                const deleteStore = deleteTransaction.objectStore("environmentalConditions");
+                deleteStore.clear();
+                alert("Données synchronisées avec succès !");
+            })
+            .catch((error) => console.error("Erreur de synchronisation", error));
         }
-    }
-};
-
-// Déclencher la synchronisation en ligne
-window.addEventListener("online", syncData);
+    };
+});

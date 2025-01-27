@@ -25,7 +25,7 @@ function updateButtonLabel() {
 document.addEventListener('DOMContentLoaded', () => {
     // Appliquer le mode stocké dans le localStorage
     const savedMode = localStorage.getItem('mode');
-    console.log("Mode récupéré:", savedMode);  // Log pour vérifier
+    // console.log("Mode récupéré:", savedMode);  // Log pour vérifier
     if (savedMode) {
         document.body.classList.add(savedMode === 'dark' ? 'dark-mode' : 'light-mode');
     } else {

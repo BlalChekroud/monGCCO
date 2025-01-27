@@ -133,38 +133,6 @@ class CountingCampaignController extends AbstractController
         return $this->json($campaigns);
     }
 
-
-    #[Route('/api/sync', name: 'api_sync_campaigns_post', methods: ['POST'])]
-    public function validateAndSync(Request $request, EntityManagerInterface $em): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $errors = [];
-    
-        foreach ($data as $item) {
-            $existingCampaign = $em->getRepository(CountingCampaign::class)->find($item['id']);
-            if ($existingCampaign) {
-                if ($existingCampaign->getUpdatedAt() > new \DateTime($item['updatedAt'])) {
-                    $errors[] = [
-                        'id' => $item['id'],
-                        'message' => 'Conflit de données, la campagne a été mise à jour plus récemment côté serveur.',
-                    ];
-                    continue;
-                }
-            }
-    
-            $campaign = $existingCampaign ?? new CountingCampaign();
-            $campaign->setCampaignName($item['name']);
-            $campaign->setCreatedAt(new \DateTimeImmutable());
-            $campaign->setDescription($item['description']);
-            $em->persist($campaign);
-        }
-    
-        $em->flush();
-    
-        return $this->json(['message' => 'Synchronisation terminée', 'errors' => $errors]);
-    }
-   
-
     // #[Route('/api/sync-campaign', name: 'app_counting_campaign_sync', methods: ['POST'])]
     // public function syncCampaign(CampaignStatusRepository $campaignStatusRepository, CountingCampaignRepository $countingCampaignRepository, Request $request, EntityManagerInterface $entityManager): JsonResponse
     // {
@@ -628,6 +596,38 @@ class CountingCampaignController extends AbstractController
 
         return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
     }
+
+
+    // #[Route('/api/sync', name: 'api_sync_campaigns_post', methods: ['POST'])]
+    // public function validateAndSync(Request $request, EntityManagerInterface $em): JsonResponse
+    // {
+    //     $data = json_decode($request->getContent(), true);
+    //     $errors = [];
+    
+    //     foreach ($data as $item) {
+    //         $existingCampaign = $em->getRepository(CountingCampaign::class)->find($item['id']);
+    //         if ($existingCampaign) {
+    //             if ($existingCampaign->getUpdatedAt() > new \DateTime($item['updatedAt'])) {
+    //                 $errors[] = [
+    //                     'id' => $item['id'],
+    //                     'message' => 'Conflit de données, la campagne a été mise à jour plus récemment côté serveur.',
+    //                 ];
+    //                 continue;
+    //             }
+    //         }
+    
+    //         $campaign = $existingCampaign ?? new CountingCampaign();
+    //         $campaign->setCampaignName($item['name']);
+    //         $campaign->setCreatedAt(new \DateTimeImmutable());
+    //         $campaign->setDescription($item['description']);
+    //         $em->persist($campaign);
+    //     }
+    
+    //     $em->flush();
+    
+    //     return $this->json(['message' => 'Synchronisation terminée', 'errors' => $errors]);
+    // }
+   
 
     #[Route('/{id}/suspend', name: 'app_counting_campaign_suspend', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas accès à cette fonction.')]

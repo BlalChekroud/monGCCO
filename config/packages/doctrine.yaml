@@ -26,11 +26,8 @@ doctrine:
                 prefix: 'App\Entity'
                 alias: App
         controller_resolver:
-<<<<<<< ours
             auto_mapping: true
-=======
-            auto_mapping: false
->>>>>>> theirs
+
 
 when@test:
     doctrine:

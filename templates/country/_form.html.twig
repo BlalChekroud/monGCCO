@@ -1,5 +1,32 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    {% import 'macros/btn_actions_macros.html.twig' as macros %}
-    {{ macros.action_buttons('app_country_new', 'app_country_show', 'app_country_edit', 'country/_delete_form.html.twig', country, app.request.attributes.get('_route')) }}
-{{ form_end(form) }}
+<form id="country-form">
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {% import 'macros/btn_actions_macros.html.twig' as macros %}
+        {{ macros.action_buttons('app_country_new', 'app_country_show', 'app_country_edit', 'country/_delete_form.html.twig', country, app.request.attributes.get('_route')) }}
+    {{ form_end(form) }}
+</form>
+<script src="/js/indexeddb.js"></script>
+<script>
+    const form = document.getElementById('country-form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const isOnline = navigator.onLine;
+        if (isOnline) {
+            form.submit(); // Soumission en ligne classique
+        } else {
+            const data = {
+                name: document.getElementById('country_name').value,
+                iso2: document.getElementById('country_iso2').value,
+                createdAt: new Date().toISOString(),
+            };
+
+            try {
+                await saveCountry(data); // Stockage local via IndexedDB
+                alert('Pays enregistré localement, synchronisation prévue.');
+            } catch (error) {
+                console.error('Erreur de stockage local :', error);
+            }
+        }
+    });
+</script>

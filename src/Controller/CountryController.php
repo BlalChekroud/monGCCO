@@ -6,6 +6,7 @@ use App\Form\ExportType;
 use App\Service\ExportService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ImportCsvType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\Country;
 use App\Form\CountryType;
@@ -201,6 +202,17 @@ class CountryController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
+
+                // Si l'utilisateur est hors ligne, ajouter les données à IndexedDB
+                if (!$this->isConnected()) {
+                    $data = [
+                        'name' => $country->getName(),
+                        'iso2' => $country->getIso2(),
+                        'createdAt' => (new \DateTimeImmutable())->format('c'),
+                    ];
+                    return $this->json($data, 200); // Envoyer les données au JavaScript pour stockage local
+                }
+
                 // Ajout de vérifications supplémentaires avant de persister l'entité
                 if (empty($country->getName()) || empty($country->getIso2())) {
                     $this->addFlash('error', 'Le nom et le code ISO2 doivent être remplis.');
@@ -221,6 +233,73 @@ class CountryController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    
+    // Méthode utilitaire pour vérifier la connectivité
+    private function isConnected(): bool
+    {
+        return @fsockopen("www.google.com", 80); // Test simple pour détecter une connexion
+    }
+
+    #[Route('/api/sync', name: 'app_country_sync', methods: ['POST'])]
+    public function sync(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $data = json_decode($request->getContent(), true);
+    
+        foreach ($data as $countryData) {
+            $country = new Country();
+            $country->setName($countryData['name']);
+            $country->setIso2($countryData['iso2']);
+            $country->setCreatedAt(new \DateTimeImmutable($countryData['createdAt']));
+            $entityManager->persist($country);
+        }
+    
+        $entityManager->flush();
+        return $this->json(['message' => 'Synchronisation réussie !'], Response::HTTP_OK);
+    }
+    
+    // #[Route('/api/sync', name: 'api_sync_countries', methods: ['GET'])]
+    // public function syncCountries(CountryRepository $countryRepository): JsonResponse
+    // {
+    //     $countries = $countryRepository->findAll();
+    //     return $this->json($countries);
+    // }
+
+
+    // #[Route('/api/sync', name: 'api_sync_countries_post', methods: ['POST'])]
+    // public function validateAndSync(Request $request, EntityManagerInterface $em): JsonResponse
+    // {
+    //     $data = json_decode($request->getContent(), true);
+    //     $errors = [];
+    
+    //     if (!$data) {
+    //         return new JsonResponse(['error' => 'Invalid JSON'], 400);
+    //     }
+
+    //     foreach ($data as $item) {
+    //         $existingCountry = $em->getRepository(Country::class)->find($item['id']);
+    //         if ($existingCountry) {
+    //             if ($existingCountry->getUpdatedAt() > new \DateTime($item['updatedAt'])) {
+    //                 $errors[] = [
+    //                     'id' => $item['id'],
+    //                     'message' => 'Conflit de données, le pays a été mise à jour plus récemment côté serveur.',
+    //                 ];
+    //                 continue;
+    //             }
+    //         }
+    
+    //         $country = $existingCountry ?? new Country();
+    //         $country->setName($item['name']);
+    //         $country->setIso2($item['iso2']);
+    //         $country->setCreatedAt(new \DateTimeImmutable());
+    //         $em->persist($country);
+    //     }
+    
+    //     $em->flush();
+    
+    //     return $this->json(['message' => 'Synchronisation terminée', 'errors' => $errors]);
+    // }
+
 
     #[Route('/{id}', name: 'app_country_show', methods: ['GET'])]
     public function show(Country $country): Response
