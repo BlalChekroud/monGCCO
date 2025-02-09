@@ -126,12 +126,12 @@ class CountingCampaignController extends AbstractController
     }
 
 
-    #[Route('/api/sync', name: 'api_sync_campaigns', methods: ['GET'])]
-    public function syncCampaigns(CampaignRepository $campaignRepository): JsonResponse
-    {
-        $campaigns = $campaignRepository->findAll();
-        return $this->json($campaigns);
-    }
+    // #[Route('/api/sync', name: 'api_sync_campaigns', methods: ['GET'])]
+    // public function syncCampaigns(CampaignRepository $campaignRepository): JsonResponse
+    // {
+    //     $campaigns = $campaignRepository->findAll();
+    //     return $this->json($campaigns);
+    // }
 
     // #[Route('/api/sync-campaign', name: 'app_counting_campaign_sync', methods: ['POST'])]
     // public function syncCampaign(CampaignStatusRepository $campaignStatusRepository, CountingCampaignRepository $countingCampaignRepository, Request $request, EntityManagerInterface $entityManager): JsonResponse
@@ -290,6 +290,27 @@ class CountingCampaignController extends AbstractController
         ]);
     }
 
+    #[IsGranted(CountingCampaignVoter::DELETE, 'countingCampaign')]
+    #[Route('/{id}', name: 'app_counting_campaign_delete', methods: ['POST'])]
+    public function delete(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$countingCampaign->getId(), $request->getPayload()->get('_token'))) {
+            try {
+                $entityManager->remove($countingCampaign);
+                $entityManager->flush();
+                $this->addFlash('success', "Campagne de comptage a bien été supprimée");
+            } catch (\Exception $e) {
+                $this->addFlash('error', "Erreur lors de la suppression : " . $e->getMessage());
+            }
+        }  else {
+            // Ajouter un message d'erreur si le jeton CSRF est invalide
+            $this->addFlash('error', 'Jeton CSRF invalide. Suppression annulée.');
+        }
+
+        return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    
     #[IsGranted(CountingCampaignVoter::VIEW, 'countingCampaign')]
     #[Route('/{id}', name: 'app_counting_campaign_show', methods: ['GET', 'POST'])]
     public function show(
@@ -577,25 +598,25 @@ class CountingCampaignController extends AbstractController
         ]);
     }
 
-    #[IsGranted(CountingCampaignVoter::DELETE, 'countingCampaign')]
-    #[Route('/{id}', name: 'app_counting_campaign_delete', methods: ['POST'])]
-    public function delete(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$countingCampaign->getId(), $request->getPayload()->get('_token'))) {
-            try {
-                $entityManager->remove($countingCampaign);
-                $entityManager->flush();
-                $this->addFlash('success', "Campagne de comptage a bien été supprimée");
-            } catch (\Exception $e) {
-                $this->addFlash('error', "Erreur lors de la suppression : " . $e->getMessage());
-            }
-        }  else {
-            // Ajouter un message d'erreur si le jeton CSRF est invalide
-            $this->addFlash('error', 'Jeton CSRF invalide. Suppression annulée.');
-        }
+    // #[IsGranted(CountingCampaignVoter::DELETE, 'countingCampaign')]
+    // #[Route('/{id}', name: 'app_counting_campaign_delete', methods: ['POST'])]
+    // public function delete(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
+    // {
+    //     if ($this->isCsrfTokenValid('delete'.$countingCampaign->getId(), $request->getPayload()->get('_token'))) {
+    //         try {
+    //             $entityManager->remove($countingCampaign);
+    //             $entityManager->flush();
+    //             $this->addFlash('success', "Campagne de comptage a bien été supprimée");
+    //         } catch (\Exception $e) {
+    //             $this->addFlash('error', "Erreur lors de la suppression : " . $e->getMessage());
+    //         }
+    //     }  else {
+    //         // Ajouter un message d'erreur si le jeton CSRF est invalide
+    //         $this->addFlash('error', 'Jeton CSRF invalide. Suppression annulée.');
+    //     }
 
-        return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
-    }
+    //     return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
+    // }
 
 
     // #[Route('/api/sync', name: 'api_sync_campaigns_post', methods: ['POST'])]

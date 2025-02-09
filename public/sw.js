@@ -1,4 +1,4 @@
-const PREFIX = "V4";
+const PREFIX = "V1";
 const BASE = location.protocol + "//" + location.host;
 const CACHED_FILES = [
     // `${BASE}/user/country/new/`,

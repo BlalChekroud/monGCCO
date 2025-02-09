@@ -19,11 +19,11 @@ class BirdSpeciesCountType extends AbstractType
             ->add('birdSpecies', EntityType::class, [
                 'class' => BirdSpecies::class,
                 'choice_label' => function(BirdSpecies $birdSpecy) {
-                    return $birdSpecy->getScientificName() . ' - '. $birdSpecy->getBirdFamily()->getFamily() . ' (' . $birdSpecy->getBirdFamily()->getFamilyName() . ') '. $birdSpecy->getBirdFamily()->getSubFamily(). '/'. $birdSpecy->getBirdFamily()->getTribe().'/'. $birdSpecy->getBirdFamily()->getOrdre();
+                    return $birdSpecy->getWispeciescode() . ' - '. $birdSpecy->getScientificName() . ' - '. $birdSpecy->getBirdFamily()->getFamily() . ' (' . $birdSpecy->getBirdFamily()->getFamilyName() . ') '. $birdSpecy->getBirdFamily()->getSubFamily(). '/'. $birdSpecy->getBirdFamily()->getTribe().'/'. $birdSpecy->getBirdFamily()->getOrdre();
                 },
                 // 'label' => 'Espèce',
                 'autocomplete' => true,
-                'placeholder' => 'Nom scientifique - Famille (Nom de famille) / Sous-famille / Tribe / Ordre d\'espèce',
+                'placeholder' => "Code d'espèce - Nom scientifique - Famille (Nom de famille) / Sous-famille / Tribe / Ordre d'espèce",
                 'label' => false,
 
             ])

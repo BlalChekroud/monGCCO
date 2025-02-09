@@ -20,7 +20,7 @@ class AgentsGroup
     #[ORM\Column(length: 255)]
     private ?string $groupName = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'leader')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $leader = null;
 
