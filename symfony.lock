@@ -276,15 +276,6 @@
     "symfony/ux-toggle-password": {
         "version": "v2.18.0"
     },
-    "symfony/ux-turbo": {
-        "version": "2.22",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "2.19",
-            "ref": "9dd2778a116b6e5e01e5e1582d03d5a9e82630de"
-        }
-    },
     "symfony/validator": {
         "version": "7.0",
         "recipe": {
@@ -311,7 +302,20 @@
         ]
     },
     "symfony/webpack-encore-bundle": {
-        "version": "v2.1.1"
+        "version": "2.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.0",
+            "ref": "35ee1edee91a1a7137095f53db7ed0c20884b745"
+        },
+        "files": [
+            "./assets/app.js",
+            "./assets/styles/app.css",
+            "./config/packages/webpack_encore.yaml",
+            "./package.json",
+            "./webpack.config.js"
+        ]
     },
     "symfonycasts/reset-password-bundle": {
         "version": "1.22",
