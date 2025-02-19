@@ -13,28 +13,30 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CountingCampaignType extends AbstractType
 {
+    public function __construct(private readonly TranslatorInterface $translator) {}
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('startDate', DateTimeType::class, [
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control'],
-                'label' => 'Date de début',
+                'label' => $this->translator->trans('campaign.start_date'),
                 'required' => true,
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'La date de début ne peut pas être vide.']),
+                    new Assert\NotBlank(['message' => $this->translator->trans('campaign.start_date_required')]),
                 ]
             ])
             ->add('endDate', DateTimeType::class, [
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control'],
-                'label' => 'Date de fin',
+                'label' => $this->translator->trans('campaign.end_date'),
                 'required' => true,
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'La date de fin ne peut pas être vide.']),
+                    new Assert\NotBlank(['message' => $this->translator->trans('campaign.end_date_required')]),
                 ]
             ])
             ->add('siteAgentsGroups', CollectionType::class, [
@@ -46,7 +48,7 @@ class CountingCampaignType extends AbstractType
                 'label' => false,
             ])
             ->add('description',TextareaType::class, [
-                'label' => 'Description',
+                'label' => $this->translator->trans('description'),
                 'required' => false,
             ])
         ;

@@ -28,7 +28,7 @@ class AppFixtures extends Fixture
 
         // Création d'un utilisateur super administrateur
         $user = new User();
-        $user->setEmail('superadmin@gccom.com')
+        $user->setEmail('superadmin@gmail.com')
              ->setName('super')
              ->setLastName('Admin')
              ->setPhone('')

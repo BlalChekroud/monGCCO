@@ -2,8 +2,6 @@
 
 namespace App\Enum;
 
-use Symfony\Contracts\Translation\TranslatorInterface;
-
 enum ExportFormat{
     case CSV;
     case XLSX;

@@ -335,50 +335,14 @@ h6.explanation {
   }
 } */
 
-@media print {
-  /* Ajuster la taille de la page au format A4 */
-  @page {
-      size: A4; /* Définit le format A4 */
-      margin: 20mm; /* Marges adaptées */
-  }
 
-  /* Masquer tout le contenu hors de #printableArea */
-  body * {
-      visibility: hidden;
-  }
-  #printableArea, #printableArea * {
-      visibility: visible;
-  }
-  #printableArea {
-      position: absolute;
-      top: 0;
-      left: 0;
-  }
-
-  /* Ajuster la mise en page pour économiser de l'espace */
-  table {
-      border-collapse: collapse;
-      width: 100%;
-  }
-  table th, table td {
-      border: 1px solid #000; /* Bordures pour rendre lisible à l'impression */
-      padding: 5px;
-      font-size: 10px; /* Taille de texte réduite */
-  }
-
-  /* Polices et mise en forme générales */
-  body, #printableArea {
-      font-size: 12px; /* Ajuster selon vos besoins */
-      line-height: 1.2;
-  }
-}
 /* Page Detail*/
-/* @media print {
+/* /* @media print {
   .hidden-print,
   .hidden-print * {
     display: none !important;
   }
-}
+} */
 
 @media print {
   body {
@@ -392,18 +356,26 @@ h6.explanation {
     page-break-after: avoid; 
   }
 
+  h5 {
+    font-size: 9pt;
+  }
+
+  h6 {
+    font-size: 8pt;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid #000;
+    /* border: 1px solid #000; */
     margin-bottom: 20px;
   }
 
   th, td {
-    border: 1px solid #000;
-    padding: 8px;
+    /* border: 1px solid #000; */
+    /* padding: 8px; */
     text-align: left;
-    font-size: 12pt;
+    font-size: 10pt;
   }
 
   .modal-body {
@@ -415,7 +387,7 @@ h6.explanation {
   }
 
   @page {
-    margin: 20mm;
+    margin: 15mm;
     counter-increment: page;
   }
 
@@ -436,7 +408,7 @@ h6.explanation {
     page-break-inside: avoid;
   }
   
-} */
+} 
 
 
   /*--------------------------------------------------------------
@@ -448,7 +420,7 @@ h6.explanation {
     justify-content: center;
     align-items: center;
     /* background: #34495e; */
-    background: #ffffff;
+    background: #ffffff00;
     border-radius: 20px;
     padding: 10px;
     /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); */
@@ -458,7 +430,7 @@ h6.explanation {
 .clock {
     font-family: 'Orbitron', sans-serif;
     color: #012970;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 

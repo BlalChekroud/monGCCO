@@ -1,11 +1,11 @@
-<form id="country-form">
+{# <form id="country-form"> #}
     {{ form_start(form) }}
         {{ form_widget(form) }}
         {% import 'macros/btn_actions_macros.html.twig' as macros %}
         {{ macros.action_buttons('app_country_new', 'app_country_show', 'app_country_edit', 'country/_delete_form.html.twig', country, app.request.attributes.get('_route')) }}
     {{ form_end(form) }}
-</form>
-<script src="/js/indexeddb.js"></script>
+{# </form> #}
+{# <script src="/js/indexeddb.js"></script>
 <script>
     const form = document.getElementById('country-form');
     form.addEventListener('submit', async (event) => {
@@ -29,4 +29,4 @@
             }
         }
     });
-</script>
+</script> #}

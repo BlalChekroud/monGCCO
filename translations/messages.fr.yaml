@@ -6,6 +6,8 @@ create_a_family: "Créer une famille d'oiseaux"
 create_a_species: "Créer une espèce d'oiseaux"
 create_user_status: "Créer un statut d'utilisateur"
 add_a_country: 'Ajouter un pays'
+add_a_countType: "Ajouter un type de comptage"
+add_a_quality: "Ajouter une qualité de collecte"
 choose_bird_family: "-- Choisir une Famille d'Oiseaux --"
 consult_families: "Consultation des familles"
 consult_reserves: "Consultation des réserves"
@@ -27,6 +29,7 @@ save: 'Enregistrer'
 update: 'Mise à jour'
 add: 'Ajouter'
 modification: 'Modification'
+delete: 'Supprimer'
 'Export Data Description': "Choisissez un format pour télécharger les données."
 'Import Bird Species Data': "Importer les données des espèces d'oiseaux"
 'Export Bird Species Data': "Exporter les données des espèces d'oiseaux"
@@ -49,6 +52,8 @@ modification: 'Modification'
 'Export sites collection Data': "Exporter les données des sites de collecte"
 'Import regions Data': "Importer les données des régions"
 'Export regions Data': "Exporter les données des régions"
+'Import count type Data': "Importer les données des types de comptage"
+'Export count type Data': "Exporter les données des types de comptage"
 
 export_format:
   csv: "CSV (Valeurs séparées par des virgules)"
@@ -73,6 +78,11 @@ status: "État"
 csv_import_title: "Importer un fichier CSV"
 csv_import_instruction: "Assurez-vous que votre fichier contient les colonnes nécessaires."
 csv_preview_title: "Aperçu du fichier CSV"
+success_import: "%importedCount% lignes ont été importées avec succès. %invalidCount% lignes n'ont pas pu être importées."
+error:
+    import: "Erreur lors de l'importation : %message%"
+    invalid_csv: "Le fichier CSV contient des caractères non valides. Veuillez vérifier l'encodage du fichier."
+    invalid_rows: "%count% lignes n'ont pas pu être importées. Numéros des lignes : %invalidRows%"
 close: "Fermer"
 note: "NB"
 columns: "Les colonnes"
@@ -87,6 +97,7 @@ maxSizeMessage: "Le fichier est trop volumineux. La taille maximale autorisée e
 coverage: 'Couverture pour cette espèce'
 iucn_red_list_category: "Catégorie de la liste rouge de l'IUCN 2022"
 birdlife_tax_treat: "Traitement taxonomique de BirdLife"
+label: 'Libellé'
 
 import_csv:
   mimeTypesMessage: "Veuillez charger un fichier CSV valide."
@@ -230,10 +241,19 @@ campaign:
   cannot_be_modified: "Une campagne %status% ne peut pas être modifiée"
   title: "Gestion des campagnes de comptage"
   manage: "Gestion des campagnes"
+  title_add: "Créer une nouvelle campagne de comptage"
+  informations: "Informations sur la nouvelle campagne"
+  sites_and_agent_groups: "Sites et Groupes d'agents"
+  site_group_selection_info: "Pour un site, vous devez choisir le(s) groupe(s) qui va compter et collecter."
+  add_site: "Ajouter un site"
   campaign_name: "Nom de la campagne"
   start_date: "Date de début"
+  start_date_required: "La date de début ne peut pas être vide."
   end_date: "Date de fin"
+  end_date_required: "La date de fin ne peut pas être vide."
   create_campaign: "Créer une campagne"
+  edit_campaign: "Modification de la campagne"
+  delete_campaign: "Supprimer la campagne"
   detail_counting_campaign: "Détail d'une campagne de comptage"
   cannot_start_collecting_before: "Vous ne pouvez pas commencer à collecter avant"
   status: "État de la campagne"
@@ -311,6 +331,24 @@ condition:
   list_environmental_conditions: "Voir la liste des conditions environnementales"
   view_conditions: "Consultation des environnementales"
 
+countType:
+  title: "Gestion des types de comptage"
+  manage: "Gestion de comptage"
+  title_add: "Ajout d'un type de comptage"
+  title_edit: "Modifier le type de comptage"
+  informations: "Informations sur le nouveau type de comptage"
+  the_new_informations: "Les nouvelles informations du type de comptage"
+  return: "Retour à la consultation des types de comptage"
+  consult: "Consultation des types de comptage"
+  delete: "Supprimer le type de comptage"
+  msg:
+    created_success: "Le type de comptage a bien été créé"
+    created_error: "Une erreur s'est produite lors de la création du type de comptage"
+    updated_success: "Le type de comptage a bien été modifié"
+    updated_error: "Une erreur s'est produite lors de la modification du type de comptage"
+    deleted_success: "Le type de comptage a bien été supprimé"
+    deleted_error: "Une erreur s'est produite lors de la suppression du type de comptage"
+
 group:
   view_groups: "Consultation des groupes"
 
@@ -344,6 +382,24 @@ notification:
   unread_notifications: "Notifications non lues"
   mark_as_seen: "Marquer comme vu"
 
+collectQuality:
+  title: "Gestion de la qualité de collecte de données"
+  manage: "Gestion de la qualité des données"
+  title_add: "Ajout d'une qualité de collecte de données"
+  title_edit: "Modifier la qualité de collecte de données"
+  informations: "Informations sur la nouvelle qualité de collecte de données"
+  the_new_informations: "Les nouvelles informations de la qualité de collecte de données"
+  return: "Retour à la consultation des qualités de collecte de données"
+  consult: "Consultation des qualités de collecte de données"
+  delete: "Supprimer la qualité de collecte de données"
+  msg:
+    created_success: "La qualité de collecte de données a bien été créée"
+    created_error: "Une erreur s'est produite lors de la création de la qualité de collecte de données"
+    updated_success: "La qualité de collecte de données a bien été modifiée"
+    updated_error: "Une erreur s'est produite lors de la modification de la qualité de collecte de données"
+    deleted_success: "La qualité de collecte de données a bien été supprimée"
+    deleted_error: "Une erreur s'est produite lors de la suppression de la qualité de collecte de données"
+
 register:
   page_title: "Inscription"
   form:
@@ -369,6 +425,11 @@ register:
 # Messages pour les erreurs de formulaire
 form_error:
   general: "Veuillez vérifier les informations et réessayer."
+
+siteAgentsGroupType:
+  collection_site: "Site de collecte"
+  choose_site: "-- Choisir un site --"
+  groups: "Groupe(s)"
 
 site_collection:
   add_collection_site: "Ajouter un site de collecte"

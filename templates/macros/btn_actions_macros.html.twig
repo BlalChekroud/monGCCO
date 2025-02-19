@@ -31,6 +31,7 @@
             {% if current_route == show_path %}
                 {# <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="{{ 'print'|trans }}"></button> #}
                 {# <button id="exportCSVButton" class="btn btn-outline-secondary btn-sm bi bi-folder" title="{{ 'export_as_CSV'|trans }}"></button> #}
+                <button onclick="printDiv()" class="btn btn-sm btn-outline-secondary bi bi-printer" title="{{ 'print'|trans }}"></button>
             {% endif %}
             <a href="{{ path(edit_path, {'id': entit.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="{{ 'edit'|trans }}"></a>
         {% endif %}

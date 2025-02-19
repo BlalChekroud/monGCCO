@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle campagne de comptage{% endblock %}
+{% block title %}{{'campaign.title'|trans }}{% endblock %}
 
 {% block body %}
 
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Créer une nouvelle campagne de comptage</h1>
+      <h1>{{'campaign.title_add'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
@@ -23,13 +23,13 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Informations sur la nouvelle campagne</h5>
+              <h5 class="card-title">{{'campaign.informations'|trans }}</h5>
               {{ include('counting_campaign/_form.html.twig') }}
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation des campagnes">Retour</a>
-              <a href="{{ path('app_agents_group_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer un groupe</a>
-              <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-1"> Ajouter un site de collecte</a>
+              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'campaign.back_to_campaign_consultation'|trans }}">{{ 'back'|trans }}</a>
+              <a href="{{ path('app_agents_group_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{'create_group'|trans }}</a>
+              <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-1"> {{'site_collection.add_collection_site'|trans }}</a>
             </div>
           </div>
         

@@ -177,28 +177,6 @@
 
     <!-- Nombre total compté pour chaque espèce -->
     <h6 class="mt-4"><i class="bi bi-bar-chart-line-fill"></i> {{ 'species_statistics.total_species_counted'|trans }} :</h6>
-    {# <table class="table table-hover table-bordered table-striped table-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>{{ 'species_statistics.species'|trans }}</th>
-                <th>{{ 'species_statistics.total_count'|trans }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for species, count in counting_campaign.getTotalCountBySpecies %}
-                <tr>
-                    <td><i class="bi bi-twitter text-primary"></i> {{ species }}</td>
-                    <td><span class="badge bg-success">{{ count }}</span></td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="2" class="text-center text-muted">
-                        <i class="bi bi-exclamation-circle"></i> {{ 'species_statistics.no_species_observed'|trans }}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table> #}
     <table class="table table-hover table-bordered table-striped table-sm">
         <thead class="table-dark">
             <tr>
@@ -238,5 +216,4 @@
         </div>
     </div>
 </div>
-    <button onclick="window.print()" class="btn btn-sm btn-outline-secondary bi bi-printer" title="{{ 'print'|trans }}"></button>
-    {# <a href="{{ path('app_counting_campaign_export', {'id': counting_campaign.id}) }}" class="btn btn-sm btn-outline-secondary bi bi-folder me-3" title="Exporter en CSV"></a> #}
+    <button onclick="printDiv()" class="btn btn-sm btn-outline-secondary bi bi-printer" title="{{ 'print'|trans }}"></button>

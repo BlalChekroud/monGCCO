@@ -6,6 +6,8 @@ create_a_family: 'إنشاء عائلة طيور'
 create_a_species: 'إنشاء نوع من الطيور'
 create_user_status: 'إنشاء حالة مستخدم'
 add_a_country: 'إضافة دولة'
+add_a_countType: "إضافة نوع عد"
+add_a_quality: "إضافة جودة"
 choose_bird_family: "-- اختر عائلة الطيور --"
 consult_families: "عرض العائلات"
 consult_reserves: "عرض المحميات"
@@ -27,6 +29,7 @@ save: "حفظ"
 update: "تحديث"
 add: 'إضافة'
 modification: 'تعديل'
+delete: "حذف"
 'Export Data Description': "اختر تنسيقًا لتنزيل البيانات."
 'Import Bird Species Data': "استيراد بيانات أنواع الطيور"
 'Export Bird Species Data': "تصدير بيانات أنواع الطيور"
@@ -49,6 +52,8 @@ modification: 'تعديل'
 'Export sites collection Data': "تصدير بيانات مواقع الجمع"
 'Import regions Data': "استيراد بيانات الأقاليم"
 'Export regions Data': "تصدير بيانات الأقاليم"
+'Import count type Data': "استيراد بيانات نوع العد"
+'Export count type Data': "تصدير بيانات نوع العد"
 
 export_format:
   csv: "CSV (قيم مفصولة بفواصل)"
@@ -73,6 +78,11 @@ status: "حالة الحملة"
 csv_import_title: "CSV استيراد ملف"
 csv_import_instruction: "تأكد من أن ملفك يحتوي على الأعمدة المطلوبة."
 csv_preview_title: "CSV معاينة ملف"
+success_import: "أسطر لم يتم استيرادهم %invalidCount% .أسطر تم استيرادهم بنجاح %importedCount%"
+error:
+    import: "خطأ أثناء الاستيراد: %message%"
+    invalid_csv: "ملف CSV يحتوي على أحرف غير صالحة. يرجى التحقق من ترميز الملف."
+    invalid_rows: "%invalidRows% من السطور لم يتم استيرادهم. أرقام السطور %count%"
 close: "إغلاق"
 note: "ملاحظة"
 columns: "الأعمدة"
@@ -87,6 +97,7 @@ maxSizeMessage: "الملف كبير جدًا. الحجم الأقصى المس�
 coverage: 'التغطية لهذا النوع'
 iucn_red_list_category: "فئة القائمة الحمراء للاتحاد الدولي لحفظ الطبيعة 2022"
 birdlife_tax_treat: "تصنيف BirdLife"
+label: "التسمية"
 
 import_csv:
   mimeTypesMessage: "يرجى تحميل ملف CSV صالح."
@@ -177,13 +188,13 @@ birdFamily:
   edit_this_family: "تعديل عائلة الأنواع"
   the_new_informations: "المعلومات الجديدة للعائلة"
   msg:
-    success_import: "تم استيراد %importedCount% من عائلات الطيور بنجاح. لم يتم استيراد %invalidCount% من السطور."
+    success_import: "لم يتم استيرادهم %invalidCount% .تم استيرادهم بنجاح %importedCount%"
     success_create: "تم إنشاء عائلة الطيور بنجاح."
     success_update: "تم تحديث العائلة بنجاح."
     success_delete: "تم حذف عائلة الأنواع بنجاح."
   error:
     import: "خطأ أثناء الاستيراد: %message%"
-    invalid_rows: "لم يتم استيراد %count% من السطور. أرقام السطور: %invalidRows%"
+    invalid_rows: "%invalidRows% من السطور لم يتم استيرادهم. أرقام السطور %count%"
     invalid_csv: "ملف CSV يحتوي على أحرف غير صالحة. يرجى التحقق من ترميز الملف."
     creation_failed: "فشل في إنشاء عائلة الطيور."
     modification_failed: "فشل في تعديل عائلة الطيور."
@@ -230,11 +241,20 @@ campaign:
   cannot_be_modified: "%status% لا يمكن تعديل الحملة بحالة"
   title: "إدارة حملات العدّ"
   manage: "إدارة الحملات"
+  title_add: "إنشاء حملة عد جديدة"
+  informations: "معلومات عن الحملة الجديدة"
+  sites_and_agent_groups: "المواقع ومجموعات الوكلاء"
+  site_group_selection_info: ".بالنسبة للموقع، يجب عليك اختيار المجموعة (المجموعات) التي ستقوم بالعد وجمع البيانات"
+  add_site: "إضافة موقع"
   campaign_name: "اسم الحملة"
   start_date: "تاريخ البدء"
+  start_date_required: ".لا يمكن أن يكون تاريخ البدء فارغًا"
   end_date: "تاريخ الانتهاء"
+  end_date_required: ".لا يمكن أن يكون تاريخ الانتهاء فارغًا"
   status: "الحالة"
   create_campaign: "إنشاء حملة"
+  edit_campaign: "تعديل الحملة"
+  delete_campaign: "حذف الحملة"
   cannot_start_collecting_before: "لا يمكنك البدء في جمع البيانات قبل"
   created_by: "أنشئت بواسطة"
   sites_and_groups: "المواقع والمجموعات"
@@ -311,6 +331,24 @@ condition:
   list_environmental_conditions: "عرض قائمة الشروط البيئية"
   view_conditions: "عرض الشروط البيئية"
 
+countType:
+  title: "إدارة أنواع العد"
+  manage: "إدارة العد"
+  title_add: "إضافة نوع عد"
+  informations: "معلومات عن نوع العد الجديد"
+  title_edit: "تعديل نوع العد"
+  the_new_informations: "المعلومات الجديدة لنوع العد"
+  return: "العودة إلى قائمة أنواع العد"
+  consult: "عرض أنواع العد"
+  delete: "حذف نوع العد"
+  msg:
+    created_success: "تم إنشاء نوع العد بنجاح"
+    created_error: "حدث خطأ أثناء إنشاء نوع العد"
+    updated_success: "تم تعديل نوع العد بنجاح"
+    updated_error: "حدث خطأ أثناء تعديل نوع العد"
+    deleted_success: "تم حذف نوع العد بنجاح"
+    deleted_error: "حدث خطأ أثناء حذف نوع العد"
+
 group:
   view_groups: "عرض المجموعات"
 
@@ -344,6 +382,24 @@ notification:
   unread_notifications: "الإشعارات غير المقروءة"
   mark_as_seen: "تحديد كمقروء"
 
+collectQuality:
+  title: "إدارة جودة جمع البيانات"
+  manage: "إدارة جودة البيانات"
+  title_add: "إضافة جودة جمع البيانات"
+  title_edit: "تعديل جودة جمع البيانات"
+  informations: "معلومات عن جودة جمع البيانات الجديدة"
+  the_new_informations: "المعلومات الجديدة عن جودة جمع البيانات"
+  return: "العودة إلى قائمة جودة جمع البيانات"
+  consult: "استشارة جودة جمع البيانات"
+  delete: "حذف جودة جمع البيانات"
+  msg:
+    created_success: "تم إنشاء جودة جمع البيانات بنجاح"
+    created_error: "حدث خطأ أثناء إنشاء جودة جمع البيانات"
+    updated_success: "تم تعديل جودة جمع البيانات بنجاح"
+    updated_error: "حدث خطأ أثناء تعديل جودة جمع البيانات"
+    deleted_success: "تم حذف جودة جمع البيانات بنجاح"
+    deleted_error: "حدث خطأ أثناء حذف جودة جمع البيانات"
+
 register:
   page_title: "التسجيل"
   form:
@@ -369,6 +425,11 @@ register:
 # Error messages for form validation
 form_error:
   general: "يرجى التحقق من المعلومات والمحاولة مرة أخرى."
+
+siteAgentsGroupType:
+  collection_site: "موقع الجمع"
+  choose_site: "-- اختر موقعًا --"
+  groups: "مجموعة/مجموعات"
 
 site_collection:
   add_collection_site: "إضافة موقع جمع البيانات"

@@ -3,30 +3,30 @@
       <!-- Date de début -->
       <div class="col-md-4">
           <label for="{{ form.startDate.vars.id }}" class="form-label">{{ form_label(form.startDate) }}<span class="requiredField">*</span></label>
-          {{ form_widget(form.startDate, {'attr': {'class': 'form-control', 'placeholder': 'Sélectionnez la date de début'}}) }}
+          {{ form_widget(form.startDate, {'attr': {'class': 'form-control'}}) }}
           <div class="text-danger">{{ form_errors(form.startDate) }}</div>
       </div>
 
       <!-- Date de fin -->
       <div class="col-md-4">
           <label for="{{ form.endDate.vars.id }}" class="form-label">{{ form_label(form.endDate) }}<span class="requiredField">*</span></label>
-          {{ form_widget(form.endDate, {'attr': {'class': 'form-control', 'placeholder': 'Sélectionnez la date de fin'}}) }}
+          {{ form_widget(form.endDate, {'attr': {'class': 'form-control'}}) }}
           <div class="text-danger">{{ form_errors(form.endDate) }}</div>
       </div>
 
   </div>
 
   <!-- Section des sites et groupes d'agents -->
-  <h5 class="mt-4">Sites et Groupes d'agents<span class="requiredField">*</span></h5>
+  <h5 class="mt-4">{{'campaign.sites_and_agent_groups'|trans }}<span class="requiredField">*</span></h5>
   <div id="site-agents-group-collection" data-prototype="{{ form_widget(form.siteAgentsGroups.vars.prototype)|e('html_attr') }}">
-    <p class="explanation">Pour un site vous devez choisir le(s) groupe(s) qui vas compter et collecter</p>
+    <p class="explanation">{{'campaign.site_group_selection_info'|trans }}</p>
       {% for siteAgentsGroup in form.siteAgentsGroups %}
           <div class="row mb-3 site-agents-group-item">
               <div class="col-md-10">
                   {{ form_widget(siteAgentsGroup) }}
               </div>
               <div class="col-md-2">
-                  <button type="button" class="btn btn-danger btn-sm bi bi-trash btn-sm remove-site-agents-group" title="Supprimer"></button>
+                  <button type="button" class="btn btn-danger btn-sm bi bi-trash btn-sm remove-site-agents-group" title="{{'delete'|trans }}"></button>
               </div>
           </div>
       {% endfor %}
@@ -36,8 +36,7 @@
   <div class="row mb-3">
       <div class="col-md-12">
         <button type="button" id="add-site-agents-group" class="btn btn-outline-primary btn-sm rounded-pill mt-3" title="Ajouter un site et son/ses groupe(s) d'agents">
-          <i class="ri-add-circle-line me-1"></i> 
-          Ajouter un site
+          <i class="ri-add-circle-line me-1"></i>{{'campaign.add_site'|trans }}
         </button>
 
       </div>

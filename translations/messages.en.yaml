@@ -6,6 +6,8 @@ create_a_family: 'Create a bird family'
 create_a_species: 'Create a bird species'
 create_user_status: 'Create a user status'
 add_a_country: 'Add a country'
+add_a_countType: "Add counting type"
+add_a_quality: "Add a data collection quality"
 choose_bird_family: "-- Choose a Bird Family --"
 consult_families: "View families"
 consult_reserves: "View reserves"
@@ -27,6 +29,7 @@ save: "Save"
 update: "Update"
 add: 'Add'
 modification: 'Modification'
+delete: "Delete"
 'Export Data Description': "Choose a format to download the data."
 'Import Bird Species Data': "Import Bird Species Data"
 'Export Bird Species Data': "Export Bird Species Data"
@@ -49,6 +52,8 @@ modification: 'Modification'
 'Export sites collection Data': "Export sites collection Data"
 'Import regions Data': "Import regions Data"
 'Export regions Data': "Export regions Data"
+'Import count type Data': "Import counting type data"
+'Export count type Data': "Export counting type data"
 
 export_format:
   csv: "CSV (Comma-Separated Values)"
@@ -73,6 +78,11 @@ status: "Status"
 csv_import_title: "Import a CSV File"
 csv_import_instruction: "Make sure your file contains the required columns."
 csv_preview_title: "CSV File Preview"
+success_import: "%importedCount% rows were successfully imported. %invalidCount% rows could not be imported."
+error:
+    import: "Error during import: %message%"
+    invalid_csv: "The CSV file contains invalid characters. Please check the file encoding."
+    invalid_rows: "%count% lines could not be imported. Row numbers: %invalidRows%"
 close: "Close"
 note: "Note"
 columns: "The columns"
@@ -87,6 +97,7 @@ maxSizeMessage: "The file is too large. The maximum allowed size is 1024k."
 coverage: 'Coverage for this species'
 iucn_red_list_category: "IUCN Red List Category 2022"
 birdlife_tax_treat: "BirdLife Taxonomic Treatment"
+label: "Label"
 
 import_csv:
   mimeTypesMessage: "Please upload a valid CSV file."
@@ -230,10 +241,19 @@ campaign:
   cannot_be_modified: "The campaign with status %status% cannot be modified"
   title: "Campaign Management"
   manage: "Manage Campaigns"
+  title_add: "Create a new counting campaign"
+  informations: "Information about the new campaign"
+  sites_and_agent_groups: "Sites and Agent Groups"
+  site_group_selection_info: "For a site, you must choose the group(s) that will count and collect."
+  add_site: "Add a site"
   campaign_name: "Campaign Name"
   start_date: "Start Date"
+  start_date_required: "The start date cannot be empty."
   end_date: "End Date"
+  end_date_required: "The end date cannot be empty."
   create_campaign: "Create a Campaign"
+  edit_campaign: "Edit Campaign"
+  delete_campaign: "Delete the campaign"
   cannot_start_collecting_before: "You cannot start collecting before"
   status: "Campaign Status"
   created_by: "Created by"
@@ -311,6 +331,24 @@ condition:
   list_environmental_conditions: "View List of Environmental Conditions"
   view_conditions: "View Environmental Conditions"
 
+countType:
+  title: "Counting Type Management"
+  manage: "Counting Management"
+  title_add: "Adding a Counting Type"
+  title_edit: "Edit Counting Type"
+  informations: "Information about the new counting type"
+  the_new_informations: "The new counting type information"
+  return: "Back to counting types overview"
+  consult: "View counting types"
+  delete: "Delete the counting type"
+  msg:
+    created_success: "The counting type has been successfully created"
+    created_error: "An error occurred while creating the counting type"
+    updated_success: "The counting type has been successfully updated"
+    updated_error: "An error occurred while updating the counting type"
+    deleted_success: "The counting type has been successfully deleted"
+    deleted_error: "An error occurred while deleting the counting type"
+
 group:
   view_groups: "View Groups"
   
@@ -344,6 +382,24 @@ notification:
   unread_notifications: "Unread Notifications"
   mark_as_seen: "Mark as Seen"
 
+collectQuality:
+  title: "Data Collection Quality Management"
+  manage: "Data Quality Management"
+  title_add: "Add a Data Collection Quality"
+  title_edit: "Edit Data Collection Quality"
+  informations: "Information about the new data collection quality"
+  the_new_informations: "New information about data collection quality"
+  return: "Back to data collection quality overview"
+  consult: "Consultation of data collection qualities"
+  delete: "Delete Data Collection Quality"
+  msg:
+    created_success: "The data collection quality has been successfully created"
+    created_error: "An error occurred while creating the data collection quality"
+    updated_success: "The data collection quality has been successfully updated"
+    updated_error: "An error occurred while updating the data collection quality"
+    deleted_success: "The data collection quality has been successfully deleted"
+    deleted_error: "An error occurred while deleting the data collection quality"
+
 register:
   page_title: "Register"
   form:
@@ -369,6 +425,11 @@ register:
 # Error messages for form validation
 form_error:
   general: "Please check the information and try again."
+
+siteAgentsGroupType:
+  collection_site: "Collection Site"
+  choose_site: "-- Choose a site --"
+  groups: "Group(s)"
 
 site_collection:
   add_collection_site: "Add a Collection Site"
