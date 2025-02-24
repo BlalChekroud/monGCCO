@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Collection de sites{% endblock %}
+{% block title %}{{'site_collection.title'|trans }}{% endblock %}
 
 {% block body %}
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Détail d'un site de collecte</h1>
+      <h1>{{'site_collection.title_show'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_site_collection_index') }}">Gestion des sites</a></li>
-          <li class="breadcrumb-item active">Détail</li>
+          <li class="breadcrumb-item"><a href="{{ path('app_site_collection_index') }}">{{ 'site_collection.manage'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{'show'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -22,83 +22,82 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">
-                            Détail
-                        </h5>
+                      <div id="printableArea">
+                        <h5 class="card-title">{{'show'|trans }}</h5>
 
                         <table class="table">
                             <tbody>
                                 <tr>
-                                    <th>Nom du site</th>
+                                    <th>{{'site_collection.siteName'|trans }}</th>
                                     <td>{{ site_collection.siteName }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Code du site</th>
+                                    <th>{{'site_collection.siteCode'|trans }}</th>
                                     <td>{{ site_collection.siteCode }}</td>
                                 </tr>
                                 <tr>
                                     <th>{{ 'created_at'|trans }}</th>
-                                    <td>{{ site_collection.createdAt ? site_collection.createdAt|date('D-m-y H:i:s') : '' }}</td>
+                                    <td>{{ site_collection.createdAt ? site_collection.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
                                     <th>{{ 'Last_updated_at'|trans }}</th>
-                                    <td>{{ site_collection.updatedAt ? site_collection.updatedAt|date('D-m-y H:i:s') : '' }}</td>
+                                    <td>{{ site_collection.updatedAt ? site_collection.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Code national</th>
+                                    <th>{{'site_collection.nationalSiteCode'|trans }}</th>
                                     <td>{{ site_collection.nationalSiteCode }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Code international</th>
+                                    <th>{{'site_collection.internationalSiteCode'|trans }}</th>
                                     <td>{{ site_collection.internationalSiteCode }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Latitude de départ</th>
+                                    <th>{{'site_collection.latDepart'|trans }}</th>
                                     <td>{{ site_collection.latDepart }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Longitude de départ</th>
+                                    <th>{{'site_collection.longDepart'|trans }}</th>
                                     <td>{{ site_collection.longDepart }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Latitude de fin</th>
+                                    <th>{{'site_collection.latFin'|trans }}</th>
                                     <td>{{ site_collection.latFin }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Longitude de fin</th>
+                                    <th>{{'site_collection.longFin'|trans }}</th>
                                     <td>{{ site_collection.longFin }}</td>
                                 </tr>
                                 <tr>
                                     {% set city = site_collection.city %}
-                                    <th>Ville</th>
+                                    <th>{{'city.name'|trans }}</th>
                                     <td>{{ city.name }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Région</th>
+                                    <th>{{'region.name'|trans }}</th>
                                     <td>{{ city.region.name }}
                                         {% if city.region.name %}
                                             {{ city.region.name }}
                                         {% else %}
-                                            <span>Aucune</span>
+                                            <span>{{'region.none'|trans }}</span>
                                         {% endif %}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Pays</th>
+                                    <th>{{'country.name'|trans }}</th>
                                     <td>
                                         {% if city.region.country %}
                                             {{ city.region.country.name }}
                                         {% else %}
-                                            <span>Aucun</span>
+                                            <span>{{'country.none'|trans }}</span>
                                         {% endif %}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Nom du site parent</th>
-                                    <td>{{ site_collection.parentSite ? site_collection.parentSite.siteName : 'Aucun' }}</td>
+                                    <th>{{'site_collection.parentSite'|trans }}</th>
+                                    <td>{{ site_collection.parentSite ? site_collection.parentSite.siteName : '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Ce site est le parent de(s)</th>
+                                    <th>{{'site_collection.parentOfSites'|trans }}</th>
                                     <td>
                                         {% if site_collection.siteCollections|length > 0 %}
                                             <ul>
@@ -107,29 +106,30 @@
                                                 {% endfor %}
                                             </ul>
                                         {% else %}
-                                            Aucun
+                                            {{'site_collection.none'|trans }}
                                         {% endif %}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Nombre d'espèces d'oiseaux uniques comptées</th>
+                                    <th>{{'site_collection.uniqueBirdSpeciesCount'|trans }}</th>
                                     <td>
                                         {{ uniqueSpeciesCount ?? 0 }}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Nombre total des oiseaux comptés</th>
+                                    <th>{{'campaign_statistics.total_birds_counted'|trans }}</th>
                                     <td>
                                         {{ totalBirdCountsForSite ?? 0 }}
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
+                      </div>
                     </div>
                     <div class="card-footer d-flex justify-content-between">
                         <div>
-                            <a href="{{ path('app_site_collection_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des site">Retour</a>
-                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Ajouter un site de collecte</a>
+                            <a href="{{ path('app_site_collection_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'site_collection.return'|trans }}">{{ 'back'|trans }}</a>
+                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> {{ 'site_collection.add_collection_site'|trans }}</a>
                         </div>
                         <div class="d-flex justify-content-end">
                             {% import 'macros/btn_actions_macros.html.twig' as macros %}

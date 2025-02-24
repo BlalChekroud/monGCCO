@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau pays{% endblock %}
+{% block title %}{{'country.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Ajouter un nouveau pays</h1>
+      <h1>{{ 'country.title_add'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_country_index') }}">Gestion des pays</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_country_index') }}">{{ 'country.manage'|trans }}</a></li>
           <li class="breadcrumb-item active">{{ 'add'|trans }}</li>
         </ol>
       </nav>
@@ -23,16 +23,16 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Informations sur le nouveau pays</h5>
+              <h5 class="card-title">{{ 'country.informations'|trans }}</h5>
 
               {{ include('country/_form.html.twig') }}
 
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_country_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des pays">Retour</a>
-              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une région</a>
-              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une ville</a>
-              <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Ajouter un site de collecte</a>
+              <a href="{{ path('app_country_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'country.return'|trans }}">{{ 'back'|trans }}</a>
+              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{'add_a_region'|trans }}</a>
+              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{'add_a_city'|trans }}</a>
+              <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> {{'campaign.add_site'|trans }}</a>
             </div>
           </div>
 

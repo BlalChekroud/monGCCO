@@ -62,7 +62,7 @@ class AgentsGroupType extends AbstractType
                 },
                 // 'label' => 'Pays<span class="requiredField">*</span>',
                 'label_html' => true,
-                'placeholder' => $this->translator->trans('Select_the_country'),
+                'placeholder' => $this->translator->trans('country.select_the_country'),
                 'required' => true,
                 'autocomplete' => true,
                 'query_builder' => function (CountryRepository $repository) {

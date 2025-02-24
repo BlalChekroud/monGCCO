@@ -1,39 +1,78 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ice index{% endblock %}
+{% block title %}{{'conditionIce.title'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>Ice index</h1>
+  <main id="main" class="main">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Label</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>{{ 'actions'|trans }}</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for ice in ices %}
-            <tr>
-                <td>{{ ice.id }}</td>
-                <td>{{ ice.label }}</td>
-                <td>{{ ice.createdAt ? ice.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ ice.updatedAt ? ice.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_ice_show', {'id': ice.id}) }}">show</a>
-                    <a href="{{ path('app_ice_edit', {'id': ice.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="pagetitle">
+      <h1>{{'conditionIce.title'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{'conditionIce.manage'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_ice_new') }}">Create new</a>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'card_title'|trans }}</h5>
+                <table class="table datatable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{'label'|trans }}</th>
+                            <th>{{ 'created_at'|trans }}</th>
+                            <th>{{ 'Last_updated_at'|trans }}</th>
+                            <th>{{ 'actions'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for ice in ices %}
+                        <tr>
+                            <td>{{ ice.id }}</td>
+                            <td>{{ ice.label }}</td>
+                            <td>{{ ice.createdAt ? ice.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ ice.updatedAt ? ice.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>
+                                <div class="d-flex justify-content-end">
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_ice_new','home', 'app_ice_edit', 'ice/_delete_form.html.twig', ice, app.request.attributes.get('_route'), false) }}
+                                    {{ include('ice/_delete_form.html.twig') }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">{{ 'no_record_found'|trans }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>        
+              
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_ice_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'add_a_ice'|trans }}</a>
+              <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> {{ 'collect.view_collections'|trans }}</a>
+              <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{'condition.view_conditions'|trans }}</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    {% import 'macros/form_macros.html.twig' as form_macros %}
+    {{ form_macros.csv_import_form(form, 'app_ice_index', formExport, 'Import ice Data', 'Export ice Data') }}
+
+
+    {% if headers is defined and rows is defined %}
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_ice_index', ['ICE']) }}
+    {% endif %}
+
+  </main><!-- End #main -->
 {% endblock %}

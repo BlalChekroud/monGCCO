@@ -65,8 +65,8 @@
       </div>
     </section>
 
-    {# {% import 'macros/form_macros.html.twig' as form_macros %}
-    {{ form_macros.csv_import_form(form, 'app_quality_index', formExport, 'Import count type Data', 'Export count type Data') }} #}
+    {% import 'macros/form_macros.html.twig' as form_macros %}
+    {{ form_macros.csv_import_form(form, 'app_quality_index', formExport, 'Import quality Data', 'Export quality Data') }}
 
 
     {% if headers is defined and rows is defined %}

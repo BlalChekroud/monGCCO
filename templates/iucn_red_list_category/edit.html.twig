@@ -1,13 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit IucnRedListCategory{% endblock %}
+{% block title %}{{'iucn.title'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>Edit IucnRedListCategory</h1>
+  <main id="main" class="main">
 
-    {{ include('iucn_red_list_category/_form.html.twig', {'button_label': 'Update'}) }}
+    <div class="pagetitle">
+      <h1>{{ 'iucn.title_edit'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_iucn_red_list_category_index') }}">{{ 'iucn.manage'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'modification'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_iucn_red_list_category_index') }}">back to list</a>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
 
-    {{ include('iucn_red_list_category/_delete_form.html.twig') }}
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'iucn.the_new_informations'|trans }}</h5>
+
+              {{ include('iucn_red_list_category/_form.html.twig') }}
+
+            </div>
+            <div class="card-footer">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <a href="{{ path('app_iucn_red_list_category_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'iucn.return'|trans }}">{{ 'back'|trans }}</a>
+                </div>
+                <div class="d-flex justify-content-end">
+                  {{ include('iucn_red_list_category/_delete_form.html.twig') }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
 {% endblock %}

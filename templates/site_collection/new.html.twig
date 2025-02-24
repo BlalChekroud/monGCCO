@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau site de collecte{% endblock %}
+{% block title %}{{'site_collection.title'|trans }}{% endblock %}
 
 {% block body %}
 
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Créer un nouveau Site de collecte</h1>
+      <h1>{{ 'site_collection.title_add'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_site_collection_index') }}">Gestion des sites</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_site_collection_index') }}">{{ 'site_collection.manage'|trans }}</a></li>
           <li class="breadcrumb-item active">{{ 'add'|trans }}</li>
         </ol>
       </nav>
@@ -23,13 +23,13 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Informations sur le nouveau site de collecte</h5>
+                        <h5 class="card-title">{{ 'site_collection.informations'|trans }}</h5>
 
                         {{ include('site_collection/_form.html.twig') }}
 
                     </div>
                     <div class="card-footer">
-                        <a href="{{ path('app_site_collection_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des site">Retour</a>
+                        <a href="{{ path('app_site_collection_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'site_collection.return'|trans }}">{{ 'back'|trans }}</a>
                     </div>
                 </div>
 

@@ -3,10 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Region;
+use App\Form\ExportType;
+use App\Service\ExportService;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Entity\City;
-
 use App\Form\ImportCsvType;
 use App\Entity\SiteCollection;
 use App\Form\SiteCollectionType;
@@ -16,16 +17,52 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Route('/site/collection')]
-#[IsGranted('ROLE_USER', message: 'Vous n\'avez pas l\'accès.')]
+// #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas l\'accès.')]
+#[Route('/user/site/collection')]
 class SiteCollectionController extends AbstractController
 {
+    public function __construct(private readonly TranslatorInterface $translator) {}
+
     #[Route('/', name: 'app_site_collection_index', methods: ['GET', 'POST'])]
-    public function index(SiteCollectionRepository $siteCollectionRepository, Request $request, EntityManagerInterface $entityManager): Response
+    public function index(ExportService $exportService,SiteCollectionRepository $siteCollectionRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
+
+        $formExport = $this->createForm(ExportType::class);
+        $formExport->handleRequest($request);
+
+        if ($formExport->isSubmitted() && $formExport->isValid()) {
+            if (!$this->isGranted('ROLE_EXPORT')) {
+                $this->addFlash('warning', $this->translator->trans('export_permission'));
+                return $this->redirectToRoute('app_site_collection_index');
+            }
+            $columnNames = ['Nom du site', 'Code du site', 'Code national', 'Code international', 'Latitude de départ', 'Longitude de départ', 'Latitude de fin', 'Longitude de fin', 'Ville', 'Nom du site parent', 'Ajouter le'];
+            $siteCollections = $siteCollectionRepository->findAll();
+
+            $data = [];
+            foreach ($siteCollections as $siteCollection) {
+                $data[] = [
+                    $siteCollection->getSiteName() ?? '',
+                    $siteCollection->getSiteCode() ?? '',
+                    $siteCollection->getNationalSiteCode() ?? '',
+                    $siteCollection->getInternationalSiteCode() ?? '',
+                    $siteCollection->getLatDepart() ?? '',
+                    $siteCollection->getLongDepart() ?? '',
+                    $siteCollection->getLatFin() ?? '',
+                    $siteCollection->getLongFin() ?? '',
+                    $siteCollection->getCity()?->getName() ?? '',
+                    $siteCollection->getParentSite()?->getSiteName() ?? '',
+                    $siteCollection->getCreatedAt()?->format('d-m-Y H:i:s') ?? ''
+                ];
+            }
+            $format = $formExport->get('format')->getData();
+            $fileName = sprintf("Exporter les données des sites de collection %s", date('d-m-Y_His'));
+    
+            return $exportService->export($columnNames, $data, $format, $fileName);
+        }
     
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $csvFile */
@@ -41,7 +78,7 @@ class SiteCollectionController extends AbstractController
 
                 // Vérifiez si la conversion a réussi
                 if (!mb_check_encoding($csvData, 'UTF-8')) {
-                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    $this->addFlash('error', $this->translator->trans('error.invalid_csv'));
                     return $this->redirectToRoute('app_site_collection_index');
                 }
 
@@ -59,9 +96,10 @@ class SiteCollectionController extends AbstractController
                     'headers' => $headers,
                     'rows' => $rows,
                     'csvData' => $csvData,
+                    'formExport' => $formExport->createView(),
                 ]);
             } else {
-                $this->addFlash('warning' ,"Vous n'avez pas le droit.");
+                $this->addFlash('warning', $this->translator->trans('export_permission'));
                 return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);
             }
         }
@@ -170,7 +208,11 @@ class SiteCollectionController extends AbstractController
                 $existingSite = $siteCollectionRepository->findOneBy(['siteName' => $siteName, 'siteCode' => $siteCode]);
 
                 if ($existingSite) {
-                    $this->addFlash('error', "Le site $siteName avec le code $siteCode existe déjà.");
+                    // $this->addFlash('error', "Le site $siteName avec le code $siteCode existe déjà.");
+                    $this->addFlash('error', $this->translator->trans('site_already_exists', [
+                        '%siteName%' => $siteName,
+                        '%siteCode%' => $siteCode
+                    ]));
                     $invalidRows[] = $lineNumber + 2;
                     $invalidCount++;
                     continue; // Ignorer cette entrée si le site existe déjà
@@ -179,7 +221,10 @@ class SiteCollectionController extends AbstractController
                 $existingParentSite = $siteCollectionRepository->findOneBy(['siteName' => $parentSite]);
 
                 if (!$existingParentSite && $parentSite) {
-                    $this->addFlash('error', "Le site parent '$parentSite' n'existe pas dans la base de données.");
+                    // $this->addFlash('error', "Le site parent '$parentSite' n'existe pas dans la base de données.");
+                    $this->addFlash('error', $this->translator->trans('site_collection.parent_site_not_found', [
+                        '%parentSite%' => $parentSite
+                    ]));
                     // continue; // Passer à la ligne suivante du CSV
                 }
                 
@@ -212,13 +257,33 @@ class SiteCollectionController extends AbstractController
     
             try {
                 $entityManager->flush();
-                $this->addFlash('success', "$importedCount sites ont été importés avec succès.");
+
+                $existingParentSite = $siteCollectionRepository->findOneBy(['siteName' => $parentSite]);
+                if ($existingParentSite) {
+                    $site->setParentSite($existingParentSite);
+                    $entityManager->persist($site);
+                    $entityManager->flush();
+                    $this->addFlash('success', 'SITE PARENT TROUVE');
+                } else {
+                    $site->setParentSite(null); // Ou gérer cela comme une erreur si nécessaire
+                }
+                // $this->addFlash('success', "$importedCount sites ont été importés avec succès.");
+                $this->addFlash('success', $this->translator->trans('site_collection.success_import', [
+                    '%importedCount%' => $importedCount
+                ]));
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
+                // $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
+                $this->addFlash('error', $this->translator->trans('error.import', [
+                    '%message%' => $e->getMessage()
+                ]));
             }
             
             if ($invalidCount > 0) {
-                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+                // $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+                $this->addFlash('error', $this->translator->trans('site_collection.import_failed', [
+                    '%invalidCount%' => $invalidCount,
+                    '%invalidRows%' => implode(', ', $invalidRows)
+                ]));
             }
             return $this->redirectToRoute('app_site_collection_index');
         }
@@ -226,6 +291,7 @@ class SiteCollectionController extends AbstractController
         return $this->render('site_collection/index.html.twig', [
             'site_collections' => $siteCollectionRepository->findAll(),
             'form' => $form->createView(),
+            'formExport' => $formExport->createView(),
         ]);
     }
 

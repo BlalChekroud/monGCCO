@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modification de la site{% endblock %}
+{% block title %}{{'site_collection.title'|trans }}{% endblock %}
 
 {% block body %}
 
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Modification de site de collecte</h1>
+      <h1>{{ 'site_collection.title_edit'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_site_collection_index') }}">Gestion des sites</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_site_collection_index') }}">{{ 'site_collection.manage'|trans }}</a></li>
           <li class="breadcrumb-item active">{{ 'modification'|trans }}</li>
         </ol>
       </nav>
@@ -23,13 +23,13 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Modifier</h5>
+                        <h5 class="card-title">{{ 'site_collection.the_new_informations'|trans }}</h5>
                         {{ include('site_collection/_form.html.twig', {'button_label': ' Mise à jour'}) }}
                     </div>
                     <div class="card-footer d-flex justify-content-between">
                         <div>
-                            <a href="{{ path('app_site_collection_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des site">Retour</a>
-                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Ajouter un site de collecte</a>
+                            <a href="{{ path('app_site_collection_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'site_collection.return'|trans }}">{{ 'back'|trans }}</a>
+                            <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> {{ 'site_collection.add_collection_site'|trans }}</a>
                         </div>
                         <div class="d-flex justify-content-end">
                             {% import 'macros/btn_actions_macros.html.twig' as macros %}

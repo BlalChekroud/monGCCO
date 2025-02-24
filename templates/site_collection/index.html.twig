@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Consultation des sites{% endblock %}
+{% block title %}{{'site_collection.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Sites de collecte</h1>
+      <h1>{{'site_collection.title'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item active">Gestion des sites</li>
+          <li class="breadcrumb-item active">{{ 'site_collection.manage'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -28,10 +28,10 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Nom du site</th>
-                            <th>Ville</th>
-                            <th>Région</th>
-                            <th>Nom du site parent</th>
+                            <th>{{'site_collection.siteName'|trans }}</th>
+                            <th>{{'city.name'|trans }}</th>
+                            <th>{{'region.name'|trans }}</th>
+                            <th>{{'site_collection.parentSite'|trans }}</th>
                             <th>{{ 'actions'|trans }}</th>
                         </tr>
                     </thead>
@@ -61,10 +61,10 @@
               </div>
               
               <div class="card-footer">
-                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> Ajouter un site de collecte</a>
-                <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des région</a>
-                <a href="{{ path('app_nature_reserve_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des réserve</a>
-                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des campagnes</a>
+                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> {{ 'site_collection.add_collection_site'|trans }}</a>
+                <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{'region.consult'|trans }}</a>
+                <a href="{{ path('app_nature_reserve_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{'consult_reserves'|trans }}</a>
+                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{ 'campaign.consult'|trans }}</a>
               </div>
 
             </div>
@@ -74,16 +74,7 @@
     </section>
     
     {% import 'macros/form_macros.html.twig' as form_macros %}
-
-    <section class="section">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    {{ form_macros.csv_import_form(form, 'app_site_collection_index') }}
-                </div>
-            </div>
-        </div>
-    </section>
+    {{ form_macros.csv_import_form(form, 'app_site_collection_index', formExport, 'Import sites collection Data', 'Export sites collection Data') }}
 
     {% if headers is defined and rows is defined %}
         {{ form_macros.csv_modal(headers, rows, csvData, 'app_site_collection_index', ['siteName', 'siteCode', 'latDepart', 'longDepart', 'latFin', 'longFin', 'city'], ['nationalSiteCode', 'internationalSiteCode', 'cityLat', 'cityLong', 'region']) }}

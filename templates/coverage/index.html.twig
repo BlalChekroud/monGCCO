@@ -1,229 +1,77 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Coverage index{% endblock %}
+{% block title %}{{'coverage.title'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>Coverage index</h1>
+  <main id="main" class="main">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Label</th>
-                <th>{{ 'created_at'|trans }}</th>
-                <th>{{ 'actions'|trans }}</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for coverage in coverages %}
-            <tr>
-                <td>{{ coverage.id }}</td>
-                <td>{{ coverage.label }}</td>
-                <td>{{ coverage.createdAt ? coverage.createdAt|date('d-m-Y H:i:s') : '' }}</td>
-                <td>{{ coverage.updatedAt ? coverage.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_coverage_show', {'id': coverage.id}) }}">show</a>
-                    <a href="{{ path('app_coverage_edit', {'id': coverage.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="pagetitle">
+      <h1>{{'coverage.title'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{'coverage.manage'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_coverage_new') }}">Create new</a>
-
-    {# <h1>Vous êtes hors ligne</h1>
-    <p>Impossible de charger le contenu. Veuillez vérifier votre connexion Internet.</p>
-    <ul id="country-list"></ul> #}
-    {# <form id="country-form">
-        <!-- {{ form_start(form) }}
-            {{ form_widget(form) }}
-            {% import 'macros/btn_actions_macros.html.twig' as macros %}
-            {{ macros.action_buttons('app_country_new', 'app_country_show', 'app_country_edit', 'country/_delete_form.html.twig', country, app.request.attributes.get('_route')) }}
-        {{ form_end(form) }} -->
-         <input name="country_name" id="country_name"/>
-         <input name="country_iso2" id="country_iso2"/>
-        <button type="submit">Enregistrer</button>
-    </form> #}
-    {# <script src="/js/indexeddb.js"></script>
-    <script>
-        const form = document.getElementById('country-form');
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-    
-            const isOnline = navigator.onLine;
-            if (isOnline) {
-                form.submit(); // Soumission en ligne classique
-            } else {
-                const data = {
-                    name: document.getElementById('country_name').value,
-                    iso2: document.getElementById('country_iso2').value,
-                    createdAt: new Date().toISOString(),
-                };
-    
-                try {
-                    await saveCountry(data); // Stockage local via IndexedDB
-                    alert('Pays enregistré localement, synchronisation prévue.');
-                } catch (error) {
-                    console.error('Erreur de stockage local :', error);
-                }
-            }
-        });
-    </script> #}
-
-    {# <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Informations sur les conditions environnementales</h5>
-
-            <!-- Floating Labels Form -->
-            <form class="row g-3">
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="floatingName" placeholder="Site">
-                        <label for="floatingName">Site de collecte</label>
-                    </div>
-                </div>
-                <div class="col-md-5">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="floatingName" placeholder="Weather">
-                        <label for="floatingName">Effets des conditions météorologiques</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="floatingName" placeholder="Water">
-                        <label for="floatingName">L'état des eaux lors du comptage</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="floatingName" placeholder="tidal">
-                        <label for="floatingName">Marée cours (la plupart) du comptage</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="floatingName" placeholder="ice">
-                        <label for="floatingName">La couverture de glace lors du comptage</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="floatingName" placeholder="Disturbed">
-                        <label for="floatingName">Disturbé</label>
-                    </div>
-                </div>
-                
-                <div class="col-md-5">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="floatingName" placeholder="CountType">
-                        <label for="floatingName">Type de comptage effectué lors de cette visite</label>
-                    </div>
-                </div>
-
-                <h5>Informations sur la nouvelle collection</h5>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="floatingName" placeholder="Quality">
-                        <label for="floatingName">Qualité</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="floatingName" placeholder="Methode">
-                        <label for="floatingName">Méthode(s) utilisées pour le comptage</label>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                    
-                        <div class="container">
-                            <!-- Conteneur pour les champs dynamiques -->
-                            <div id="speciesContainer" class="mb-3">
-                                <!-- Les champs initiaux peuvent être laissés vides -->
-                                <div class="row mb-3 specy-group">
-                                    <div class="col-md-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control specy" placeholder="Nom ou Code d'oiseau">
-                                            <label>Code ou Nom d'oiseau</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-floating">
-                                            <input type="number" class="form-control count" placeholder="Nombre">
-                                            <label>Nombre</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-center">
-                                        <button class="btn btn-danger btn-remove" type="button">Supprimer</button>
-                                    </div>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'card_title'|trans }}</h5>
+                <table class="table datatable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{'label'|trans }}</th>
+                            <th>{{ 'created_at'|trans }}</th>
+                            <th>{{ 'Last_updated_at'|trans }}</th>
+                            <th>{{ 'actions'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for coverage in coverages %}
+                        <tr>
+                            <td>{{ coverage.id }}</td>
+                            <td>{{ coverage.label }}</td>
+                            <td>{{ coverage.createdAt ? coverage.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ coverage.updatedAt ? coverage.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>
+                                <div class="d-flex justify-content-end">
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_coverage_new','home', 'app_coverage_edit', 'coverage/_delete_form.html.twig', coverage, app.request.attributes.get('_route'), false) }}
+                                    {{ include('coverage/_delete_form.html.twig') }}
                                 </div>
-                            </div>
-
-                            <!-- Bouton pour ajouter un nouveau groupe de champs -->
-                            <button id="addSpecyBtn" class="btn btn-primary">Ajouter une espèce</button>
-                        </div>
-
-                        <script>
-                            document.getElementById("addSpecyBtn").addEventListener("click", function () {
-                                // Référence au conteneur des champs
-                                const container = document.getElementById("speciesContainer");
-
-                                // Création d'un nouveau groupe de champs
-                                const newGroup = document.createElement("div");
-                                newGroup.className = "row mb-3 specy-group";
-                                newGroup.innerHTML = `
-                                    <div class="col-md-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control specy" placeholder="Nom ou Code d'oiseau">
-                                            <label>Code ou Nom d'oiseau</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-floating">
-                                            <input type="number" class="form-control count" placeholder="Nombre">
-                                            <label>Nombre</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-center">
-                                        <button class="btn btn-danger btn-remove" type="button">Supprimer</button>
-                                    </div>
-                                `;
-
-                                // Ajouter le nouveau groupe de champs au conteneur
-                                container.appendChild(newGroup);
-
-                                // Ajouter l'événement pour le bouton "Supprimer"
-                                newGroup.querySelector(".btn-remove").addEventListener("click", function () {
-                                    newGroup.remove();
-                                });
-                            });
-
-                            // Ajouter un événement "Supprimer" pour les champs existants
-                            document.querySelectorAll(".btn-remove").forEach((button) => {
-                                button.addEventListener("click", function () {
-                                    button.closest(".specy-group").remove();
-                                });
-                            });
-                        </script>
-
-                    </div>
-                    <div class="card-footer">
-                    Footer
-                    </div>
-                </div><!-- End Card with header and footer -->
-
-                <div class="text-center">
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <button type="reset" class="btn btn-secondary">Reset</button>
-                </div>
-            </form><!-- End floating Labels Form -->
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">{{ 'no_record_found'|trans }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>        
+              
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_coverage_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'add_a_coverage'|trans }}</a>
+              <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> {{ 'collect.view_collections'|trans }}</a>
+            </div>
+          </div>
 
         </div>
-    </div> #}
+      </div>
+    </section>
+
+    {% import 'macros/form_macros.html.twig' as form_macros %}
+    {{ form_macros.csv_import_form(form, 'app_coverage_index', formExport, 'Import coverage Data', 'Export coverage Data') }}
+
+
+    {% if headers is defined and rows is defined %}
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_coverage_index', ['COVERAGE']) }}
+    {% endif %}
+
+  </main><!-- End #main -->
 {% endblock %}

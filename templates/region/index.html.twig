@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Consultation des régions{% endblock %}
+{% block title %}{{'region.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Les Régions</h1>
+      <h1>{{'region.title'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item active">Gestion des régions</li>
+          <li class="breadcrumb-item active">{{ 'region.manage'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -26,9 +26,9 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Région</th>
-                                <th>Code Région</th>
-                                <th>Pays</th>
+                                <th>{{ 'region.name'|trans }}</th>
+                                <th>{{'region.code'|trans }}</th>
+                                <th>{{'country.name'|trans }}</th>
                                 <th>{{ 'created_at'|trans }}</th>
                                 <th>{{ 'actions'|trans }}</th>
                             </tr>
@@ -60,12 +60,10 @@
                 </div>          
               
             </div>
-            <div class="card-footer">
-              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Créer une région</a>
-              <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des pays</a>
-              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer pays</a>
-              <a href="{{ path('app_city_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des villes</a>
-              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une ville</a>
+            <div class="card-footer d-flex justify-content-between">
+              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'add_a_region'|trans }}</a>
+              <a href="{{ path('app_country_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{'country.consult'|trans }}</a>
+              <a href="{{ path('app_city_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{'city.consult'|trans }}</a>
             </div>
           </div>
 
@@ -74,16 +72,8 @@
     </section>
 
     {% import 'macros/form_macros.html.twig' as form_macros %}
+    {{ form_macros.csv_import_form(form, 'app_region_index', formExport, 'Import regions Data', 'Export regions Data') }}
 
-    <section class="section">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    {{ form_macros.csv_import_form(form, 'app_region_index') }}
-                </div>
-            </div>
-        </div>
-    </section>
 
     {% if headers is defined and rows is defined %}
         {{ form_macros.csv_modal(headers, rows, csvData, 'app_region_index', ['region', 'regionCode'], ['country', 'iso2']) }}

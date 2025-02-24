@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier la région {% endblock %}
+{% block title %}{{'region.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Modifier la région</h1>
+      <h1>{{ 'region.title_edit'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_region_index') }}">Gestion des régions</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_region_index') }}">{{ 'region.manage'|trans }}</a></li>
           <li class="breadcrumb-item active">{{ 'modification'|trans }}</li>
         </ol>
       </nav>
@@ -22,14 +22,14 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Les nouvelles informations sur la région</h5>
+              <h5 class="card-title">{{ 'region.the_new_informations'|trans }}</h5>
 
               {{ include('region/_form.html.twig') }}
 
             </div>
             <div class="card-footer d-flex justify-content-between">
               <div>
-                <a href="{{ path('app_region_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des régions">Retour</a>
+                <a href="{{ path('app_region_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'region.return'|trans }}">{{ 'back'|trans }}</a>
               </div>
               <div class="d-flex justify-content-end">
                 {% import 'macros/btn_actions_macros.html.twig' as macros %}

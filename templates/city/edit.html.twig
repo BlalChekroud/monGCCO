@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier la ville{% endblock %}
+{% block title %}{{'city.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Modifier la ville</h1>
+      <h1>{{ 'city.title_edit'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_city_index') }}">Gestion des ville</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_city_index') }}">{{ 'city.manage'|trans }}</a></li>
           <li class="breadcrumb-item active">{{ 'modification'|trans }}</li>
         </ol>
       </nav>
@@ -22,14 +22,14 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Les nouvelles informations sur la ville</h5>
+              <h5 class="card-title">{{ 'city.the_new_informations'|trans }}</h5>
 
               {{ include('city/_form.html.twig') }}
 
             </div>
             <div class="card-footer d-flex justify-content-between">
               <div>
-                <a href="{{ path('app_city_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des villes">Retour</a>
+                <a href="{{ path('app_city_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'city.return'|trans }}">{{ 'back'|trans }}</a>
               </div>
               <div class="d-flex justify-content-end">
                 {% import 'macros/btn_actions_macros.html.twig' as macros %}

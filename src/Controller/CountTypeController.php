@@ -32,6 +32,10 @@ class CountTypeController extends AbstractController
         $formExport->handleRequest($request);
 
         if ($formExport->isSubmitted() && $formExport->isValid()) {
+            if (!$this->isGranted('ROLE_EXPORT')) {
+                $this->addFlash('warning', $this->translator->trans('export_permission'));
+                return $this->redirectToRoute('app_count_type_index');
+            }
             $columnNames = ['Libellé', 'Créé le', 'Dernière mise à jour le'];
             $countTypes = $countTypeRepository->findAll();
 
@@ -47,7 +51,7 @@ class CountTypeController extends AbstractController
                 ];
             }
             $format = $formExport->get('format')->getData();
-            $fileName = sprintf("Exportation des types de comptage %s", date('d-m-Y_His'));
+            $fileName = sprintf("Export des types de comptage %s", date('d-m-Y_His'));
     
             return $exportService->export($columnNames, $data, $format, $fileName);
         }
@@ -205,13 +209,18 @@ class CountTypeController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $countType->setCreatedAt(new \DateTimeImmutable());
-                $entityManager->persist($countType);
-                $entityManager->flush();
-                $this->addFlash('success', $this->translator->trans('countType.msg.created_success'));
-    
-                return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);
-            } else {
+                try {
+                    $countType->setCreatedAt(new \DateTimeImmutable());
+                    $entityManager->persist($countType);
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('countType.msg.created_success'));
+        
+                    return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_count_type_new', [], Response::HTTP_SEE_OTHER);
+                }
+                } else {
                 $this->addFlash('error', $this->translator->trans('countType.msg.created_error'));
             }
         }
@@ -230,11 +239,15 @@ class CountTypeController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $countType->setUpdatedAt(new \DateTimeImmutable());
-                $entityManager->flush();
-                $this->addFlash('success', $this->translator->trans('countType.msg.updated_success'));
-    
-                return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);
+                try {
+                    $countType->setUpdatedAt(new \DateTimeImmutable());
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('countType.msg.updated_success'));
+        
+                    return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_count_type_edit', ['id' => $countType->getId()], Response::HTTP_SEE_OTHER);}
             } else {
                 $this->addFlash('error', $this->translator->trans('countType.msg.updated_error'));
             }
@@ -250,12 +263,17 @@ class CountTypeController extends AbstractController
     public function delete(Request $request, CountType $countType, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$countType->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($countType);
-            $entityManager->flush();
-            $this->addFlash('success', $this->translator->trans('countType.msg.deleted_success'));
+            try {
+                $entityManager->remove($countType);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('countType.msg.deleted_success'));
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);
+            }
         } else {
             $this->addFlash('error',$this->translator->trans('countType.msg.deleted_error'));
-        }
+        } 
 
         return $this->redirectToRoute('app_count_type_index', [], Response::HTTP_SEE_OTHER);
     }

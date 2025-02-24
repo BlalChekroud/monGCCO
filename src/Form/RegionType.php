@@ -9,28 +9,31 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RegionType extends AbstractType
 {
+    public function __construct(private readonly TranslatorInterface $translator) {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Nom de la région<span class="requiredField">*</span>',
+                'label' => $this->translator->trans('region.name').'<span class="requiredField">*</span>',
                 'label_html' => true,
                 'required' => false,
                 ])
             ->add('regionCode',TextType::class, [
-                'label' => 'Code de la région<span class="requiredField">*</span>',
+                'label' => $this->translator->trans('region.code').'<span class="requiredField">*</span>',
                 'label_html' => true,
                 'required' => false,
                 ])
             ->add('country', EntityType::class, [
                 'class' => Country::class,
                 'choice_label' => 'name',
-                'placeholder' => '-- Choisir le pays --',
+                'placeholder' => $this->translator->trans('country.select_the_country'),
                 'autocomplete' => true,
-                'label' => 'Pays<span class="requiredField">*</span>',
+                'label' => $this->translator->trans('country.name').'<span class="requiredField">*</span>',
                 'label_html' => true,
             ])
         ;

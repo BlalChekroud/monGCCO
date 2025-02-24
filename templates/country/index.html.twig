@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Consultation des pays{% endblock %}
+{% block title %}{{'country.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Les pays</h1>
+      <h1>{{'country.title'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item active">Gestion des pays</li>
+          <li class="breadcrumb-item active">{{ 'country.manage'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -26,9 +26,9 @@
                 <table class="table datatable">
                     <thead>
                         <tr>
-                            <th>Pays</th>
-                            <th>Iso2</th>
-                            <th>Les régions</th>
+                            <th>{{ 'country.name'|trans }}</th>
+                            <th>{{ 'country.iso'|trans }}</th>
+                            <th>{{ 'regions'|trans }}</th>
                             <th>{{ 'created_at'|trans }}</th>
                             <th>{{ 'actions'|trans }}</th>
                         </tr>
@@ -37,7 +37,7 @@
                     {% for country in countries %}
                         <tr>
                             <td>
-                                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ country.id }}" aria-expanded="false" aria-controls="collapse{{ country.id }}" title="Voir les villes">
+                                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ country.id }}" aria-expanded="false" aria-controls="collapse{{ country.id }}" title="{{'country.viewCities'|trans }}">
                                     {{ country.name }}
                                 </button>
                             </td>
@@ -53,7 +53,7 @@
                                                 {% endfor %}
                                             </ul>
                                         {% else %}
-                                            <p>Aucune région</p>
+                                            <p>{{ 'region.none'|trans }}</p>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -79,11 +79,11 @@
               
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Ajouter un pays</a>
-              <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des régions</a>
-              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une région</a>
-              <a href="{{ path('app_city_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des villes</a>
-              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une ville</a>
+              <a href="{{ path('app_country_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'add_a_country'|trans }}</a>
+              <a href="{{ path('app_region_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{'region.consult'|trans }}</a>
+              <a href="{{ path('app_region_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{'add_a_region'|trans }}</a>
+              <a href="{{ path('app_city_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{'city.consult'|trans }}</a>
+              <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{'add_a_city'|trans }}</a>
             </div>
           </div>
 

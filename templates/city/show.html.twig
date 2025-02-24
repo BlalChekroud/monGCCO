@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ville{% endblock %}
+{% block title %}{{'city.title'|trans }}{% endblock %}
 
 {% block body %}
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Détails de la ville</h1>
+      <h1>{{'city.title_show'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_city_index') }}">Gestion des villes</a></li>
-          <li class="breadcrumb-item active">Détail</li>
+          <li class="breadcrumb-item"><a href="{{ path('app_city_index') }}">{{ 'city.manage'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{'show'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -22,31 +22,31 @@
                 <div class="card">
                     <div class="card-body">
                      <div id="printableArea">
-                        <h5 class="card-title">Détail</h5>
+                        <h5 class="card-title">{{'show'|trans }}</h5>
                             <table class="table">
                                 <tbody>
                                     <tr>
-                                        <th>Nom de la ville :</th>
+                                        <th>{{'city.name'|trans }} :</th>
                                         <td>{{ city.name }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Latitude :</th>
+                                        <th>{{'latitude'|trans }} :</th>
                                         <td>{{ city.latitude }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Longitude :</th>
+                                        <th>{{'longitude'|trans }} :</th>
                                         <td>{{ city.longitude }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Pays :</th>
+                                        <th>{{'country.name'|trans }} :</th>
                                         <td>{{ city.region.country.name }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Région :</th>
+                                        <th>{{'region.name'|trans }} :</th>
                                         <td>{{ city.region.name }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Sites de collectes :</th>
+                                        <th>{{'site_collection.sites'|trans }} :</th>
                                         {% if city.siteCollections|length > 0 %}
                                             {% set sorted_sites = city.siteCollections|sort((a, b) => a.siteName <=> b.siteName) %}
                                             <ul>
@@ -55,7 +55,7 @@
                                                 {% endfor %}
                                             </ul>
                                         {% else %}
-                                        <td>Aucun site</td>
+                                        <td>{{'site_collection.none'|trans }}</td>
                                         {% endif %}
                                     </tr>
                                     <tr>
@@ -73,8 +73,8 @@
                     </div>
                     <div class="card-footer d-flex justify-content-between">
                         <div>
-                            <a href="{{ path('app_city_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des villes">Retour</a>
-                            <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Ajouter une ville</a>
+                            <a href="{{ path('app_city_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'city.return'|trans }}">{{ 'back'|trans }}</a>
+                            <a href="{{ path('app_city_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{ 'add_a_city'|trans }}</a>
                         </div>
                         <div class="d-flex justify-content-end">
                             {% import 'macros/btn_actions_macros.html.twig' as macros %}

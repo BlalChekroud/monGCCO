@@ -1,40 +1,6 @@
 {% if is_granted('ROLE_DELETE') %}
-    <form method="post" action="{{ path('app_country_delete', {'id': country.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+    <form method="post" action="{{ path('app_country_delete', {'id': country.id}) }}" onsubmit="return confirm('{{ 'delete_confirm'|trans }}');">
         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ country.id) }}">
-        <button class="btn btn-danger btn-sm bi bi-trash mx-2" title="Supprimer"></button>
+        <button class="btn btn-danger btn-sm bi bi-trash mx-2" title="{{ 'country.delete'|trans }}"></button>
     </form>
 {% endif %}
-{# <form id="delete-form-{{ country.id }}" method="post" action="{{ path('app_country_delete', {'id': country.id}) }}">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ country.id) }}">
-    <button type="button" class="btn-action btn btn-outline-danger btn-sm bi bi-x-circle-fill mx-2" onclick="confirmDeletion({{ country.id }})"> Supprimer</button>
-</form>
-
-<script>
-function confirmDeletion(countryId) {
-    Swal.fire({
-        title: 'Êtes-vous sûr ?',
-        text: "Vous ne pourrez pas revenir en arrière !",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Oui, supprimer !',
-        cancelButtonText: 'Non, annuler !',
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Form submission if confirmed
-            document.getElementById('delete-form-' + countryId).submit();
-            swalWithBootstrapButtons.fire({
-                    title: 'Supprimé !',
-                    text: 'L\'élément a été supprimé.👍',
-                    icon: 'success'
-                });
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire(
-                'Annulé',
-                'Votre élément est toujours en sécurité 🙂',
-                'error'
-            );
-        }
-    });
-}
-</script> #}

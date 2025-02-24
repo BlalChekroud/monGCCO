@@ -1,6 +1,6 @@
 {% if is_granted('ROLE_DELETE') %}
-    <form method="post" action="{{ path('app_city_delete', {'id': city.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+    <form method="post" action="{{ path('app_city_delete', {'id': city.id}) }}" onsubmit="return confirm('{{ 'delete_confirm'|trans }}');">
         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ city.id) }}">
-        <button class="btn btn-danger btn-sm bi bi-trash-fill mx-2" title="Supprimer la ville"></button>
+        <button class="btn btn-danger btn-sm bi bi-trash-fill mx-2" title={{ 'city.delete'|trans }}"></button>
     </form>
 {% endif %}

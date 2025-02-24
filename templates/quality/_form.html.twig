@@ -1,4 +1,5 @@
 {{ form_start(form) }}
     {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+    {{ macros.action_buttons('app_quality_new', 'app_quality_show', 'app_quality_edit', 'quality/_delete_form.html.twig', quality, app.request.attributes.get('_route')) }}
 {{ form_end(form) }}

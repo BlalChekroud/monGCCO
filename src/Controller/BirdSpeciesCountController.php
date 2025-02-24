@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/bird/species/count')]
+#[Route('/user/bird/species/count')]
 class BirdSpeciesCountController extends AbstractController
 {
     #[Route('/', name: 'app_bird_species_count_index', methods: ['GET'])]

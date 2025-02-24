@@ -1,37 +1,77 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}IucnRedListCategory index{% endblock %}
+{% block title %}{{'iucn.title'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>IucnRedListCategory index</h1>
+  <main id="main" class="main">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Label</th>
-                <th>{{ 'actions'|trans }}</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for iucn_red_list_category in iucn_red_list_categories %}
-            <tr>
-                <td>{{ iucn_red_list_category.id }}</td>
-                <td>{{ iucn_red_list_category.Label }}</td>
-                <td>{{ iucn_red_list_category.createdAt ? iucn_red_list_category.createdAt|date('d-m-Y H:i:s') : '' }}</td>
-                <td>{{ iucn_red_list_category.updatedAt ? iucn_red_list_category.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_iucn_red_list_category_show', {'id': iucn_red_list_category.id}) }}">show</a>
-                    <a href="{{ path('app_iucn_red_list_category_edit', {'id': iucn_red_list_category.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="pagetitle">
+      <h1>{{'iucn.title'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{'iucn.manage'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_iucn_red_list_category_new') }}">Create new</a>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'card_title'|trans }}</h5>
+                <table class="table datatable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{'label'|trans }}</th>
+                            <th>{{ 'created_at'|trans }}</th>
+                            <th>{{ 'Last_updated_at'|trans }}</th>
+                            <th>{{ 'actions'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for iucn_red_list_category in iucn_red_list_categories %}
+                        <tr>
+                            <td>{{ iucn_red_list_category.id }}</td>
+                            <td>{{ iucn_red_list_category.label }}</td>
+                            <td>{{ iucn_red_list_category.createdAt ? iucn_red_list_category.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ iucn_red_list_category.updatedAt ? iucn_red_list_category.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>
+                                <div class="d-flex justify-content-end">
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_iucn_red_list_category_new','home', 'app_iucn_red_list_category_edit', 'iucn_red_list_category/_delete_form.html.twig', iucn_red_list_category, app.request.attributes.get('_route'), false) }}
+                                    {{ include('iucn_red_list_category/_delete_form.html.twig') }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">{{ 'no_record_found'|trans }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>        
+              
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_iucn_red_list_category_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'add_a_iucn'|trans }}</a>
+              <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> {{ 'collect.view_collections'|trans }}</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    {% import 'macros/form_macros.html.twig' as form_macros %}
+    {{ form_macros.csv_import_form(form, 'app_iucn_red_list_category_index', formExport, 'Import iucn Data', 'Export iucn Data') }}
+
+
+    {% if headers is defined and rows is defined %}
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_iucn_red_list_category_index', ['IUCN']) }}
+    {% endif %}
+
+  </main><!-- End #main -->
 {% endblock %}

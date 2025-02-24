@@ -22,7 +22,7 @@ class NotificationController extends AbstractController
         $this->requestStack = $requestStack;
     }
 
-    #[Route('/notifications', name: 'all_notifications')]
+    #[Route('/user/notifications', name: 'all_notifications')]
     public function index(NotificationRepository $notificationRepository): Response
     {
         $user = $this->getUser();
@@ -41,7 +41,7 @@ class NotificationController extends AbstractController
     }
 
 
-    #[Route('/notifications/{id}/mark-as-seen', name: 'notification_mark_as_seen')]
+    #[Route('/user/notifications/{id}/mark-as-seen', name: 'notification_mark_as_seen')]
      public function markAsSeen(Notification $notification, EntityManagerInterface $entityManager): RedirectResponse
     {
         // Vérifiez que l'utilisateur est le propriétaire de la notification

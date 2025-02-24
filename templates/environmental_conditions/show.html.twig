@@ -11,7 +11,7 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
           <li class="breadcrumb-item"><a href="{{ path('app_environmental_conditions_index') }}">Gestion des conditions d'environnement</a></li>
-          <li class="breadcrumb-item active">Détail</li>
+          <li class="breadcrumb-item active">{{'show'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -22,7 +22,7 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Détail</h5>
+                        <h5 class="card-title">{{'show'|trans }}</h5>
 
                         <table class="table">
                             <tbody>
@@ -72,7 +72,7 @@
                                 {% if environmental_condition.countingCampaign %}
                                     <a href="{{ path('app_counting_campaign_show', {'id': environmental_condition.countingCampaign.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-1" title="Détail de la campagne"> Campagne</a>
                                 {% endif %}
-                                <a href="{{ path('app_environmental_conditions_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> Ajouter un site de collecte</a>
+                                <a href="{{ path('app_environmental_conditions_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> {{ 'site_collection.add_collection_site'|trans }}</a>
                             </div>
                             <div class="d-flex justify-content-end">
                                 {% import 'macros/btn_actions_macros.html.twig' as macros %}

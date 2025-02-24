@@ -1,6 +1,6 @@
 {% if is_granted('ROLE_DELETE') %}
-    <form method="post" action="{{ path('app_region_delete', {'id': region.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+    <form method="post" action="{{ path('app_region_delete', {'id': region.id}) }}" onsubmit="return confirm('{{ 'delete_confirm'|trans }}');">
         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ region.id) }}">
-        <button class="btn btn-danger btn-sm bi bi-trash mx-2" title="Supprimer"></button>
+        <button class="btn btn-danger btn-sm bi bi-trash mx-2" title="{{ 'region.delete'|trans }}"></button>
     </form>
 {% endif %}

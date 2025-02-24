@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Country;
+use App\Form\ExportType;
+use App\Service\ExportService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Entity\Region;
 use App\Form\ImportCsvType;
@@ -13,15 +15,44 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Route('/region')]
+#[Route('/user/region')]
 class RegionController extends AbstractController
 {
+    public function __construct(private readonly TranslatorInterface $translator) {}
+
     #[Route('/', name: 'app_region_index', methods: ['GET', 'POST'])]
-    public function index(RegionRepository $regionRepository, Request $request, EntityManagerInterface $entityManager): Response
+    public function index(ExportService $exportService, RegionRepository $regionRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ImportCsvType::class);
         $form->handleRequest($request);
+
+        $formExport = $this->createForm(ExportType::class);
+        $formExport->handleRequest($request);
+
+        if ($formExport->isSubmitted() && $formExport->isValid()) {
+            if (!$this->isGranted('ROLE_EXPORT')) {
+                $this->addFlash('warning', $this->translator->trans('export_permission'));
+                return $this->redirectToRoute('app_region_index');
+            }
+            $columnNames = ['Région', 'Code région', 'Pays', 'Ajouter le'];
+            $regions = $regionRepository->findAll();
+
+            $data = [];
+            foreach ($regions as $region) {
+                $data[] = [
+                    $region->getName(),
+                    $region->getRegionCode(),
+                    $region->getCountry()->getName(),
+                    $region->getCreatedAt()->format('d-m-Y H:i:s'),
+                ];
+            }
+            $format = $formExport->get('format')->getData();
+            $fileName = sprintf("Exporter les données des régions %s", date('d-m-Y_His'));
+    
+            return $exportService->export($columnNames, $data, $format, $fileName);
+        }
     
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $csvFile */
@@ -37,7 +68,7 @@ class RegionController extends AbstractController
 
                 // Vérifiez si la conversion a réussi
                 if (!mb_check_encoding($csvData, 'UTF-8')) {
-                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    $this->addFlash('error', $this->translator->trans('error.invalid_csv'));
                     return $this->redirectToRoute('app_region_index');
                 }
                 
@@ -53,6 +84,7 @@ class RegionController extends AbstractController
                     'headers' => $headers,
                     'rows' => $rows,
                     'csvData' => $csvData,
+                    'formExport' => $formExport->createView(),
                 ]);
             }
         }
@@ -69,7 +101,7 @@ class RegionController extends AbstractController
             $processedRegions = []; // Tableau pour suivre les régions déjà traitées
             $invalidCount = 0; // Compteur de lignes non importées
             $invalidRows = []; // Tableau pour stocker les numéros des lignes invalides
-            $processedCountries = [];
+            $processedRegions = [];
     
             foreach ($rows as $lineNumber => $row) {
                 // Ignorer les lignes vides
@@ -126,20 +158,20 @@ class RegionController extends AbstractController
                 // Vérifier si le pays a déjà été traité
                 if (!$existingCountry) {
                     // Si le pays n'existe pas, créez un nouveau pays
-                    if (!isset($processedCountries[$countryName])) {
+                    if (!isset($processedRegions[$countryName])) {
                         $country = new Country();
                         $country->setName($countryName);
                         $country->setIso2($iso2);
                         $country->setCreatedAt(new \DateTimeImmutable());
 
                         $entityManager->persist($country);
-                        $processedCountries[$countryName] = $country; // Marquer comme traité
+                        $processedRegions[$countryName] = $country; // Marquer comme traité
                         $existingCountry = $country; // Réassigner pour utiliser l'objet persisté
                     } else {
-                        $existingCountry = $processedCountries[$countryName]; // Utiliser le pays déjà traité
+                        $existingCountry = $processedRegions[$countryName]; // Utiliser le pays déjà traité
                     }
                 } else {
-                    $processedCountries[$countryName] = $existingCountry; // Marquer comme traité
+                    $processedRegions[$countryName] = $existingCountry; // Marquer comme traité
                 }
                 
                 // Créez et persistez une nouvelle région
@@ -158,12 +190,24 @@ class RegionController extends AbstractController
                 $processedRegions[$regionName] = true;
             }
     
-            $entityManager->flush();
-    
-            $this->addFlash('success', "$importedCount régions ont été importées avec succès.  $invalidCount lignes n'ont pas pu être importées.");
-    
+            // Affichez le nombre de lignes importées et non importées    
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('success_import', [
+                    '%importedCount%' => $importedCount,
+                    '%invalidCount%' => $invalidCount
+                ]));
+            } catch (\Exception $e) {
+                $this->addFlash('error', $this->translator->trans('error.import', [
+                    '%message%' => $e->getMessage()
+                ]));
+            }
+            
             if ($invalidCount > 0) {
-                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+                $this->addFlash('error', $this->translator->trans('error.invalid_rows', [
+                    '%count%' => $invalidCount,
+                    '%invalidRows%' => implode(', ', $invalidRows),
+                ]));
             }
             
             return $this->redirectToRoute('app_region_index');
@@ -172,6 +216,7 @@ class RegionController extends AbstractController
         return $this->render('region/index.html.twig', [
             'regions' => $regionRepository->findAll(),
             'form' => $form->createView(),
+            'formExport' => $formExport->createView(),
         ]);
     }
     
@@ -185,14 +230,18 @@ class RegionController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $region->setCreatedAt(new \DateTimeImmutable());
-                $entityManager->persist($region);
-                $entityManager->flush();
-                $this->addFlash('success', "La région a bien été créée.");
-    
-                return $this->redirectToRoute('app_region_index', [], Response::HTTP_SEE_OTHER);
+                try {
+                    $region->setCreatedAt(new \DateTimeImmutable());
+                    $entityManager->persist($region);
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('region.msg.created_success'));
+                    return $this->redirectToRoute('app_region_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_region_new', [], Response::HTTP_SEE_OTHER);
+                }
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de la création de la région.');
+                $this->addFlash('error', $this->translator->trans('region.msg.created_error'));
             }
         }
 
@@ -218,13 +267,17 @@ class RegionController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $region->setUpdatedAt(new \DateTimeImmutable());
-                $entityManager->flush();
-                $this->addFlash('success', "La région a bien été modifiée.");
-    
-                return $this->redirectToRoute('app_region_index', [], Response::HTTP_SEE_OTHER);
+                try {
+                    $region->setUpdatedAt(new \DateTimeImmutable());
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('region.msg.updated_success'));
+                    return $this->redirectToRoute('app_region_show', ['id' => $region->getId()], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_region_edit', ['id' => $region->getId()], Response::HTTP_SEE_OTHER);
+                }
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de la création de la région.');
+                $this->addFlash('error', $this->translator->trans('region.msg.updated_error'));
             }
         }
 
@@ -238,9 +291,16 @@ class RegionController extends AbstractController
     public function delete(Request $request, Region $region, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$region->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($region);
-            $entityManager->flush();
-            $this->addFlash('success', "La région a bien été supprimée.");
+            try {
+                $entityManager->remove($region);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('region.msg.deleted_success'));
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_region_index', [], Response::HTTP_SEE_OTHER);
+            }
+        } else {
+            $this->addFlash('error',$this->translator->trans('region.msg.deleted_error'));
         }
 
         return $this->redirectToRoute('app_region_index', [], Response::HTTP_SEE_OTHER);

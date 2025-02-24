@@ -1,149 +1,77 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Consultation des méthodes{% endblock %}
+{% block title %}{{'method.title'|trans }}{% endblock %}
 
 {% block body %}
-    <main id="main" class="main">
+  <main id="main" class="main">
 
-        <div class="pagetitle">
-        <h1>Consultation des méthodes de comptage</h1>
-        <nav>
-            <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-            <li class="breadcrumb-item active">Gestion des méthodes de comptage</li>
-            </ol>
-        </nav>
-        </div><!-- End Page Title -->
+    <div class="pagetitle">
+      <h1>{{'method.title'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{'method.manage'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-        <section class="section">
-            <div class="row">
-                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
-
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ 'card_title'|trans }}</h5>
-
-                            <div id="printableArea">
-                                <table class="table datatable">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Méthode</th>
-                                            <th>{{ 'created_at'|trans }}</th>
-                                            <th>{{ 'Last_updated_at'|trans }}</th>
-                                            <th>{{ 'actions'|trans }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for method in methods %}
-                                        <tr>
-                                            <td>{{ method.id }}</td>
-                                            <td>{{ method.label }}</td>
-                                            <td>{{ method.createdAt ? method.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                                            <td>{{ method.updatedAt ? method.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                                            <td>
-                                                <div class="d-flex justify-content-end">
-                                                    <a href="{{ path('app_method_show', {'id': method.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="Détail"></a>
-                                                    <a href="{{ path('app_method_edit', {'id': method.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="Modifier"></a>
-                                                    {{ include('method/_delete_form.html.twig') }}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {% else %}
-                                        <tr>
-                                            <td colspan="5">{{ 'no_record_found'|trans }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="card-footer d-flex justify-content-between">
-                            <div>
-                                <a href="{{ path('app_method_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une méthode</a>
-                                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="Voir la liste des campagnes de comptage"> Consultation des campagnes</a>
-                            </div>
-                            <div>
-                                <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer" title="Imprimer"></button>
-                                <a href="#" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'card_title'|trans }}</h5>
+                <table class="table datatable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{'label'|trans }}</th>
+                            <th>{{ 'created_at'|trans }}</th>
+                            <th>{{ 'Last_updated_at'|trans }}</th>
+                            <th>{{ 'actions'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for method in methods %}
+                        <tr>
+                            <td>{{ method.id }}</td>
+                            <td>{{ method.label }}</td>
+                            <td>{{ method.createdAt ? method.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ method.updatedAt ? method.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>
+                                <div class="d-flex justify-content-end">
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_method_new','home', 'app_method_edit', 'method/_delete_form.html.twig', method, app.request.attributes.get('_route'), false) }}
+                                    {{ include('method/_delete_form.html.twig') }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">{{ 'no_record_found'|trans }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>        
+              
             </div>
-        </section>
-        {# <section class="section">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-end">
-                            <button id="printButton" class="btn btn-secondary btn-sm bi bi-printer" title="Imprimer"></button>
-                            <a href="#" class="btn btn-secondary btn-sm bi bi-folder" title="Exporter en CSV"></a>
-                        </div>
-                        <div class="card-body">
-                            {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'csvForm'}}) }}
-                                {{ form_row(form.csvFile, {
-                                    'attr': {
-                                        'onchange': 'document.getElementById("csvForm").submit();'
-                                    }
-                                }) }}
-                            {{ form_end(form) }}
-                        </div>
-                        
-                    </div>
-                </div>
+            <div class="card-footer">
+              <a href="{{ path('app_method_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'add_a_method'|trans }}</a>
+              <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> {{ 'collect.view_collections'|trans }}</a>
             </div>
-        </section>
-        {% if headers is defined and rows is defined %}
-            <!-- Modal -->
-            <div class="modal fade" id="csvPreviewModal" tabindex="-1" aria-labelledby="csvPreviewModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-scrollable">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="csvPreviewModalLabel"><b>NB:</b> Le colonne <code>method</code> est obligatoire.</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <h5 class="text-center">Aperçu du fichier CSV</h5>
-                        <div class="modal-body">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        {% for header in headers %}
-                                            <th>{{ header }}</th>
-                                        {% endfor %}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for row in rows %}
-                                        <tr>
-                                            {% for cell in row %}
-                                                <td>{{ cell }}</td>
-                                            {% endfor %}
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <form method="post" action="{{ path('app_method_index') }}">
-                                <input type="hidden" name="csvData" value="{{ csvData|e('html_attr') }}">
-                                <button type="submit" name="action" value="import" class="btn btn-outline-primary btn-sm bi bi-upload"> Importer</button>
-                                <button type="button" class="btn btn-outline-dark btn-sm bi bi-x-square" data-bs-dismiss="modal"> Annuler</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
 
-            <!-- Script to auto-show the modal after form submission -->
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});
-                    myModal.show();
-                });
-            </script>
-        {% endif %} #}
-    </main>
+        </div>
+      </div>
+    </section>
+
+    {% import 'macros/form_macros.html.twig' as form_macros %}
+    {{ form_macros.csv_import_form(form, 'app_method_index', formExport, 'Import method Data', 'Export method Data') }}
+
+
+    {% if headers is defined and rows is defined %}
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_method_index', ['METHOD']) }}
+    {% endif %}
+
+  </main><!-- End #main -->
 {% endblock %}

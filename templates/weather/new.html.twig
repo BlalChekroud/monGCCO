@@ -1,11 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Weather{% endblock %}
+{% block title %}{{'conditionWeather.title'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>Create new Weather</h1>
+  <main id="main" class="main">
 
-    {{ include('weather/_form.html.twig') }}
+    <div class="pagetitle">
+      <h1>{{ 'conditionWeather.title_add'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_weather_index') }}">{{ 'conditionWeather.manage'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'add'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_weather_index') }}">back to list</a>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'conditionWeather.informations'|trans }}</h5>
+
+              {{ include('weather/_form.html.twig') }}
+
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_weather_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'conditionWeather.return'|trans }}">{{ 'back'|trans }}</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
 {% endblock %}

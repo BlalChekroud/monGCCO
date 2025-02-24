@@ -55,7 +55,7 @@ class CountryController extends AbstractController
                 ];
             }
             $format = $formExport->get('format')->getData();
-            $fileName = sprintf("Countries_export_%s", date('d-m-Y_His'));
+            $fileName = sprintf("Exporter les données des pays %s", date('d-m-Y_His'));
     
             return $exportService->export($columnNames, $data, $format, $fileName);
         }
@@ -66,7 +66,7 @@ class CountryController extends AbstractController
             
             if ($csvFile) {
                 if (!$this->isGranted('ROLE_IMPORT')) {
-                    throw $this->createNotFoundException('Vous n\'avez pas l\'autorisation d\'importer des données.');
+                    throw $this->createNotFoundException($this->translator->trans('import_permission'));
                 }
 
                 $csvData = file_get_contents($csvFile->getPathname());
@@ -78,7 +78,7 @@ class CountryController extends AbstractController
 
                 // Vérifiez si la conversion a réussi
                 if (!mb_check_encoding( $csvData, 'UTF-8')) {
-                    $this->addFlash('error', 'Le fichier CSV contient des caractères non valides. Veuillez vérifier l\'encodage du fichier.');
+                    $this->addFlash('error', $this->translator->trans('error.invalid_csv'));
                     return $this->redirectToRoute('app_country_index');
                 }
 
@@ -172,15 +172,24 @@ class CountryController extends AbstractController
                 $processedCountries[$countryName] = true;
             }
     
+            // Affichez le nombre de lignes importées et non importées    
             try {
                 $entityManager->flush();
-                $this->addFlash('success', "$importedCount pays ont été importés avec succès.");
+                $this->addFlash('success', $this->translator->trans('success_import', [
+                    '%importedCount%' => $importedCount,
+                    '%invalidCount%' => $invalidCount
+                ]));
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
+                $this->addFlash('error', $this->translator->trans('error.import', [
+                    '%message%' => $e->getMessage()
+                ]));
             }
             
             if ($invalidCount > 0) {
-                $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
+                $this->addFlash('error', $this->translator->trans('error.invalid_rows', [
+                    '%count%' => $invalidCount,
+                    '%invalidRows%' => implode(', ', $invalidRows),
+                ]));
             }
 
             return $this->redirectToRoute('app_country_index');
@@ -202,29 +211,23 @@ class CountryController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-
-                // Si l'utilisateur est hors ligne, ajouter les données à IndexedDB
-                if (!$this->isConnected()) {
-                    $data = [
-                        'name' => $country->getName(),
-                        'iso2' => $country->getIso2(),
-                        'createdAt' => (new \DateTimeImmutable())->format('c'),
-                    ];
-                    return $this->json($data, 200); // Envoyer les données au JavaScript pour stockage local
+                try {
+                    // Ajout de vérifications supplémentaires avant de persister l'entité
+                    if (empty($country->getName()) || empty($country->getIso2())) {
+                        $this->addFlash('error', $this->translator->trans('country.msg.name_and_iso2_required'));
+                        return $this->redirectToRoute('app_country_new');
+                    }
+                    $country->setCreatedAt(new \DateTimeImmutable());
+                    $entityManager->persist($country);
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('country.msg.created_success'));
+                    return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_country_new', [], Response::HTTP_SEE_OTHER);
                 }
-
-                // Ajout de vérifications supplémentaires avant de persister l'entité
-                if (empty($country->getName()) || empty($country->getIso2())) {
-                    $this->addFlash('error', 'Le nom et le code ISO2 doivent être remplis.');
-                    return $this->redirectToRoute('app_country_new');
-                }
-                $country->setCreatedAt(new \DateTimeImmutable());
-                $entityManager->persist($country);
-                $entityManager->flush();
-                $this->addFlash('success', "Le pays a bien été crée");
-                return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);
             } else {
-                $this->addFlash('error',"Une erreur s'est produite lors de la création du pays.");
+                $this->addFlash('error', $this->translator->trans('country.msg.created_error'));
             }
         }
 
@@ -236,71 +239,28 @@ class CountryController extends AbstractController
 
     
     // Méthode utilitaire pour vérifier la connectivité
-    private function isConnected(): bool
-    {
-        return @fsockopen("www.google.com", 80); // Test simple pour détecter une connexion
-    }
-
-    #[Route('/api/sync', name: 'app_country_sync', methods: ['POST'])]
-    public function sync(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $data = json_decode($request->getContent(), true);
-    
-        foreach ($data as $countryData) {
-            $country = new Country();
-            $country->setName($countryData['name']);
-            $country->setIso2($countryData['iso2']);
-            $country->setCreatedAt(new \DateTimeImmutable($countryData['createdAt']));
-            $entityManager->persist($country);
-        }
-    
-        $entityManager->flush();
-        return $this->json(['message' => 'Synchronisation réussie !'], Response::HTTP_OK);
-    }
-    
-    // #[Route('/api/sync', name: 'api_sync_countries', methods: ['GET'])]
-    // public function syncCountries(CountryRepository $countryRepository): JsonResponse
+    // private function isConnected(): bool
     // {
-    //     $countries = $countryRepository->findAll();
-    //     return $this->json($countries);
+    //     return @fsockopen("www.google.com", 80); // Test simple pour détecter une connexion
     // }
 
-
-    // #[Route('/api/sync', name: 'api_sync_countries_post', methods: ['POST'])]
-    // public function validateAndSync(Request $request, EntityManagerInterface $em): JsonResponse
+    // #[Route('/api/sync', name: 'app_country_sync', methods: ['POST'])]
+    // public function sync(Request $request, EntityManagerInterface $entityManager): Response
     // {
     //     $data = json_decode($request->getContent(), true);
-    //     $errors = [];
     
-    //     if (!$data) {
-    //         return new JsonResponse(['error' => 'Invalid JSON'], 400);
-    //     }
-
-    //     foreach ($data as $item) {
-    //         $existingCountry = $em->getRepository(Country::class)->find($item['id']);
-    //         if ($existingCountry) {
-    //             if ($existingCountry->getUpdatedAt() > new \DateTime($item['updatedAt'])) {
-    //                 $errors[] = [
-    //                     'id' => $item['id'],
-    //                     'message' => 'Conflit de données, le pays a été mise à jour plus récemment côté serveur.',
-    //                 ];
-    //                 continue;
-    //             }
-    //         }
-    
-    //         $country = $existingCountry ?? new Country();
-    //         $country->setName($item['name']);
-    //         $country->setIso2($item['iso2']);
-    //         $country->setCreatedAt(new \DateTimeImmutable());
-    //         $em->persist($country);
+    //     foreach ($data as $countryData) {
+    //         $country = new Country();
+    //         $country->setName($countryData['name']);
+    //         $country->setIso2($countryData['iso2']);
+    //         $country->setCreatedAt(new \DateTimeImmutable($countryData['createdAt']));
+    //         $entityManager->persist($country);
     //     }
     
-    //     $em->flush();
-    
-    //     return $this->json(['message' => 'Synchronisation terminée', 'errors' => $errors]);
+    //     $entityManager->flush();
+    //     return $this->json(['message' => 'Synchronisation réussie !'], Response::HTTP_OK);
     // }
-
-
+    
     #[Route('/{id}', name: 'app_country_show', methods: ['GET'])]
     public function show(Country $country): Response
     {
@@ -317,12 +277,22 @@ class CountryController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $country->setUpdatedAt(new \DateTimeImmutable());
-                $entityManager->flush();
-                $this->addFlash('success', "Le pays a bien été modifié");
-                return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);
+                // Ajout de vérifications supplémentaires avant de persister l'entité
+                if (empty($country->getName()) || empty($country->getIso2())) {
+                    $this->addFlash('error', $this->translator->trans('country.msg.name_and_iso2_required'));
+                    return $this->redirectToRoute('app_country_new');
+                }
+
+                try {
+                    $country->setUpdatedAt(new \DateTimeImmutable());
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('country.msg.updated_success'));
+                    return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_country_edit', ['id' => $country->getId()], Response::HTTP_SEE_OTHER);}
             } else {
-                $this->addFlash('error',"Une erreur s'est produite lors de la modification du pays.");
+                $this->addFlash('error', $this->translator->trans('country.msg.updated_error'));
             }
         }
 
@@ -336,11 +306,16 @@ class CountryController extends AbstractController
     public function delete(Request $request, Country $country, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$country->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($country);
-            $entityManager->flush();
-            $this->addFlash('success', "Le pays a bien été supprimé");
+            try {
+                $entityManager->remove($country);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('country.msg.deleted_success'));
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);
+            }
         } else {
-            $this->addFlash('error', "Une erreur est survenue");
+            $this->addFlash('error',$this->translator->trans('country.msg.deleted_error'));
         }
 
         return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);

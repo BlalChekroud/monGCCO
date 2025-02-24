@@ -1,13 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit BirdLifeTaxTreat{% endblock %}
+{% block title %}{{'birdLifeTaxTreat.title'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>Edit BirdLifeTaxTreat</h1>
+  <main id="main" class="main">
 
-    {{ include('bird_life_tax_treat/_form.html.twig', {'button_label': 'Update'}) }}
+    <div class="pagetitle">
+      <h1>{{ 'birdLifeTaxTreat.title_edit'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_bird_life_tax_treat_index') }}">{{ 'birdLifeTaxTreat.manage'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'modification'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_bird_life_tax_treat_index') }}">back to list</a>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
 
-    {{ include('bird_life_tax_treat/_delete_form.html.twig') }}
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'birdLifeTaxTreat.the_new_informations'|trans }}</h5>
+
+              {{ include('bird_life_tax_treat/_form.html.twig') }}
+
+            </div>
+            <div class="card-footer">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <a href="{{ path('app_bird_life_tax_treat_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'birdLifeTaxTreat.return'|trans }}">{{ 'back'|trans }}</a>
+                </div>
+                <div class="d-flex justify-content-end">
+                  {{ include('bird_life_tax_treat/_delete_form.html.twig') }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
 {% endblock %}
