@@ -1,71 +1,98 @@
-{{ form_start(form) }}
-    {# {{ form_widget(form) }} #}
-    {# <div class="row mb-3">
-        {{ form_label(form.name, 'Nom') }}
-        <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
-            {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
-        </div>
-    </div> #}
-    {# <div class="row mb-3">
-        <div class="col-sm-11 col-md-11 col-lg-11 col-xl-11">
-            {{ form_row(form.siteCollection) }}
-        </div>
-    </div> #}
+{# {{ form_start(form) }}
     <div class="row mb-3">
-        {{ form_label(form.disturbed, 'Disturbé(e):<span class="requiredField">*</span>') }}<p class="explanation">Indique si le comptage a été affecté par une perturbation</p>
+        {{ form_label(form.disturbed, 'disturbed'|trans ~ '<span class="requiredField">*</span>'|raw) }}<p class="explanation">{{'conditionDisturbed.description'|trans }}</p>
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
             {{ form_widget(form.disturbed, {'attr': {'class': 'form-control'}}) }}
         </div>
         <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
-            <turbo-frame id="disturbed_new">
-                <a href="{{ path('app_disturbed_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Ajouter</a>
-            <turbo-frame>
+            <a href="{{ path('app_disturbed_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> {{'add'|trans }}</a>
         </div>
     </div>
     <div class="row mb-3">
-        {{ form_label(form.weather, 'Effets des conditions météorologiques:<span class="requiredField">*</span>') }}<p class="explanation">(vent, pluie, brouillard) sur les comptages</p>
+        {{ form_label(form.weather, 'conditionWeather.description'|trans ~ '<span class="requiredField">*</span>') }}<p class="explanation">{{'conditionWeather.weather_effects'|trans }}</p>
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
             {{ form_widget(form.weather, {'attr': {'class': 'form-control'}}) }}
         </div>
         <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
-            <turbo-frame id="weather_new">
-                <a href="{{ path('app_weather_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Ajouter</a>
-            <turbo-frame>
+            <a href="{{ path('app_weather_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> {{'add'|trans }}</a>
         </div>
     </div>
     <div class="row mb-3">
-        {{ form_label(form.water, 'L\'état des eaux lors du comptage<span class="requiredField">*</span>') }}
+        {{ form_label(form.water, 'conditionWater.description'|trans ~'<span class="requiredField">*</span>') }}
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
             {{ form_widget(form.water, {'attr': {'class': 'form-control'}}) }}
         </div>
         <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
-            <turbo-frame id="water_new">
-                <a href="{{ path('app_water_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Ajouter</a>
-            <turbo-frame>
+            <a href="{{ path('app_water_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> {{'add'|trans }}</a>
         </div>
     </div>
     <div class="row mb-3">
-        {{ form_label(form.ice, 'La couverture de glace lors du comptage<span class="requiredField">*</span>') }}
+        {{ form_label(form.ice, 'conditionIce.description'|trans ~'<span class="requiredField">*</span>') }}
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
             {{ form_widget(form.ice, {'attr': {'class': 'form-control'}}) }}
         </div>
         <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
-            <turbo-frame id="ice_new">
-                <a href="{{ path('app_ice_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Ajouter</a>
-            <turbo-frame>
+            <a href="{{ path('app_ice_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> {{'add'|trans }}</a>
         </div>
     </div>
     <div class="row mb-3">
-        {{ form_label(form.tidal, 'Marée cours (la plupart) du comptage<span class="requiredField">*</span>') }}
+        {{ form_label(form.tidal, 'conditionTidal.description'|trans ~'<span class="requiredField">*</span>') }}
         <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
             {{ form_widget(form.tidal, {'attr': {'class': 'form-control'}}) }}
         </div>
         <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
-            <turbo-frame id="tidal_new">
-                <a href="{{ path('app_tidal_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> Ajouter</a>
-            <turbo-frame>
+            <a href="{{ path('app_tidal_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-2"> {{'add'|trans }}</a>
         </div>
     </div>
     {% import 'macros/btn_actions_macros.html.twig' as macros %}
     {{ macros.action_buttons('app_environmental_conditions_new','app_environmental_conditions_show', 'app_environmental_conditions_edit', 'environmental_condition/_delete_form.html.twig', environmental_condition, app.request.attributes.get('_route')) }}
+{{ form_end(form) }} #}
+
+<!-- Présentation de la campagne -->
+<div class="mb-3 d-flex align-items-center justify-content-center">
+    <label class="fw-bold text-secondary me-2">{{ 'campaign.name'|trans }} :</label>
+    <a href="{{ path('app_counting_campaign_show', {'id': countingCampaign.id}) }}"
+        class="fw-bold btn btn-outline-success btn-sm"
+        title="{{ 'campaign.campaign_details'|trans }}"
+        aria-label="{{ 'campaign.campaign_details'|trans }}">
+        <i class="bi bi-eye"></i> {{ countingCampaign.campaignName }}
+    </a>
+</div>
+
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+    <fieldset class="border p-3 rounded">
+        {% for field, label in {
+            'disturbed': 'conditionDisturbed',
+            'weather': 'conditionWeather',
+            'tidal': 'conditionTidal',
+            'water': 'conditionWater',
+            'ice': 'conditionIce'
+        } %}
+            <div class="row mb-2 align-items-center">
+                <div class="col-md-5">
+                    {{ form_label(attribute(form, field), (label ~ '.description')|trans ~ '<span class="requiredField">*</span>'|raw, {'class': 'fw-semibold mb-1'}) }}
+                    {% if field == 'disturbed' or field == 'weather' %}
+                        <p class="explanation mt-0 mb-0 text-muted">{{ (label ~ '.explanation')|trans }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-5">
+                    {{ form_widget(attribute(form, field), {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(attribute(form, field)) }}
+                </div>
+                <div class="col-md-2 text-end">
+                    <a href="{{ path('app_' ~ field ~ '_new') }}" class="btn btn-outline-info btn-sm explanation" title="{{('add_a_' ~ field)|trans }}">
+                        <i class="bi bi-plus-circle-dotted"></i> {{ 'add'|trans }}
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% import 'macros/btn_actions_macros.html.twig' as macros %}
+        <div class="mt-3">
+            {{ macros.action_buttons('app_environmental_conditions_new','app_environmental_conditions_show', 'app_environmental_conditions_edit', 'environmental_condition/_delete_form.html.twig', environmental_condition, app.request.attributes.get('_route')) }}
+        </div>
+
+    </fieldset>
+
 {{ form_end(form) }}

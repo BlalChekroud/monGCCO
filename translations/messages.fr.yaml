@@ -254,6 +254,8 @@ agentsGroup:
   # Modifier
   edit_this_group: "Modifier ce groupe"
   the_new_informations: "Les nouvelles informations du groupe"
+  none: "Aucun"
+  consult: "Consultation des groupes"
   error:
     no_member_selected: "Vous devez sélectionner au moins un membre pour créer un groupe d'agents."
     leader_not_in_members: "Le chef du groupe doit être parmi les membres sélectionnés."
@@ -326,6 +328,7 @@ birdSpecies:
   sis_rec_id: "sisRec ID"
   spc_rec_id: "spcRec ID"
   subspp_id: "subspp ID"
+  code_and_scientific_name: "Code d'espèce - Nom scientifique (Nom français/Nom anglais)"
   msg:
     success_import: "%importedCount% espèces d'oiseaux ont été importées avec succès. %invalidCount% lignes n'ont pas pu être importées."
     success_create: "Espèce d'oiseau créée avec succès."
@@ -340,6 +343,8 @@ birdSpecies:
     invalid_encoding: "Le fichier CSV contient des caractères non valides. Veuillez vérifier l'encodage du fichier."
 
 campaign:
+  name: "Campagne de comptage"
+  none: "Aucune campagne"
   cannot_be_modified: "Une campagne %status% ne peut pas être modifiée"
   title: "Gestion des campagnes de comptage"
   manage: "Gestion des campagnes"
@@ -379,11 +384,14 @@ campaign:
   close_campaign: "Clôturer la campagne"
   confirm_cancel: "Êtes-vous sûr de vouloir annuler cette campagne ? Cette action n'est pas réversible"
   cancel_campaign: "Annuler la campagne"
-  campaign_details: "Détails de la campagne"
+  campaign_details: "Détail de la campagne"
   consult: "Consultation des campagnes"
+  not_allowed_modify: "Vous n'avez pas l'autorisation pour faire la modification"
+  campaign_closed_no_modify: "Une campagne %statusClosed% ne peut pas être modifiée"
+  campaign_suspended_no_modify: "Une campagne %statusSuspended% ne peut pas être modifiée"
+  campaign_cancelled_no_modify: "Une campagne %statusCancelled% ne peut pas être modifiée"
 
 description: "Description"
-disturbed: "Disturbé(e)"
 none: "Aucune"
 ice_cover: "Couverture de Glace"
 tidal: "Marée"
@@ -428,11 +436,66 @@ overall_totals:
 
 collect:
   please_create_the_environmental_conditions_for_this_site_first: "Veuillez d'abord créer les conditions environnementales pour ce site."
-  view_collections: "Consultation des collectes"
+  collection_number: "Numéro de collecte"
+  no_collection: "Pas de collecte"
+  title: "Gestion des collectes"
+  manage: "Gestion des collectes"
+  title_add: "Ajout d'une collecte"
+  informations: "Informations sur la collecte"
+  title_edit: "Modifier la collecte"
+  title_show: "Détail de la collecte"
+  the_new_informations: "Les nouvelles informations de la collecte"
+  return: "Retour à la consultation des collectes"
+  consult: "Consultation des collectes"
+  delete: "Supprimer la collecte"
+  count_a_bird: "Compter un oiseau"
+  collection_environmental_condition: "Condition environnementale de cette collecte"
+  conditions_environment: "Conditions d'environnement"
+  species_count: "Nombre compté pour chaque espèce"
+  count: "Nombre compté"
+  collect_add: "Créer une collecte"
+  msg:
+    created_success: "La collecte a bien été créée"
+    created_error: "Une erreur s'est produite lors de la création de la collecte"
+    updated_success: "La collecte a bien été modifiée"
+    updated_error: "Une erreur s'est produite lors de la modification de la collecte"
+    deleted_success: "La collecte a bien été supprimée"
+    deleted_error: "Une erreur s'est produite lors de la suppression de la collecte"
+    data_collection_not_valid: "La collecte de données et sa condition environnementale ne sont pas validées"
+    total_bird_count_positive: "Le total des comptages d'oiseaux doit être positif"
+    site_environment_mismatch: "Le site de collecte ne correspond pas aux conditions environnementales."
+    no_bird_species_selected: "Aucune espèce d'oiseau sélectionnée."
+    no_collection_method_selected: "Aucune méthode de collecte sélectionnée"
+    collection_quality_required: "La qualité de la collecte est requise."
+    count_type_required: "Le type de comptage est requis."
+    access_denied: "Vous n'avez pas accès à cette collecte"
 
 condition:
   list_environmental_conditions: "Voir la liste des conditions environnementales"
   view_conditions: "Consultation des environnementales"
+  title: "Gestion des conditions environnementales"
+  manage: "Gestion des conditions environnementales"
+  title_add: "Ajout d'une condition environnementale"
+  title_edit: "Modifier la condition environnementale"
+  title_show: "Détail de la condition environnementale"
+  informations: "Informations sur la nouvelle condition environnementale de :"
+  the_new_informations: "Les nouvelles informations de la condition environnementale de :"
+  return: "Retour à la consultation des conditions environnementales"
+  consult: "Consultation des conditions environnementales"
+  delete: "Supprimer la condition environnementale"
+  collection_associated: "Collecte associée"
+  collection_date: "Date de collecte"
+  no_collection_associated: "Aucune collecte associée à cette condition d'environnement."
+  campaign_not_found: "La campagne spécifiée est introuvable"
+  site_not_found: "Le site spécifié est introuvable."
+  access_denied_environment: "Vous n'avez pas accès à cette condition environnementale"
+  msg:
+    created_success: "La condition environnementale a bien été créée"
+    created_error: "Une erreur s'est produite lors de la création de la condition environnementale"
+    updated_success: "La condition environnementale a bien été modifiée"
+    updated_error: "Une erreur s'est produite lors de la modification de la condition environnementale"
+    deleted_success: "La condition environnementale a bien été supprimée"
+    deleted_error: "Une erreur s'est produite lors de la suppression de la condition environnementale"
 
 countType:
   title: "Gestion des types de comptage"
@@ -444,6 +507,8 @@ countType:
   return: "Retour à la consultation des types de comptage"
   consult: "Consultation des types de comptage"
   delete: "Supprimer le type de comptage"
+  label: "Type de comptage effectué lors de cette visite:"
+  placeholder: "-- Choisir un type --"
   msg:
     created_success: "Le type de comptage a bien été créé"
     created_error: "Une erreur s'est produite lors de la création du type de comptage"
@@ -462,6 +527,7 @@ method:
   return: "Retour à la consultation des méthodes de collecte"
   consult: "Consultation des méthodes de collecte"
   delete: "Supprimer la méthode de collecte"
+  label: "Méthode(s) utilisées pour le comptage:"
   msg:
     created_success: "La méthode de collecte a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la méthode de collecte"
@@ -471,6 +537,7 @@ method:
     deleted_error: "Une erreur s'est produite lors de la suppression de la méthode de collecte"
 
 conditionDisturbed:
+  description: "Disturbé(e)"
   title: "Gestion des perturbations"
   manage: "Gestion des perturbations"
   title_add: "Ajout d'une perturbation"
@@ -480,6 +547,8 @@ conditionDisturbed:
   return: "Retour à la consultation des perturbations"
   consult: "Consultation des perturbations"
   delete: "Supprimer la perturbation"
+  explanation: "Indique si le comptage a été affecté par une perturbation"
+  choose: "-- Choisir une perturbation --"
   msg:
     created_success: "La perturbation a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la perturbation"
@@ -498,6 +567,8 @@ conditionIce:
   return: "Retour à la consultation des glaces"
   consult: "Consultation des glaces"
   delete: "Supprimer la donnée sur la glace"
+  description: "Couverture de glace lors du comptage"
+  choose: "-- Choisir une condition de glace --"
   msg:
     created_success: "La donnée sur la glace a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la donnée sur la glace"
@@ -516,6 +587,8 @@ conditionWater:
   return: "Retour à la consultation des eaux"
   consult: "Consultation des eaux"
   delete: "Supprimer la donnée sur l'eau"
+  description: "État des eaux lors du comptage"
+  choose: "-- Choisir une condition d'eau --"
   msg:
     created_success: "La donnée sur l'eau a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la donnée sur l'eau"
@@ -534,6 +607,8 @@ conditionTidal:
   return: "Retour à la consultation des marées"
   consult: "Consultation des marées"
   delete: "Supprimer la donnée sur les marées"
+  description: "Marée en cours lors du comptage"
+  choose: "-- Choisir une condition de marée --"
   msg:
     created_success: "La donnée sur les marées a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la donnée sur les marées"
@@ -552,6 +627,9 @@ conditionWeather:
   return: "Retour à la consultation des conditions météorologiques"
   consult: "Consultation des conditions météorologiques"
   delete: "Supprimer la condition météorologique"
+  description: "Effets des conditions météorologiques"
+  explanation: "(vent, pluie, brouillard) sur les comptages"
+  choose: "-- Choisir une condition météorologique --"
   msg:
     created_success: "La condition météorologique a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la condition météorologique"
@@ -616,6 +694,7 @@ iucn:
 
 group:
   view_groups: "Consultation des groupes"
+  name: "Nom du groupe"
 
 language:
   name: 'Nom'
@@ -657,6 +736,7 @@ collectQuality:
   return: "Retour à la consultation des qualités de collecte de données"
   consult: "Consultation des qualités de collecte de données"
   delete: "Supprimer la qualité de collecte de données"
+
   msg:
     created_success: "La qualité de collecte de données a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la qualité de collecte de données"
@@ -708,7 +788,7 @@ site_collection:
   parentSiteDescription: "Si le site est un sous-site d'un grand site ou une zone, ce vaste site est le site parent."
   chooseParentSite: "-- Choisir un site parent --"
   parentSite: "Nom du site parent"
-  parentOfSites: "Ce site est le parent de(s)"
+  # parentOfSites: "Ce site est le parent de(s)"
   latDepart: "Latitude de départ"
   longDepart: "Longitude de départ"
   latFin: "Latitude de fin"

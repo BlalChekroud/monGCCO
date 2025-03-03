@@ -21,7 +21,7 @@
 
     <div class="row mb-3">
       <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-        {{ form_label(form.country, 'country'|trans ) }}<span class="requiredField">*</span>
+        {{ form_label(form.country, 'country.name'|trans ) }}<span class="requiredField">*</span>
       </div>
       <div class="col-sm-9 col-md-9 col-lg-9 col-xl-9">
         {{ form_widget(form.country, { 'attr': {'class': 'form-control' } }) }}

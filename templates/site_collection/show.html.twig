@@ -48,10 +48,6 @@
                                     <td>{{ site_collection.nationalSiteCode }}</td>
                                 </tr>
                                 <tr>
-                                    <th>{{'site_collection.internationalSiteCode'|trans }}</th>
-                                    <td>{{ site_collection.internationalSiteCode }}</td>
-                                </tr>
-                                <tr>
                                     <th>{{'site_collection.latDepart'|trans }}</th>
                                     <td>{{ site_collection.latDepart }}</td>
                                 </tr>
@@ -66,6 +62,10 @@
                                 <tr>
                                     <th>{{'site_collection.longFin'|trans }}</th>
                                     <td>{{ site_collection.longFin }}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{'site_collection.parentSite'|trans }}</th>
+                                    <td>{{ site_collection.parentSite ? site_collection.parentSite : '' }}</td>
                                 </tr>
                                 <tr>
                                     {% set city = site_collection.city %}
@@ -92,11 +92,7 @@
                                         {% endif %}
                                     </td>
                                 </tr>
-                                <tr>
-                                    <th>{{'site_collection.parentSite'|trans }}</th>
-                                    <td>{{ site_collection.parentSite ? site_collection.parentSite.siteName : '' }}</td>
-                                </tr>
-                                <tr>
+                                {# <tr>
                                     <th>{{'site_collection.parentOfSites'|trans }}</th>
                                     <td>
                                         {% if site_collection.siteCollections|length > 0 %}
@@ -109,7 +105,7 @@
                                             {{'site_collection.none'|trans }}
                                         {% endif %}
                                     </td>
-                                </tr>
+                                </tr> #}
                                 <tr>
                                     <th>{{'site_collection.uniqueBirdSpeciesCount'|trans }}</th>
                                     <td>

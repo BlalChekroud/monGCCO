@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Repository\LanguageRepository;
+use App\Repository\UserStatusRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -17,7 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, Security $security, TranslatorInterface $translator): Response
+    public function register(Request $request, 
+                            UserPasswordHasherInterface $userPasswordHasher, 
+                            EntityManagerInterface $entityManager, 
+                            Security $security, 
+                            TranslatorInterface $translator, 
+                            LanguageRepository $languageRepository, 
+                            UserStatusRepository $userStatusRepository): Response
     {
         // Vérifier si l'utilisateur est déjà authentifié
         if ($security->getUser() && !$this->isGranted('ROLE_SUPER_ADMIN')) {
@@ -32,9 +40,20 @@ class RegistrationController extends AbstractController
             
             // Récupérer la locale depuis la session
             $_locale = $request->getSession()->get('_locale', 'fr'); // valeur par défaut
-            $user->setLanguage($_locale); // Définit la locale de l'utilisateur
+            
+            // Trouver l'entité Language correspondante en base de données
+            $defaultLanguage = $languageRepository->findOneBy(['iso2' => $_locale]);
+            if (!$defaultLanguage) {
+                $defaultLanguage = $languageRepository->findOneBy(['iso2' => 'fr']); // Fallback si la langue n'existe pas
+            }
+            $user->setLanguage($defaultLanguage); // Affecter l'objet Language et non une chaîne
             $user->setCreatedAt(new \DateTimeImmutable());
             
+            $defaultStatus = $userStatusRepository->findOneBy(['label' => 'Actif']);
+            if ($defaultStatus) {
+                $user->setUserStatus($defaultStatus);
+            }
+
             // encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(

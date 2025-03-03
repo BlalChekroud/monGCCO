@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Conditions d'environnement{% endblock %}
+{% block title %}{{'condition.title'|trans }}{% endblock %}
 
 {% block body %}
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Détails d'une condition d'environnement</h1>
+      <h1>{{'condition.title_show'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_environmental_conditions_index') }}">Gestion des conditions d'environnement</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_environmental_conditions_index') }}">{{ 'condition.manage'|trans }}</a></li>
           <li class="breadcrumb-item active">{{'show'|trans }}</li>
         </ol>
       </nav>
@@ -22,38 +22,61 @@
 
                 <div class="card">
                     <div class="card-body">
+                      <div id="printableArea">
                         <h5 class="card-title">{{'show'|trans }}</h5>
 
                         <table class="table">
                             <tbody>
                                 <tr>
-                                    <th>Numéro</th>
-                                    <td>{{ environmental_condition.id }}</td>
+                                    <th>{{'campaign.name'|trans }}</th>
+                                    <td>{{ environmental_condition.countingCampaign.campaignName ?? '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Crée par</th>
-                                    <td>{{ environmental_condition.user.name }} {{ environmental_condition.user.lastName }}</td>
+                                    <th>{{'site_collection.siteName'|trans }}</th>
+                                    <td>{{ environmental_condition.siteCollection.siteName ?? '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Campagne de comptage</th>
-                                    <td>{{ environmental_condition.countingCampaign.campaignName }}</td>
+                                    <th>{{'created_by'|trans }}</th>
+                                    <td>{{ environmental_condition.user.name ?? '' }} {{ environmental_condition.user.lastName ?? '' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Site de collecte</th>
-                                    <td>{{ environmental_condition.siteCollection.siteName }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Collecte associée<h6 class="explanation">Date de collecte</h6></th>
+                                    <th>{{'condition.collection_associated'|trans }}<h6 class="explanation">{{'condition.collection_date'|trans }}</h6></th>
                                     {% if environmental_condition.collectedData is not empty %}
                                         <td>
                                             {{ environmental_condition.collectedData.id }}
-                                            <p class="explanation">{{ environmental_condition.collectedData.createdAt ? environmental_condition.createdAt|date('d-m-Y') : 'Non spécifiée' }}</p>
+                                            <p class="explanation">{{ environmental_condition.collectedData.createdAt ? environmental_condition.createdAt|date('d-m-Y') : '' }}</p>
                                         </td>
                                     {% else %}
-                                        <td>Aucune collecte associée à cette condition d'environnement.</td>
+                                        <td>{{'condition.no_collection_associated'|trans }}</td>
                                     {% endif %}
                                     </td>
-                                </tr
+                                </tr>
+                                <tr>
+                                    <th>
+                                        {{ 'conditionDisturbed.description'|trans }}
+                                        <h6 class="explanation">{{ 'conditionDisturbed.explanation'|trans }}</h6>
+                                    </th>
+                                    <td>{{ environmental_condition.disturbed.label ?? '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        {{ 'conditionWeather.description'|trans }}
+                                        <h6 class="explanation">{{ 'conditionWeather.explanation'|trans }}</h6>
+                                    </th>
+                                    <td>{{ environmental_condition.weather.label ?? '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{ 'conditionTidal.description'|trans }}</th>
+                                    <td>{{ environmental_condition.tidal.label ?? '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{ 'conditionWater.description'|trans }}</th>
+                                    <td>{{ environmental_condition.water.label ?? '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{ 'conditionIce.description'|trans }}</th>
+                                    <td>{{ environmental_condition.ice.label ?? '' }}</td>
+                                </tr>
                                 <tr>
                                     <th>{{ 'created_at'|trans }}</th>
                                     <td>{{ environmental_condition.createdAt ? environmental_condition.createdAt|date('Y-m-d H:i:s') : '' }}</td>
@@ -64,13 +87,14 @@
                                 </tr>
                             </tbody>
                         </table>
+                      </div>
                     </div>
                     <div class="card-footer">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers la consultation des conditioons environnementales">Retour</a>
+                                <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-sm btn-outline-secondary" title="{{ 'condition.return'|trans }}">{{ 'back'|trans }}</a>
                                 {% if environmental_condition.countingCampaign %}
-                                    <a href="{{ path('app_counting_campaign_show', {'id': environmental_condition.countingCampaign.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-1" title="Détail de la campagne"> Campagne</a>
+                                    <a href="{{ path('app_counting_campaign_show', {'id': environmental_condition.countingCampaign.id}) }}" class="btn btn-outline-success btn-sm bi bi-eye mx-1" title="{{ 'campaign.campaign_details'|trans }}"> {{'campaign.name'|trans }}</a>
                                 {% endif %}
                                 <a href="{{ path('app_environmental_conditions_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> {{ 'site_collection.add_collection_site'|trans }}</a>
                             </div>

@@ -254,6 +254,8 @@ agentsGroup:
   # Edit
   edit_this_group: 'تعديل هذه المجموعة'
   the_new_informations: 'المعلومات الجديدة للمجموعة'
+  none: 'لا شيء'
+  consult: 'عرض المجموعات'
   error:
     no_member_selected: "يجب اختيار عضو واحد على الأقل لإنشاء مجموعة وكلاء."
     leader_not_in_members: "يجب أن يكون قائد المجموعة ضمن الأعضاء المحددين."
@@ -326,6 +328,7 @@ birdSpecies:
   sis_rec_id: "معرف sisRec"
   spc_rec_id: "معرف spcRec"
   subspp_id: "معرف subspp"
+  code_and_scientific_name: "رمز النوع - الاسم العلمي (الاسم الفرنسي/الاسم الإنجليزي)"
   msg:
     success_import: "تم استيراد %importedCount% من أنواع الطيور بنجاح. لم يتم استيراد %invalidCount% من السطور."
     success_create: "تم إنشاء نوع الطيور بنجاح."
@@ -340,6 +343,8 @@ birdSpecies:
     invalid_encoding: "ملف CSV يحتوي على أحرف غير صالحة. يرجى التحقق من ترميز الملف."
 
 campaign:
+  name: "حملة العد"
+  none: "لا شيء"
   cannot_be_modified: "%status% لا يمكن تعديل الحملة بحالة"
   title: "إدارة حملات العدّ"
   manage: "إدارة الحملات"
@@ -381,9 +386,12 @@ campaign:
   cancel_campaign: "إلغاء الحملة"
   campaign_details: "تفاصيل حملة العد"
   consult: "عرض الحملات"
+  not_allowed_modify: "ليس لديك الإذن لإجراء التعديل"
+  campaign_closed_no_modify: "لا يمكن تعديل حملة %statusClosed%"
+  campaign_suspended_no_modify: "لا يمكن تعديل حملة %statusSuspended%"
+  campaign_cancelled_no_modify: "لا يمكن تعديل حملة %statusCancelled%"
 
 description: "الوصف"
-disturbed: "مضطرب"
 none: "لا شيء"
 ice_cover: "غطاء جليدي"
 tidal: "المد والجزر"
@@ -427,12 +435,67 @@ overall_totals:
   unique_species_observed: "إجمالي الأنواع الفريدة المرصودة"
 
 collect:
-  please_create_the_environmental_conditions_for_this_site_first: "يرجى إنشاء الظروف البيئية لهذا الموقع أولاً"
-  view_collections: "عرض البيانات المجمعة"
+  please_create_the_environmental_conditions_for_this_site_first: "يرجى أولاً إنشاء الظروف البيئية لهذا الموقع."
+  collection_number: "رقم الجمع"
+  no_collection: "لا توجد عملية جمع"
+  title: "إدارة عمليات الجمع"
+  manage: "إدارة عمليات الجمع"
+  title_add: "إضافة عملية جمع"
+  informations: "معلومات عن عملية الجمع"
+  title_edit: "تعديل عملية الجمع"
+  title_show: "تفاصيل عملية الجمع"
+  the_new_informations: "المعلومات الجديدة عن عملية الجمع"
+  return: "العودة إلى استعراض عمليات الجمع"
+  consult: "استعراض عمليات الجمع"
+  delete: "حذف عملية الجمع"
+  count_a_bird: "عد طائر"
+  collection_environmental_condition: "الحالة البيئية لهذه العملية"
+  conditions_environment: "الظروف البيئية"
+  species_count: "العدد المحتسب لكل نوع"
+  count: "العدد المحتسب"
+  collect_add: "إنشاء عملية جمع"
+  msg:
+    created_success: "تم إنشاء عملية الجمع بنجاح"
+    created_error: "حدث خطأ أثناء إنشاء عملية الجمع"
+    updated_success: "تم تعديل عملية الجمع بنجاح"
+    updated_error: "حدث خطأ أثناء تعديل عملية الجمع"
+    deleted_success: "تم حذف عملية الجمع بنجاح"
+    deleted_error: "حدث خطأ أثناء حذف عملية الجمع"
+    data_collection_not_valid: "عملية جمع البيانات وحالتها البيئية لم يتم اعتمادها"
+    total_bird_count_positive: "يجب أن يكون إجمالي عد الطيور إيجابياً"
+    site_environment_mismatch: "موقع الجمع لا يتطابق مع الظروف البيئية."
+    no_bird_species_selected: "لم يتم اختيار أي نوع من الطيور."
+    no_collection_method_selected: "لم يتم اختيار أي طريقة جمع."
+    collection_quality_required: "جودة الجمع مطلوبة."
+    count_type_required: "نوع العد مطلوب."
+    access_denied: "ليس لديك صلاحية الوصول إلى عملية الجمع هذه"
   
 condition:
   list_environmental_conditions: "عرض قائمة الشروط البيئية"
   view_conditions: "عرض الشروط البيئية"
+  title: "إدارة الظروف البيئية"
+  manage: "إدارة الظروف البيئية"
+  title_add: "إضافة شرط بيئي"
+  title_edit: "تعديل الشرط البيئي"
+  title_show: "تفاصيل الشرط البيئي"
+  informations: "معلومات حول الشرط البيئي الجديد لـ :"
+  the_new_informations: "المعلومات الجديدة عن الشرط البيئي لـ :"
+  return: "العودة إلى استعراض الظروف البيئية"
+  consult: "استعراض الظروف البيئية"
+  delete: "حذف الشرط البيئي"
+  collection_associated: "عملية جمع مرتبطة"
+  collection_date: "تاريخ الجمع"
+  no_collection_associated: "لا توجد عملية جمع مرتبطة بهذه الحالة البيئية."
+  campaign_not_found: "الحملة المحددة غير موجودة"
+  site_not_found: "الموقع المحدد غير موجود."
+  access_denied_environment: "ليس لديك حق الوصول إلى هذه الحالة البيئية"
+  msg:
+    created_success: "تم إنشاء الشرط البيئي بنجاح"
+    created_error: "حدث خطأ أثناء إنشاء الشرط البيئي"
+    updated_success: "تم تعديل الشرط البيئي بنجاح"
+    updated_error: "حدث خطأ أثناء تعديل الشرط البيئي"
+    deleted_success: "تم حذف الشرط البيئي بنجاح"
+    deleted_error: "حدث خطأ أثناء حذف الشرط البيئي"
 
 countType:
   title: "إدارة بيانات أنواع العد"
@@ -444,6 +507,8 @@ countType:
   return: "العودة إلى قائمة أنواع العد"
   consult: "عرض أنواع العد"
   delete: "حذف نوع العد"
+  label: "نوع العد الذي تم إجراؤه خلال هذه الزيارة:"
+  placeholder: "-- اختر نوعًا --"
   msg:
     created_success: "تم إنشاء نوع العد بنجاح"
     created_error: "حدث خطأ أثناء إنشاء نوع العد"
@@ -462,6 +527,7 @@ method:
   return: "العودة إلى طرق الجمع"
   consult: "استشارة طرق الجمع"
   delete: "حذف طريقة الجمع"
+  label: "الطريقة(الطرق) المستخدمة في العد:"
   msg:
     created_success: "تم إنشاء طريقة الجمع بنجاح"
     created_error: "حدث خطأ أثناء إنشاء طريقة الجمع"
@@ -471,6 +537,7 @@ method:
     deleted_error: "حدث خطأ أثناء حذف طريقة الجمع"
 
 conditionDisturbed:
+  description: "مضطرب"
   title: "إدارة بيانات الاضطرابات"
   manage: "إدارة الاضطرابات"
   title_add: "إضافة اضطراب"
@@ -480,6 +547,8 @@ conditionDisturbed:
   return: "العودة إلى قائمة الاضطرابات"
   consult: "استشارة الاضطرابات"
   delete: "حذف الاضطراب"
+  explanation: "يشير إلى ما إذا كان العد قد تأثر باضطراب"
+  choose: "-- اختر اضطرابًا --"
   msg:
     created_success: "تم إنشاء الاضطراب بنجاح"
     created_error: "حدث خطأ أثناء إنشاء الاضطراب"
@@ -498,6 +567,8 @@ conditionIce:
   return: "العودة إلى بيانات الجليد"
   consult: "استشارة بيانات الجليد"
   delete: "حذف بيانات الجليد"
+  description: "تغطية الجليد أثناء العد"
+  choose: "-- اختر حالة جليدية --"
   msg:
     created_success: "تم إنشاء بيانات الجليد بنجاح"
     created_error: "حدث خطأ أثناء إنشاء بيانات الجليد"
@@ -516,6 +587,8 @@ conditionWater:
   return: "العودة إلى بيانات المياه"
   consult: "استشارة بيانات المياه"
   delete: "حذف بيانات المياه"
+  description: "حالة المياه أثناء العد"
+  choose: "-- اختر حالة مائية --"
   msg:
     created_success: "تم إنشاء بيانات المياه بنجاح"
     created_error: "حدث خطأ أثناء إنشاء بيانات المياه"
@@ -534,6 +607,8 @@ conditionTidal:
   return: "العودة إلى بيانات المد والجزر"
   consult: "استشارة بيانات المد والجزر"
   delete: "حذف بيانات المد والجزر"
+  description: "حالة المد والجزر أثناء العد"
+  choose: "-- اختر حالة المد والجزر --"
   msg:
     created_success: "تم إنشاء بيانات المد والجزر بنجاح"
     created_error: "حدث خطأ أثناء إنشاء بيانات المد والجزر"
@@ -552,6 +627,9 @@ conditionWeather:
   return: "العودة إلى بيانات الحالات الجوية"
   consult: "استشارة بيانات الحالات الجوية"
   delete: "حذف بيانات حالة جوية"
+  description: "تأثيرات الظروف الجوية على العد"
+  explanation: "(الرياح، المطر، الضباب)"
+  choose: "-- اختر حالة الطقس --"
   msg:
     created_success: "تم إنشاء بيانات حالة جوية بنجاح"
     created_error: "حدث خطأ أثناء إنشاء بيانات حالة جوية"
@@ -616,6 +694,7 @@ iucn:
 
 group:
   view_groups: "عرض المجموعات"
+  name: "إسم المجموعة"
 
 language:
   name: "الاسم"
@@ -708,7 +787,7 @@ site_collection:
   chooseParentSite: "-- اختر موقعًا رئيسيًا --"
   siteCodeDescription: "رمز موقع مخصص ويستخدم من قبل جمعية التنسيق الوطنية، المعهد أو فرد، إن وجد."
   parentSite: "اسم الموقع الأصل"
-  parentOfSites: "هذا الموقع هو الأصل لـ"
+  # parentOfSites: "هذا الموقع هو الأصل لـ"
   latDepart: "خط العرض الابتدائي"
   longDepart: "خط الطول الابتدائي"
   latFin: "خط العرض النهائي"
@@ -760,70 +839,6 @@ userStatus:
     deletion_failed: "حدث خطأ أثناء حذف الحالة."
 
 
-
-# site:
-#   # Form
-#   new_site_form: "نموذج موقع جديد"
-#   add_a_site: "إضافة موقع"
-#   edit_a_site: "تعديل موقع"
-#   country: "الدولة"
-#   city: "المدينة"
-#   reserve: "المحمية"
-#   coordinates: "الإحداثيات"
-#   latitude: "خط العرض"
-#   longitude: "خط الطول"
-#   description: "الوصف"
-#   add_description: "إضافة وصف"
-#   actions: "الإجراءات"
-#   # Messages
-#   msg:
-#     created: "تم إنشاء الموقع بنجاح."
-#     updated: "تم تحديث الموقع بنجاح."
-#     deleted: "تم حذف الموقع بنجاح."
-#   error:
-#     creation_failed: "حدث خطأ أثناء إنشاء الموقع."
-#     modification_failed: "حدث خطأ أثناء تعديل الموقع."
-#     deletion_failed: "حدث خطأ أثناء حذف الموقع."
-
-# bird_family:
-#   breadcrumb: "عائلات الطيور"
-#   create_a_family: "إنشاء عائلة طيور"
-#   edit_a_family: "تعديل عائلة طيور"
-#   view_all_families: "عرض جميع عائلات الطيور"
-#   msg:
-#     created: "تم إنشاء عائلة الطيور بنجاح."
-#     updated: "تم تحديث عائلة الطيور بنجاح."
-#     deleted: "تم حذف عائلة الطيور بنجاح."
-
-# bird_species:
-#   breadcrumb: "أنواع الطيور"
-#   create_a_species: "إنشاء نوع طيور"
-#   edit_a_species: "تعديل نوع طيور"
-#   view_all_species: "عرض جميع أنواع الطيور"
-#   msg:
-#     created: "تم إنشاء نوع الطيور بنجاح."
-#     updated: "تم تحديث نوع الطيور بنجاح."
-#     deleted: "تم حذف نوع الطيور بنجاح."
-
-# campaign:
-#   breadcrumb: "الحملات"
-#   create_a_campaign: "إنشاء حملة"
-#   edit_a_campaign: "تعديل حملة"
-#   view_all_campaigns: "عرض جميع الحملات"
-#   msg:
-#     created: "تم إنشاء الحملة بنجاح."
-#     updated: "تم تحديث الحملة بنجاح."
-#     deleted: "تم حذف الحملة بنجاح."
-
-# environmental_conditions:
-#   breadcrumb: "الظروف البيئية"
-#   create_a_condition: "إنشاء حالة بيئية"
-#   edit_a_condition: "تعديل حالة بيئية"
-#   view_all_conditions: "عرض جميع الحالات البيئية"
-#   msg:
-#     created: "تم إنشاء الحالة البيئية بنجاح."
-#     updated: "تم تحديث الحالة البيئية بنجاح."
-#     deleted: "تم حذف الحالة البيئية بنجاح."
 
 # notification:
 #   mark_as_read: "تحديد كمقروء"

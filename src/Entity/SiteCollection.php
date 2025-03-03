@@ -34,9 +34,6 @@ class SiteCollection
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $nationalSiteCode = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $internationalSiteCode = null;
-
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $latDepart = null;
@@ -69,14 +66,14 @@ class SiteCollection
     #[ORM\OneToMany(targetEntity: CollectedData::class, mappedBy: 'siteCollection')]
     private Collection $collectedData;
 
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'siteCollections')]
-    private ?self $parentSite = null;
+    // #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'siteCollections')]
+    // private ?self $parentSite = null;
 
-    /**
-     * @var Collection<int, self>
-     */
-    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parentSite')]
-    private Collection $siteCollections;
+    // /**
+    //  * @var Collection<int, self>
+    //  */
+    // #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parentSite')]
+    // private Collection $siteCollections;
 
     /**
      * @var Collection<int, SiteAgentsGroup>
@@ -86,6 +83,9 @@ class SiteCollection
 
     #[ORM\ManyToOne(inversedBy: 'siteCollections')]
     private ?NatureReserve $natureReserve = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $parentSite = null;
 
     public function __construct()
     {
@@ -156,18 +156,6 @@ class SiteCollection
     public function setNationalSiteCode(?string $nationalSiteCode): static
     {
         $this->nationalSiteCode = $nationalSiteCode;
-
-        return $this;
-    }
-
-    public function getInternationalSiteCode(): ?string
-    {
-        return $this->internationalSiteCode;
-    }
-
-    public function setInternationalSiteCode(?string $internationalSiteCode): static
-    {
-        $this->internationalSiteCode = $internationalSiteCode;
 
         return $this;
     }
@@ -292,47 +280,47 @@ class SiteCollection
         return $this;
     }
 
-    public function getParentSite(): ?self
-    {
-        return $this->parentSite;
-    }
+    // public function getParentSite(): ?self
+    // {
+    //     return $this->parentSite;
+    // }
 
-    public function setParentSite(?self $parentSite): static
-    {
-        $this->parentSite = $parentSite;
+    // public function setParentSite(?self $parentSite): static
+    // {
+    //     $this->parentSite = $parentSite;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    /**
-     * @return Collection<int, self>
-     */
-    public function getSiteCollections(): Collection
-    {
-        return $this->siteCollections;
-    }
+    // /**
+    //  * @return Collection<int, self>
+    //  */
+    // public function getSiteCollections(): Collection
+    // {
+    //     return $this->siteCollections;
+    // }
 
-    public function addSiteCollection(self $siteCollection): static
-    {
-        if (!$this->siteCollections->contains($siteCollection)) {
-            $this->siteCollections->add($siteCollection);
-            $siteCollection->setParentSite($this);
-        }
+    // public function addSiteCollection(self $siteCollection): static
+    // {
+    //     if (!$this->siteCollections->contains($siteCollection)) {
+    //         $this->siteCollections->add($siteCollection);
+    //         $siteCollection->setParentSite($this);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function removeSiteCollection(self $siteCollection): static
-    {
-        if ($this->siteCollections->removeElement($siteCollection)) {
-            // set the owning side to null (unless already changed)
-            if ($siteCollection->getParentSite() === $this) {
-                $siteCollection->setParentSite(null);
-            }
-        }
+    // public function removeSiteCollection(self $siteCollection): static
+    // {
+    //     if ($this->siteCollections->removeElement($siteCollection)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($siteCollection->getParentSite() === $this) {
+    //             $siteCollection->setParentSite(null);
+    //         }
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     public function __toString()
     {
@@ -377,6 +365,18 @@ class SiteCollection
     public function setNatureReserve(?NatureReserve $natureReserve): static
     {
         $this->natureReserve = $natureReserve;
+
+        return $this;
+    }
+
+    public function getParentSite(): ?string
+    {
+        return $this->parentSite;
+    }
+
+    public function setParentSite(?string $parentSite): static
+    {
+        $this->parentSite = $parentSite;
 
         return $this;
     }

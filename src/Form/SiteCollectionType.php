@@ -33,10 +33,6 @@ class SiteCollectionType extends AbstractType
                 'required' => false,
                 'label_html' => true
             ])
-            ->add('internationalSiteCode',TextType::class, [
-                'label' => $this->translator->trans('site_collection.internationalSiteCode'),
-                'required' => false,
-            ])
             ->add('latDepart',TextType::class, [
                 'label' => $this->translator->trans('site_collection.latDepart').'<span class="requiredField">*</span>',
                 'label_html' => true
@@ -69,19 +65,14 @@ class SiteCollectionType extends AbstractType
                 },
                 'attr' => ['class' => 'form-control']
             ])
-            ->add('parentSite', EntityType::class, [
-                'class' => SiteCollection::class, // Assurez-vous que l'entité est correcte
-                'choice_label' => 'siteName', // Le champ à afficher dans la liste
-                'label' => $this->translator->trans('site_collection.parentSite').'<h6 class="explanation">'.$this->translator->trans('site_collection.parentSiteDescription').'</h6>',
+            ->add('parentSite',TextType::class, [
+                'label' => $this->translator->trans('site_collection.parentSite').'<h6 class="explanation">' . $this->translator->trans('site_collection.parentSiteDescription') . '</h6>',
                 'label_html' => true,
                 'required' => false,
-                'autocomplete' => true,
-                'placeholder' => $this->translator->trans('site_collection.chooseParentSite'),
-                'query_builder' => function (SiteCollectionRepository $repository) {
-                    return $repository->createQueryBuilder('s')
-                        ->orderBy('s.siteName', 'ASC'); // Trier par nom du site
-                },
-                'attr' => ['class' => 'form-control']
+                'attr' => [
+                    'class' => 'form-control autocomplete-parent-site',  // Ajout d'une classe CSS pour cibler ce champ
+                    'data-url' => '/user/site/collection', // URL pour récupérer les suggestions
+                ],
             ])
         ;
     }

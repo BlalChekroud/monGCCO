@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier les conditions d'environnement{% endblock %}
+{% block title %}{{'condition.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Modifier les conditions d'environnement</h1>
+      <h1>{{ 'condition.title_edit'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_environmental_conditions_index') }}">Gestion des conditions d'environnement</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_environmental_conditions_index') }}">{{ 'condition.manage'|trans }}</a></li>
           <li class="breadcrumb-item active">{{ 'modification'|trans }}</li>
         </ol>
       </nav>
@@ -22,18 +22,15 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Informations sur les conditions environnementales</h5>
+              <h5 class="card-title">{{ 'condition.the_new_informations'|trans }}</h5>
 
-              {{ include('environmental_conditions/_form.html.twig', {'button_label': ' Mise à jour'}) }}
+              {{ include('environmental_conditions/_form.html.twig') }}
 
             </div>
             <div class="card-footer d-flex justify-content-between">
               <div>
-                <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers la consultation des conditioons environnementales">Retour</a>
-                {% if environmental_condition.countingCampaign %}
-                  <a href="{{ path('app_counting_campaign_show', {'id': environmental_condition.countingCampaign.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-1" title="Détail de la campagne"> Campagne</a>
-                {% endif %}
-                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des campagnes</a>
+                <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-sm btn-outline-secondary" title="{{ 'condition.return'|trans }}">{{ 'back'|trans }}</a>
+                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{'campaign.consult'|trans }}</a>
               </div>
               <div class="d-flex justify-content-end">
                 {% import 'macros/btn_actions_macros.html.twig' as macros %}

@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle conditions environnementales{% endblock %}
+{% block title %}{{'condition.title'|trans }}{% endblock %}
 
 {% block body %}
     <main id="main" class="main">
 
         <div class="pagetitle">
-        <h1>Création de conditions environnementales</h1>
+        <h1>{{ 'condition.title_add'|trans }}</h1>
         <nav>
             <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ path('app_environmental_conditions_index') }}">Gestion des conditions</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('app_environmental_conditions_index') }}">{{ 'condition.manage'|trans }}</a></li>
             <li class="breadcrumb-item active">{{ 'add'|trans }}</li>
             </ol>
         </nav>
@@ -22,13 +22,16 @@
 
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Informations sur les conditions environnementales de: {{ siteCollection.siteName }}</h5>
+                            <h5 class="card-title d-flex justify-content-start align-items-center">
+                                {{ 'condition.informations'|trans }} &nbsp;
+                                <div class="fw-bold text-primary"> {{ siteCollection.siteName }}</div>
+                            </h5>
 
                             {{ include('environmental_conditions/_form.html.twig') }}
 
                         </div>
                         <div class="card-footer">
-                            <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers la consultation des conditioons environnementales">Retour</a>
+                            <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-sm btn-outline-secondary" title="{{ 'condition.return'|trans }}">{{ 'back'|trans }}</a>
                         </div>
                     </div>
 

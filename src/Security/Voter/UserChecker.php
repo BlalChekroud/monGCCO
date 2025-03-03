@@ -20,7 +20,10 @@ class UserChecker implements UserCheckerInterface
         if (!$user instanceof User) {
             return;
         }
-        if ($user->getUserStatus()->getLabel() !== 'Actif') {
+
+        $userStatus = $user->getUserStatus(); // Récupérer le statut
+
+        if (!$userStatus || $userStatus->getLabel() !== 'Actif') {
             throw new CustomUserMessageAuthenticationException(
                 $this->translator->trans('inactive_account_cannot_log_in')
             );

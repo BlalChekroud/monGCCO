@@ -48,13 +48,12 @@ class SiteCollectionController extends AbstractController
                     $siteCollection->getSiteName() ?? '',
                     $siteCollection->getSiteCode() ?? '',
                     $siteCollection->getNationalSiteCode() ?? '',
-                    $siteCollection->getInternationalSiteCode() ?? '',
                     $siteCollection->getLatDepart() ?? '',
                     $siteCollection->getLongDepart() ?? '',
                     $siteCollection->getLatFin() ?? '',
                     $siteCollection->getLongFin() ?? '',
                     $siteCollection->getCity()?->getName() ?? '',
-                    $siteCollection->getParentSite()?->getSiteName() ?? '',
+                    $siteCollection->getParentSite() ?? '',
                     $siteCollection->getCreatedAt()?->format('d-m-Y H:i:s') ?? ''
                 ];
             }
@@ -141,7 +140,6 @@ class SiteCollectionController extends AbstractController
                 $siteName = $data['siteName'];
                 $siteCode = $data['siteCode'];
                 $nationalSiteCode = $data['nationalSiteCode'] ?? null;
-                $internationalSiteCode = $data['internationalSiteCode'] ?? null;
                 $latDepart = $data['latDepart'];
                 $longDepart = $data['longDepart'];
                 $latFin = $data['latFin'];
@@ -156,14 +154,7 @@ class SiteCollectionController extends AbstractController
                     $invalidRows[] = $lineNumber + 2;
                     $invalidCount++;
                     continue;
-                }
-
-                // if (!is_numeric($latDepart) || !is_numeric($longDepart) || !is_numeric($latFin) || !is_numeric($longFin)) {
-                //     $this->addFlash('error', "Les coordonnées ne sont pas valides pour le site: $siteName.");
-                //     $invalidRows[] = $lineNumber + 2;
-                //     $invalidCount++;
-                //     continue; // Ignorer cette entrée si les coordonnées ne sont pas valides
-                // }                
+                }              
     
                 // Vérifier si le site a déjà été traitée dans ce fichier
                 if (isset($processedSites[$siteName])) {
@@ -208,7 +199,6 @@ class SiteCollectionController extends AbstractController
                 $existingSite = $siteCollectionRepository->findOneBy(['siteName' => $siteName, 'siteCode' => $siteCode]);
 
                 if ($existingSite) {
-                    // $this->addFlash('error', "Le site $siteName avec le code $siteCode existe déjà.");
                     $this->addFlash('error', $this->translator->trans('site_already_exists', [
                         '%siteName%' => $siteName,
                         '%siteCode%' => $siteCode
@@ -217,33 +207,18 @@ class SiteCollectionController extends AbstractController
                     $invalidCount++;
                     continue; // Ignorer cette entrée si le site existe déjà
                 }
-
-                $existingParentSite = $siteCollectionRepository->findOneBy(['siteName' => $parentSite]);
-
-                if (!$existingParentSite && $parentSite) {
-                    // $this->addFlash('error', "Le site parent '$parentSite' n'existe pas dans la base de données.");
-                    $this->addFlash('error', $this->translator->trans('site_collection.parent_site_not_found', [
-                        '%parentSite%' => $parentSite
-                    ]));
-                    // continue; // Passer à la ligne suivante du CSV
-                }
                 
                 // Créez et persistez un nouveau site
                 $site = new SiteCollection();
                 $site->setSiteName($siteName);
                 $site->setSiteCode($siteCode);
                 $site->setNationalSiteCode($nationalSiteCode);
-                $site->setInternationalSiteCode($internationalSiteCode);
                 $site->setLatDepart($latDepart);
                 $site->setLongDepart($longDepart);
                 $site->setLatFin($latFin);
                 $site->setLongFin($longFin);
+                $site->setParentSite($parentSite);
                 $site->setCreatedAt(new \DateTimeImmutable());
-                if ($existingParentSite) {
-                    $site->setParentSite($existingParentSite);
-                } else {
-                    $site->setParentSite(null); // Ou gérer cela comme une erreur si nécessaire
-                }
                 
                 // Associer le site au ville
                 $site->setCity($existingCity);
@@ -257,29 +232,16 @@ class SiteCollectionController extends AbstractController
     
             try {
                 $entityManager->flush();
-
-                $existingParentSite = $siteCollectionRepository->findOneBy(['siteName' => $parentSite]);
-                if ($existingParentSite) {
-                    $site->setParentSite($existingParentSite);
-                    $entityManager->persist($site);
-                    $entityManager->flush();
-                    $this->addFlash('success', 'SITE PARENT TROUVE');
-                } else {
-                    $site->setParentSite(null); // Ou gérer cela comme une erreur si nécessaire
-                }
-                // $this->addFlash('success', "$importedCount sites ont été importés avec succès.");
                 $this->addFlash('success', $this->translator->trans('site_collection.success_import', [
                     '%importedCount%' => $importedCount
                 ]));
             } catch (\Exception $e) {
-                // $this->addFlash('error', 'Erreur lors de l\'importation : ' . $e->getMessage());
                 $this->addFlash('error', $this->translator->trans('error.import', [
                     '%message%' => $e->getMessage()
                 ]));
             }
             
             if ($invalidCount > 0) {
-                // $this->addFlash('error', "$invalidCount lignes n'ont pas pu être importées. Numéros des lignes : " . implode(', ', $invalidRows));
                 $this->addFlash('error', $this->translator->trans('site_collection.import_failed', [
                     '%invalidCount%' => $invalidCount,
                     '%invalidRows%' => implode(', ', $invalidRows)
@@ -305,20 +267,18 @@ class SiteCollectionController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                if ($this->IsGranted('ROLE_CREAT')) {
-
+                try {
                     $siteCollection->setCreatedAt(new \DateTimeImmutable());
                     $entityManager->persist($siteCollection);
                     $entityManager->flush();
-                    $this->addFlash('success', "Site de collecte a bien été crée");
-        
+                    $this->addFlash('success', $this->translator->trans('site_collection.msg.created_success'));
                     return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);
-                } else {
-                    $this->addFlash('warning',"Vous n'avez pas le droit.");
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
                     return $this->redirectToRoute('app_site_collection_new', [], Response::HTTP_SEE_OTHER);
                 }
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de l\'ajout du site.');
+                $this->addFlash('error', $this->translator->trans('site_collection.msg.created_error'));
             }
         }
 
@@ -329,6 +289,7 @@ class SiteCollectionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_site_collection_show', methods: ['GET'])]
+    #[IsGranted('ROLE_VIEW', message: 'Vous n\'avez pas l\'accès.')]
     public function show(SiteCollection $siteCollection, SiteCollectionRepository $siteCollectionRepository): Response
     {
         // Récupère le nombre total d'oiseaux pour le site
@@ -350,12 +311,21 @@ class SiteCollectionController extends AbstractController
         $form = $this->createForm(SiteCollectionType::class, $siteCollection);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $siteCollection->setUpdatedAt(new \DateTimeImmutable());
-            $entityManager->flush();
-            $this->addFlash('success', "Site de collecte a bien été modifié");
-
-            return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                try {
+                    $siteCollection->setUpdatedAt(new \DateTimeImmutable());
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('site_collection.msg.updated_success'));
+        
+                    return $this->redirectToRoute('app_site_collection_show', ['id' => $siteCollection->getId()], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_site_collection_edit', ['id' => $siteCollection->getId()], Response::HTTP_SEE_OTHER);
+                }
+            } else {
+                $this->addFlash('error', $this->translator->trans('site_collection.msg.updated_error'));
+            }
         }
 
         return $this->render('site_collection/edit.html.twig', [
@@ -369,9 +339,16 @@ class SiteCollectionController extends AbstractController
     public function delete(Request $request, SiteCollection $siteCollection, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$siteCollection->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($siteCollection);
-            $entityManager->flush();
-            $this->addFlash('success', "Site de collecte a bien été supprimée");
+            try {
+                $entityManager->remove($siteCollection);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('site_collection.msg.deleted_success'));
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_siteCollection_index', [], Response::HTTP_SEE_OTHER);
+            }
+        } else {
+            $this->addFlash('error',$this->translator->trans('site_collection.msg.deleted_error'));
         }
 
         return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);

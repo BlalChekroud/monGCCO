@@ -254,6 +254,8 @@ agentsGroup:
   # Edit
   edit_this_group: 'Edit this group'
   the_new_informations: 'The new group information'
+  none: "None"
+  consult: "View groups"
   error:
     no_member_selected: "You must select at least one member to create an agents group."
     leader_not_in_members: "The group leader must be among the selected members."
@@ -326,6 +328,7 @@ birdSpecies:
   sis_rec_id: "sisRec ID"
   spc_rec_id: "spcRec ID"
   subspp_id: "subspp ID"
+  code_and_scientific_name: "Species code - Scientific name (French name/English name)"
   msg:
     success_import: "%importedCount% bird species were successfully imported. %invalidCount% rows could not be imported."
     success_create: "Bird species created successfully."
@@ -340,6 +343,8 @@ birdSpecies:
     invalid_encoding: "The CSV file contains invalid characters. Please check the file encoding."
 
 campaign:
+  name: "Counting campaign"
+  none: "None"
   cannot_be_modified: "The campaign with status %status% cannot be modified"
   title: "Counting campaign management"
   manage: "Campaigns Management"
@@ -381,9 +386,12 @@ campaign:
   cancel_campaign: "Cancel Campaign"
   campaign_details: "Counting Campaign Details"
   consult: "View campaigns"
+  not_allowed_modify: "You do not have permission to modify"
+  campaign_closed_no_modify: "A campaign %statusClosed% cannot be modified"
+  campaign_suspended_no_modify: "A campaign %statusSuspended% cannot be modified"
+  campaign_cancelled_no_modify: "A campaign %statusCancelled% cannot be modified"
 
 description: "Description"
-disturbed: "Disturbed"
 none: "None"
 ice_cover: "Ice Cover"
 tidal: "Tidal"
@@ -427,12 +435,67 @@ overall_totals:
   unique_species_observed: "Total Unique Species Observed"
 
 collect:
-  please_create_the_environmental_conditions_for_this_site_first: "Please create the environmental conditions for this site first"
-  view_collections: "View Collections"
+  please_create_the_environmental_conditions_for_this_site_first: "Please create the environmental conditions for this site first."
+  collection_number: "Collection number"
+  no_collection: "No collection"
+  title: "Collection Management"
+  manage: "Manage collections"
+  title_add: "Add a collection"
+  informations: "Collection information"
+  title_edit: "Edit collection"
+  title_show: "Collection Details"
+  the_new_informations: "New collection information"
+  return: "Back to collection overview"
+  consult: "Collection overview"
+  delete: "Delete collection"
+  count_a_bird: "Count a bird"
+  collection_environmental_condition: "Environmental condition of this collection"
+  conditions_environment: "Environmental conditions"
+  species_count: "Counted number for each species"
+  count: "Counted number"
+  collect_add: "Create a collection"
+  msg:
+    created_success: "The collection has been successfully created"
+    created_error: "An error occurred while creating the collection"
+    updated_success: "The collection has been successfully updated"
+    updated_error: "An error occurred while updating the collection"
+    deleted_success: "The collection has been successfully deleted"
+    deleted_error: "An error occurred while deleting the collection"
+    data_collection_not_valid: "The data collection and its environmental condition are not validated"
+    total_bird_count_positive: "The total bird count must be positive"
+    site_environment_mismatch: "The collection site does not match the environmental conditions."
+    no_bird_species_selected: "No bird species selected."
+    no_collection_method_selected: "No collection method selected."
+    collection_quality_required: "The collection quality is required."
+    count_type_required: "The count type is required."
+    access_denied: "You do not have access to this collection"
 
 condition:
   list_environmental_conditions: "View List of Environmental Conditions"
   view_conditions: "View Environmental Conditions"
+  title: "Environmental Conditions Management"
+  manage: "Environmental Conditions Management"
+  title_add: "Add Environmental Conditions"
+  title_edit: "Edit Environmental Conditions"
+  title_show: "Environmental Conditions Details"
+  informations: "Information about the new environmental condition of :"
+  the_new_informations: "New information about the environmental condition of :"
+  return: "Back to environmental conditions overview"
+  consult: "Environmental Conditions Consultation"
+  delete: "Delete Environmental Conditions"
+  collection_associated: "Associated collection"
+  collection_date: "Collection date"
+  no_collection_associated: "No collection associated with this environmental condition."
+  campaign_not_found: "The specified campaign is not found."
+  site_not_found: "The specified site is not found."
+  access_denied_environment: "You do not have access to this environmental condition"
+  msg:
+    created_success: "The environmental conditions have been successfully created"
+    created_error: "An error occurred while creating the environmental conditions"
+    updated_success: "The environmental conditions have been successfully updated"
+    updated_error: "An error occurred while updating the environmental conditions"
+    deleted_success: "The environmental conditions have been successfully deleted"
+    deleted_error: "An error occurred while deleting the environmental conditions"
 
 countType:
   title: "Counting Type Management"
@@ -444,6 +507,8 @@ countType:
   return: "Back to counting types overview"
   consult: "View counting types"
   delete: "Delete the counting type"
+  label: "Type of count performed during this visit:"
+  placeholder: "-- Choose a type --"
   msg:
     created_success: "The counting type has been successfully created"
     created_error: "An error occurred while creating the counting type"
@@ -462,6 +527,7 @@ method:
   return: "Back to collection methods"
   consult: "Collection methods consultation"
   delete: "Delete collection method"
+  label: "Method(s) used for the count:"
   msg:
     created_success: "The collection method has been successfully created"
     created_error: "An error occurred while creating the collection method"
@@ -471,6 +537,7 @@ method:
     deleted_error: "An error occurred while deleting the collection method"
 
 conditionDisturbed:
+  description: "Disturbed"
   title: "Management of disturbances"
   manage: "Disturbance management"
   title_add: "Add a disturbance"
@@ -480,6 +547,8 @@ conditionDisturbed:
   return: "Back to disturbances"
   consult: "Disturbances consultation"
   delete: "Delete disturbance"
+  explanation: "Indicates whether the count was affected by a disturbance"
+  choose: "-- Choose a disturbance --"
   msg:
     created_success: "The disturbance has been successfully created"
     created_error: "An error occurred while creating the disturbance"
@@ -498,6 +567,8 @@ conditionIce:
   return: "Back to ice data"
   consult: "Ice data consultation"
   delete: "Delete ice data"
+  description: "Ice coverage during the count"
+  choose: "-- Choose an ice condition --"
   msg:
     created_success: "The ice data has been successfully created"
     created_error: "An error occurred while creating the ice data"
@@ -516,6 +587,8 @@ conditionWater:
   return: "Back to water data"
   consult: "Water data consultation"
   delete: "Delete water data"
+  description: "Water conditions during the count"
+  choose: "-- Choose a water condition --"
   msg:
     created_success: "The water data has been successfully created"
     created_error: "An error occurred while creating the water data"
@@ -534,6 +607,8 @@ conditionTidal:
   return: "Back to tidal data"
   consult: "Tidal data consultation"
   delete: "Delete tidal data"
+  description: "Tidal conditions during the count"
+  choose: "-- Choose a tidal condition --"
   msg:
     created_success: "The tidal data has been successfully created"
     created_error: "An error occurred while creating the tidal data"
@@ -552,6 +627,9 @@ conditionWeather:
   return: "Back to weather conditions"
   consult: "Weather conditions consultation"
   delete: "Delete weather condition"
+  description: "Effects of weather conditions on counts"
+  explanation: "(wind, rain, fog)"
+  choose: "-- Choose a weather condition --"
   msg:
     created_success: "The weather condition has been successfully created"
     created_error: "An error occurred while creating the weather condition"
@@ -616,6 +694,7 @@ iucn:
 
 group:
   view_groups: "View Groups"
+  name: "Group name"
   
 language:
   name: 'name'
@@ -708,7 +787,7 @@ site_collection:
   chooseParentSite: "-- Choose a parent site --"
   siteCodeDescription: "A site code designated and used by the national coordination association, institute, or an individual, if applicable."
   parentSite: "Parent site name"
-  parentOfSites: "This site is the parent of"
+  # parentOfSites: "This site is the parent of"
   latDepart: "Start latitude"
   longDepart: "Start longitude"
   latFin: "End latitude"

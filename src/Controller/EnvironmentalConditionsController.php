@@ -19,12 +19,11 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/user/environmental/conditions')]
-#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class EnvironmentalConditionsController extends AbstractController
 {
     private $campaignStatusService;
-
-    public function __construct(CampaignStatusService $campaignStatusService)
+    
+    public function __construct(CampaignStatusService $campaignStatusService, private readonly TranslatorInterface $translator)
     {
         $this->campaignStatusService = $campaignStatusService;
     }
@@ -46,8 +45,9 @@ class EnvironmentalConditionsController extends AbstractController
     }
 
 
+    #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/new', name: 'app_environmental_conditions_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser(); // Récupérer l'utilisateur actuel
         $siteId = $request->query->get('siteId');
@@ -58,25 +58,25 @@ class EnvironmentalConditionsController extends AbstractController
         
         // Vérifier si la campagne et le site existent
         if (!$campaign) {
-            $this->addFlash('error', 'La campagne spécifiée est introuvable.');
+            $this->addFlash('error', $this->translator->trans('condition.campaign_not_found'));
             return $this->redirectToRoute('app_counting_campaign_index');
         }
         
         if (!$site) {
-            $this->addFlash('error', 'Le site spécifié est introuvable.');
+            $this->addFlash('error', $this->translator->trans('condition.site_not_found'));
             return $this->redirectToRoute('app_counting_campaign_index');
         }
         
         // Si l'utilisateur n'est pas membre d'un groupe, interdire l'accès
         if (!$this->isUserSiteMember($user, $site)) {
-            $this->addFlash('warning', $translator->trans('member_of_a_group_assigned_to_this_site'));
+            $this->addFlash('warning', $this->translator->trans('member_of_a_group_assigned_to_this_site'));
             return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
         }
         
         // Vérifier si la campagne est modifiable
         if ($campaign && !$this->campaignStatusService->ensureCampaignIsEditable($campaign)) {
             // La vérification échoue, un message flash est déjà ajouté par le service
-            $this->addFlash('error', $translator->trans('campaign.cannot_be_modified', ['%status%' => $campaign->getCampaignStatus()]));
+            $this->addFlash('error', $this->translator->trans('campaign.cannot_be_modified', ['%status%' => $campaign->getCampaignStatus()]));
             return $this->redirectToRoute('app_counting_campaign_show', ['id' => $campaignId]);
         }
 
@@ -95,18 +95,22 @@ class EnvironmentalConditionsController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()){
-                $environmentalCondition->setCreatedAt(new \DateTimeImmutable());
-                $environmentalCondition->setSiteCollection($site);
-                $environmentalCondition->setCountingCampaign($campaign);
-                $environmentalCondition->setUser($user);
-    
-                $entityManager->persist($environmentalCondition);
-                $entityManager->flush();
-    
-                $this->addFlash('success', "Conditions d'environnement ont bien été créées");
-                return $this->redirectToRoute('app_collected_data_new', ['campaignId' => $campaignId, 'siteId' => $siteId  ], Response::HTTP_SEE_OTHER);
+                try{
+                    $environmentalCondition->setCreatedAt(new \DateTimeImmutable());
+                    $environmentalCondition->setSiteCollection($site);
+                    $environmentalCondition->setCountingCampaign($campaign);
+                    $environmentalCondition->setUser($user);
+                    $entityManager->persist($environmentalCondition);
+                    $entityManager->flush();
+        
+                    $this->addFlash('success', $this->translator->trans('condition.msg.created_success'));
+                    return $this->redirectToRoute('app_collected_data_new', ['campaignId' => $campaignId, 'siteId' => $siteId  ], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_environmental_conditions_new', [], Response::HTTP_SEE_OTHER);
+                }
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de la création de conditions d\'environnement.');
+                $this->addFlash('error',$this->translator->trans('condition.msg.created_error'));
             }
         }
 
@@ -114,6 +118,7 @@ class EnvironmentalConditionsController extends AbstractController
             'environmental_condition' => $environmentalCondition,
             'form' => $form,
             'siteCollection' => $site,
+            'countingCampaign' => $campaign,
         ]);
     }
 
@@ -131,6 +136,7 @@ class EnvironmentalConditionsController extends AbstractController
     }
 
 
+    #[IsGranted('ROLE_VIEW', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_environmental_conditions_show', methods: ['GET'])]
     public function show(EnvironmentalConditions $environmentalCondition): Response
     {
@@ -140,11 +146,12 @@ class EnvironmentalConditionsController extends AbstractController
                 'environmental_condition' => $environmentalCondition,
             ]);
         } else {
-            $this->addFlash('info', 'Vous n\'avez pas accès à cette condition environnementale.');
+            $this->addFlash('info', $this->translator->trans('condition.access_denied_environment'));
             return $this->redirectToRoute('app_environmental_conditions_index');
         }
     }
 
+    #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}/edit', name: 'app_environmental_conditions_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, EnvironmentalConditions $environmentalCondition, EntityManagerInterface $entityManager): Response
     {
@@ -157,18 +164,18 @@ class EnvironmentalConditionsController extends AbstractController
         $statusCancelled = $statuses['statusCancelled'];
         
         if ($user != $environmentalCondition->getUser() && !$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_EDIT')) {
-            $this->addFlash('error', "Vous n'avez pas l'autorisation pour faire la modification");
+            $this->addFlash('error', $this->translator->trans('campaign.not_allowed_modify'));
             return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
         }
         
         if ($campaign->getCampaignStatus() === $statusClosed) {
-            throw $this->createNotFoundException("Une campagne $statusClosed ne peut pas être modifiée");
+            throw $this->createNotFoundException($this->translator->trans('campaign.campaign_closed_no_modify'));
         }
         if ($campaign->getCampaignStatus() === $statusSuspended) {
-            throw $this->createNotFoundException("Une campagne $statusSuspended ne peut pas être modifiée");
+            throw $this->createNotFoundException($this->translator->trans('campaign.campaign_suspended_no_modify'));
         }
         if ($campaign->getCampaignStatus() === $statusCancelled) {
-            throw $this->createNotFoundException("Une campagne $statusClosed ne peut pas être modifiée");
+            throw $this->createNotFoundException($this->translator->trans('campaign.campaign_cancelled_no_modify'));
         }
         
         $form = $this->createForm(EnvironmentalConditionsType::class, $environmentalCondition);
@@ -176,35 +183,46 @@ class EnvironmentalConditionsController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $environmentalCondition->setUpdatedAt(new \DateTimeImmutable());
-                $entityManager->flush();
-                $this->addFlash('success', "Conditions a bien été modifié");
-    
-                return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
+                try {
+                    $environmentalCondition->setUpdatedAt(new \DateTimeImmutable());
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('condition.msg.updated_success'));
+        
+                    return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_environmental_conditions_edit', ['id' => $environmentalCondition->getId()], Response::HTTP_SEE_OTHER);
+                }
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de la modification de conditions d\'environnement.');
+                $this->addFlash('error',$this->translator->trans('condition.msg.updated_error'));
             }
         }
 
         return $this->render('environmental_conditions/edit.html.twig', [
             'environmental_condition' => $environmentalCondition,
             'form' => $form,
+            'countingCampaign' => $campaign,
         ]);
     }
 
     #[Route('/{id}', name: 'app_environmental_conditions_delete', methods: ['POST'])]
-    public function delete(Request $request, EnvironmentalConditions $environmentalCondition, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
+    public function delete(Request $request, EnvironmentalConditions $environmentalCondition, EntityManagerInterface $entityManager): Response
     {
         if ($this->getUser() !== $environmentalCondition->getUser() && !$this->isGranted('ROLE_DELETE')){
-            $this->addFlash('error', $translator->trans('delete_permission'));
+            $this->addFlash('error', $this->translator->trans('delete_permission'));
             return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
         }
         if ($this->isCsrfTokenValid('delete'.$environmentalCondition->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($environmentalCondition);
-            $entityManager->flush();
-            $this->addFlash('success', "Conditions a bien été supprimée");
+            try {
+                $entityManager->remove($environmentalCondition);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('condition.msg.deleted_success'));
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
+            }
         } else {
-            $this->addFlash('error','Une erreur s\'est produite lors de la suppression de conditions d\'environnement.');
+            $this->addFlash('error',$this->translator->trans('condition.msg.deleted_error'));
         }
 
         return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);

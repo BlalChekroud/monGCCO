@@ -10,7 +10,6 @@ use App\Repository\BirdSpeciesRepository;
 use App\Repository\EnvironmentalConditionsRepository;
 use App\Service\CampaignStatusService;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-
 use App\Entity\CollectedData;
 use App\Form\CollectedDataType;
 use App\Repository\CollectedDataRepository;
@@ -26,20 +25,20 @@ class CollectedDataController extends AbstractController
 {
     private $campaignStatusService;
 
-    public function __construct(CampaignStatusService $campaignStatusService)
+    public function __construct(CampaignStatusService $campaignStatusService, private readonly TranslatorInterface $translator)
     {
         $this->campaignStatusService = $campaignStatusService;
     }
     
 
     #[Route('/', name: 'app_collected_data_index', methods: ['GET'])]
-    public function index(CollectedDataRepository $collectedDataRepository, TranslatorInterface $translator): Response
+    public function index(CollectedDataRepository $collectedDataRepository): Response
     {
         $user = $this->getUser();
 
         // Vérifiez si l'utilisateur a l'un des rôles
         if (!$this->isGranted('ROLE_VIEW') && !$this->isGranted('ROLE_COLLECTOR')) {
-            $this->addFlash('error', $translator->trans('access'));
+            $this->addFlash('error', $this->translator->trans('access'));
             return $this->redirectToRoute('home');
         }
 
@@ -56,7 +55,7 @@ class CollectedDataController extends AbstractController
 
     #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/new', name: 'app_collected_data_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager, EnvironmentalConditionsRepository $environmentalConditionsRepository, TranslatorInterface $translator): Response
+    public function new(Request $request, BirdSpeciesRepository $birdSpeciesRepository, EntityManagerInterface $entityManager, EnvironmentalConditionsRepository $environmentalConditionsRepository): Response
     {
         // Récupérer l'utilisateur actuel
         $user = $this->getUser();
@@ -72,18 +71,18 @@ class CollectedDataController extends AbstractController
 
         // Vérifier si la campagne et le site existent
         if (!$campaign) {
-            $this->addFlash('error', 'La campagne spécifiée est introuvable.');
+            $this->addFlash('error', $this->translator->trans('condition.campaign_not_found'));
             return $this->redirectToRoute('app_collected_data_index');
         }
         
         if (!$site) {
-            $this->addFlash('error', 'Le site spécifié est introuvable.');
+            $this->addFlash('error', $this->translator->trans('collect.site_not_found'));
             return $this->redirectToRoute('app_collected_data_index');
         }
         
         // Si l'utilisateur n'est pas membre d'un groupe, interdire l'accès
         if (!$this->isUserSiteMember($user, $site)) {
-            $this->addFlash('warning', $translator->trans('member_of_a_group_assigned_to_this_site'));
+            $this->addFlash('warning', $this->translator->trans('member_of_a_group_assigned_to_this_site'));
             return $this->redirectToRoute('app_collected_data_index');
         }        
 
@@ -100,19 +99,27 @@ class CollectedDataController extends AbstractController
         // Récupérer toutes les espèces d'oiseaux
         $birdSpecies = $birdSpeciesRepository->findAll();
         
-        // if (!$environmentalConditions || $environmentalConditions->getCollectedData()) {
-        //     // Rediriger vers la page de création des conditions environnementales si elles n'existent pas
-        //     $this->addFlash('warning', $translator->trans('collect.please_create_the_environmental_conditions_for_this_site_first'));
-        //     return $this->redirectToRoute('app_environmental_conditions_new', [
-        //         'campaignId' => $campaignId,
-        //         'siteId' => $siteId
-        //     ]);
-        // }
+        if (!$environmentalConditions || $environmentalConditions->getCollectedData()) {
+            // Rediriger vers la page de création des conditions environnementales si elles n'existent pas
+            $this->addFlash('warning', $this->translator->trans('collect.please_create_the_environmental_conditions_for_this_site_first'));
+            return $this->redirectToRoute('app_environmental_conditions_new', [
+                'campaignId' => $campaignId,
+                'siteId' => $siteId
+            ]);
+        }
         
+        if ($environmentalConditions->getCollectedData() !== null) {
+            // Rediriger vers la page de création des données collectées si elles existent déjà
+            $this->addFlash('warning', $this->translator->trans('collect.data_already_collected'));
+            return $this->redirectToRoute('app_collected_data_new', [
+                'campaignId' => $campaignId,
+                'siteId' => $siteId
+            ]);
+        }
         // Vérifier si la campagne est modifiable
         if ($campaign && !$this->campaignStatusService->ensureCampaignIsEditable($campaign)) {
             // La vérification échoue, un message flash est déjà ajouté par le service
-            $this->addFlash('error', $translator->trans('campaign.cannot_be_modified', ['%status%' => $campaign->getCampaignStatus()]));
+            $this->addFlash('error', $this->translator->trans('campaign.cannot_be_modified', ['%status%' => $campaign->getCampaignStatus()]));
             return $this->redirectToRoute('app_counting_campaign_show', ['id' => $campaignId]);
         }
         
@@ -131,25 +138,29 @@ class CollectedDataController extends AbstractController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 if ($this->validateCollectedData($collectedDatum, $environmentalConditions)) {
-                    // Enregistrez les données collectées
-                    $collectedDatum->setCreatedAt(new \DateTimeImmutable());
-                    $entityManager->persist($collectedDatum);
-        
-                    foreach ($collectedDatum->getBirdSpeciesCounts() as $birdSpeciesCount) {
-                        $birdSpeciesCount->setCollectedData($collectedDatum);
-                        $entityManager->persist($birdSpeciesCount);
+                    try {
+                        // Enregistrez les données collectées
+                        $collectedDatum->setCreatedAt(new \DateTimeImmutable());
+                        $entityManager->persist($collectedDatum);
+            
+                        foreach ($collectedDatum->getBirdSpeciesCounts() as $birdSpeciesCount) {
+                            $birdSpeciesCount->setCollectedData($collectedDatum);
+                            $entityManager->persist($birdSpeciesCount);
+                        }
+                        
+                        // Sauvegarde des données
+                        $entityManager->flush();
+                        $this->addFlash('success', $this->translator->trans('collect.msg.created_success'));
+                        return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', $e->getMessage());
+                        return $this->redirectToRoute('app_collected_data_new', [], Response::HTTP_SEE_OTHER);
                     }
-                    
-                    // Sauvegarde des données
-                    $entityManager->flush();
-                    $this->addFlash('success', "Les données collectées ont été créées avec succès.");
-                    return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
                 } else {
-                    $this->addFlash('error', "Erreur lors de la création de la collecte.");
+                    $this->addFlash('error', $this->translator->trans('collect.msg.data_collection_not_valid'));
                 }
-
             } else {
-                $this->addFlash('error',$translator->trans('invalid_form'));
+                $this->addFlash('error',$this->translator->trans('invalid_form'));
             }
         }
 
@@ -182,32 +193,32 @@ class CollectedDataController extends AbstractController
     private function validateCollectedData(CollectedData $collectedDatum, EnvironmentalConditions $environmentalConditions): bool
     {
         if ($collectedDatum->getTotalCount() <= 0) {
-            $this->addFlash('error', "Le total des comptages d'oiseaux doit être positif.");
+            $this->addFlash('error', $this->translator->trans('collect.msg.total_bird_count_positive'));
             return false;
         }
 
         if ($collectedDatum->getSiteCollection() !== $environmentalConditions->getSiteCollection()) {
-            $this->addFlash('error', "Le site de collecte ne correspond pas aux conditions environnementales.");
+            $this->addFlash('error', $this->translator->trans('collect.msg.site_environment_mismatch'));
             return false;
         }
 
         if ($collectedDatum->getBirdSpeciesCounts()->isEmpty()) {
-            $this->addFlash('error', "Aucune espèce d'oiseau sélectionnée.");
+            $this->addFlash('error', $this->translator->trans('collect.msg.no_bird_species_selected'));
             return false;
         }
 
         if ($collectedDatum->getMethod()->isEmpty()) {
-            $this->addFlash('error', "Aucune méthode de collecte sélectionnée.");
+            $this->addFlash('error', $this->translator->trans('collect.msg.no_collection_method_selected'));
             return false;
         }
 
         if ($collectedDatum->getQuality() === null) {
-            $this->addFlash('error', "La qualité de la collecte est requise.");
+            $this->addFlash('error', $this->translator->trans('collect.msg.collection_quality_required'));
             return false;
         }
 
         if ($collectedDatum->getCountType() === null) {
-            $this->addFlash('error', "Le type de comptage est requis.");
+            $this->addFlash('error', $this->translator->trans('collect.msg.count_type_required'));
             return false;
         }
 
@@ -240,37 +251,38 @@ class CollectedDataController extends AbstractController
             ]);
             
         } else {
-            $this->addFlash('info', 'Vous n\'avez pas accès à cette collecte.');
+            $this->addFlash('info', $this->translator->trans('collect.msg.access_denied'));
             return $this->redirectToRoute('app_collected_data_index');
         }
     }
 
+    #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}/edit', name: 'app_collected_data_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, CollectedData $collectedDatum, EntityManagerInterface $entityManager, TranslatorInterface $translator, BirdSpeciesRepository $birdSpeciesRepository): Response
+    public function edit(Request $request, CollectedData $collectedDatum, EntityManagerInterface $entityManager, BirdSpeciesRepository $birdSpeciesRepository): Response
     {
         $campaign = $collectedDatum->getCountingCampaign();
         $site = $collectedDatum->getSiteCollection();
         $environmentalConditions = $collectedDatum->getEnvironmentalConditions();
         
         if ($this->getUser() !== $collectedDatum->getCreatedBy() && !$this->isGranted('ROLE_SUPER_ADMIN')) {
-            $this->addFlash('error', $translator->trans('edit_permission'));
+            $this->addFlash('error', $this->translator->trans('edit_permission'));
             return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
         }
         // Si l'utilisateur n'est pas membre d'un groupe, interdire l'accès
         if (!$this->isUserSiteMember($this->getUser(), $site)) {
-            $this->addFlash('warning', $translator->trans('member_of_a_group_assigned_to_this_site'));
+            $this->addFlash('warning', $this->translator->trans('member_of_a_group_assigned_to_this_site'));
             return $this->redirectToRoute('app_collected_data_index');
         }
         // Vérifier si la campagne est modifiable
         if ($campaign && !$this->campaignStatusService->ensureCampaignIsEditable($campaign)) {
             // La vérification échoue, un message flash est déjà ajouté par le service
-            $this->addFlash('error', $translator->trans('campaign.cannot_be_modified', ['%status%' => $campaign->getCampaignStatus()]));
+            $this->addFlash('error', $this->translator->trans('campaign.cannot_be_modified', ['%status%' => $campaign->getCampaignStatus()]));
             return $this->redirectToRoute('app_collected_data_index');
         }
         
         if (!$environmentalConditions) {
             // Rediriger vers la page de création des conditions environnementales si elles n'existent pas
-            $this->addFlash('warning', $translator->trans('collect.please_create_the_environmental_conditions_for_this_site_first'));
+            $this->addFlash('warning', $this->translator->trans('collect.please_create_the_environmental_conditions_for_this_site_first'));
             return $this->redirectToRoute('app_environmental_conditions_new', [
                 'campaignId' => $campaign->getId(),
                 'siteId' => $site->getId()
@@ -282,18 +294,23 @@ class CollectedDataController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                // Vérifiez que le total des comptages d'oiseaux est positif
-                if ($collectedDatum->getTotalCount() <= 0) {
-                    $this->addFlash('error', "La collecte ne peut pas être nulle.");
-                    return $this->redirectToRoute('app_collected_data_new', [], Response::HTTP_SEE_OTHER);
+                if ($this->validateCollectedData($collectedDatum, $environmentalConditions)) {
+                    try {
+                        $collectedDatum->setUpdatedAt(new \DateTimeImmutable);
+                        $entityManager->flush();
+                        $this->addFlash('success', $this->translator->trans('collect.msg.updated_success'));
+                        return $this->redirectToRoute('app_collected_data_show', ['id' => $collectedDatum->getId()], Response::HTTP_SEE_OTHER);
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', $e->getMessage());
+                        return $this->redirectToRoute('app_collected_data_new', [], Response::HTTP_SEE_OTHER);
+                    }
+                } else {
+                    $this->addFlash('error', $this->translator->trans('collect.msg.data_collection_not_valid'));
                 }
-                $collectedDatum->setUpdatedAt(new \DateTimeImmutable);
-                $entityManager->flush();
-                $this->addFlash('success', "Les données ont été mises à jour avec succès.");
     
                 return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de la modification de la collection de données.');
+                $this->addFlash('error',$this->translator->trans('invalid_form'));
             }
         }
 
@@ -305,18 +322,23 @@ class CollectedDataController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_collected_data_delete', methods: ['POST'])]
-    public function delete(Request $request, CollectedData $collectedDatum, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
+    public function delete(Request $request, CollectedData $collectedDatum, EntityManagerInterface $entityManager): Response
     {
         if ($this->getUser() !== $collectedDatum->getCreatedBy() && !$this->isGranted('ROLE_DELETE')){
-            $this->addFlash('error', $translator->trans('delete_permission'));
+            $this->addFlash('error', $this->translator->trans('delete_permission'));
             return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
         }
         if ($this->isCsrfTokenValid('delete'.$collectedDatum->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($collectedDatum);
-            $entityManager->flush();
-            $this->addFlash('success', "Les données collectées ont été supprimées avec succès.");
+            try {
+                $entityManager->remove($collectedDatum);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('collect.msg.deleted_success'));
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
+            }
         } else {
-            $this->addFlash('error','Une erreur s\'est produite lors de la suppression de la collection de données.');
+            $this->addFlash('error',$this->translator->trans('collect.msg.deleted_error'));
         }
 
         return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);

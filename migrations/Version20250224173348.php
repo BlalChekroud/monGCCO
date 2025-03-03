@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250217114628 extends AbstractMigration
+final class Version20250224173348 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -50,7 +50,7 @@ final class Version20250217114628 extends AbstractMigration
         $this->addSql('CREATE TABLE reset_password_request (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, selector VARCHAR(20) NOT NULL, hashed_token VARCHAR(100) NOT NULL, requested_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', expires_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_7CE748AA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE site_agents_group (id INT AUTO_INCREMENT NOT NULL, counting_campaign_id INT NOT NULL, site_collection_id INT NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_7A88312460B458C7 (counting_campaign_id), INDEX IDX_7A8831243EA3E56 (site_collection_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE site_agents_group_agents_group (site_agents_group_id INT NOT NULL, agents_group_id INT NOT NULL, INDEX IDX_3B5B54BD7C3B27D6 (site_agents_group_id), INDEX IDX_3B5B54BD72A1F93D (agents_group_id), PRIMARY KEY(site_agents_group_id, agents_group_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE site_collection (id INT AUTO_INCREMENT NOT NULL, city_id INT NOT NULL, parent_site_id INT DEFAULT NULL, nature_reserve_id INT DEFAULT NULL, site_name VARCHAR(255) NOT NULL, site_code VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', national_site_code VARCHAR(255) DEFAULT NULL, international_site_code VARCHAR(255) DEFAULT NULL, lat_depart VARCHAR(255) NOT NULL, long_depart VARCHAR(255) NOT NULL, lat_fin VARCHAR(255) NOT NULL, long_fin VARCHAR(255) NOT NULL, INDEX IDX_DC44EAF78BAC62AF (city_id), INDEX IDX_DC44EAF784F56200 (parent_site_id), INDEX IDX_DC44EAF7B56D1D28 (nature_reserve_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE site_collection (id INT AUTO_INCREMENT NOT NULL, city_id INT NOT NULL, nature_reserve_id INT DEFAULT NULL, site_name VARCHAR(255) NOT NULL, site_code VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', national_site_code VARCHAR(255) DEFAULT NULL, international_site_code VARCHAR(255) DEFAULT NULL, lat_depart VARCHAR(255) NOT NULL, long_depart VARCHAR(255) NOT NULL, lat_fin VARCHAR(255) NOT NULL, long_fin VARCHAR(255) NOT NULL, parent_site VARCHAR(255) DEFAULT NULL, INDEX IDX_DC44EAF78BAC62AF (city_id), INDEX IDX_DC44EAF7B56D1D28 (nature_reserve_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE tidal (id INT AUTO_INCREMENT NOT NULL, label VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, image_id INT DEFAULT NULL, user_status_id INT DEFAULT NULL, language_id INT DEFAULT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, last_name VARCHAR(255) NOT NULL, phone VARCHAR(15) NOT NULL, created_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', UNIQUE INDEX UNIQ_8D93D6493DA5256D (image_id), INDEX IDX_8D93D6496B178D59 (user_status_id), INDEX IDX_8D93D64982F1BAF4 (language_id), UNIQUE INDEX UNIQ_IDENTIFIER_EMAIL (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user_status (id INT AUTO_INCREMENT NOT NULL, label VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -101,7 +101,6 @@ final class Version20250217114628 extends AbstractMigration
         $this->addSql('ALTER TABLE site_agents_group_agents_group ADD CONSTRAINT FK_3B5B54BD7C3B27D6 FOREIGN KEY (site_agents_group_id) REFERENCES site_agents_group (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE site_agents_group_agents_group ADD CONSTRAINT FK_3B5B54BD72A1F93D FOREIGN KEY (agents_group_id) REFERENCES agents_group (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE site_collection ADD CONSTRAINT FK_DC44EAF78BAC62AF FOREIGN KEY (city_id) REFERENCES city (id)');
-        $this->addSql('ALTER TABLE site_collection ADD CONSTRAINT FK_DC44EAF784F56200 FOREIGN KEY (parent_site_id) REFERENCES site_collection (id)');
         $this->addSql('ALTER TABLE site_collection ADD CONSTRAINT FK_DC44EAF7B56D1D28 FOREIGN KEY (nature_reserve_id) REFERENCES nature_reserve (id)');
         $this->addSql('ALTER TABLE user ADD CONSTRAINT FK_8D93D6493DA5256D FOREIGN KEY (image_id) REFERENCES image (id)');
         $this->addSql('ALTER TABLE user ADD CONSTRAINT FK_8D93D6496B178D59 FOREIGN KEY (user_status_id) REFERENCES user_status (id)');
@@ -155,7 +154,6 @@ final class Version20250217114628 extends AbstractMigration
         $this->addSql('ALTER TABLE site_agents_group_agents_group DROP FOREIGN KEY FK_3B5B54BD7C3B27D6');
         $this->addSql('ALTER TABLE site_agents_group_agents_group DROP FOREIGN KEY FK_3B5B54BD72A1F93D');
         $this->addSql('ALTER TABLE site_collection DROP FOREIGN KEY FK_DC44EAF78BAC62AF');
-        $this->addSql('ALTER TABLE site_collection DROP FOREIGN KEY FK_DC44EAF784F56200');
         $this->addSql('ALTER TABLE site_collection DROP FOREIGN KEY FK_DC44EAF7B56D1D28');
         $this->addSql('ALTER TABLE user DROP FOREIGN KEY FK_8D93D6493DA5256D');
         $this->addSql('ALTER TABLE user DROP FOREIGN KEY FK_8D93D6496B178D59');

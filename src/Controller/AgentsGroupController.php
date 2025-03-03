@@ -53,6 +53,7 @@ class AgentsGroupController extends AbstractController
     //     }
     // }
 
+    #[IsGranted('ROLE_VIEW', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/', name: 'app_agents_group_index', methods: ['GET'])]
     public function index(AgentsGroupRepository $agentsGroupRepository): Response
     {
@@ -193,8 +194,7 @@ class AgentsGroupController extends AbstractController
                     $this->notificationService->sendNotification($member, 'edit', $this->getUser(), $agentsGroup);
                 }
                 
-                return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);
-
+                return $this->redirectToRoute('app_agents_group_show', ['id'=> $agentsGroup->getId()], Response::HTTP_SEE_OTHER);
             } else {
                 $this->addFlash('error', $translator->trans('agentsGroup.error.modification_failed'));
             }

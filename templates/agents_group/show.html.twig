@@ -30,7 +30,7 @@
                                     <td>{{ agents_group.groupName }}</td>
                                 </tr>
                                 <tr>
-                                    <th>{{ 'country'|trans }}</th>
+                                    <th>{{ 'country.name'|trans }}</th>
                                     <td>{{ agents_group.country.name }}</td>
                                 </tr>
                                 <tr>
@@ -61,7 +61,7 @@
                                         {% if agents_group.createdBy is not null %}
                                             {{ agents_group.createdBy.getEmail() }}
                                         {% else %}
-                                            <span>Aucun</span>
+                                            <span>{{'agentsGroup.none'|trans }}</span>
                                         {% endif %}
                                     </td>
                                 </tr>

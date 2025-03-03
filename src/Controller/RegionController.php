@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/user/region')]
@@ -220,7 +221,7 @@ class RegionController extends AbstractController
         ]);
     }
     
-    
+    #[IsGranted('ROLE_CREAT', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/new', name: 'app_region_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -251,6 +252,7 @@ class RegionController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_VIEW', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_region_show', methods: ['GET'])]
     public function show(Region $region): Response
     {
@@ -259,6 +261,7 @@ class RegionController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_EDIT', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}/edit', name: 'app_region_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Region $region, EntityManagerInterface $entityManager): Response
     {
@@ -287,6 +290,7 @@ class RegionController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/{id}', name: 'app_region_delete', methods: ['POST'])]
     public function delete(Request $request, Region $region, EntityManagerInterface $entityManager): Response
     {

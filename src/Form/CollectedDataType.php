@@ -11,31 +11,33 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CollectedDataType extends AbstractType
 {
+    public function __construct(private readonly TranslatorInterface $translator) {}
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('countType', EntityType::class, [
                 'class' => CountType::class,
                 'choice_label' => 'label',
-                'label' => "Type de comptage effectué lors de cette visite:<span class='requiredField'>*</span>",
+                'label' => $this->translator->trans('countType.label') . "<span class='requiredField'>*</span>",
                 'label_html' => true,
-                'placeholder' => '-- Choisir un type --',
+                'placeholder' => $this->translator->trans('countType.placeholder'),
                 'required' => true,
             ])
             ->add('quality', EntityType::class, [
                 'class' => Quality::class,
                 'choice_label' => 'label',
-                'label' => 'Qualité:<span class="requiredField">*</span>',
+                'label' => $this->translator->trans('quality') .' :<span class="requiredField">*</span>',
                 'label_html' => true,
                 'required' => true,
             ])
             ->add('method', EntityType::class, [
                 'class' => Method::class,
                 'choice_label' => 'label',
-                'label' => 'Méthode(s) utilisées pour le comptage:<span class="requiredField">*</span>',
+                'label' => $this->translator->trans('method.label') .'<span class="requiredField">*</span>',
                 'label_html' => true,
                 'multiple' => true,
                 'expanded' => true,

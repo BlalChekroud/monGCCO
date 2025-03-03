@@ -180,9 +180,9 @@ class BirdSpeciesController extends AbstractController
 
                 if (!$existingFamily) {
                     $birdFamily = new BirdFamily();
-                    $birdFamily->setOrdre($data['ordre']);
+                    $birdFamily->setOrdre($data['Ordre']);
                     $birdFamily->setFamilyName($familyName);
-                    $birdFamily->setFamily( $data['family']);
+                    $birdFamily->setFamily( $data['Family']);
                     $birdFamily->setSubFamily($data['Subfamily'] ?? null);
                     $birdFamily->setTribe($data['Tribe'] ?? null);
                     $birdFamily->setCreatedAt(new \DateTimeImmutable());

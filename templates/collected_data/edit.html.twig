@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modification de données collectées{% endblock %}
+{% block title %}{{'collect.title'|trans }}{% endblock %}
 
 {% block body %}
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Modification de données collectées</h1>
+      <h1>{{ 'collect.title_edit'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_collected_data_index') }}">Gestion des données collectées</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_collected_data_index') }}">{{ 'collect.manage'|trans }}</a></li>
           <li class="breadcrumb-item active">{{ 'modification'|trans }}</li>
         </ol>
       </nav>
@@ -22,14 +22,14 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Modifier</h5>
+                        <h5 class="card-title">{{ 'collect.the_new_informations'|trans }}</h5>
 
                         {{ include('collected_data/_form.html.twig') }}
                     </div>
                     <div class="card-footer d-flex justify-content-between">
                         <div>
-                            <a href="{{ path('app_collected_data_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation des collectes">Retour</a>
-                            <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> Créer une espèce</a>
+                            <a href="{{ path('app_collected_data_index') }}" class="btn btn-sm btn-outline-secondary" title="{{ 'collect.return'|trans }}">{{ 'back'|trans }}</a>
+                            <a href="{{ path('app_bird_species_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{'create_a_species'|trans }}</a>
                         </div>
                         <div class="d-flex justify-content-end">
                             {% import 'macros/btn_actions_macros.html.twig' as macros %}

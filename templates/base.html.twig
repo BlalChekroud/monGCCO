@@ -657,22 +657,22 @@
         
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-bar-chart"></i><span>Gestion des collectées</span><i class="bi bi-chevron-down ms-auto"></i>
+            <i class="bi bi-bar-chart"></i><span>{{'collect.manage'|trans }}</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="{{ path('app_counting_campaign_index') }}">
-                <i class="bi bi-circle"></i><span>Ajouter des collectes</span>
+                <i class="bi bi-circle"></i><span>{{'collect.collect_add'|trans }}</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_collected_data_index') }}">
-                <i class="bi bi-circle"></i><span>Consultation des collectes</span>
+                <i class="bi bi-circle"></i><span>{{'collect.consult'|trans }}</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_environmental_conditions_index') }}">
-                <i class="bi bi-circle"></i><span>Consultation des conditions d'environnement</span>
+                <i class="bi bi-circle"></i><span>{{'condition.consult'|trans }}</span>
               </a>
             </li>
             <li>
@@ -725,12 +725,12 @@
           <ul id="users-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="{{ path('app_agents_group_new') }}">
-                <i class="bi bi-circle"></i><span>Créer un groupe</span>
+                <i class="bi bi-circle"></i><span>{{'agentsGroup.create_a_new_agent_group'|trans }}</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_agents_group_index') }}">
-                <i class="bi bi-circle"></i><span>Consultation des groupes d'agents</span>
+                <i class="bi bi-circle"></i><span>{{'agentsGroup.consult'|trans }}</span>
               </a>
             </li>
             <li>

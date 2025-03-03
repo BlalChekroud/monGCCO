@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Consultation de données collectées{% endblock %}
+{% block title %}{{'condition.title'|trans }}{% endblock %}
 
 {% block body %}
 
 <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Consultation de données collectées</h1>
+      <h1>{{'collect.title'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item active">Gestion des données collectées</li>
+          <li class="breadcrumb-item active">{{ 'collect.manage'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -28,9 +28,9 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Collecteur</th>
-                            <th>Site de collecte</th>
-                            <th>Nombre total</th>
+                            <th>{{'collector'|trans }}</th>
+                            <th>{{'site_collection.siteName'|trans }}</th>
+                            <th>{{'species_statistics.total_count'|trans }}</th>
                             <th>{{ 'created_at'|trans }}</th>
                             <th>{{ 'actions'|trans }}</th>
                         </tr>
@@ -39,16 +39,17 @@
                     {% for collected_datum in collected_datas|reverse %}
                         <tr>
                             <td>{{ collected_datum.id }}</td>
-                            <td>{{ collected_datum.createdBy.name }} {{ collected_datum.createdBy.lastName }}</td>
+                            <td>{{ collected_datum.createdBy.name ?? ''}} {{ collected_datum.createdBy.lastName ?? ''}}</td>
                             <td>{{ collected_datum.siteCollection.siteName }}</td>
                             <td>
                               {% if collected_datum.totalCount > 0 %}
-                                  {{ collected_datum.totalCount }}
+                                  {{ collected_datum.totalCount ?? 0}}
                               {% else %}
-                                  0  {# Ou afficher un message comme "Aucune collecte" #}
+                                  0 
                               {% endif %}
                             </td>
-                            <td>{{ collected_datum.createdAt ? collected_datum.createdAt|date('d-m-Y') : '' }}</td>
+                            {# <td>{{ collected_datum.createdAt ? collected_datum.createdAt|date('d-m-Y') : '' }}</td> #}
+                            <td>{{ collected_datum.environmentalConditions.id ?? ''}}</td>
                             <td>
                                 <div class="d-flex justify-content-end">
                                   {% import 'macros/btn_actions_macros.html.twig' as macros %}
@@ -66,9 +67,8 @@
                 </table>
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="Voir la liste des campagnes de comptage"> Consultation des campagnes</a>
-              <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="Voir la liste des conditions environnementales"> Consultation des conditions</a>
-              {# <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm ri-database-line"> Créer une collecte</a> #}
+              <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{ 'campaign.consult'|trans }}</a>
+              <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="{{'condition.list_environmental_conditions'|trans }}"> {{ 'condition.consult'|trans }}</a>
               <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{ 'campaign.create_campaign'|trans }}</a>
             </div>
           </div>
