@@ -1,46 +1,74 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Image index{% endblock %}
+{% block title %}{{'image.title'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>Image index</h1>
+  <main id="main" class="main">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Image</th>
-                <th>{{ 'created_at'|trans }}</th>
-                <th>{{ 'Last_updated_at'|trans }}</th>
-                <th>{{ 'actions'|trans }}</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for image in images %}
-            <tr>
-                <td>{{ image.id }}</td>
-                <td>
-                    {% if image.imageFilename %}
-                        <img src="{{ vich_uploader_asset(image, 'imageFile') }}" alt="image" class="imgIndex rounded mx-auto d-block">
+    <div class="pagetitle">
+      <h1>{{'image.title'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{'image.manage'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'card_title'|trans }}</h5>
+                <table class="table datatable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{'image.name'|trans }}</th>
+                            <th>{{ 'created_at'|trans }}</th>
+                            <th>{{ 'Last_updated_at'|trans }}</th>
+                            <th>{{ 'actions'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for image in images %}
+                        <tr>
+                            <td>{{ image.id }}</td>
+                            <td>
+                                {% if image.imageFilename %}
+                                    <img src="{{ vich_uploader_asset(image, 'imageFile') }}" alt="image" class="imgIndex rounded mx-auto d-block">
+                                {% else %}
+                                    <p>{{ "image.not_available"|trans }}</p>
+                                {% endif %}
+                            </td>
+                            <td>{{ image.createdAt ? image.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ image.updatedAt ? image.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>
+                                <div class="d-flex justify-content-end">
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_image_new','home', 'app_image_edit', 'image/_delete_form.html.twig', image, app.request.attributes.get('_route'), false) }}
+                                    {{ include('image/_delete_form.html.twig') }}
+                                </div>
+                            </td>
+
+                        </tr>
                     {% else %}
-                        <p>{{ "image.not_available"|trans }}</p>
-                    {% endif %}
-                </td>
-                <td>{{ image.createdAt ? image.createdAt|date('d-m-Y H:i:s') : '' }}</td>
-                <td>{{ image.updatedAt ? image.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_image_show', {'id': image.id}) }}">show</a>
-                    <a href="{{ path('app_image_edit', {'id': image.id}) }}">edit</a>
-                </td>
+                        <tr>
+                            <td colspan="5">{{ 'no_record_found'|trans }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>        
+              
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_image_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'add_an_image'|trans }}</a>
+            </div>
+          </div>
 
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_image_new') }}">Create new</a>
+        </div>
+      </div>
+    </section>
+  </main><!-- End #main -->
 {% endblock %}

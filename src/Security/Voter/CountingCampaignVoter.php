@@ -9,7 +9,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class CountingCampaignVoter extends Voter
 {
-    public const EDIT = 'ROLE_EDIT';
+    public const EDIT = 'ROLE_ADMIN';
     public const VIEW = 'ROLE_VIEW';
     public const CREATE = 'ROLE_SUPER_CREAT';
     public const DELETE = 'ROLE_SUPER_ADMIN';

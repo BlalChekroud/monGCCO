@@ -12,7 +12,7 @@ add_a_countType: "إضافة نوع عد"
 add_a_quality: "إضافة جودة"
 add_a_method: "إضافة طريقة"
 add_a_disturbed: "إضافة اضطراب"
-add_a_ice: "إضافة حالة جليدية"
+add_an_ice: "إضافة حالة جليدية"
 add_a_water: "إضافة حالة مائية"
 add_a_tidal: "إضافة حالة مد وجزر"
 add_a_weather: "إضافة حالة جوية"
@@ -20,6 +20,9 @@ add_a_specy: "إضافة نوع من الطيور"
 add_a_iucn: "إضافة فئة IUCN"
 add_a_coverage: "إضافة تغطية"
 add_a_birdLifeTaxTreat: "إضافة معالجة تصنيفية لـ BirdLife"
+add_a_logo: "إضافة شعار"
+add_a_campaignStatus: "إضافة حالة حملة"
+add_an_image: "إضافة صورة"
 choose_bird_family: "-- اختر عائلة الطيور --"
 consult_families: "عرض العائلات"
 consult_reserves: "عرض المحميات"
@@ -91,6 +94,7 @@ export_format:
   xlsx: "إكسل (XLSX)"
   ods: "جدول بيانات OpenDocument (ODS)"
 print: "طباعة"
+campaign_remaining_time: "الوقت المتبقي للحملة"
 created_by: 'أنشئ بواسطة'
 collector: "الجامع"
 back: 'رجوع'
@@ -105,6 +109,7 @@ msg_export_limit: "حجم التصدير كبير جدًا. يرجى تقليل 
 "choose export format": "-- اختر التنسيق للتصدير --"
 help: 'مساعدة'
 status: "حالة الحملة"
+settings: "الإعدادات"
 
 csv_import_title: "CSV استيراد ملف"
 csv_import_instruction: "تأكد من أن ملفك يحتوي على الأعمدة المطلوبة."
@@ -211,16 +216,33 @@ city:
 vich_uploader.form_label.delete_confirm: 'حذف؟'
 vich_uploader.link.download: 'تحميل'
 image:
-  insert: "(JPG أو PNG)إدراج صورة"
-  not_available: 'لا تتوفر صورة'
-  mimeTypesMessage: '(JPEG أو PNG) يرجى تحميل ملف صورة صالح'
+  insert: "إدراج صورة (JPG أو PNG)"
+  not_available: "لا توجد صورة متاحة"
+  mimeTypesMessage: "يرجى تحميل ملف صورة صالح (JPEG أو PNG)"
+  name: "صورة"
+  title: "إدارة الصور"
+  manage: "إدارة الصور"
+  title_add: "إضافة صورة"
+  title_edit: "تعديل الصورة"
+  informations: "معلومات الصورة"
+  the_new_informations: "المعلومات الجديدة للصورة"
+  return: "العودة إلى استعراض الصور"
+  consult: "استعراض الصور"
+  delete: "حذف الصورة"
+  msg:
+    created_success: "تم إنشاء الصورة بنجاح"
+    created_error: "حدث خطأ أثناء إنشاء الصورة"
+    updated_success: "تم تحديث الصورة بنجاح"
+    updated_error: "حدث خطأ أثناء تحديث الصورة"
+    deleted_success: "تم حذف الصورة بنجاح"
+    deleted_error: "حدث خطأ أثناء حذف الصورة"
 
 Log_in_to_your_account: 'تسجيل الدخول إلى حسابك'
 Enter_your_email_and_password_to_log_in: 'أدخل بريدك الإلكتروني وكلمة المرور لتسجيل الدخول'
 You_are_logged_in_as: 'تم تسجيل الدخول باسم'
 You_are_already_logged_in_as: 'أنت مسجل بالفعل باسم: '
 inactive_account_cannot_log_in: "حسابك غير نشط. لا يمكنك تسجيل الدخول."
-# Your_account_is_disabled: "حسابك معطل."
+Your_account_is_disabled: "حسابك معطل."
 Sign_out: 'تسجيل الخروج'
 Email: 'البريد الإلكتروني'
 Please_enter_your_email: 'يرجى إدخال بريدك الإلكتروني'
@@ -237,6 +259,7 @@ hidden_label: 'إخفاء'
 visible_label: 'عرض'
 no_role: 'بدون دور'
 please_log_in_to_access_the_page: 'يرجى تسجيل الدخول للوصول إلى الصفحة'
+logout: "تسجيل الخروج"
 
 agentsGroup:
   title: "إدارة مجموعة الوكلاء"
@@ -370,8 +393,8 @@ campaign:
   add_conditions_then_start_collecting: "أضف الظروف البيئية ثم ابدأ الجمع"
   add_environmental_conditions: "إضافة ظروف بيئية"
   reserved_for_site_agents: "هذا القسم مخصص لوكلاء الموقع"
-  associated_agent_groups: "المجموعات المرتبطة :"
-  leader: "القائد:"
+  associated_agent_groups: "المجموعات المرتبطة"
+  leader: "القائد"
   no_group_found: "لم يتم العثور على مجموعة"
   no_site_found: "لم يتم العثور على موقع"
   back_to_campaign_consultation: "العودة إلى استشارة الحملات"
@@ -390,6 +413,43 @@ campaign:
   campaign_closed_no_modify: "لا يمكن تعديل حملة %statusClosed%"
   campaign_suspended_no_modify: "لا يمكن تعديل حملة %statusSuspended%"
   campaign_cancelled_no_modify: "لا يمكن تعديل حملة %statusCancelled%"
+
+campaignController:
+  select_at_least_one_site_and_group: "يجب عليك اختيار موقع واحد على الأقل ومجموعة واحدة."
+  created: "تم إنشاء حملة العد بنجاح."
+  creation_error: "حدث خطأ أثناء إنشاء حملة العد."
+  deleted: "تم حذف حملة العد بنجاح."
+  delete_error: "خطأ أثناء الحذف:"
+  csrf_invalid: "رمز CSRF غير صالح. تم إلغاء الحذف."
+  cannot_edit_closed: "لا يمكن تعديل حملة %statusClosed%."
+  cannot_edit_cancelled: "لا يمكن تعديل حملة %statusCancelled%."
+  select_site_and_group: "يجب عليك اختيار موقع واحد على الأقل ومجموعة من الوكلاء."
+  updated: "تم تعديل حملة العد بنجاح."
+  update_error: "حدث خطأ أثناء تعديل الحملة."
+  suspended: "تم تعليق الحملة."
+  resumed: "تم استئناف الحملة."
+  cannot_suspend_closed: "لا يمكن أن تكون هذه الحملة %statusSuspended% لأنها بالفعل %statusClosed%."
+  cancelled: "تم %statusCancelled% الحملة بنجاح."
+  cancel_error: "حدث خطأ أثناء إلغاء الحملة:"
+  cannot_cancel_suspended: "الحملة حالياً %statusSuspended%. يرجى رفع التعليق قبل الإلغاء."
+  already_closed_or_cancelled: "هذه الحملة بالفعل %statusClosed% أو %statusCancelled% ولا يمكن تعديلها."
+  closed_successfully: "تم %statusClosed% الحملة بنجاح."
+  close_error: "حدث خطأ أثناء %statusClosed% الحملة:"
+  cannot_close_before_end_date: "لا يمكن أن تكون الحملة %statusClosed% قبل تاريخ انتهائها."
+  no_sites_associated: "لا يوجد موقع مرتبط بالحملة."
+  no_agents_assigned: "لا توجد مجموعة وكلاء معينة للموقع: %site_name%"
+  missing_site: "الموقع المرتبط مفقود."
+  missing_environmental_conditions: "الموقع %site_name% لا يحتوي على شروط بيئية."
+  missing_collected_data: "الشروط البيئية %condition_id% للموقع %site_name% بدون بيانات مجمعة."
+  collected_data_without_conditions: "البيانات المجمعة %collected_data_id% للموقع %site_name% لا تحتوي على شروط بيئية."
+  collected_data_without_species_count: "البيانات المجمعة للموقع %site_name% لا تحتوي على عدد أنواع الطيور."
+  already_closed: "هذه الحملة مغلقة بالفعل %statusClosed%."
+  no_available_status: "لا توجد حالة متاحة للحملة."
+
+campaignEntity:
+  date_start_end_not_null: "لا يمكن أن تكون تواريخ البداية والنهاية فارغة."
+  end_date_after_start: "يجب أن يكون تاريخ النهاية لاحقًا لتاريخ البداية."
+  sites_groups_required: "يجب تحديد المواقع ومجموعاتها لتوليد اسم الحملة."
 
 description: "الوصف"
 none: "لا شيء"
@@ -433,6 +493,24 @@ species_statistics:
 overall_totals:
   general_count_total: "الإجمالي العام للعد في الحملة"
   unique_species_observed: "إجمالي الأنواع الفريدة المرصودة"
+
+campaignStatus:
+  title: "إدارة حالة الحملة"
+  manage: "إدارة حالة الحملة"
+  title_add: "إضافة حالة حملة"
+  title_edit: "تعديل حالة الحملة"
+  informations: "معلومات عن حالة الحملة الجديدة"
+  the_new_informations: "المعلومات الجديدة لحالة الحملة"
+  return: "العودة إلى استعراض حالات الحملة"
+  consult: "استعراض حالات الحملة"
+  delete: "حذف حالة الحملة"
+  msg:
+    created_success: "تم إنشاء حالة الحملة بنجاح"
+    created_error: "حدث خطأ أثناء إنشاء حالة الحملة"
+    updated_success: "تم تحديث حالة الحملة بنجاح"
+    updated_error: "حدث خطأ أثناء تحديث حالة الحملة"
+    deleted_success: "تم حذف حالة الحملة بنجاح"
+    deleted_error: "حدث خطأ أثناء حذف حالة الحملة"
 
 collect:
   please_create_the_environmental_conditions_for_this_site_first: "يرجى أولاً إنشاء الظروف البيئية لهذا الموقع."
@@ -489,6 +567,7 @@ condition:
   campaign_not_found: "الحملة المحددة غير موجودة"
   site_not_found: "الموقع المحدد غير موجود."
   access_denied_environment: "ليس لديك حق الوصول إلى هذه الحالة البيئية"
+  condition_number: "رقم الشرط"
   msg:
     created_success: "تم إنشاء الشرط البيئي بنجاح"
     created_error: "حدث خطأ أثناء إنشاء الشرط البيئي"
@@ -698,13 +777,18 @@ group:
 
 language:
   name: "الاسم"
-  iso2: "كود ISO2"
+  iso2: "رمز ISO2"
+  none: "لا توجد لغة"
   title: "إدارة اللغات"
-  create_a_new_language: "إنشاء لغة جديدة"
-  manage_language: "إدارة اللغات"
-  informations: "معلومات اللغة"
+  title_add: "إضافة لغة"
+  title_edit: "تعديل اللغة"
+  the_new_informations: "المعلومات الجديدة عن اللغة"
+  add_a_language: "إنشاء لغة جديدة"
+  manage: "إدارة اللغات"
+  informations: "معلومات عن اللغة"
   return_to_language_consultation: "العودة إلى استعراض اللغات"
-  delete_language: "حذف اللغة"
+  delete: "حذف اللغة"
+  consult: "استعراض اللغات"
   msg:
     created: "تم إنشاء اللغة بنجاح."
     updated: "تم تحديث اللغة بنجاح."
@@ -713,6 +797,25 @@ language:
     creation_failed: "فشل إنشاء اللغة."
     modification_failed: "حدث خطأ أثناء تحديث اللغة."
     deletion_failed: "حدث خطأ أثناء حذف اللغة."
+
+logo:
+  title: "إدارة الشعار"
+  manage: "إدارة الشعار"
+  title_add: "إضافة شعار"
+  title_edit: "تعديل الشعار"
+  informations: "معلومات الشعار"
+  the_new_informations: "المعلومات الجديدة عن الشعار"
+  return: "العودة إلى استعراض الشعارات"
+  consult: "استعراض الشعارات"
+  delete: "حذف الشعار"
+  logo_already_exists: "تم إضافة شعار بالفعل. لا يمكنك إضافة شعار آخر."
+  msg:
+    created_success: "تم إنشاء الشعار بنجاح"
+    created_error: "حدث خطأ أثناء إنشاء الشعار"
+    updated_success: "تم تحديث الشعار بنجاح"
+    updated_error: "حدث خطأ أثناء تحديث الشعار"
+    deleted_success: "تم حذف الشعار بنجاح"
+    deleted_error: "حدث خطأ أثناء حذف الشعار"
 
 notification:
   all: "جميع الإشعارات"
@@ -817,28 +920,158 @@ site_collection:
     deleted_error: "حدث خطأ أثناء حذف موقع الجمع"
 
 user:
+  firstName: "الاسم"
+  lastName: "اسم العائلة"
+  email: "عنوان البريد الإلكتروني"
+  phone: "رقم الهاتف"
+  password: "كلمة المرور"
+  password_confirmation: "تأكيد كلمة المرور"
+  password_placeholder: "يرجى إدخال كلمة المرور الخاصة بك!"
+  role: "الدور"
+  role_placeholder: "-- اختر دورًا --"
+  ROLE_USER: "مستخدم"
+  ROLE_VIEW: "مشاهد"
+  ROLE_EDIT: "محرر"
+  ROLE_CREAT: "منشئ"
+  ROLE_DELETE: "حذف"
+  ROLE_IMPORT: "مستورد"
+  ROLE_EXPORT: "مُصدّر"
+  ROLE_SUPER_CREAT: "منشئ ممتاز"
+  ROLE_COLLECTOR: "جامع"
+  ROLE_ADMIN: "مدير"
+  ROLE_SUPER_ADMIN: "مدير فائق"
+  profile: "الملف الشخصي"
+  title: "المستخدمون"
+  manage: "إدارة المستخدمين"
+  title_add: "إضافة مستخدم"
+  title_edit: "تعديل المستخدم"
+  the_new_informations: "المعلومات الجديدة للمستخدم"
+  return: "العودة إلى استعراض المستخدمين"
+  consult: "استعراض المستخدمين"
+  delete: "حذف المستخدم"
+  overview: "نظرة عامة"
+  profile_details: "تفاصيل الملف الشخصي"
+  save_changes: "حفظ التغييرات"
+  profile_image: "صورة الملف الشخصي"
+  show: "عرض"
+  hide: "إخفاء"
+  change_password: "تغيير كلمة المرور"
+  current_password: "كلمة المرور الحالية"
+  new_password: "كلمة المرور الجديدة"
+  confirm_new_password: "تأكيد كلمة المرور الجديدة"
+  edit: "تعديل الملف الشخصي"
+  not_logged_in: "أنت غير مسجل الدخول"
+  firstName_blank: "يرجى إدخال الإسم"
+  firstName_too_short: "يجب أن يحتوي الإسم على الأقل {{ limit }} أحرف."
+  lastName_blank: "يرجى إدخال اسمك العائلي"
+  lastName_too_short: "يجب أن يحتوي اسمك العائلي على الأقل {{ limit }} أحرف."
+  phone_blank: "يرجى إدخال رقم هاتفك"
+  phone_too_short: "يجب أن يحتوي رقم هاتفك على الأقل {{ limit }} أرقام."
+  password_blank: "يرجى إدخال كلمة المرور"
+  password_too_short: "يجب أن تحتوي كلمة المرور على الأقل {{ limit }} أحرف."
+  password_mismatch: "يجب أن تتطابق كلمتا المرور."
   msg:
+    created: "تم إنشاء المستخدم بنجاح."
+    updated: "تم تعديل المستخدم بنجاح."
     deleted: "تم حذف حساب المستخدم بنجاح."
+    disconnected: "لقد تم تسجيل خروجك."
+    account_info_modified: "تم تعديل معلومات الحساب بنجاح."
+    password_incorrect: "كلمة المرور المُدخلة غير صحيحة."
+    password_modified: "تم تعديل كلمة المرور بنجاح."
   error:
+    creation_failed: "فشل في إنشاء المستخدم."
+    modification_failed: "حدث خطأ أثناء تعديل المستخدم."
     deletion_failed: "حدث خطأ أثناء حذف حساب المستخدم."
 
 userStatus:
   title: "إدارة حالات المستخدم"
+  manage: "إدارة حالات المستخدم"
+  title_add: "إضافة حالة مستخدم"
+  title_edit: "تعديل حالة المستخدم"
+  the_new_informations: "المعلومات الجديدة لحالة المستخدم"
   breadcrumb_management: "إدارة الحالات"
   label: "التسمية"
-  delete_user_status: "حذف الحالة"
-  informations: "معلومات الحالة"
-  return_to_user_status_consultation: "العودة إلى استعراض حالات المستخدم"
+  delete_user_status: "حذف حالة المستخدم"
+  informations: "معلومات حالة المستخدم"
+  return: "العودة إلى استعراض حالات المستخدم"
+  consult: "استعراض حالات المستخدم"
+  delete: "حذف حالة المستخدم"
   msg:
-    created: "تم إنشاء الحالة بنجاح."
-    updated: "تم تحديث الحالة بنجاح."
-    deleted: "تم حذف الحالة بنجاح."
+    created: "تم إنشاء حالة المستخدم بنجاح."
+    updated: "تم تعديل حالة المستخدم بنجاح."
+    deleted: "تم حذف حالة المستخدم بنجاح."
   error:
-    creation_failed: "فشل في إنشاء الحالة."
-    modification_failed: "حدث خطأ أثناء تحديث الحالة."
-    deletion_failed: "حدث خطأ أثناء حذف الحالة."
+    creation_failed: "فشل إنشاء حالة المستخدم"
+    modification_failed: "حدث خطأ أثناء تعديل حالة المستخدم."
+    deletion_failed: "حدث خطأ أثناء حذف حالة المستخدم."
 
+campaignGuide:
+  title: "دليل حالات حملة عد الطيور"
+  close: "إغلاق"
+  introductionTitle: "مقدمة"
+  introductionText: "أثناء إدارة حملات عد الطيور، يمكن للحملة أن تمر بعدة حالات. تتيح هذه الحالات تتبع دورة حياة الحملة، من التخطيط إلى الإغلاق أو الإلغاء."
+  differentStatesTitle: "الحالات المختلفة ومعانيها:"
+  common:
+    active: "عندما تكون الحالة نشطة:"
+    actions: "الإجراءات الممكنة:"
+  state:
+    planned:
+      title: "مخططة"
+      description: "تم تحديد الحملة، لكنها لم تبدأ بعد."
+      active_description: "تاريخ بدء الحملة في المستقبل."
+      actions_description: "يمكن للمستخدم إعداد المواقع والفرق، ولكن لا يمكن بدء جمع البيانات بعد."
+    ongoing:
+      title: "جارية"
+      description: "الحملة جارية حاليًا."
+      active_description: "تم الوصول إلى تاريخ البدء، وما زال تاريخ الانتهاء قادمًا."
+      actions_description: "يمكن للفرق إجراء جمع البيانات في المواقع المحددة."
+    finished:
+      title: "منتهية"
+      description: "انتهت فترة الحملة، لكنها لم تغلق رسميًا بعد."
+      active_description: "مر تاريخ انتهاء الحملة، لكن قد تكون هناك مراجعات نهائية قيد الانتظار."
+      actions_description: "يمكن للمستخدم مراجعة البيانات المجموعة قبل اتخاذ القرارات النهائية."
+    closed:
+      title: "مغلقة"
+      description: "تم إغلاق الحملة رسميًا."
+      active_description: "تم التحقق من جميع البيانات واعتمادها، ولا يمكن اتخاذ أي إجراء إضافي."
+    suspended:
+      title: "معلقة"
+      description: "تم تعليق الحملة مؤقتًا."
+      active_description: "تم تعليق الحملة لسبب ما (مثل الظروف الجوية، إلخ)."
+      actions_description: "يمكن استئناف الحملة أو إلغاؤها وفقًا للظروف."
+    cancelled:
+      title: "ملغاة"
+      description: "تم إلغاء الحملة قبل إغلاقها."
+      active_description: "قرر المستخدم أو أحد المسؤولين إلغاء الحملة."
+      actions_description: "لا يمكن إجراء جمع بيانات إضافية."
+    error:
+      title: "خطأ"
+      description: "حدثت مشكلة تمنع تنفيذ الحملة بشكل صحيح."
+      active_description: "منعت مشكلة تقنية أو تنظيمية الحملة من التقدم."
+  adviceTitle: "نصائح:"
+  advice:
+    close:
+      title: "إغلاق الحملة:"
+      description: "تأكد من جمع واعتماد جميع البيانات قبل الإغلاق."
+    resume:
+      title: "استئناف الحملة المعلقة:"
+      description: "يمكن استئنافها بمجرد إزالة العقبات."
+    cancel:
+      title: "الإلغاء:"
+      description: "كن حذرًا، لا يمكن استئناف حملة ملغاة."
 
+sweetalert:
+  confirm_title: "هل أنت متأكد؟"
+  confirm_text: "لا يمكنك التراجع عن ذلك!"
+  confirm_text_user: "سيؤدي حذف الحساب أيضًا إلى حذف كل ما تم إنشاؤه بواسطة هذا المستخدم. لا يمكنك التراجع عن ذلك!"
+  confirm_button: "نعم، احذف!"
+  cancel_button: "لا، إلغاء!"
+  deleted_title: "تم الحذف!"
+  deleted_text: "تم حذف العنصر."
+  cancelled_title: "أُلغي"
+  cancelled_text: "عنصرك لا يزال في أمان 🙂"
+
+my_profile: "ملفي الشخصي"
 
 # notification:
 #   mark_as_read: "تحديد كمقروء"

@@ -41,7 +41,7 @@
                 <td><i class="bi bi-cloud-sun-fill"></i> {{ 'campaign_statistics.most_frequent_conditions'|trans }}</td>
                 <td>
                     <ul>
-                        <li>{{ 'disturbed'|trans }} : {{ frequentConditions.disturbed ?? 'Aucune' }}</li>
+                        <li>{{ 'conditionDisturbed.description'|trans }} : {{ frequentConditions.disturbed ?? 'Aucune' }}</li>
                         <li>{{ 'ice_cover'|trans }} : {{ frequentConditions.ice ?? 'Aucune' }}</li>
                         <li>{{ 'tidal'|trans }} : {{ frequentConditions.tidal ?? 'Aucune' }}</li>
                         <li>{{ 'water_condition'|trans }} : {{ frequentConditions.water ?? 'Aucune' }}</li>
@@ -141,7 +141,7 @@
                                     <!-- Conditions Environnementales -->
                                     <td>
                                         <ul>
-                                            <li><strong>{{ 'disturbed'|trans }}:</strong> {{ collect.environmentalConditions.disturbed ?? '' }}</li>
+                                            <li><strong>{{ 'conditionDisturbed.description'|trans }}:</strong> {{ collect.environmentalConditions.disturbed ?? '' }}</li>
                                             <li><strong>{{ 'weather'|trans }}:</strong> {{ collect.environmentalConditions.weather.label ?? '' }}</li>
                                             <li><strong>{{ 'ice'|trans }}:</strong> {{ collect.environmentalConditions.ice.label ?? '' }}</li>
                                             <li><strong>{{ 'tidal'|trans }}:</strong> {{ collect.environmentalConditions.tidal.label ?? '' }}</li>

@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Utilisateurs / Profil{% endblock %}
+{% block title %}{{'user.title'|trans }}{% endblock %}
 
 {% block body %}
   {% if is_granted('IS_AUTHENTICATED_FULLY') %}
     <main id="main" class="main">
 
       <div class="pagetitle">
-        <h1>Profil</h1>
+        <h1>{{'user.profile'|trans }}</h1>
         <nav>
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-            <li class="breadcrumb-item active">Utilisateurs</li>
+            <li class="breadcrumb-item active">{{'user.manage'|trans }}</li>
           </ol>
         </nav>
       </div><!-- End Page Title -->
@@ -27,11 +27,11 @@
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Nom</th>
-                      <th>Prénom</th>
-                      <th>Email</th>
-                      <th>Rôles</th>
-                      <th>État</th>
+                      <th>{{'user.firstName'|trans }}</th>
+                      <th>{{'user.lastName'|trans }}</th>
+                      <th>{{'user.email'|trans }}</th>
+                      <th>{{'user.role'|trans }}</th>
+                      <th>{{'status'|trans }}</th>
                       <th>{{ 'actions'|trans }}</th>
                     </tr>
                   </thead>
@@ -42,7 +42,19 @@
                         <td>{{ user.name }}</td>
                         <td>{{ user.lastName }}</td>
                         <td>{{ user.email }}</td>
-                        <td><h6>{{ user.getRoles()|join(', ') }}</h6></td>
+                        <td>
+                          <h6>
+                           <div class="text-start">
+                            {% for role in user.getRoles() %}
+                                <h6 class="ri-user-follow-line">
+                                    {{ ('user.' ~ role)|trans }}
+                                </h6>
+                            {% else %}
+                                <span>{{ 'no_role'|trans }}</span>
+                            {% endfor %}
+                          </div>
+                          </h6>
+                        </td>
                         <td>
                             {{ user.userStatus.label ?? ''}}
                         </td>

@@ -18,94 +18,81 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserType extends AbstractType
 {
-    private TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
+    public function __construct(private readonly TranslatorInterface $translator) {}
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Ajouter le champ 'roles' uniquement si 'show_roles' est vrai
         if ($options['show_roles']) {
             $builder->add('roles', ChoiceType::class, [
                 'choices' => [
-                    'Utilisateur' => 'ROLE_USER',
-                    'ROLE_VIEW' => 'ROLE_VIEW',
-                    'ROLE_EDIT' => 'ROLE_EDIT',
-                    'ROLE_CREAT' => 'ROLE_CREAT',
-                    'ROLE_DELETE' => 'ROLE_DELETE',
-                    'ROLE_IMPORT' => 'ROLE_IMPORT',
-                    'ROLE_EXPORT' => 'ROLE_EXPORT',
-                    'ROLE_SUPER_CREAT' => 'ROLE_SUPER_CREAT',
-                    'Collecteur' => 'ROLE_COLLECTOR',
+                    $this->translator->trans('user.ROLE_USER') => 'ROLE_USER',
+                    $this->translator->trans('user.ROLE_VIEW') => 'ROLE_VIEW',
+                    $this->translator->trans('user.ROLE_EDIT') => 'ROLE_EDIT',
+                    $this->translator->trans('user.ROLE_CREAT') => 'ROLE_CREAT',
+                    $this->translator->trans('user.ROLE_DELETE') => 'ROLE_DELETE',
+                    $this->translator->trans('user.ROLE_IMPORT') => 'ROLE_IMPORT',
+                    $this->translator->trans('user.ROLE_EXPORT') => 'ROLE_EXPORT',
+                    $this->translator->trans('user.ROLE_SUPER_CREAT') => 'ROLE_SUPER_CREAT',
+                    $this->translator->trans('user.ROLE_COLLECTOR') => 'ROLE_COLLECTOR',
                     // 'Chef d\'équipe' => 'ROLE_TEAMLEADER',
-                    'Administrateur' => 'ROLE_ADMIN',
-                    'Super Administrateur' => 'ROLE_SUPER_ADMIN',
+                    $this->translator->trans('user.ROLE_ADMIN') => 'ROLE_ADMIN',
+                    $this->translator->trans('user.ROLE_SUPER_ADMIN') => 'ROLE_SUPER_ADMIN',
                 ],
                 'expanded' => true,
                 'multiple' => true,
-                'label' => 'Rôles',
+                'label' => $this->translator->trans('user.role'),
             ])
             ->add('userStatus', EntityType::class, [
                 'class' => UserStatus::class,
                 'label' => $this->translator->trans('userStatus.label'),
                 'choice_label' => 'label',
-                // 'required' => true
+                'required' => true
             ])
             ;
         }
         $builder
             ->add('image', ImageType::class, [
-                'label' => 'Inserer une image<span class="requiredField">*</span>',
-                'label_html' => true,
+                'label' => $this->translator->trans('image.insert'),
+                // 'label_html' => true,
                 'required' => false,
             ])
-
-            // ->add('email', EmailType::class, [
-            //     'attr' => [
-            //         'class' => 'form-control',
-            //         'id' => 'yourEmail',
-            //         'required' => true,
-            //     ],
-            // ])
             ->add('name',TextType::class, [
-                'label' => 'Nom',
+                'label' => $this->translator->trans('user.firstName'),
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Veuillez saisir votre nom',
+                        'message' => $this->translator->trans('user.firstName_blank'),
                     ]),
                     new Length([
                         'min' => 2,
-                        'minMessage' => 'Votre nom doit avoir au moins {{ limit }} caractères.',
+                        'minMessage' => $this->translator->trans('user.firstName_too_short'),
                         // max length allowed by Symfony for security reasons
                         'max' => 50,
                     ]),
                 ],
             ])
             ->add('lastName',TextType::class, [
-                'label' => 'Prénom',
+                'label' => $this->translator->trans('user.lastName'),
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Veuillez saisir votre prénom',
+                        'message' => $this->translator->trans('user.lastName_blank'),
                     ]),
                     new Length([
                         'min' => 2,
-                        'minMessage' => 'Votre prénom doit avoir au moins {{ limit }} caractères.',
+                        'minMessage' => $this->translator->trans('user.lastName_too_short'),
                         // max length allowed by Symfony for security reasons
                         'max' => 50,
                     ]),
                 ],
             ])
             ->add('phone',TextType::class, [
-                'label' => 'Numéro de téléphone',
+                'label' => $this->translator->trans('user.phone'),
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Veuillez saisir votre Numéro de téléphone',
+                        'message' => $this->translator->trans('user.phone_blank'),
                     ]),
                     new Length([
                         'min' => 5,
-                        'minMessage' => 'Votre numéro de téléphone doit avoir au moins {{ limit }} caractères.',
+                        'minMessage' => $this->translator->trans('user.phone_too_short'),
                         // max length allowed by Symfony for security reasons
                         'max' => 50,
                     ]),
@@ -116,17 +103,17 @@ class UserType extends AbstractType
                 // this is read and encoded in the controller
                 'mapped' => false,
                 'toggle' => true,
-                'hidden_label' => 'Masquer',
-                'visible_label' => 'Afficher',
+                'hidden_label' => $this->translator->trans('user.hide'),
+                'visible_label' => $this->translator->trans('user.show'),
                 'attr' => ['autocomplete' => 'new-password'],
                 'required' => $options['require_password'],  // Rend le mot de passe facultatif pour les administrateurs
                 'constraints' => $options['require_password'] ? [
                     new NotBlank([
-                        'message' => 'Veuillez saisir un mot de passe',
+                        'message' => $this->translator->trans('user.password_blank'),
                     ]),
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Votre mot de passe doit avoir au moins {{ limit }} caractères.',
+                        'minMessage' => $this->translator->trans('user.password_too_short'),
                         // max length allowed by Symfony for security reasons
                         'max' => 4096,
                     ]),

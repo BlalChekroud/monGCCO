@@ -1,41 +1,72 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Language index{% endblock %}
+{% block title %}{{'language.title'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>Language index</h1>
+  <main id="main" class="main">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Iso2</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>{{ 'actions'|trans }}</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for language in languages %}
-            <tr>
-                <td>{{ language.id }}</td>
-                <td>{{ language.name }}</td>
-                <td>{{ language.iso2 }}</td>
-                <td>{{ language.createdAt ? language.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ language.updatedAt ? language.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_language_show', {'id': language.id}) }}">show</a>
-                    <a href="{{ path('app_language_edit', {'id': language.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="pagetitle">
+      <h1>{{'language.title'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{'language.manage'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_language_new') }}">Create new</a>
+    <section class="section">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ 'card_title'|trans }}</h5>
+                <table class="table datatable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <td>{{ 'language.name'|trans }}</td>
+                            <th>{{'language.iso2'|trans }}</th>
+                            <th>{{ 'created_at'|trans }}</th>
+                            <th>{{ 'Last_updated_at'|trans }}</th>
+                            <th>{{ 'actions'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for language in languages %}
+                        <tr>
+                            <td>{{ language.id }}</td>
+                            <td>{{ language.name }}</td>
+                            <td>{{ language.iso2 }}</td>
+                            <td>{{ language.createdAt ? language.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ language.updatedAt ? language.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>
+                                <div class="d-flex justify-content-end">
+                                    {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                    {{ macros.action_buttons('app_language_new','home', 'app_language_edit', 'language/_delete_form.html.twig', language, app.request.attributes.get('_route'), false) }}
+                                    {{ include('language/_delete_form.html.twig') }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">{{ 'no_record_found'|trans }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>        
+              
+            </div>
+            <div class="card-footer">
+              <a href="{{ path('app_language_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'language.add_a_language'|trans }}</a>
+              <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> {{ 'collect.consult'|trans }}</a>
+              <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{'condition.view_conditions'|trans }}</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
 {% endblock %}

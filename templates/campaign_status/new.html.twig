@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau état{% endblock %}
+{% block title %}{{'campaignStatus.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Créer un état de campagne</h1>
+      <h1>{{ 'campaignStatus.title_add'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_campaign_status_index') }}">Gestion des pays</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_campaign_status_index') }}">{{ 'campaignStatus.manage'|trans }}</a></li>
           <li class="breadcrumb-item active">{{ 'add'|trans }}</li>
         </ol>
       </nav>
@@ -22,13 +22,13 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Informations sur le nouveau état</h5>
+              <h5 class="card-title">{{ 'campaignStatus.informations'|trans }}</h5>
 
               {{ include('campaign_status/_form.html.twig') }}
 
             </div>
             <div class="card-footer">
-                <a href="{{ path('app_campaign_status_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="Retour vers la consultation des état de campagne">Retour</a>
+                <a href="{{ path('app_campaign_status_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'campaignStatus.return'|trans }}">{{ 'back'|trans }}</a>
             </div>
           </div>
 

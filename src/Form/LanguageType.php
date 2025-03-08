@@ -21,11 +21,13 @@ class LanguageType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => $this->translator->trans('language.name'),
+                'label' => $this->translator->trans('language.name').'<span class="requiredField">*</span>',
+                'label_html' => true,
                 'required' => true,
             ])
             ->add('iso2', TextType::class, [
-                'label' => $this->translator->trans('language.iso2'),
+                'label' => $this->translator->trans('language.iso2').'<span class="requiredField">*</span>',
+                'label_html' => true,
                 'required' => true,
             ])
         ;

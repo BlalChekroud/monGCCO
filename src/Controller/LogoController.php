@@ -11,10 +11,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/super-admin/logo')]
+#[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
 class LogoController extends AbstractController
 {
+    public function __construct(private readonly TranslatorInterface $translator) {}
+
     #[Route('/', name: 'app_logo_index', methods: ['GET'])]
     public function index(LogoRepository $logoRepository): Response
     {
@@ -31,7 +36,7 @@ class LogoController extends AbstractController
         
         if ($existingLogo) {
             // Rediriger ou afficher un message d'erreur si un logo existe déjà
-            $this->addFlash('error', 'Un logo a déjà été créé. Vous ne pouvez pas en créer un autre.');
+            $this->addFlash('error', $this->translator->trans('logo.logo_already_exists'));
             return $this->redirectToRoute('app_logo_index');
         }
 
@@ -41,26 +46,31 @@ class LogoController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $imageFile = $form->get('image')['imageFile']->getData(); // Get image file
+                try {
+                    $imageFile = $form->get('image')['imageFile']->getData(); // Get image file
+        
+                    if ($imageFile) {
+                        $image = new Image();
+                        $image->setImageFile($imageFile);
+                        $image->setCreatedAt(new \DateTimeImmutable());
+                        $entityManager->persist($image);
+                        $logo->setImage($image);
     
-                if ($imageFile) {
-                    $image = new Image();
-                    $image->setImageFile($imageFile);
-                    $image->setCreatedAt(new \DateTimeImmutable());
-                    $entityManager->persist($image);
-                    $logo->setImage($image);
-
+                    }
+        
+                    $logo->setCreatedAt(new \DateTimeImmutable());
+                    $entityManager->persist($logo);
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('logo.msg.created_success'));
+        
+                    return $this->redirectToRoute('app_logo_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_logo_new', [], Response::HTTP_SEE_OTHER);
                 }
-    
-                $logo->setCreatedAt(new \DateTimeImmutable());
-                $entityManager->persist($logo);
-                $entityManager->flush();
-                $this->addFlash('success', "Le logo a bien été ajouté.");
-    
-                return $this->redirectToRoute('app_logo_index', [], Response::HTTP_SEE_OTHER);
 
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de l\'ajout du logo.');
+                $this->addFlash('error',$this->translator->trans('invalid_form'));
             }
         }
 
@@ -79,39 +89,43 @@ class LogoController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                
-                $imageFile = $form->get('image')['imageFile']->getData(); // Get the uploaded image
-    
-                // Handle image upload only if a new image is provided
-                if ($imageFile) {
-                    // If there's already an image, we need to update it
-                    if ($logo->getImage()) {
-                        $image = $logo->getImage();
-                        $image->setImageFile($imageFile); // Update with the new file
-                    } else {
-                        // If there's no image yet, create a new Image entity
-                        $image = new Image();
-                        $image->setImageFile($imageFile);
-                        $image->setCreatedAt(new \DateTimeImmutable());
-                        $entityManager->persist($image);
-                        $logo->setImage($image); // Set the new image to the logo
+                try {
+                    $imageFile = $form->get('image')['imageFile']->getData(); // Get the uploaded image
+            
+                    // Handle image upload only if a new image is provided
+                    if ($imageFile) {
+                        // If there's already an image, we need to update it
+                        if ($logo->getImage()) {
+                            $image = $logo->getImage();
+                            $image->setImageFile($imageFile); // Update with the new file
+                        } else {
+                            // If there's no image yet, create a new Image entity
+                            $image = new Image();
+                            $image->setImageFile($imageFile);
+                            $image->setCreatedAt(new \DateTimeImmutable());
+                            $entityManager->persist($image);
+                            $logo->setImage($image); // Set the new image to the logo
+                        }
                     }
+            
+                    $logo->setUpdatedAt(new \DateTimeImmutable());
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('logo.msg.updated_success'));
+            
+                    return $this->redirectToRoute('app_logo_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_logo_edit', ['id' => $logo->getId()], Response::HTTP_SEE_OTHER);
                 }
-
-                $logo->setUpdatedAt(new \DateTimeImmutable());
-                $entityManager->flush();
-                $this->addFlash('success', "Le logo a bien été modifié.");
-
-                return $this->redirectToRoute('app_logo_index', [], Response::HTTP_SEE_OTHER);
             }  else {
-                $this->addFlash('error','Une erreur s\'est produite lors de la modification du logo.');
+                $this->addFlash('error','invalid_form');
             }
 
         }
 
         return $this->render('logo/edit.html.twig', [
             'logo' => $logo,
-            'formEdit' => $form,
+            'form' => $form,
         ]);
     }
 
@@ -119,9 +133,16 @@ class LogoController extends AbstractController
     public function delete(Request $request, Logo $logo, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$logo->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($logo);
-            $entityManager->flush();
-            $this->addFlash('success', "Le logo a bien été supprimé");
+            try {
+                $entityManager->remove($logo);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('logo.msg.deleted_success'));
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_logo_index', [], Response::HTTP_SEE_OTHER);
+            }
+        } else {
+            $this->addFlash('error',$this->translator->trans('logo.msg.deleted_error'));
         }
 
         return $this->redirectToRoute('app_logo_new', [], Response::HTTP_SEE_OTHER);

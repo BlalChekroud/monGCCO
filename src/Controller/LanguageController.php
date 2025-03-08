@@ -15,6 +15,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[Route('/super-admin/language')]
 class LanguageController extends AbstractController
 {
+    public function __construct(private readonly TranslatorInterface $translator) {}
+
     #[Route('/', name: 'app_language_index', methods: ['GET'])]
     public function index(LanguageRepository $languageRepository): Response
     {
@@ -49,24 +51,26 @@ class LanguageController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_language_show', methods: ['GET'])]
-    public function show(Language $language): Response
-    {
-        return $this->render('language/show.html.twig', [
-            'language' => $language,
-        ]);
-    }
-
     #[Route('/{id}/edit', name: 'app_language_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Language $language, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(LanguageType::class, $language);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_language_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                try {
+                    $language->setUpdatedAt(new \DateTimeImmutable());
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('language.msg.updated'));
+                    return $this->redirectToRoute('app_language_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $this->translator->trans('language.error.modification_failed') . $e->getMessage());
+                    return $this->redirectToRoute('app_language_edit', ['id' => $language->getId()], Response::HTTP_SEE_OTHER);
+                }
+            } else {
+                $this->addFlash('error', $this->translator->trans('invalid_form'));
+            }
         }
 
         return $this->render('language/edit.html.twig', [
@@ -79,8 +83,16 @@ class LanguageController extends AbstractController
     public function delete(Request $request, Language $language, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$language->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($language);
-            $entityManager->flush();
+            try {
+                $entityManager->remove($language);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('language.msg.deleted'));
+            } catch (\Exception $e) {
+                $this->addFlash('error', $this->translator->trans('language.error.deletion_failed') . $e->getMessage());
+                return $this->redirectToRoute('app_language_index', [], Response::HTTP_SEE_OTHER);
+            }    
+        } else {
+            $this->addFlash('error',$this->translator->trans('invalid_form'));
         }
 
         return $this->redirectToRoute('app_language_index', [], Response::HTTP_SEE_OTHER);

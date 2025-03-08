@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau Logo{% endblock %}
+{% block title %}{{'logo.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Ajouter un logo</h1>
+      <h1>{{ 'logo.title_add'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item"><a href="{{ path('app_logo_index') }}">Gestion du logo</a></li>
-          <li class="breadcrumb-item active">Insertion</li>
+          <li class="breadcrumb-item"><a href="{{ path('app_logo_index') }}">{{ 'logo.manage'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{ 'add'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -22,13 +22,13 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Informations sur le logo</h5>
+              <h5 class="card-title">{{ 'logo.informations'|trans }}</h5>
 
               {{ include('logo/_form.html.twig') }}
 
             </div>
             <div class="card-footer">
-              <a href="{{ path('app_logo_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation du logo">Retour</a>
+              <a href="{{ path('app_logo_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'logo.return'|trans }}">{{ 'back'|trans }}</a>
             </div>
           </div>
 

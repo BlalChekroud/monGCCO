@@ -11,11 +11,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/super-admin/campaign/status')]
 // #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
 class CampaignStatusController extends AbstractController
 {
+    public function __construct(private readonly TranslatorInterface $translator) {}
+
     #[Route('/', name: 'app_campaign_status_index', methods: ['GET'])]
     public function index(CampaignStatusRepository $campaignStatusRepository): Response
     {
@@ -31,14 +34,23 @@ class CampaignStatusController extends AbstractController
         $form = $this->createForm(CampaignStatusType::class, $campaignStatus);
         $form->handleRequest($request);
     
-        if ($form->isSubmitted() && $form->isValid()) {
-            $campaignStatus->setCreatedAt(new \DateTimeImmutable());
-            $entityManager->persist($campaignStatus);
-            $entityManager->flush();
-    
-            $this->addFlash('success', "Etat de campagne a bien été crée");
-    
-            return $this->redirectToRoute('app_campaign_status_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                try {
+                    $campaignStatus->setCreatedAt(new \DateTimeImmutable());
+                    $entityManager->persist($campaignStatus);
+                    $entityManager->flush();
+
+                    $this->addFlash('success', $this->translator->trans('campaignStatus.msg.created_success'));
+
+                    return $this->redirectToRoute('app_campaign_status_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_campaign_status_new', [], Response::HTTP_SEE_OTHER);
+                }
+            } else {
+                $this->addFlash('error', $this->translator->trans('campaignStatus.msg.created_error'));
+            }
         }
     
         return $this->render('campaign_status/new.html.twig', [
@@ -54,12 +66,21 @@ class CampaignStatusController extends AbstractController
         $form = $this->createForm(CampaignStatusType::class, $campaignStatus);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $campaignStatus->setUpdatedAt(new \DateTimeImmutable());
-            $entityManager->flush();
-            $this->addFlash('success', "Etat de campagne de comptage a bien été modifié");
-
-            return $this->redirectToRoute('app_campaign_status_index', [], Response::HTTP_SEE_OTHER);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                try {
+                    $campaignStatus->setUpdatedAt(new \DateTimeImmutable());
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('campaignStatus.msg.updated_success'));
+            
+                    return $this->redirectToRoute('app_campaign_status_index', [], Response::HTTP_SEE_OTHER);        
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_campaign_status_edit', ['id' => $campaignStatus->getId()], Response::HTTP_SEE_OTHER);
+                }
+            } else {
+                $this->addFlash('error', $this->translator->trans('campaignStatus.msg.updated_error'));
+            }
         }
 
         return $this->render('campaign_status/edit.html.twig', [
@@ -76,14 +97,14 @@ class CampaignStatusController extends AbstractController
                 // Tentative de suppression de l'état de campagne
                 $entityManager->remove($campaignStatus);
                 $entityManager->flush();
-                $this->addFlash('success', 'L\'état de la campagne a bien été supprimé.');
+                $this->addFlash('success', $this->translator->trans('campaignStatus.msg.deleted_success'));
             } catch (\Exception $e) {
                 // Gestion des erreurs lors de la suppression
-                $this->addFlash('error', 'Erreur lors de la suppression de l\'état de campagne : ' . $e->getMessage());
+                $this->addFlash('error', $this->translator->trans('campaignStatus.msg.deleted_error') . $e->getMessage());
                 return $this->redirectToRoute('app_campaign_status_index', [], Response::HTTP_SEE_OTHER);
             }            
         } else {
-            $this->addFlash('error', 'Token CSRF invalide. Suppression annulée.');
+            $this->addFlash('error', $this->translator->trans('campaignStatus.msg.deleted_error'));
         }
 
         return $this->redirectToRoute('app_campaign_status_index', [], Response::HTTP_SEE_OTHER);

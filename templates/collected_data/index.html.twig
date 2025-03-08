@@ -31,6 +31,7 @@
                             <th>{{'collector'|trans }}</th>
                             <th>{{'site_collection.siteName'|trans }}</th>
                             <th>{{'species_statistics.total_count'|trans }}</th>
+                            <th>{{ 'condition.condition_number'|trans }}</th>
                             <th>{{ 'created_at'|trans }}</th>
                             <th>{{ 'actions'|trans }}</th>
                         </tr>
@@ -43,13 +44,13 @@
                             <td>{{ collected_datum.siteCollection.siteName }}</td>
                             <td>
                               {% if collected_datum.totalCount > 0 %}
-                                  {{ collected_datum.totalCount ?? 0}}
+                                  <span class="badge bg-info">{{ collected_datum.totalCount ?? 0}}</span>
                               {% else %}
                                   0 
                               {% endif %}
                             </td>
-                            {# <td>{{ collected_datum.createdAt ? collected_datum.createdAt|date('d-m-Y') : '' }}</td> #}
                             <td>{{ collected_datum.environmentalConditions.id ?? ''}}</td>
+                            <td>{{ collected_datum.createdAt ? collected_datum.createdAt|date('d-m-Y') : '' }}</td>
                             <td>
                                 <div class="d-flex justify-content-end">
                                   {% import 'macros/btn_actions_macros.html.twig' as macros %}
@@ -76,6 +77,14 @@
         </div>
       </div>
     </section>
+    
+    {% import 'macros/form_macros.html.twig' as form_macros %}
+    {{ form_macros.csv_import_form(form, 'app_collected_data_index', formExport, 'Import collected Data', 'Export collected Data') }}
+
+{# 
+    {% if headers is defined and rows is defined %}
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_collected_data_index', ['country', 'iso2']) }}
+    {% endif %} #}
 
 </main><!-- End #main -->
 {% endblock %}

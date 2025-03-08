@@ -1,7 +1,7 @@
 {% if is_granted('ROLE_SUPER_ADMIN') %}
 <form id="delete-form" method="post" action="{{ path('app_user_delete', {'id': user.id}) }}">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-    <button type="button" onclick="confirmDelete()" class="btn btn-danger btn-sm bi bi-trash mx-2" title="Supprimer ce compte d'utilisateur"></button>
+    <button type="button" onclick="confirmDelete()" class="btn btn-danger btn-sm bi bi-trash mx-2" title="{{'user.delete'|trans }}"></button>
 </form>
 {% endif %}
 <script>
@@ -15,26 +15,26 @@
         });
 
         swalWithBootstrapButtons.fire({
-            title: 'Êtes-vous sûr ?',
-            text: "La suppression du compte entraînera également la suppression de tout ce qui a été créé par cet utilisateur. Vous ne pourrez pas revenir en arrière !",
+            title: "{{'sweetalert.confirm_title'|trans }}",
+            text: "{{'sweetalert.confirm_text_user'|trans }}",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Oui, supprimer !',
-            cancelButtonText: 'Non, annuler !',
+            confirmButtonText: "{{'sweetalert.confirm_button'|trans }}",
+            cancelButtonText: "{{'sweetalert.cancel_button'|trans }}",
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
                 // Soumettre le formulaire si l'utilisateur confirme la suppression
                 document.getElementById('delete-form').submit();
                 swalWithBootstrapButtons.fire({
-                    title: 'Supprimé !',
-                    text: 'L\'élément a été supprimé.',
+                    title: "{{'sweetalert.deleted_title'|trans }}",
+                    text: "{{'sweetalert.deleted_text'|trans }}",
                     icon: 'success'
                 });
             } else if (result.dismiss === Swal.DismissReason.cancel) {
                 swalWithBootstrapButtons.fire({
-                    title: 'Annulé',
-                    text: 'Votre élément est toujours en sécurité 🙂',
+                    title: "{{'sweetalert.cancelled_title'|trans }}",
+                    text: "{{'sweetalert.cancelled_text'|trans }}",
                     icon: 'error'
                 });
             }

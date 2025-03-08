@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Logo{% endblock %}
+{% block title %}{{'logo.title'|trans }}{% endblock %}
 
 {% block body %}
     <main id="main" class="main">
 
         <div class="pagetitle">
-            <h1>Consultation de logo</h1>
+            <h1>{{'logo.title'|trans }}</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-                    <li class="breadcrumb-item active">Gestion du logo</li>
+                    <li class="breadcrumb-item active">{{'logo.manage'|trans }}</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -21,40 +21,33 @@
 
                     <div class="card">
                         <div class="card-header">
-                            Logo
+                            {{ 'card_title'|trans }}
                         </div>
 
                         <div class="card-body">
                             <div>
                                 {% for logo in logos %}
                                     {% if logo.image and logo.image.imageFilename %}
-                                        <turbo-frame id="logo_{{ logo.id }}">
-                                            <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgLogoShow rounded mx-auto d-block">
-                                            <div class="d-flex justify-content-end">
-                                               <a href="{{ path('app_logo_edit', {'id': logo.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="{{ 'edit'|trans }}"></a>
-                                                {{ include('logo/_delete_form.html.twig') }}
-                                            </div>
-                                        </turbo-frame>
+                                        <img src="{{ vich_uploader_asset(logo.image, 'imageFile') }}" alt="logo" class="imgLogoShow rounded mx-auto d-block">
+                                        <div class="d-flex justify-content-end">
+                                            <a href="{{ path('app_logo_edit', {'id': logo.id}) }}" class="btn btn-primary btn-sm bi bi-pencil-square mx-2" title="{{ 'edit'|trans }}"></a>
+                                            {{ include('logo/_delete_form.html.twig') }}
+                                        </div>
                                     {% else %}
                                         <p>{{ "image.not_available"|trans }}</p>
                                     {% endif %}
 
                                 {% else %}
-                                    <p>Logo manquant</p>
+                                    <p>{{ 'no_record_found'|trans }}</p>
                                 {% endfor %}
                             </div>
 
                         </div>
                         <div class="card-footer">
                             <div class="d-flex justify-content-between">
-                                <div class="d-flex justify-content-start">
-                                    <a href="{{ path('app_logo_index') }}" class="btn btn-sm btn-outline-secondary" title="Retour vers consultation du logo">Retour</a>
-                                    <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list mx-1"> Consultation des campagnes</a>
-                                </div>
-                                <div>
-                                    <a href="{{ path('app_logo_new') }}" class="btn btn-light btn-sm mx-1"> Ajouter le logo</a>
-                                    <a href="{{ path('home') }}" class="btn btn-light btn-sm ri-home-4-line mx-1"> Page d'accueil</a>
-                                </div>
+                                    <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list mx-1"> {{'campaign.consult'|trans }}</a>
+                                    <a href="{{ path('app_logo_new') }}" class="btn btn-light btn-sm mx-1"> {{'add_a_logo'|trans }}</a>
+                                    <a href="{{ path('home') }}" class="btn btn-light btn-sm ri-home-4-line mx-1"> {{ 'breadcrumb_home'|trans }}</a>
                             </div>
                         </div>
                     </div>

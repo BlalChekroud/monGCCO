@@ -4,7 +4,7 @@ card_title: "Listes"
 create_group: "Créer un groupe"
 create_a_family: "Créer une famille d'oiseaux"
 create_a_species: "Créer une espèce d'oiseaux"
-create_user_status: "Créer un statut d'utilisateur"
+create_user_status: "Créer un état d'utilisateur"
 add_a_country: 'Ajouter un pays'
 add_a_region: 'Ajouter une région'
 add_a_city: 'Ajouter une ville'
@@ -20,6 +20,9 @@ add_a_specy: "Ajouter une espèce d'oiseau"
 add_a_iucn: "Ajouter une catégorie IUCN"
 add_a_coverage: "Ajouter une couverture"
 add_a_birdLifeTaxTreat: "Ajouter un traitement taxonomique BirdLife"
+add_a_logo: "Ajouter un logo"
+add_a_campaignStatus: "Ajouter un état de campagne"
+add_an_image: "Ajouter une image"
 choose_bird_family: "-- Choisir une Famille d'Oiseaux --"
 consult_families: "Consultation des familles"
 consult_reserves: "Consultation des réserves"
@@ -91,6 +94,7 @@ export_format:
   xlsx: "Excel (XLSX)"
   ods: "OpenDocument Spreadsheet (ODS)"
 print: "Imprimer"
+campaign_remaining_time: "Le temps restant d'une campagne"
 created_by: 'Créé par'
 collector: "Collecteur"
 back: 'Retour'
@@ -105,6 +109,7 @@ msg_export_limit: "La taille de l'exportation est trop grande. Veuillez restrein
 "choose export format": "-- Choisissez le format à exporter --"
 help: 'Aide'
 status: "État"
+settings: "Paramètres"
 
 csv_import_title: "Importer un fichier CSV"
 csv_import_instruction: "Assurez-vous que votre fichier contient les colonnes nécessaires."
@@ -212,15 +217,32 @@ vich_uploader.form_label.delete_confirm: 'Supprimer?'
 vich_uploader.link.download: 'Télécharger'
 image:
   insert: "Insérer une image (JPG ou PNG)"
-  not_available: 'Aucune image disponible'
+  not_available: "Aucune image disponible"
   mimeTypesMessage: "Veuillez télécharger un fichier d'image valide (JPEG ou PNG)"
+  name: "Image"
+  title: "Gestion des images"
+  manage: "Gestion des images"
+  title_add: "Ajout d'une image"
+  title_edit: "Modification de l'image"
+  informations: "Informations sur l'image"
+  the_new_informations: "Les nouvelles informations de l'image"
+  return: "Retour à la consultation des images"
+  consult: "Consultation des images"
+  delete: "Supprimer l'image"
+  msg:
+    created_success: "L'image a été créée avec succès"
+    created_error: "Une erreur s'est produite lors de la création de l'image"
+    updated_success: "L'image a été mise à jour avec succès"
+    updated_error: "Une erreur s'est produite lors de la mise à jour de l'image"
+    deleted_success: "L'image a été supprimée avec succès"
+    deleted_error: "Une erreur s'est produite lors de la suppression de l'image"
 
 Log_in_to_your_account: 'Connexion à votre compte'
 Enter_your_email_and_password_to_log_in: 'Entrez votre e-mail & mot de passe pour vous connecter'
 You_are_logged_in_as: 'Vous êtes connecté en tant que'
 You_are_already_logged_in_as: 'Vous êtes déjà connecté en tant que : '
 inactive_account_cannot_log_in: "Votre compte est inactif. Vous ne pouvez pas vous connecter."
-# Your_account_is_disabled: "Votre compte est désactivé."
+Your_account_is_disabled: "Votre compte est désactivé."
 Sign_out: 'Déconnexion'
 Email: 'E-mail'
 Please_enter_your_email: 'Veuillez entrer votre E-mail'
@@ -237,6 +259,7 @@ hidden_label: 'Masquer'
 visible_label: 'Afficher'
 no_role: "Aucun rôle"
 please_log_in_to_access_the_page: "Veuillez vous connecter pour accéder à la page"
+logout: "Se déconnecter"
 
 agentsGroup:
   title: "Gestion des groupes d'agents"
@@ -391,6 +414,43 @@ campaign:
   campaign_suspended_no_modify: "Une campagne %statusSuspended% ne peut pas être modifiée"
   campaign_cancelled_no_modify: "Une campagne %statusCancelled% ne peut pas être modifiée"
 
+campaignController:
+  select_at_least_one_site_and_group: "Vous devez sélectionner au moins un site et un groupe."
+  created: "La campagne de comptage a bien été créée."
+  creation_error: "Une erreur s'est produite lors de la création de la campagne de comptage."
+  deleted: "La campagne de comptage a bien été supprimée."
+  delete_error: "Erreur lors de la suppression :"
+  csrf_invalid: "Jeton CSRF invalide. Suppression annulée."
+  cannot_edit_closed: "Impossible de modifier une campagne %statusClosed%."
+  cannot_edit_cancelled: "Impossible de modifier une campagne %statusCancelled%."
+  select_site_and_group: "Vous devez sélectionner au moins un site et un groupe d'agents."
+  updated: "La campagne de comptage a bien été modifiée."
+  update_error: "Une erreur s'est produite lors de la modification de la campagne."
+  suspended: "La campagne a été mise en suspens."
+  resumed: "La campagne a été reprise."
+  cannot_suspend_closed: "Cette campagne ne peut pas être %statusSuspended% car elle est déjà %statusClosed%."
+  cancelled: "La campagne a bien été %statusCancelled%."
+  cancel_error: "Erreur lors de l'annulation de la campagne :"
+  cannot_cancel_suspended: "La campagne est actuellement %statusSuspended%. Veuillez la lever avant d'annuler."
+  already_closed_or_cancelled: "Cette campagne est déjà %statusClosed% ou %statusCancelled%, elle ne peut pas être modifiée."
+  closed_successfully: "La campagne a été %statusClosed% avec succès."
+  close_error: "Une erreur est survenue lors de la %statusClosed% de la campagne :"
+  cannot_close_before_end_date: "La campagne ne peut pas être %statusClosed% avant sa date de fin."
+  no_sites_associated: "Aucun site n'est associé à la campagne."
+  no_agents_assigned: "Aucun groupe d'agents n'est assigné au site : %site_name%"
+  missing_site: "Le site associé est manquant."
+  missing_environmental_conditions: "Le site %site_name% n'a pas de conditions environnementales."
+  missing_collected_data: "Les conditions environnementales %condition_id% du site %site_name% sont sans collecte de données."
+  collected_data_without_conditions: "Une collecte de données %collected_data_id% pour le site %site_name% n'a pas de conditions environnementales."
+  collected_data_without_species_count: "La collecte de données pour le site %site_name% n'a pas de comptage d'espèces d'oiseaux."
+  already_closed: "Cette campagne est déjà %statusClosed%."
+  no_available_status: "Aucun état de campagne n'est disponible."
+
+campaignEntity:
+  date_start_end_not_null: "Les dates de début et de fin ne peuvent pas être nulles."
+  end_date_after_start: "La date de fin doit être postérieure à la date de début."
+  sites_groups_required: "Les sites et leurs groupes doivent être définis pour générer le nom de la campagne."
+
 description: "Description"
 none: "Aucune"
 ice_cover: "Couverture de Glace"
@@ -433,6 +493,24 @@ species_statistics:
 overall_totals:
   general_count_total: "Total général des comptages dans la campagne"
   unique_species_observed: "Total d'espèces uniques observées"
+
+campaignStatus:
+  title: "Gestion des statuts de campagne"
+  manage: "Gestion des statuts de campagne"
+  title_add: "Ajout d'un statut de campagne"
+  title_edit: "Modification du statut de campagne"
+  informations: "Informations sur le nouveau statut de campagne"
+  the_new_informations: "Les nouvelles informations du statut de campagne"
+  return: "Retour à la consultation des statuts de campagne"
+  consult: "Consultation des statuts de campagne"
+  delete: "Supprimer le statut de campagne"
+  msg:
+    created_success: "Le statut de campagne a été créé avec succès"
+    created_error: "Une erreur est survenue lors de la création du statut de campagne"
+    updated_success: "Le statut de campagne a été mis à jour avec succès"
+    updated_error: "Une erreur est survenue lors de la mise à jour du statut de campagne"
+    deleted_success: "Le statut de campagne a été supprimé avec succès"
+    deleted_error: "Une erreur est survenue lors de la suppression du statut de campagne"
 
 collect:
   please_create_the_environmental_conditions_for_this_site_first: "Veuillez d'abord créer les conditions environnementales pour ce site."
@@ -489,6 +567,7 @@ condition:
   campaign_not_found: "La campagne spécifiée est introuvable"
   site_not_found: "Le site spécifié est introuvable."
   access_denied_environment: "Vous n'avez pas accès à cette condition environnementale"
+  condition_number: "Numéro de condition"
   msg:
     created_success: "La condition environnementale a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la condition environnementale"
@@ -697,14 +776,19 @@ group:
   name: "Nom du groupe"
 
 language:
-  name: 'Nom'
-  iso2: 'Code ISO2'
+  name: "Nom"
+  iso2: "Code ISO2"
+  none: "Aucune langue"
   title: "Gestion des langues"
-  create_a_new_language: "Créer une nouvelle langue"
-  manage_language: "Gérer les langues"
+  title_add: "Ajout d'une langue"
+  title_edit: "Modification de la langue"
+  the_new_informations: "Les nouvelles informations de la langue"
+  add_a_language: "Ajouter une nouvelle langue"
+  manage: "Gérer les langues"
   informations: "Informations sur la langue"
   return_to_language_consultation: "Retour à la consultation des langues"
-  delete_language: "Supprimer la langue"
+  delete: "Supprimer la langue"
+  consult: "Consultation des langues"
   msg:
     created: "La langue a été créée avec succès."
     updated: "La langue a été mise à jour avec succès."
@@ -713,6 +797,25 @@ language:
     creation_failed: "Échec de la création de la langue."
     modification_failed: "Une erreur s'est produite lors de la mise à jour de la langue."
     deletion_failed: "Une erreur s'est produite lors de la suppression de la langue."
+
+logo:
+  title: "Gestion du logo"
+  manage: "Gestion du logo"
+  title_add: "Ajout d'un logo"
+  title_edit: "Modification du logo"
+  informations: "Informations sur le logo"
+  the_new_informations: "Les nouvelles informations du logo"
+  return: "Retour à la consultation des logos"
+  consult: "Consultation des logos"
+  delete: "Supprimer le logo"
+  logo_already_exists: "Un logo a déjà été ajouté. Vous ne pouvez pas en ajouter un autre."
+  msg:
+    created_success: "Le logo a été créé avec succès"
+    created_error: "Une erreur s'est produite lors de la création du logo"
+    updated_success: "Le logo a été mis à jour avec succès"
+    updated_error: "Une erreur s'est produite lors de la mise à jour du logo"
+    deleted_success: "Le logo a été supprimé avec succès"
+    deleted_error: "Une erreur s'est produite lors de la suppression du logo"
 
 notification:
   all: "Toutes les notifications"
@@ -736,7 +839,6 @@ collectQuality:
   return: "Retour à la consultation des qualités de collecte de données"
   consult: "Consultation des qualités de collecte de données"
   delete: "Supprimer la qualité de collecte de données"
-
   msg:
     created_success: "La qualité de collecte de données a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la qualité de collecte de données"
@@ -818,23 +920,155 @@ site_collection:
     deleted_error: "Une erreur s'est produite lors de la suppression du site de collecte"
 
 user:
+  firstName: "Nom"
+  lastName: "Prénom"
+  email: "Adresse e-mail"
+  phone: "Numéro de téléphone"
+  password: "Mot de passe"
+  password_confirmation: "Confirmer le mot de passe"
+  password_placeholder: "Veuillez entrer votre mot de passe !"
+  role: "Rôle"
+  role_placeholder: "-- Choisir un rôle --"
+  ROLE_USER: "Utilisateur"
+  ROLE_VIEW: "Visualisateur"
+  ROLE_EDIT: "Éditeur"
+  ROLE_CREAT: "Créateur"
+  ROLE_DELETE: "Supprimeur"
+  ROLE_IMPORT: "Importateur"
+  ROLE_EXPORT: "Exportateur"
+  ROLE_SUPER_CREAT: "Super Créateur"
+  ROLE_COLLECTOR: "Collecteur"
+  ROLE_ADMIN: "Administrateur"
+  ROLE_SUPER_ADMIN: "Super Administrateur"
+  profile: "Profil"
+  title: "Utilisateurs"
+  manage: "Gestion des utilisateurs"
+  title_add: "Ajout d'un utilisateur"
+  title_edit: "Modification de l'utilisateur"
+  the_new_informations: "Les nouvelles informations de l'utilisateur"
+  return: "Retour à la consultation des utilisateurs"
+  consult: "Consultation des utilisateurs"
+  delete: "Supprimer l'utilisateur"
+  overview: "Aperçu"
+  profile_details: "Détails du Profil"
+  save_changes: "Enregistrer les modifications"
+  profile_image: "Image de Profil"
+  show: "Afficher"
+  hide: "Masquer"
+  change_password: "Changer votre mot de passe"
+  current_password: "Mot de passe Actuel"
+  new_password: "Nouveau mot de passe"
+  confirm_new_password: "Confirmer le nouveau mot de passe"
+  edit: "Modifier le profil"
+  not_logged_in: "Vous n'êtes pas connecté"
+  firstName_blank: "Veuillez saisir votre nom"
+  firstName_too_short: "Votre nom doit avoir au moins {{ limit }} caractères."
+  lastName_blank: "Veuillez saisir votre prénom"
+  lastName_too_short: "Votre prénom doit avoir au moins {{ limit }} caractères."
+  phone_blank: "Veuillez saisir votre Numéro de téléphone"
+  phone_too_short: "Votre numéro de téléphone doit avoir au moins {{ limit }} caractères."
+  password_blank: "Veuillez saisir un mot de passe"
+  password_too_short: "Votre mot de passe doit avoir au moins {{ limit }} caractères."
+  password_mismatch: "Les deux mots de passe doivent correspondre."
   msg:
+    created: "L'utilisateur a bien été créé."
+    updated: "L'utilisateur a bien été modifié."
     deleted: "Le compte utilisateur a bien été supprimé."
+    disconnected: "Vous êtes déconnecté."
+    account_info_modified: "Les informations du compte ont été bien modifiées."
+    password_incorrect: "Le mot de passe renseigné est incorrect."
+    password_modified: "Le mot de passe a été bien modifié."
   error:
+    creation_failed: "Échec de la création de l'utilisateur."
+    modification_failed: "Une erreur s'est produite lors de la modification de l'utilisateur."
     deletion_failed: "Une erreur s'est produite lors de la suppression du compte utilisateur."
 
 userStatus:
-  title: "Gestion des statuts d'utilisateur"
-  breadcrumb_management: "Gestion des statuts"
-  label: 'Libellé'
-  delete_user_status: "Supprimer le statut"
-  informations: "Les informations du statut"
-  return_to_user_status_consultation: "Retour vers la consultation des statuts d'utilisateur"
+  title: "Gestion des états d'utilisateur"
+  manage: "Gestion des états d'utilisateur"
+  title_add: "Ajout d'un état d'utilisateur"
+  title_edit: "Modification de l'état d'utilisateur"
+  the_new_informations: "Les nouvelles informations de l'état d'utilisateur"
+  breadcrumb_management: "Gestion des états"
+  label: "Libellé"
+  delete_user_status: "Supprimer l'état"
+  informations: "Les informations de l'état"
+  return: "Retour vers la consultation des états d'utilisateur"
+  consult: "Consultation des états d'utilisateur"
+  delete: "Supprimer l'état"
   msg:
-    created: "Le statut a bien été créé."
-    updated: "Le statut a bien été modifié."
-    deleted: "Le statut a bien été supprimé."
+    created: "L'état a bien été créé."
+    updated: "L'état a bien été modifié."
+    deleted: "L'état a bien été supprimé."
   error:
-    creation_failed: "Échec de la création du statut"
-    modification_failed: "Une erreur s'est produite lors de la modification du statut."
-    deletion_failed: "Une erreur s'est produite lors de la suppression du statut."
+    creation_failed: "Échec de la création de l'état"
+    modification_failed: "Une erreur s'est produite lors de la modification de l'état."
+    deletion_failed: "Une erreur s'est produite lors de la suppression de l'état."
+
+campaignGuide:
+  title: "Guide des États d'une Campagne de Comptage"
+  close: "Fermer"
+  introductionTitle: "Introduction"
+  introductionText: "Lors de la gestion des campagnes de comptage des oiseaux, une campagne peut traverser plusieurs états. Ces états permettent de suivre le cycle de vie d'une campagne, de sa planification à sa clôture ou annulation."
+  differentStatesTitle: "Les différents états et leurs significations :"
+  common:
+    active: "Quand l'état est actif :"
+    actions: "Actions possibles :"
+  state:
+    planned:
+      title: "Planifiée"
+      description: "La campagne est définie, mais n'a pas encore commencé."
+      active_description: "La date de début de la campagne est dans le futur."
+      actions_description: "L'utilisateur peut préparer les sites et les équipes, mais la collecte de données ne peut pas encore commencer."
+    ongoing:
+      title: "En cours"
+      description: "La campagne est actuellement en cours de réalisation."
+      active_description: "La date de début est atteinte, et la date de fin est encore à venir."
+      actions_description: "Les collectes de données peuvent être réalisées par les équipes sur les sites assignés."
+    finished:
+      title: "Terminée"
+      description: "La période de la campagne est terminée, mais elle n'est pas encore officiellement clôturée."
+      active_description: "La date de fin de la campagne est passée, mais des vérifications finales peuvent être en attente."
+      actions_description: "L'utilisateur peut examiner les données collectées avant de prendre des décisions finales."
+    closed:
+      title: "Clôturée"
+      description: "La campagne est officiellement close."
+      active_description: "Toutes les données ont été vérifiées et validées, aucune autre action n'est possible."
+    suspended:
+      title: "Suspendue"
+      description: "La campagne est temporairement interrompue."
+      active_description: "La campagne a été mise en pause pour une raison quelconque (conditions météorologiques, etc.)."
+      actions_description: "La campagne peut être reprise ou annulée selon les circonstances."
+    cancelled:
+      title: "Annulée"
+      description: "La campagne a été annulée avant d'être clôturée."
+      active_description: "L'utilisateur ou un administrateur a décidé d'annuler la campagne."
+      actions_description: "Aucune collecte de données supplémentaire ne peut être effectuée."
+    error:
+      title: "Erreur"
+      description: "Un problème est survenu empêchant la réalisation correcte de la campagne."
+      active_description: "Un problème technique ou organisationnel a empêché la campagne d'avancer."
+  adviceTitle: "Conseils :"
+  advice:
+    close:
+      title: "Clôturer une campagne :"
+      description: "Assurez-vous que toutes les données sont collectées et validées avant de clôturer."
+    resume:
+      title: "Reprise d'une campagne suspendue :"
+      description: "Elle peut être reprise une fois que les obstacles sont levés."
+    cancel:
+      title: "Annulation :"
+      description: "Soyez prudent, une campagne annulée ne pourra pas être reprise."
+
+sweetalert:
+  confirm_title: "Êtes-vous sûr ?"
+  confirm_text: "Vous ne pourrez pas revenir en arrière !"
+  confirm_text_user: "La suppression du compte entraînera également la suppression de tout ce qui a été créé par cet utilisateur. Vous ne pourrez pas revenir en arrière !"
+  confirm_button: "Oui, supprimer !"
+  cancel_button: "Non, annuler !"
+  deleted_title: "Supprimé !"
+  deleted_text: "L'élément a été supprimé."
+  cancelled_title: "Annulé"
+  cancelled_text: "Votre élément est toujours en sécurité 🙂"
+
+my_profile: "Mon Profil"

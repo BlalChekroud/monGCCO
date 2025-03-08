@@ -4,14 +4,6 @@ namespace App\Controller;
 
 use App\Form\ExportType;
 use App\Service\ExportService;
-use Symfony\Component\HttpFoundation\JsonResponse;
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use League\Csv\Writer;
-
-use Symfony\Component\HttpFoundation\StreamedResponse;
-
 use App\Entity\EnvironmentalConditions;
 use App\Repository\AgentsGroupRepository;
 use App\Repository\BirdSpeciesCountRepository;
@@ -37,13 +29,11 @@ class CountingCampaignController extends AbstractController
 {
     private $campaignStatusService;
     private $exportService;
-    private $translator;
 
-    public function __construct(CampaignStatusService $campaignStatusService, ExportService $exportService, TranslatorInterface $translator)
+    public function __construct(CampaignStatusService $campaignStatusService, ExportService $exportService, private readonly TranslatorInterface $translator)
     {
         $this->campaignStatusService = $campaignStatusService;
         $this->exportService = $exportService;
-        $this->translator = $translator;
     }
 
     #[Route('/', name: 'app_counting_campaign_index', methods: ['GET','POST'])]
@@ -122,6 +112,7 @@ class CountingCampaignController extends AbstractController
             'counting_campaigns' => $countingCampaigns,
             'statusIndexMap' => $statusIndexMap,  // Passer le tableau d'index des statuts
             'formExport' => $formExport->createView(),
+            'campaign_statuses' => $campaignStatusRepository->findAll(),
         ]);
     }
 
@@ -246,40 +237,39 @@ class CountingCampaignController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                foreach ($countingCampaign->getSiteAgentsGroups() as $siteAgentsGroup) {
-                    $siteAgentsGroup->setCountingCampaign($countingCampaign);
-                    $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
-                    $entityManager->persist($siteAgentsGroup);
-                }
-
-                if ($countingCampaign->getSiteAgentsGroups()->isEmpty()) {
-                    $this->addFlash('error', 'Vous devez sélectionner au moins un site et un groupe.');
-                    return $this->redirectToRoute('app_counting_campaign_new');
-                }
-
-                // if ($countingCampaign->getNatureReserves()->isEmpty()) {
-                //     $this->addFlash('error', 'Vous devez sélectionner au moins une réserve naturelle.');
-                //     return $this->redirectToRoute('app_counting_campaign_new');
-                // }
-
-                $countingCampaign->setCreatedAt(new \DateTimeImmutable());
-                $countingCampaign->setCreatedBy($user);
-                // Générer et définir le nom de la campagne
-                $countingCampaign->generateCampaignName();
-                // Mettre à jour le statut de la campagne
-                $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
-                $entityManager->persist($countingCampaign);
-                $entityManager->flush();
-                
-                $countingCampaign->generateCampaignName();
-                $entityManager->flush();
-                
-                $this->addFlash('success', "Campagne de comptage a bien été crée");
+                try {
+                    foreach ($countingCampaign->getSiteAgentsGroups() as $siteAgentsGroup) {
+                        $siteAgentsGroup->setCountingCampaign($countingCampaign);
+                        $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
+                        $entityManager->persist($siteAgentsGroup);
+                    }
     
-                return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
-                
+                    if ($countingCampaign->getSiteAgentsGroups()->isEmpty()) {
+                        $this->addFlash('error', $this->translator->trans('campaignController.select_at_least_one_site_and_group'));
+                        return $this->redirectToRoute('app_counting_campaign_new');
+                    }
+    
+                    $countingCampaign->setCreatedAt(new \DateTimeImmutable());
+                    $countingCampaign->setCreatedBy($user);
+                    // Générer et définir le nom de la campagne
+                    $countingCampaign->generateCampaignName($this->translator);
+                    // Mettre à jour le statut de la campagne
+                    $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
+                    $entityManager->persist($countingCampaign);
+                    $entityManager->flush();
+                    
+                    $countingCampaign->generateCampaignName($this->translator);
+                    $entityManager->flush();
+                    
+                    $this->addFlash('success', $this->translator->trans('campaignController.created'));
+        
+                    return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $this->translator->trans('campaignController.creation_error') . $e->getMessage());
+                    return $this->redirectToRoute('app_counting_campaign_new', [], Response::HTTP_SEE_OTHER);
+                }
             } else {
-                $this->addFlash('error',"Une erreur s'est produite lors de la création de la campagne de comptage.");
+                $this->addFlash('error',$this->translator->trans('invalid_form'));
             }
 
         }
@@ -298,13 +288,13 @@ class CountingCampaignController extends AbstractController
             try {
                 $entityManager->remove($countingCampaign);
                 $entityManager->flush();
-                $this->addFlash('success', "Campagne de comptage a bien été supprimée");
+                $this->addFlash('success', $this->translator->trans('campaignController.deleted'));
             } catch (\Exception $e) {
-                $this->addFlash('error', "Erreur lors de la suppression : " . $e->getMessage());
+                $this->addFlash('error', $this->translator->trans('campaignController.delete_error') . $e->getMessage());
             }
         }  else {
             // Ajouter un message d'erreur si le jeton CSRF est invalide
-            $this->addFlash('error', 'Jeton CSRF invalide. Suppression annulée.');
+            $this->addFlash('error', $this->translator->trans('campaignController.csrf_invalid'));
         }
 
         return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
@@ -447,101 +437,6 @@ class CountingCampaignController extends AbstractController
     }
 
 
-    // #[Route('/{id}/export', name: 'app_counting_campaign_export', methods: ['GET'])]
-    // public function export(ExportService $exportService, Request $request, CountingCampaign $countingCampaign, CountingCampaignRepository $countingCampaignRepository, TranslatorInterface $translator): Response
-    // {
-    //     $formExport = $this->createForm(ExportType::class)
-    //                 ->handleRequest($request);
-
-    //     if ($formExport->isSubmitted() && $formExport->isValid()) {
-    //         $columnNames = ['Nom de la campagne', 'Date de début', 'Date de fin', 'Créé le', 'Créé par'];
-    //         // $countingCampaign = $countingCampaignRepository->findAll();
-            
-    //         $data = [
-    //             [
-    //                 $countingCampaign->getCampaignName(),
-    //                 $countingCampaign->getStartDate()->format('d-m-Y H:i:s'),
-    //                 $countingCampaign->getEndDate()->format('d-m-Y H:i:s'),
-    //                 $countingCampaign->getCreatedAt()->format('d-m-Y H:i:s'),
-    //                 $countingCampaign->getCreatedBy()->getEmail(),
-    //             ]
-    //         ];
-
-    //         $format = $formExport->get('format')->getData();
-    //         $fileName = sprintf("Counting_campaign_export_%s", date('d-m-Y_His'));
-    
-    //         return $exportService->export($columnNames, $data, $format, $fileName);
-    //     }
-
-    //     return $this->render('counting_campaign/show.html.twig', [
-    //         'formExport' => $formExport->createView(),
-    //     ]);
-    // }
-
-
-    // #[Route('/{id}/export', name: 'app_counting_campaign_export', methods: ['GET'])]
-    // public function exportCsv(
-    //     CountingCampaign $campaign,
-    //    CountingCampaignRepository $countingCampaignRepository,
-    //     TranslatorInterface $translator
-    // ): Response {
-    //     // Vérification des autorisations
-    //     if (!$this->isGranted('ROLE_EXPORT')) {
-    //         $this->addFlash('warning', $translator->trans('export_permission'));
-    //         return $this->redirectToRoute('app_counting_campaign_show', ['id' => $campaign->getId()]);
-    //     }
-
-    //     // Récupérer les données à exporter
-    //     $data = $countingCampaignRepository->getExportDataByCampaign($campaign);
-        
-    //     // Limite le nombre de données à exporter (par exemple, pas plus de 1000 sites)
-    //     // $maxExportSize = 1000;
-    //     // if (count($data) > $maxExportSize) {
-    //     //     $this->addFlash('warning', $translator->trans('msg_export_limit'));
-    //     //     return $this->redirectToRoute('app_counting_campaign_show', ['id' => $campaign->getId()]);
-    //     // }
-    
-    //     // Créer la réponse avec un flux
-    //     $response = new StreamedResponse(function () use ($data) {
-    //         // Ouvrir le flux pour écrire dans le fichier CSV
-    //         $handle = fopen('php://output', 'w');
-    
-    //         if (!empty($data)) {
-    //             // Ajouter les en-têtes
-    //             fputcsv($handle, array_keys($data[0]), ';');
-    
-    //             // Ajouter les lignes de données
-    //             foreach ($data as $row) {
-    //                 // Appliquer le format aux dates et encoder les caractères
-    //                 $row['CreatedAt'] = $row['CreatedAt']->format('d-m-Y H:i:s');
-    //                 $row['startDate'] = $row['startDate']->format('d-m-Y H:i:s');
-    //                 $row['endDate'] = $row['endDate']->format('d-m-Y H:i:s');
-    //                 $row['Site'] = mb_convert_encoding($row['Site'], 'UTF-8', 'auto');
-    //                 $row['City'] = mb_convert_encoding($row['City'], 'UTF-8', 'auto');
-    //                 $row['Region'] = mb_convert_encoding($row['Region'], 'UTF-8', 'auto');
-    //                 $row['AgentName'] = mb_convert_encoding($row['AgentName'], 'UTF-8', 'auto');
-    //                 $row['AgentLastName'] = mb_convert_encoding($row['AgentLastName'], 'UTF-8', 'auto');
-    //                 $row['Species'] = mb_convert_encoding($row['Species'], 'UTF-8', 'auto');
-    //                 $row['Method'] = mb_convert_encoding($row['Method'], 'UTF-8', 'auto');
-    
-    //                 fputcsv($handle, $row, ';');
-    //             }
-    //         } else {
-    //             // Ajouter une ligne vide si aucune donnée
-    //             fputcsv($handle, ['No data available'], ';');
-    //         }
-    
-    //         fclose($handle); // Fermer le fichier après l'export
-    //     });
-    
-    //     // Définir les headers pour forcer le téléchargement du fichier CSV
-    //     $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
-    //     $response->headers->set('Content-Disposition', 'attachment; filename="campaign_export.csv"');
-    
-    //     return $response;
-    // }
-
-
     #[IsGranted(CountingCampaignVoter::EDIT, 'countingCampaign')]
     #[Route('/{id}/edit', name: 'app_counting_campaign_edit', methods: ['GET', 'POST'])]
     public function edit(CampaignStatusRepository $campaignStatusRepository, Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
@@ -552,11 +447,11 @@ class CountingCampaignController extends AbstractController
 
         // Empêcher la modification d'une campagne si elle est clôturée ou Annulée
         if ($countingCampaign->getCampaignStatus() === $statusClosed) {
-            throw $this->createNotFoundException('Impossible de modifier une campagne ' . $statusClosed);
+            throw $this->createNotFoundException($this->translator->trans('campaignController.cannot_edit_closed', [ '%statusClosed%' => $statusClosed]));
         }
         
         if ($countingCampaign->getCampaignStatus() === $statusCancelled) {
-            throw $this->createNotFoundException('Impossible de modifier une campagne ' . $statusCancelled);
+            throw $this->createNotFoundException($this->translator->trans('campaignController.cannot_edit_cancelled', [ '%statusCancelled%' => $statusCancelled]));
         }
 
         $form = $this->createForm(CountingCampaignType::class, $countingCampaign);
@@ -564,31 +459,35 @@ class CountingCampaignController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                // Vérification si la collection de SiteAgentsGroup est vide
-                if ($countingCampaign->getSiteAgentsGroups()->isEmpty()) {
-                    $this->addFlash('error', 'Vous devez sélectionner au moins un site et un groupe d\'agents.');
-                    return $this->redirectToRoute('app_counting_campaign_edit', ['id' => $countingCampaign->getId()]);
-                }
-                // Persister chaque SiteAgentsGroup si ce n'est pas déjà fait
-                foreach ($countingCampaign->getSiteAgentsGroups() as $siteAgentsGroup) {
-                    $siteAgentsGroup->setCountingCampaign($countingCampaign);
-                    $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
-                    $entityManager->persist($siteAgentsGroup);
-                }
-
-                $countingCampaign->setUpdatedAt(new \DateTimeImmutable());
-                // Générer et définir le nom de la campagne
-                $countingCampaign->generateCampaignName();
-                $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
+                try {
+                    // Vérification si la collection de SiteAgentsGroup est vide
+                    if ($countingCampaign->getSiteAgentsGroups()->isEmpty()) {
+                        $this->addFlash('error', $this->translator->trans('campaignController.select_site_and_group'));
+                        return $this->redirectToRoute('app_counting_campaign_edit', ['id' => $countingCampaign->getId()]);
+                    }
+                    // Persister chaque SiteAgentsGroup si ce n'est pas déjà fait
+                    foreach ($countingCampaign->getSiteAgentsGroups() as $siteAgentsGroup) {
+                        $siteAgentsGroup->setCountingCampaign($countingCampaign);
+                        $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
+                        $entityManager->persist($siteAgentsGroup);
+                    }
     
-                // Enregistrer les changements
-                $entityManager->flush();
-                $this->addFlash('success', "La campagne de comptage a bien été modifiée.");
-    
-                return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
-
+                    $countingCampaign->setUpdatedAt(new \DateTimeImmutable());
+                    // Générer et définir le nom de la campagne
+                    $countingCampaign->generateCampaignName($this->translator);
+                    $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
+        
+                    // Enregistrer les changements
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('campaignController.updated'));
+        
+                    return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_counting_campaign_edit', ['id' => $countingCampaign->getId()], Response::HTTP_SEE_OTHER);
+                }
             } else {
-                $this->addFlash('error','Une erreur s\'est produite lors de la modification de la campagne.');
+                $this->addFlash('error',$this->translator->trans('campaignController.update_error'));
             }
         }
 
@@ -597,26 +496,6 @@ class CountingCampaignController extends AbstractController
             'form' => $form,
         ]);
     }
-
-    // #[IsGranted(CountingCampaignVoter::DELETE, 'countingCampaign')]
-    // #[Route('/{id}', name: 'app_counting_campaign_delete', methods: ['POST'])]
-    // public function delete(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
-    // {
-    //     if ($this->isCsrfTokenValid('delete'.$countingCampaign->getId(), $request->getPayload()->get('_token'))) {
-    //         try {
-    //             $entityManager->remove($countingCampaign);
-    //             $entityManager->flush();
-    //             $this->addFlash('success', "Campagne de comptage a bien été supprimée");
-    //         } catch (\Exception $e) {
-    //             $this->addFlash('error', "Erreur lors de la suppression : " . $e->getMessage());
-    //         }
-    //     }  else {
-    //         // Ajouter un message d'erreur si le jeton CSRF est invalide
-    //         $this->addFlash('error', 'Jeton CSRF invalide. Suppression annulée.');
-    //     }
-
-    //     return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
-    // }
 
 
     // #[Route('/api/sync', name: 'api_sync_campaigns_post', methods: ['POST'])]
@@ -654,29 +533,33 @@ class CountingCampaignController extends AbstractController
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas accès à cette fonction.')]
     public function suspendCampaign(CampaignStatusRepository $campaignStatusRepository, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
-        // Appel de la méthode pour récupérer les statuts
-        $statuses = $this->campaignStatusService->getCampaignStatuses();
-        $statusClosed = $statuses['statusClosed'];
-        $statusSuspended = $statuses['statusSuspended'];
-        $statusCancelled = $statuses['statusCancelled'];
-
-        // Si la campagne n'est ni "Clôturé" ni déjà en "Suspens"
-        if ($countingCampaign->getCampaignStatus() != $statusClosed && $countingCampaign->getCampaignStatus() != $statusSuspended && $countingCampaign->getCampaignStatus() !== $statusCancelled) {
-            $countingCampaign->setCampaignStatus($statusSuspended);
-            $entityManager->flush();
-            $this->addFlash('success', 'La campagne a été mise en suspens.');
-        } 
-        // Si la campagne est déjà en "Suspens", on la reprend
-        elseif ($countingCampaign->getCampaignStatus() == $statusSuspended) {
-            // Enlever le statut "Suspens" avant de recalculer le nouveau statut
-            $countingCampaign->setCampaignStatus(null); // Supprimer l'état suspens pour forcer la mise à jour
-            $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
-            $entityManager->flush();
-            $this->addFlash('success', 'La campagne a été reprise.');
-        } 
-        // Sinon, la campagne est clôturée, et ne peut pas être mise en suspens
-        else {
-            $this->addFlash('warning', "Cette campagne ne peut pas être $statusSuspended car elle est déjà $statusClosed.");
+        try {
+            // Appel de la méthode pour récupérer les statuts
+            $statuses = $this->campaignStatusService->getCampaignStatuses();
+            $statusClosed = $statuses['statusClosed'];
+            $statusSuspended = $statuses['statusSuspended'];
+            $statusCancelled = $statuses['statusCancelled'];
+    
+            // Si la campagne n'est ni "Clôturé" ni déjà en "Suspens"
+            if ($countingCampaign->getCampaignStatus() != $statusClosed && $countingCampaign->getCampaignStatus() != $statusSuspended && $countingCampaign->getCampaignStatus() !== $statusCancelled) {
+                $countingCampaign->setCampaignStatus($statusSuspended);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('campaignController.suspended'));
+            } 
+            // Si la campagne est déjà en "Suspens", on la reprend
+            elseif ($countingCampaign->getCampaignStatus() == $statusSuspended) {
+                // Enlever le statut "Suspens" avant de recalculer le nouveau statut
+                $countingCampaign->setCampaignStatus(null); // Supprimer l'état suspens pour forcer la mise à jour
+                $this->updateCampaignStatus($countingCampaign, $campaignStatusRepository);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('campaignController.resumed'));
+            } 
+            // Sinon, la campagne est clôturée, et ne peut pas être mise en suspens
+            else {
+                $this->addFlash('warning', $this->translator->trans('campaignController.cannot_suspend_closed', [ '%statusSuspended%' => $statusSuspended, '%statusClosed%' => $statusClosed ]));
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
     
         return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()]);
@@ -684,7 +567,7 @@ class CountingCampaignController extends AbstractController
     
     
     #[Route('/{id}/cancel', name: 'app_counting_campaign_cancel', methods: ['GET'])]
-    #[IsGranted('ROLE_SUPER_ADMIN', message: 'Vous n\'avez pas accès à cette fonction.')]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas accès à cette fonction.')]
     public function cancelCampaign(CampaignStatusRepository $campaignStatusRepository, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
         // Appel de la méthode pour récupérer les statuts
@@ -700,20 +583,20 @@ class CountingCampaignController extends AbstractController
             try {
                 $countingCampaign->setCampaignStatus($statusCancelled);
                 $entityManager->flush();
-                $this->addFlash('success', "La campagne a bien été $statusCancelled.");
+                $this->addFlash('success', $this->translator->trans('campaignController.cancelled', ['%statusCancelled%' => $statusCancelled]));
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de l\'annulation de la campagne : ' . $e->getMessage());
+                $this->addFlash('error', $this->translator->trans('campaignController.cancel_error') . $e->getMessage());
                 return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
             }
         } 
         elseif ($countingCampaign->getCampaignStatus() == $statusSuspended) {
             // Enlever le statut "Suspens" avant l'annulation
-            $this->addFlash('success', "La campagne est actuellement $statusSuspended. Veuillez la lever avant d'annuler.");
+            $this->addFlash('info', $this->translator->trans('campaignController.cannot_cancel_suspended', ['%statusSuspended%' => $statusSuspended]));
         } 
         // Sinon, la campagne est clôturée, et ne peut pas être mise en suspens
         else {
             // Si la campagne est déjà clôturée ou annulée
-            $this->addFlash('warning', "Cette campagne est déjà $statusClosed ou $statusCancelled, elle ne peut pas être modifiée.");
+            $this->addFlash('warning', $this->translator->trans('campaignController.already_closed_or_cancelled', ['%statusClosed%' => $statusClosed, '%statusCancelled%' => $statusCancelled]));
         }
     
         return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()]);
@@ -740,11 +623,11 @@ class CountingCampaignController extends AbstractController
             if ($this->validateCampaignClosure($campaignStatusRepository,$countingCampaign)) {
                 $countingCampaign->setCampaignStatus($statusClosed);
                 $entityManager->flush();
-                $this->addFlash('success', "La campagne a été $statusClosed avec succès.");
+                $this->addFlash('success', $this->translator->trans('campaignController.closed_successfully', ['%statusClosed%' => $statusClosed]));
             } 
 
         } catch (\Exception $e) {
-            $this->addFlash('error', "Une erreur est survenue lors de la $statusClosed de la campagne : " . $e->getMessage());
+            $this->addFlash('error', $this->translator->trans('campaignController.close_error', ['%statusClosed%' => $statusClosed]) . $e->getMessage());
         }
 
         return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()]);
@@ -765,12 +648,12 @@ class CountingCampaignController extends AbstractController
         // Vérification des dates de début et de fin de la campagne
         $now = new \DateTimeImmutable();
         if ($countingCampaign->getEndDate() > $now) {
-            $this->addFlash('warning', "La campagne ne peut pas être $statusClosed avant sa date de fin.");
+            $this->addFlash('warning', $this->translator->trans('campaignController.cannot_close_before_end_date', ['%statusClosed%' => $statusClosed]));
             return false;
         }
         // Vérifier si la campagne a des sites associés
         if ($countingCampaign->getSiteAgentsGroups()->isEmpty()) {
-            $this->addFlash('warning', "Aucun site n'est associé à la campagne.");
+            $this->addFlash('warning', $this->translator->trans('campaignController.no_sites_associated'));
             return false;
         }
 
@@ -781,26 +664,26 @@ class CountingCampaignController extends AbstractController
             // Vérification de l'existence des groupes d'agents pour chaque site
             $agentsGroup = $siteAgentsGroup->getAgentsGroup();
             if ($agentsGroup === null || $agentsGroup->isEmpty()) {
-                $this->addFlash('warning', "Aucun groupe d'agents n'est assigné au site: " . $site->getSiteName());
+                $this->addFlash('warning', $this->translator->trans('campaignController.no_agents_assigned', ['%site_name%' => $site->getSiteName()]));
                 return false;
             }
             
             // Vérifier si le site existe
             if (!$site) {
-                $this->addFlash('warning', "Le site associé est manquant.");
+                $this->addFlash('warning', $this->translator->trans('campaignController.missing_site'));
                 return false;
             }
 
             // Vérifier si les conditions environnementales sont présentes pour le site
             if ($site->getEnvironmentalConditions()->isEmpty()) {
-                $this->addFlash('warning', "Le site {$site->getSiteName()} n'a pas de conditions environnementales.");
+                $this->addFlash('warning', $this->translator->trans('campaignController.missing_environmental_conditions', ['%site_name%' => $site->getSiteName()]));
                 return false;
             }
 
             foreach ($site->getEnvironmentalConditions() as $condition) {
                 // Vérifier si les collectes sont présentes
                 if ($condition->getCollectedData() == null) {
-                    $this->addFlash('warning', "Conditions environnementales {$condition->getId()} du site {$site->getSiteName()} est sans collecte de données");
+                    $this->addFlash('warning', $this->translator->trans('campaignController.missing_collected_data', ['%condition_id%' => $condition->getId(), '%site_name%' => $site->getSiteName()]));
                     return false;
                 }
             }
@@ -810,13 +693,16 @@ class CountingCampaignController extends AbstractController
 
                 // Vérifier si les conditions environnementales sont associées à chaque collecte
                 if ($collectedData->getEnvironmentalConditions() == null) {
-                    $this->addFlash('warning', "Une collecte de données {$collectedData->getId()} pour le site {$site->getSiteName()} n'a pas de conditions environnementales.");
+                    $this->addFlash('warning', $this->translator->trans('campaignController.collected_data_without_conditions', [
+                        '%collected_data_id%' => $collectedData->getId(),
+                        '%site_name%' => $site->getSiteName()
+                    ]));
                     return false;
                 }
 
                 // Vérifier si des comptages d'espèces sont présents pour chaque collecte
                 if ($collectedData->getBirdSpeciesCounts()->isEmpty()) {
-                    $this->addFlash('warning', "La collecte de données pour le site {$site->getSiteName()} n'a pas de comptage d'espèces d'oiseaux.");
+                    $this->addFlash('warning', $this->translator->trans('campaignController.collected_data_without_species_count'));
                     return false;
                 }
             }
@@ -824,7 +710,7 @@ class CountingCampaignController extends AbstractController
 
         // Vérification supplémentaire pour s'assurer que la campagne est dans un état pouvant être clôturé
         if ($countingCampaign->getCampaignStatus() == $statusClosed) {
-            $this->addFlash('warning', "Cette campagne est déjà $statusClosed");
+            $this->addFlash('warning', $this->translator->trans('campaignController.already_closed', ['%statusClosed%' => $statusClosed]));
             return false;
         }
 
@@ -850,7 +736,7 @@ class CountingCampaignController extends AbstractController
 
         // Si aucun statut n'est défini dans la base de données, sortir de la fonction
         if (empty($campaignStatuses)) {
-            throw new \Exception("Aucun statut de campagne n'est disponible.");
+            throw new \Exception($this->translator->trans('campaignController.no_available_status'));
         }
 
         /**

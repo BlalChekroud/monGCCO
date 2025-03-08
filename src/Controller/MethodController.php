@@ -220,7 +220,7 @@ class MethodController extends AbstractController
                     $this->addFlash('error', $e->getMessage());
                     return $this->redirectToRoute('app_method_new', [], Response::HTTP_SEE_OTHER);
                 }
-                } else {
+            } else {
                 $this->addFlash('error', $this->translator->trans('method.msg.created_error'));
             }
         }
@@ -247,7 +247,8 @@ class MethodController extends AbstractController
                     return $this->redirectToRoute('app_method_index', [], Response::HTTP_SEE_OTHER);
                 } catch (\Exception $e) {
                     $this->addFlash('error', $e->getMessage());
-                    return $this->redirectToRoute('app_method_edit', ['id' => $method->getId()], Response::HTTP_SEE_OTHER);}
+                    return $this->redirectToRoute('app_method_edit', ['id' => $method->getId()], Response::HTTP_SEE_OTHER);
+                }
             } else {
                 $this->addFlash('error', $this->translator->trans('method.msg.updated_error'));
             }

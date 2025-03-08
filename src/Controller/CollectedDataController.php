@@ -81,7 +81,7 @@ class CollectedDataController extends AbstractController
         }
         
         // Si l'utilisateur n'est pas membre d'un groupe, interdire l'accès
-        if (!$this->isUserSiteMember($user, $site)) {
+        if (!$this->isUserSiteMember($user, $site) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
             $this->addFlash('warning', $this->translator->trans('member_of_a_group_assigned_to_this_site'));
             return $this->redirectToRoute('app_collected_data_index');
         }        
@@ -269,7 +269,7 @@ class CollectedDataController extends AbstractController
             return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
         }
         // Si l'utilisateur n'est pas membre d'un groupe, interdire l'accès
-        if (!$this->isUserSiteMember($this->getUser(), $site)) {
+        if (!$this->isUserSiteMember($this->getUser(), $site) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
             $this->addFlash('warning', $this->translator->trans('member_of_a_group_assigned_to_this_site'));
             return $this->redirectToRoute('app_collected_data_index');
         }

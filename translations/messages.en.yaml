@@ -12,7 +12,7 @@ add_a_countType: "Add counting type"
 add_a_quality: "Add a data collection quality"
 add_a_method: "Add a method"
 add_a_disturbed: "Add a disturbance"
-add_a_ice: "Add an ice condition"
+add_an_ice: "Add an ice condition"
 add_a_water: "Add a water condition"
 add_a_tidal: "Add a tidal condition"
 add_a_weather: "Add a weather condition"
@@ -20,6 +20,9 @@ add_a_specy: "Add a bird specy"
 add_a_iucn: "Add an IUCN Category"
 add_a_coverage: "Add Coverage"
 add_a_birdLifeTaxTreat: "Add a BirdLife Taxonomic Treatment"
+add_a_logo: "Add a logo"
+add_a_campaignStatus: "Add a campaign status"
+add_an_image: "Add an image"
 choose_bird_family: "-- Choose a Bird Family --"
 consult_families: "View families"
 consult_reserves: "View reserves"
@@ -91,6 +94,7 @@ export_format:
   xlsx: "Excel (XLSX)"
   ods: "OpenDocument Spreadsheet (ODS)"
 print: "Print"
+campaign_remaining_time: "The remaining time of a campaign"
 created_by: 'Created by'
 collector: "Collector"
 back: 'Back'
@@ -105,6 +109,7 @@ msg_export_limit: "Export size too large. Please narrow your campaign or try a s
 "choose export format": "-- Choose the format to export --"
 help: 'Help'
 status: "Status"
+settings: "Settings"
 
 csv_import_title: "Import a CSV File"
 csv_import_instruction: "Make sure your file contains the required columns."
@@ -212,15 +217,32 @@ vich_uploader.form_label.delete_confirm: 'Delete?'
 vich_uploader.link.download: 'Download'
 image:
   insert: "Insert an image (JPG or PNG)"
-  not_available: 'No image available'
-  mimeTypesMessage: 'Please upload a valid image file (JPEG or PNG)'
+  not_available: "No image available"
+  mimeTypesMessage: "Please upload a valid image file (JPEG or PNG)"
+  name: "Image"
+  title: "Image Management"
+  manage: "Manage Images"
+  title_add: "Add an Image"
+  title_edit: "Edit Image"
+  informations: "Image Information"
+  the_new_informations: "New image information"
+  return: "Back to image overview"
+  consult: "Image overview"
+  delete: "Delete Image"
+  msg:
+    created_success: "The image has been successfully created"
+    created_error: "An error occurred while creating the image"
+    updated_success: "The image has been successfully updated"
+    updated_error: "An error occurred while updating the image"
+    deleted_success: "The image has been successfully deleted"
+    deleted_error: "An error occurred while deleting the image"
 
 Log_in_to_your_account: 'Log in to your account'
 Enter_your_email_and_password_to_log_in: 'Enter your email & password to log in'
 You_are_logged_in_as: 'You are logged in as'
 You_are_already_logged_in_as: 'You are already logged in as : '
 inactive_account_cannot_log_in: "Your account is inactive. You cannot log in."
-# Your_account_is_disabled: "Your account is disabled."
+Your_account_is_disabled: "Your account is disabled."
 Sign_out: 'Sign out'
 Email: 'Email'
 Please_enter_your_email: 'Please enter your email'
@@ -237,6 +259,7 @@ hidden_label: 'Hide'
 visible_label: 'Show'
 no_role: 'No role'
 please_log_in_to_access_the_page: 'Please log in to access the page'
+logout: "Log out"
 
 agentsGroup:
   title: "Agent group management"
@@ -370,8 +393,8 @@ campaign:
   add_conditions_then_start_collecting: "Add environmental conditions then start collecting"
   add_environmental_conditions: "Add Environmental Conditions"
   reserved_for_site_agents: "This section is reserved for site agents"
-  associated_agent_groups: "Associated Agent Groups:"
-  leader: "Leader:"
+  associated_agent_groups: "Associated Agent Groups"
+  leader: "Leader"
   no_group_found: "No group found"
   no_site_found: "No site found"
   back_to_campaign_consultation: "Back to Campaign Consultation"
@@ -390,6 +413,43 @@ campaign:
   campaign_closed_no_modify: "A campaign %statusClosed% cannot be modified"
   campaign_suspended_no_modify: "A campaign %statusSuspended% cannot be modified"
   campaign_cancelled_no_modify: "A campaign %statusCancelled% cannot be modified"
+
+campaignController:
+  select_at_least_one_site_and_group: "You must select at least one site and one group."
+  created: "The counting campaign has been successfully created."
+  creation_error: "An error occurred while creating the counting campaign."
+  deleted: "The counting campaign has been successfully deleted."
+  delete_error: "Error during deletion:"
+  csrf_invalid: "Invalid CSRF token. Deletion canceled."
+  cannot_edit_closed: "Cannot edit a campaign %statusClosed%."
+  cannot_edit_cancelled: "Cannot edit a campaign %statusCancelled%."
+  select_site_and_group: "You must select at least one site and one group of agents."
+  updated: "The counting campaign has been successfully updated."
+  update_error: "An error occurred while updating the campaign."
+  suspended: "The campaign has been suspended."
+  resumed: "The campaign has been resumed."
+  cannot_suspend_closed: "This campaign cannot be %statusSuspended% because it is already %statusClosed%."
+  cancelled: "The campaign has been successfully %statusCancelled%."
+  cancel_error: "Error during campaign cancellation:"
+  cannot_cancel_suspended: "The campaign is currently %statusSuspended%. Please lift the suspension before canceling."
+  already_closed_or_cancelled: "This campaign is already %statusClosed% or %statusCancelled% and cannot be modified."
+  closed_successfully: "The campaign has been successfully %statusClosed%."
+  close_error: "An error occurred while %statusClosed% the campaign:"
+  cannot_close_before_end_date: "The campaign cannot be %statusClosed% before its end date."
+  no_sites_associated: "No sites are associated with the campaign."
+  no_agents_assigned: "No group of agents is assigned to the site: %site_name%"
+  missing_site: "The associated site is missing."
+  missing_environmental_conditions: "The site %site_name% has no environmental conditions."
+  missing_collected_data: "Environmental conditions %condition_id% of site %site_name% have no collected data."
+  collected_data_without_conditions: "Collected data %collected_data_id% for site %site_name% has no environmental conditions."
+  collected_data_without_species_count: "The collected data for site %site_name% has no bird species count."
+  already_closed: "This campaign is already %statusClosed%."
+  no_available_status: "No campaign status is available."
+
+campaignEntity:
+  date_start_end_not_null: "The start and end dates cannot be null."
+  end_date_after_start: "The end date must be after the start date."
+  sites_groups_required: "Sites and their groups must be defined to generate the campaign name."
 
 description: "Description"
 none: "None"
@@ -433,6 +493,24 @@ species_statistics:
 overall_totals:
   general_count_total: "Overall Total Count in Campaign"
   unique_species_observed: "Total Unique Species Observed"
+
+campaignStatus:
+  title: "Campaign Status Management"
+  manage: "Manage Campaign Status"
+  title_add: "Add a Campaign Status"
+  title_edit: "Edit Campaign Status"
+  informations: "Information about the new campaign status"
+  the_new_informations: "New campaign status information"
+  return: "Back to campaign status overview"
+  consult: "Campaign status overview"
+  delete: "Delete Campaign Status"
+  msg:
+    created_success: "The campaign status has been successfully created"
+    created_error: "An error occurred while creating the campaign status"
+    updated_success: "The campaign status has been successfully updated"
+    updated_error: "An error occurred while updating the campaign status"
+    deleted_success: "The campaign status has been successfully deleted"
+    deleted_error: "An error occurred while deleting the campaign status"
 
 collect:
   please_create_the_environmental_conditions_for_this_site_first: "Please create the environmental conditions for this site first."
@@ -489,6 +567,7 @@ condition:
   campaign_not_found: "The specified campaign is not found."
   site_not_found: "The specified site is not found."
   access_denied_environment: "You do not have access to this environmental condition"
+  condition_number: "Condition number"
   msg:
     created_success: "The environmental conditions have been successfully created"
     created_error: "An error occurred while creating the environmental conditions"
@@ -695,16 +774,21 @@ iucn:
 group:
   view_groups: "View Groups"
   name: "Group name"
-  
+
 language:
-  name: 'name'
-  iso2: 'Iso2 Code'
-  title: "Language management"
-  create_a_new_language: "Create a new language"
-  manage_language: "Manage language"
-  informations: "Language informations"
-  return_to_language_consultation: "Return to language consultation"
-  delete_language: 'Delete language'
+  name: "Name"
+  iso2: "ISO2 Code"
+  none: "No language"
+  title: "Language Management"
+  title_add: "Add a Language"
+  title_edit: "Edit Language"
+  the_new_informations: "New language information"
+  add_a_language: "Create a new language"
+  manage: "Manage languages"
+  informations: "Language information"
+  return_to_language_consultation: "Return to language overview"
+  delete: "Delete language"
+  consult: "Language overview"
   msg:
     created: "The language has been successfully created."
     updated: "The language has been successfully updated."
@@ -713,6 +797,25 @@ language:
     creation_failed: "Failed to create the language."
     modification_failed: "An error occurred while updating the language."
     deletion_failed: "An error occurred while deleting the language."
+
+logo:
+  title: "Logo Management"
+  manage: "Manage Logo"
+  title_add: "Add a Logo"
+  title_edit: "Edit Logo"
+  informations: "Logo Information"
+  the_new_informations: "New Logo Information"
+  return: "Back to Logo Overview"
+  consult: "Logo Overview"
+  delete: "Delete Logo"
+  logo_already_exists: "A logo has already been added. You cannot add another one."
+  msg:
+    created_success: "The logo has been successfully created"
+    created_error: "An error occurred while creating the logo"
+    updated_success: "The logo has been successfully updated"
+    updated_error: "An error occurred while updating the logo"
+    deleted_success: "The logo has been successfully deleted"
+    deleted_error: "An error occurred while deleting the logo"
 
 notification:
   all: "All notifications"
@@ -817,23 +920,155 @@ site_collection:
     deleted_error: "An error occurred while deleting the site"
 
 user:
+  firstName: "First Name"
+  lastName: "Last Name"
+  email: "Email Address"
+  phone: "Phone Number"
+  password: "Password"
+  password_confirmation: "Confirm Password"
+  password_placeholder: "Please enter your password!"
+  role: "Role"
+  role_placeholder: "-- Choose a role --"
+  ROLE_USER: "User"
+  ROLE_VIEW: "Viewer"
+  ROLE_EDIT: "Editor"
+  ROLE_CREAT: "Creator"
+  ROLE_DELETE: "Deleter"
+  ROLE_IMPORT: "Importer"
+  ROLE_EXPORT: "Exporter"
+  ROLE_SUPER_CREAT: "Super Creator"
+  ROLE_COLLECTOR: "Collector"
+  ROLE_ADMIN: "Administrator"
+  ROLE_SUPER_ADMIN: "Super Administrator"
+  profile: "Profile"
+  title: "Users"
+  manage: "User Management"
+  title_add: "Add a User"
+  title_edit: "Edit User"
+  the_new_informations: "New user information"
+  return: "Back to user overview"
+  consult: "User overview"
+  delete: "Delete User"
+  overview: "Overview"
+  profile_details: "Profile Details"
+  save_changes: "Save Changes"
+  profile_image: "Profile Image"
+  show: "Show"
+  hide: "Hide"
+  change_password: "Change your password"
+  current_password: "Current Password"
+  new_password: "New Password"
+  confirm_new_password: "Confirm New Password"
+  edit: "Edit Profile"
+  not_logged_in: "You are not logged in"
+  firstName_blank: "Please enter your first name"
+  firstName_too_short: "Your first name must be at least {{ limit }} characters long."
+  lastName_blank: "Please enter your last name"
+  lastName_too_short: "Your last name must be at least {{ limit }} characters long."
+  phone_blank: "Please enter your phone number"
+  phone_too_short: "Your phone number must be at least {{ limit }} characters long."
+  password_blank: "Please enter a password"
+  password_too_short: "Your password must be at least {{ limit }} characters long."
+  password_mismatch: "The two passwords must match."
   msg:
+    created: "The user has been successfully created."
+    updated: "The user has been successfully updated."
     deleted: "The user account has been successfully deleted."
+    disconnected: "You are logged out."
+    account_info_modified: "Account information has been successfully updated."
+    password_incorrect: "The entered password is incorrect."
+    password_modified: "The password has been successfully updated."
   error:
+    creation_failed: "Failed to create the user."
+    modification_failed: "An error occurred while updating the user."
     deletion_failed: "An error occurred while deleting the user account."
 
 userStatus:
-  title: "User Status Management"
-  breadcrumb_management: "Status Management"
-  label: 'Label'
-  delete_user_status: "Delete the status"
-  informations: "Status information"
-  return_to_user_status_consultation: "Back to user status overview"
+  title: "User State Management"
+  manage: "Manage user states"
+  title_add: "Add a user state"
+  title_edit: "Edit user state"
+  the_new_informations: "New user state information"
+  breadcrumb_management: "User State Management"
+  label: "Label"
+  delete_user_status: "Delete user state"
+  informations: "User state information"
+  return: "Back to user state overview"
+  consult: "User state overview"
+  delete: "Delete user state"
   msg:
-    created: "The status has been successfully created."
-    updated: "The status has been successfully updated."
-    deleted: "The status has been successfully deleted."
+    created: "The state has been successfully created."
+    updated: "The state has been successfully updated."
+    deleted: "The state has been successfully deleted."
   error:
-    creation_failed: "Failed to create the status."
-    modification_failed: "An error occurred while updating the status."
-    deletion_failed: "An error occurred while deleting the status."
+    creation_failed: "Failed to create the state"
+    modification_failed: "An error occurred while updating the state."
+    deletion_failed: "An error occurred while deleting the state."
+
+campaignGuide:
+  title: "Guide to Campaign Statuses for Bird Counting"
+  close: "Close"
+  introductionTitle: "Introduction"
+  introductionText: "During the management of bird counting campaigns, a campaign can go through several statuses. These statuses allow tracking the life cycle of a campaign, from planning to closure or cancellation."
+  differentStatesTitle: "The different statuses and their meanings:"
+  common:
+    active: "When the status is active:"
+    actions: "Possible actions:"
+  state:
+    planned:
+      title: "Planned"
+      description: "The campaign is defined but has not yet started."
+      active_description: "The campaign's start date is in the future."
+      actions_description: "The user can prepare sites and teams, but data collection cannot yet begin."
+    ongoing:
+      title: "Ongoing"
+      description: "The campaign is currently in progress."
+      active_description: "The start date has been reached, and the end date is yet to come."
+      actions_description: "Data collection can be carried out by teams at assigned sites."
+    finished:
+      title: "Finished"
+      description: "The campaign period is over, but it has not been officially closed yet."
+      active_description: "The campaign's end date has passed, but final checks may still be pending."
+      actions_description: "The user can review the collected data before making final decisions."
+    closed:
+      title: "Closed"
+      description: "The campaign is officially closed."
+      active_description: "All data has been verified and validated, and no further action is possible."
+    suspended:
+      title: "Suspended"
+      description: "The campaign is temporarily paused."
+      active_description: "The campaign has been put on hold for some reason (e.g. weather conditions)."
+      actions_description: "The campaign can be resumed or cancelled depending on the circumstances."
+    cancelled:
+      title: "Cancelled"
+      description: "The campaign has been cancelled before closure."
+      active_description: "The user or an administrator has decided to cancel the campaign."
+      actions_description: "No further data collection can be performed."
+    error:
+      title: "Error"
+      description: "An issue occurred preventing the campaign from proceeding correctly."
+      active_description: "A technical or organizational problem prevented the campaign from progressing."
+  adviceTitle: "Advice:"
+  advice:
+    close:
+      title: "Closing a campaign:"
+      description: "Make sure all data is collected and validated before closing."
+    resume:
+      title: "Resuming a suspended campaign:"
+      description: "It can be resumed once obstacles are removed."
+    cancel:
+      title: "Cancellation:"
+      description: "Be careful, a cancelled campaign cannot be resumed."
+
+sweetalert:
+  confirm_title: "Are you sure?"
+  confirm_text: "You cannot undo this action!"
+  confirm_text_user: "Deleting the account will also remove everything created by this user. You cannot undo this action!"
+  confirm_button: "Yes, delete it!"
+  cancel_button: "No, cancel!"
+  deleted_title: "Deleted!"
+  deleted_text: "The item has been deleted."
+  cancelled_title: "Cancelled"
+  cancelled_text: "Your item is still safe 🙂"
+
+my_profile: "My Profile"

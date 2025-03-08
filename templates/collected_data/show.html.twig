@@ -154,7 +154,7 @@
                                 <a href="{{ path('app_environmental_conditions_show', {'id': collected_datum.environmentalConditions.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-2" title="{{'condition.title_show'|trans }}"> {{'campaign_statistics.environmental_conditions'|trans }}</a>
                             {% endif %}
                             {% if collected_datum.countingCampaign %}
-                                <a href="{{ path('app_counting_campaign_show', {'id': collected_datum.countingCampaign.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-1" title="{{'campaign.campaign_details'|trans }}"> {{'campaign.campaign_name'|trans }}</a>
+                                <a href="{{ path('app_counting_campaign_show', {'id': collected_datum.countingCampaign.id}) }}" class="btn btn-outline-success btn-sm bi bi-card-text mx-1" title="{{'campaign.campaign_details'|trans }}"> {{'campaign.name'|trans }}</a>
                             {% endif %}
                             <a href="{{ path('app_collected_data_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{'collect.collect_add'|trans }}</a>
                         </div>

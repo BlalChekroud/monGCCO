@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[ORM\Entity(repositoryClass: CountingCampaignRepository::class)]
 class CountingCampaign
@@ -69,25 +70,21 @@ class CountingCampaign
         $this->siteAgentsGroups = new ArrayCollection();
     }
 
-    public function generateCampaignName(): void
+    public function generateCampaignName(TranslatorInterface $translator): void
     {
         $startDate = $this->getStartDate();
         $endDate = $this->getEndDate();
 
         if ($startDate === null || $endDate === null) {
-            throw new \InvalidArgumentException('Les dates de début et de fin ne peuvent pas être les mêmes.');
+            throw new \InvalidArgumentException($translator->trans('campaignEntity.date_start_end_not_null'));
         }
 
         if ($startDate >= $endDate) {
-            throw new \InvalidArgumentException('La date de fin doit être postérieure à la date de début.');
+            throw new \InvalidArgumentException($translator->trans('campaignEntity.end_date_after_start'));
         }        
-        
-        if ($startDate->format('Y-m-d H:i:s') === $endDate->format('Y-m-d H:i:s')) {
-            throw new \InvalidArgumentException('Les dates de début et de fin ne peuvent pas être les mêmes.');
-        }
 
         if (!$this->getSiteAgentsGroups()) {
-            throw new \InvalidArgumentException('Les sites et leurs groupes doivent être définies pour générer le nom de la campagne.');
+            throw new \InvalidArgumentException($translator->trans('campaignEntity.sites_groups_required'));
         }
 
         $regionCode = [];
@@ -100,7 +97,6 @@ class CountingCampaign
         $campaignId = $this->getId();
 
         $this->campaignName = sprintf('%s %s-%s', implode(',',$uniqueregionCode) ,$startYear ,$campaignId);
-        // $this->campaignName = sprintf('%s-%s', $startYear ,$campaignId);
     }
 
 

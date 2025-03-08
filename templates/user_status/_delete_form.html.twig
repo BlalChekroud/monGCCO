@@ -1,4 +1,4 @@
-{% if is_granted('ROLE_ADMIN') %}
+{% if is_granted('ROLE_SUPER_ADMIN') %}
     <form method="post" action="{{ path('app_user_status_delete', {'id': user_status.id}) }}" onsubmit="return confirm('{{ 'delete_confirm'|trans }}');">
         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user_status.id) }}">
         <button class="btn btn-danger btn-sm bi bi-trash-fill mx-2" title="{{ 'userStatus.delete_user_status'|trans }}"></button>

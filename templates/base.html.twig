@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang={{ app.request.session.get('_locale', app.request.locale) ??  'fr'}}>
+{# <html lang={{ app.user.language.iso2 ?? 'fr' }}> #}
+{# <html lang="{{ app.request.locale ?? 'fr' }}"> #}
 
   <head>
     <meta charset="utf-8">
@@ -442,7 +444,7 @@
                       {{ app.user.getName() }}
                   </span>
               {% else %}
-                  <a href="{{ path('app_login') }}">Se connecter</a>
+                  <a href="{{ path('app_login') }}">{{'login_redirect'|trans }}</a>
               {% endif %}
             </a><!-- End Profile Iamge Icon -->
 
@@ -452,7 +454,7 @@
                   <h6>{{ app.user.getName() }}</h6>
                   <ul class="text-start">
                     {% for role in app.user.getRoles() %}
-                      <li class="explanation">{{ role }}</li>
+                      <li class="explanation">{{ ('user.' ~ role)|trans }}</li>
                     {% else %}
                       <span>{{ 'no_role'|trans }}</span>
                     {% endfor %}
@@ -465,22 +467,24 @@
                 <li>
                   <a class="dropdown-item d-flex align-items-center" href="{{ path('app_profile_edit', {'id': app.user.id}) }}">
                     <i class="bi bi-person"></i>
-                    <span>Mon Profil</span>
+                    <span>{{'my_profile'|trans }}</span>
                   </a>
                 </li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>
 
+                {%  if is_granted('ROLE_ADMIN') %}
                 <li>
                   <a class="dropdown-item d-flex align-items-center" href="{{ path('app_profile') }}">
                     <i class="bi bi-people"></i>
-                    <span>Utilisateurs</span>
+                    <span>{{'user.title'|trans }}</span>
                   </a>
                 </li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>
+                {% endif %}
 
                 <li>
                   <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
@@ -495,7 +499,7 @@
                 <li>
                   <a class="dropdown-item d-flex align-items-center" href="{{ path('app_logout') }}">
                     <i class="bi bi-box-arrow-right"></i>
-                    <span>Se déconnecter</span>
+                    <span>{{'logout'|trans }}</span>
                   </a>
                 </li>
               {% endif %}
@@ -720,7 +724,7 @@
 
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#users-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-people"></i><span>Gestion des utilisateurs</span><i class="bi bi-chevron-down ms-auto"></i>
+            <i class="bi bi-people"></i><span>{{'user.manage'|trans }}</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul id="users-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
@@ -735,7 +739,7 @@
             </li>
             <li>
               <a href="{{ path('app_profile') }}">
-                <i class="bi bi-circle"></i><span>Consultation des utilisateurs</span>
+                <i class="bi bi-circle"></i><span>{{'user.consult'|trans }}</span>
               </a>
             </li>
           </ul>
@@ -744,37 +748,37 @@
         {% if is_granted('ROLE_SUPER_ADMIN') %}
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#parameters-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-gear"></i><span>Paramètres</span><i class="bi bi-chevron-down ms-auto"></i>
+            <i class="bi bi-gear"></i><span>{{'settings'|trans }}</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul id="parameters-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="{{ path('app_logo_new') }}">
-                <i class="bi bi-circle"></i><span>Ajouter le logo</span>
+                <i class="bi bi-circle"></i><span>{{'add_a_logo'|trans }}</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_logo_index') }}">
-                <i class="bi bi-circle"></i><span>Consulter le logo</span>
+                <i class="bi bi-circle"></i><span>{{'logo.consult'|trans}}</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_image_index') }}">
-                <i class="bi bi-circle"></i><span>Consultation des images</span>
+                <i class="bi bi-circle"></i><span>{{'image.consult'|trans }}</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_campaign_status_index') }}">
-                <i class="bi bi-circle"></i><span>Statuts de la campagne</span>
+                <i class="bi bi-circle"></i><span>{{'campaignStatus.consult'|trans }}</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_user_status_index') }}">
-                <i class="bi bi-circle"></i><span>Statuts d'utilisateur</span>
+                <i class="bi bi-circle"></i><span>{{'userStatus.consult'|trans }}</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_language_index') }}">
-                <i class="bi bi-circle"></i><span>Langues</span>
+                <i class="bi bi-circle"></i><span>{{'language.consult'|trans }}</span>
               </a>
             </li>
           </ul>

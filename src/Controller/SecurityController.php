@@ -13,8 +13,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
-
-
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,30 +28,16 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    public function __construct(private readonly TranslatorInterface $translator) {}
+
     #[Route(path: '/login', name: 'app_login')]
-    public function login(Request $request, AuthenticationUtils $authenticationUtils, Security $security, TranslatorInterface $translator): Response
+    public function login(Request $request, AuthenticationUtils $authenticationUtils, Security $security): Response
     {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
-        
-        // // Vérifier si l'utilisateur est déjà authentifié
-        // if ($security->getUser()) {
-        //     $user = $security->getUser();
-
-        //     // Vérifier si le statut de l'utilisateur est "Inactif"
-        //     if ($user->getUserStatus()->getLabel() !== 'Actif') {
-        //         // Ajouter un message flash et rediriger vers la déconnexion
-        //         $this->addFlash('warning', $translator->trans('Your_account_is_disabled'));
-        //         return $this->redirectToRoute('app_logout');
-        //     } else {
-        //         // Si l'utilisateur est actif, afficher un message d'information
-        //         $this->addFlash('info', $translator->trans('You_are_already_logged_in_as') . ' ' . $lastUsername);
-        //         return $this->redirectToRoute('home');
-        //     }
-        // }
 
         // Enregistrer la locale dans la session (facultatif)
         $_locale = $request->getSession()->get('_locale', 'fr'); // valeur par défaut
@@ -88,7 +72,7 @@ class SecurityController extends AbstractController
     public function logout(): void
     {
         // throw new \LogicException('Ce champ de méthode peut être vide - il sera intercepté par la clé de déconnexion de votre pare-feu.');
-        throw new \LogicException('Vous étes déconnecté.');
+        throw new \LogicException($this->translator->trans('user.msg.disconnected'));
         // $this->addFlash('warning','Vous étes déconnecté.');
     }
 
@@ -113,12 +97,12 @@ class SecurityController extends AbstractController
         // Vérifier si l'utilisateur est actif avant de permettre l'édition
         if ($this->getUser()->getUserStatus()->getLabel() !== 'Actif') {
             // throw new CustomUserMessageAuthenticationException('Votre compte est désactivé.');
-            $this->addFlash('warning','Votre compte est désactivé.');
+            $this->addFlash('warning',$this->translator->trans('Your_account_is_disabled'));
             return $this->redirectToRoute('app_logout');
         }
         // Autoriser l'utilisateur à modifier son propre profil ou si c'est un administrateur
         if ($this->getUser() !== $user && !$this->isGranted('ROLE_ADMIN')) {
-            $this->addFlash('info', "Vous n'avez pas le droit de modifier ce compte.");
+            $this->addFlash('info', $this->translator->trans('edit_permission'));
             return $this->redirectToRoute('home');
         }
 
@@ -159,12 +143,11 @@ class SecurityController extends AbstractController
                     $user->setUpdatedAt(new \DateTimeImmutable());
                     
                     $entityManager->flush();
-                    $this->addFlash('success', 'Les informations du compte ont été bien modifiées');
+                    $this->addFlash('success', $this->translator->trans('user.msg.account_info_modified'));
                     return $this->redirectToRoute('app_profile_edit', ['id' => $user->getId()], Response::HTTP_SEE_OTHER);
                 } else {
-                    $this->addFlash('warning', 'Le mot de passe renseigné est incorrect.');
+                    $this->addFlash('warning', $this->translator->trans('user.msg.password_incorrect'));
                 }
-
             } else {
                 $this->addFlash('error', $form->getErrors(true));
             }
@@ -180,10 +163,10 @@ class SecurityController extends AbstractController
                 $user->setUpdatedAt(new \DateTimeImmutable());
                 $user->setPassword($hasher->hashPassword($user, $newPassword));
                 $entityManager->flush();
-                $this->addFlash('success', 'Le mot de passe a été bien modifié.');
+                $this->addFlash('success', $this->translator->trans('user.msg.password_modified'));
                 return $this->redirectToRoute('home', [], Response::HTTP_SEE_OTHER);
             } else {
-                $this->addFlash('warning', 'Le mot de passe renseigné est incorrect.');
+                $this->addFlash('warning', $this->translator->trans('user.msg.password_incorrect'));
             }
         }
     
@@ -197,15 +180,15 @@ class SecurityController extends AbstractController
 
     #[IsGranted('ROLE_SUPER_ADMIN', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/admin/profile/{id}', name: 'app_user_delete', methods: ['POST'])]
-    public function delete(Request $request, User $user, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
+    public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->get('_token'))) {
 
             $entityManager->remove($user);
             $entityManager->flush();
-            $this->addFlash('success', $translator->trans('user.msg.deleted'));
+            $this->addFlash('success', $this->translator->trans('user.msg.deleted'));
         } else {
-            $this->addFlash('error', $translator->trans('user.error.deletion_failed'));
+            $this->addFlash('error', $this->translator->trans('user.error.deletion_failed'));
         }
 
         return $this->redirectToRoute('app_profile', [], Response::HTTP_SEE_OTHER);

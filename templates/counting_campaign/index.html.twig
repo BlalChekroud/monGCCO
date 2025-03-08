@@ -49,6 +49,7 @@
                       <th>{{ 'campaign.campaign_name'|trans }}</th>
                       <th>{{ 'campaign.start_date'|trans }}</th>
                       <th>{{ 'campaign.end_date'|trans }}</th>
+                      <th>{{ 'campaign_remaining_time'|trans }}</th>
                       <th>{{ 'campaign.status'|trans }}</th>
                       <th>{{ 'actions'|trans }}</th>
                     </tr>
@@ -62,11 +63,11 @@
                     * $campaignStatuses[5] -> "Suspendue"
                     * $campaignStatuses[6] -> "Annulée #}
                     {% set status_classes = {
-                        0: 'primary',   
-                        1: 'info',      
-                        2: 'light',   
-                        3: 'success', 
-                        4: 'warning',    
+                        0: 'info',   
+                        1: 'success',      
+                        2: 'warning',   
+                        3: 'light', 
+                        4: 'danger',    
                         5: 'secondary',   
                         6: 'dark'       
                     } %}
@@ -77,6 +78,23 @@
                         <td>{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y') : '' }}</td>
                         <td>{{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y') : '' }}</td>
                         <td>
+                          {# Calculer le pourcentage du temps restant #}
+                            {% set totalDuration = date(counting_campaign.endDate)|date('U') - date(counting_campaign.startDate)|date('U') %}
+                            {% set timeRemaining = date(counting_campaign.endDate)|date('U') - date("now")|date('U') %}
+                            {% set progressPercentage = (timeRemaining / totalDuration) * 100 %}
+                            {% set progressPercentage = progressPercentage < 0 ? 0 : (progressPercentage > 100 ? 100 : progressPercentage) %}
+                            {% set barColor = progressPercentage > 50 ? 'bg-success' : (progressPercentage > 20 ? 'bg-warning' : 'bg-danger') %}
+                            {# Afficher la barre de progression #}
+                            <div class="progress mt-3">
+                                <div class="progress-bar progress-bar-striped {{ barColor }} progress-bar-animated" role="progressbar" 
+                                    style="width: {{ progressPercentage }}%;" 
+                                    aria-valuenow="{{ progressPercentage|round }}" 
+                                    aria-valuemin="0" aria-valuemax="100">
+                                    {{ progressPercentage|round }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
                           {# Utiliser le label du statut pour obtenir l'index depuis statusIndexMap #}
                           {% set campaignStatusIndex = statusIndexMap[counting_campaign.campaignStatus.id] %}
                           <div class="badge bg-{{ status_classes[campaignStatusIndex] ?? 'secondary' }}">
@@ -86,8 +104,12 @@
                         </td>
                         <td>
                           <div class="d-flex justify-content-end">
-                            {% import 'macros/btn_actions_macros.html.twig' as macros %}
-                            {{ macros.action_buttons('app_counting_campaign_new','app_counting_campaign_show', 'app_counting_campaign_edit', 'counting_campaign/_delete_form.html.twig', counting_campaign, app.request.attributes.get('_route'), true) }}
+                            {% if is_granted('ROLE_ADMIN') %}
+                              {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                              {{ macros.action_buttons('app_counting_campaign_new','app_counting_campaign_show', 'app_counting_campaign_edit', 'counting_campaign/_delete_form.html.twig', counting_campaign, app.request.attributes.get('_route'), true) }}
+                            {% else %}
+                              <a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" class="btn btn-success btn-sm bi bi-card-text mx-2" title="{{ 'show'|trans }}"></a>
+                            {% endif %}
                             {{ include('counting_campaign/_delete_form.html.twig') }}
                           </div>
                         </td>

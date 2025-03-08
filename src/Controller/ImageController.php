@@ -11,11 +11,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
-#[Route('/super-admin/image')]
+// #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
+#[Route('/admin/image')]
 class ImageController extends AbstractController
 {
+    public function __construct(private readonly TranslatorInterface $translator) {}
+
     #[Route('/', name: 'app_image_index', methods: ['GET'])]
     public function index(ImageRepository $imageRepository): Response
     {
@@ -31,19 +34,28 @@ class ImageController extends AbstractController
         $form = $this->createForm(ImageType::class, $image);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // /** @var UploadedFile $imageFile */
-            $imageFile = $form->get('imageFile')->getData();
-
-            if ($imageFile) {
-                $image->setImageFile($imageFile);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                try {
+                    // /** @var UploadedFile $imageFile */
+                    $imageFile = $form->get('imageFile')->getData();
+            
+                    if ($imageFile) {
+                        $image->setImageFile($imageFile);
+                    }
+                    $image->setCreatedAt(new \DateTimeImmutable());
+                    $entityManager->persist($image);
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('image.msg.created_success'));
+            
+                    return $this->redirectToRoute('app_image_index', [], Response::HTTP_SEE_OTHER);        
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_image_new', [], Response::HTTP_SEE_OTHER);
+                }
+            } else {
+                $this->addFlash('error', $this->translator->trans('image.msg.created_error'));
             }
-            $image->setCreatedAt(new \DateTimeImmutable());
-            $entityManager->persist($image);
-            $entityManager->flush();
-            $this->addFlash('success', "L'image a bien été ajoutée.");
-
-            return $this->redirectToRoute('app_image_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('image/new.html.twig', [
@@ -52,13 +64,6 @@ class ImageController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_image_show', methods: ['GET'])]
-    public function show(Image $image): Response
-    {
-        return $this->render('image/show.html.twig', [
-            'image' => $image,
-        ]);
-    }
 
     #[Route('/{id}/edit', name: 'app_image_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Image $image, EntityManagerInterface $entityManager): Response
@@ -66,18 +71,27 @@ class ImageController extends AbstractController
         $form = $this->createForm(ImageType::class, $image);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // /** @var UploadedFile $imageFile */
-            $imageFile = $form->get('imageFile')->getData();
-
-            if ($imageFile) {
-                $image->setImageFile($imageFile);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                try {
+                    // /** @var UploadedFile $imageFile */
+                    $imageFile = $form->get('imageFile')->getData();
+            
+                    if ($imageFile) {
+                        $image->setImageFile($imageFile);
+                    }
+                    $image->setUpdatedAt(new \DateTimeImmutable());
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('image.msg.updated_success'));
+            
+                    return $this->redirectToRoute('app_image_index', [], Response::HTTP_SEE_OTHER);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                    return $this->redirectToRoute('app_image_edit', ['id' => $image->getId()], Response::HTTP_SEE_OTHER);
+                }
+            } else {
+                $this->addFlash('error', $this->translator->trans('image.msg.updated_error'));
             }
-            $image->setUpdatedAt(new \DateTimeImmutable());
-            $entityManager->flush();
-            $this->addFlash('success', "L'image a bien été modifiée.");
-
-            return $this->redirectToRoute('app_image_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('image/edit.html.twig', [
@@ -90,9 +104,16 @@ class ImageController extends AbstractController
     public function delete(Request $request, Image $image, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$image->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($image);
-            $entityManager->flush();
-            $this->addFlash('success', "L'image a bien été supprimée.");
+            try {
+                $entityManager->remove($image);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('image.msg.deleted_success'));
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_image_index', [], Response::HTTP_SEE_OTHER);
+            }
+        } else {
+            $this->addFlash('error',$this->translator->trans('image.msg.deleted_error'));
         }
 
         return $this->redirectToRoute('app_image_index', [], Response::HTTP_SEE_OTHER);
