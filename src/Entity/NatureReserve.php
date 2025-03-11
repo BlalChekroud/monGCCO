@@ -6,6 +6,7 @@ use App\Repository\NatureReserveRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NatureReserveRepository::class)]
 class NatureReserve
@@ -16,6 +17,7 @@ class NatureReserve
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
     private ?string $reserveName = null;
 
     #[ORM\Column]
@@ -28,15 +30,16 @@ class NatureReserve
     #[ORM\JoinColumn(nullable: false)]
     private ?User $createdBy = null;
 
+    #[ORM\ManyToOne(inversedBy: 'natureReservesLeader')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
+    private ?User $reserveLeader = null;
+
     /**
      * @var Collection<int, SiteCollection>
      */
     #[ORM\OneToMany(targetEntity: SiteCollection::class, mappedBy: 'natureReserve')]
     private Collection $siteCollections;
-
-    #[ORM\ManyToOne(inversedBy: 'natureReservesLeader')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $reserveLeader = null;
 
     public function __construct()
     {
@@ -96,6 +99,18 @@ class NatureReserve
         return $this;
     }
 
+    public function getReserveLeader(): ?User
+    {
+        return $this->reserveLeader;
+    }
+
+    public function setReserveLeader(?User $reserveLeader): static
+    {
+        $this->reserveLeader = $reserveLeader;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, SiteCollection>
      */
@@ -122,18 +137,6 @@ class NatureReserve
                 $siteCollection->setNatureReserve(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getReserveLeader(): ?User
-    {
-        return $this->reserveLeader;
-    }
-
-    public function setReserveLeader(?User $reserveLeader): static
-    {
-        $this->reserveLeader = $reserveLeader;
 
         return $this;
     }

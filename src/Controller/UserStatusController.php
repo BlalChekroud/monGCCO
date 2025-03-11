@@ -81,7 +81,7 @@ class UserStatusController extends AbstractController
             $this->addFlash('error', $translator->trans('delete_permission'));
             return $this->redirectToRoute('app_user_status_index', [], Response::HTTP_SEE_OTHER);
         }
-        if ($this->isCsrfTokenValid('delete'.$userStatus->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$userStatus->getId(), $request->getPayload()->get('_token'))) {
             $entityManager->remove($userStatus);
             $entityManager->flush();
             $this->addFlash('success', $translator->trans('userStatus.msg.deleted'));

@@ -81,11 +81,12 @@ class SiteCollection
     #[ORM\OneToMany(targetEntity: SiteAgentsGroup::class, mappedBy: 'siteCollection', orphanRemoval: true)]
     private Collection $siteAgentsGroups;
 
-    #[ORM\ManyToOne(inversedBy: 'siteCollections')]
-    private ?NatureReserve $natureReserve = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $parentSite = null;
+
+    #[ORM\ManyToOne(inversedBy: 'siteCollections')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?NatureReserve $natureReserve = null;
 
     public function __construct()
     {
@@ -357,18 +358,6 @@ class SiteCollection
         return $this;
     }
 
-    public function getNatureReserve(): ?NatureReserve
-    {
-        return $this->natureReserve;
-    }
-
-    public function setNatureReserve(?NatureReserve $natureReserve): static
-    {
-        $this->natureReserve = $natureReserve;
-
-        return $this;
-    }
-
     public function getParentSite(): ?string
     {
         return $this->parentSite;
@@ -377,6 +366,18 @@ class SiteCollection
     public function setParentSite(?string $parentSite): static
     {
         $this->parentSite = $parentSite;
+
+        return $this;
+    }
+
+    public function getNatureReserve(): ?NatureReserve
+    {
+        return $this->natureReserve;
+    }
+
+    public function setNatureReserve(?NatureReserve $natureReserve): static
+    {
+        $this->natureReserve = $natureReserve;
 
         return $this;
     }

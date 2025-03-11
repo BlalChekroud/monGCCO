@@ -132,7 +132,7 @@ class LogoController extends AbstractController
     #[Route('/{id}', name: 'app_logo_delete', methods: ['POST'])]
     public function delete(Request $request, Logo $logo, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$logo->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$logo->getId(), $request->getPayload()->get('_token'))) {
             try {
                 $entityManager->remove($logo);
                 $entityManager->flush();

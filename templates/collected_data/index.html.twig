@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{'condition.title'|trans }}{% endblock %}
+{% block title %}{{'collect.title'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -78,9 +78,10 @@
       </div>
     </section>
     
-    {% import 'macros/form_macros.html.twig' as form_macros %}
-    {{ form_macros.csv_import_form(form, 'app_collected_data_index', formExport, 'Import collected Data', 'Export collected Data') }}
-
+    {# {% import 'macros/form_macros.html.twig' as form_macros %}
+    {{ form_macros.csv_import_form(formExport, 'app_collected_data_index', formExport, 'Import collected Data', 'Export collected Data') }} #}
+    {% import 'macros/show_export_macros.html.twig' as macros %}
+    {{ macros.export_section(formExport, 'Export collected Data') }}
 {# 
     {% if headers is defined and rows is defined %}
         {{ form_macros.csv_modal(headers, rows, csvData, 'app_collected_data_index', ['country', 'iso2']) }}

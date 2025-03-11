@@ -108,25 +108,6 @@ class AgentsGroup
 
         return $this;
     }
-    // public function setLeader(?User $leader): self
-    // {
-    //     if ($this->leader !== $leader) {
-    //         // Retirer l'ancien leader
-    //         if ($this->leader) {
-    //             $this->leader->removeLeader($this);
-    //         }
-
-    //         // Définir le nouveau leader
-    //         $this->leader = $leader;
-
-    //         // Ajouter ce groupe au nouveau leader
-    //         if ($leader) {
-    //             $leader->addLeader($this);
-    //         }
-    //     }
-
-    //     return $this;
-    // }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {

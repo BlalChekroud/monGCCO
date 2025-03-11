@@ -34,6 +34,24 @@ class SiteCollectionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Récupère toutes les campagnes d'un SiteCollections.
+     * utilisé dans reserve.
+     * @param SiteCollection $site
+     * @return CountingCampaign[] Retourne un tableau d'objets CountingCampains
+     */
+    public function getCampaignsBySiteCollection(SiteCollection $site): array
+    {
+        return $this->createQueryBuilder('sc')
+            ->select('DISTINCT cc.id AS campaignId, cc.campaignName AS campaignName')
+            ->join('sc.siteAgentsGroups', 'sag')
+            ->join('sag.countingCampaign', 'cc')
+            ->where('sc.id = :siteId')
+            ->setParameter('siteId', $site->getId())
+            ->getQuery()
+            ->getResult();
+    }
+    
 
     /**
      * Récupère le nombre total de comptages d'oiseaux pour un site spécifique

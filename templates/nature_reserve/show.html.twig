@@ -1,34 +1,138 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}NatureReserve{% endblock %}
+{% block title %}{{'nature_reserve.title'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>NatureReserve</h1>
+<main id="main" class="main">
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ nature_reserve.id }}</td>
-            </tr>
-            <tr>
-                <th>ReserveName</th>
-                <td>{{ nature_reserve.reserveName }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ nature_reserve.createdAt ? nature_reserve.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>UpdatedAt</th>
-                <td>{{ nature_reserve.updatedAt ? nature_reserve.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="pagetitle">
+      <h1>{{'nature_reserve.title_show'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
+          <li class="breadcrumb-item"><a href="{{ path('app_nature_reserve_index') }}">{{ 'nature_reserve.manage'|trans }}</a></li>
+          <li class="breadcrumb-item active">{{'show'|trans }}</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-    <a href="{{ path('app_nature_reserve_index') }}">back to list</a>
+    <section class="section">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                     <div id="printableArea">
+                        <h5 class="card-title">{{'show'|trans }}</h5>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>{{ 'nature_reserve.name'|trans }}:</th>
+                                    <td>{{ nature_reserve.reserveName }}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{'nature_reserve.reserveLeader'|trans }}:</th>
+                                    <td>{{ nature_reserve.reserveLeader }}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{'nature_reserve.sites'|trans }}: </th>
+                                    <td>
+                                        {% if nature_reserve.siteCollections|length > 0 %}
+                                            {% set sorted_siteCollections = nature_reserve.siteCollections|sort((a, b) => a.siteName <=> b.siteName) %}
+                                            <ul>
+                                                {% for site in sorted_siteCollections %}
+                                                    <li>
+                                                        {{ site.siteCode }} - {{ site.SiteName }}
+                                                    </li>                                                    
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p>{{'site_collection.none'|trans }}</p>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>{{ 'created_at'|trans }}:</th>
+                                    <td>{{ nature_reserve.createdAt ? nature_reserve.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{ 'Last_updated_at'|trans }}:</th>
+                                    <td>{{ nature_reserve.updatedAt ? nature_reserve.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                     </div>
 
-    <a href="{{ path('app_nature_reserve_edit', {'id': nature_reserve.id}) }}">edit</a>
+                     {% for campaign in reserveCampaigns %}
+                        <li>
+                            {{ campaign.campaignName }} - {{ campaign.campaignId }}
+                        </li>
+                    {% else %}
+                        <p>{{'campaign.none'|trans }}</p>
+                    {% endfor %}
 
-    {{ include('nature_reserve/_delete_form.html.twig') }}
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <div>
+                            <a href="{{ path('app_nature_reserve_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'nature_reserve.return'|trans }}">{{ 'back'|trans }}</a>
+                            <a href="{{ path('app_nature_reserve_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'add_a_nature_reserve'|trans }}</a>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                            {{ macros.action_buttons('app_nature_reserve_new','app_nature_reserve_show', 'app_nature_reserve_edit', 'nature_reserve/_delete_form.html.twig', nature_reserve, app.request.attributes.get('_route')) }}
+                            {{ include('nature_reserve/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <section>
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+              <div id="printableArea">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Accordion without outline borders -->
+                        <div class="accordion accordion-flush" id="accordionFlushExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="flush-headingOne">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                                        <h6 class="mt-4"><i class="bi bi-info-circle-fill text-info"></i> {{ 'campaign.campaign_details'|trans }}</h6>
+                                    </button>
+                                </h2>
+                                <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                    <div class="accordion-body">
+                                        {% for site in nature_reserve.siteCollections %}
+                                        <div class="mb-3">
+                                            <h5>{{ site.siteName }}</h5>
+                                            {% set campaigns = campaignsBySite[site.id] %}
+                                            {% if campaigns is not empty %}
+                                            <ul class="list-group list-group-flush">
+                                                {% for campaign in campaigns|reverse %}
+                                                <li class="list-group-item">
+                                                    {{ campaign.campaignName }}
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% else %}
+                                            <p class="text-muted">{{ 'no_campaign_found'|trans }}</p>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div><!-- End Accordion without outline borders -->
+                    </div>
+
+                </div>
+            
+              </div>
+            </div>
+        </div>
+
+    </section>
+</main>
 {% endblock %}

@@ -82,7 +82,7 @@ class LanguageController extends AbstractController
     #[Route('/{id}', name: 'app_language_delete', methods: ['POST'])]
     public function delete(Request $request, Language $language, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$language->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$language->getId(), $request->getPayload()->get('_token'))) {
             try {
                 $entityManager->remove($language);
                 $entityManager->flush();

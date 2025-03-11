@@ -41,7 +41,7 @@ class CollectedDataRepository extends ServiceEntityRepository
             ->join('site.siteAgentsGroups', 'sag')      // Join SiteCollection à SiteAgentsGroups
             ->join('sag.agentsGroup', 'ag')             // Join SiteAgentsGroup à AgentsGroup
             ->join('ag.leader', 'leader')               // Join AgentsGroup à User (Leader)
-            ->select('leader.email, ag.groupName as groupName') // Sélectionner l'id et nom du leader et du groupe
+            ->select('leader.email, leader.name as name, leader.lastName as lastName, ag.groupName as groupName') // Sélectionner l'id et nom du leader et du groupe
             ->where('cd = :collectedData')
             ->setParameter('collectedData', $collectedData)
             ->setMaxResults(1);
@@ -73,8 +73,19 @@ class CollectedDataRepository extends ServiceEntityRepository
         // Exécuter la requête et retourner les résultats
         return $qb->getQuery()->getResult();
     }
-       
-       
+
+    // Pas bon
+    // public function getCountBySpecies(): array
+    // {
+    //     return $this->createQueryBuilder('bsc')
+    //         ->select('bs.scientificName AS speciesName, SUM(bsc.count) AS totalCount')
+    //         ->join('bsc.birdSpecies', 'bs')
+    //         ->groupBy('bs.scientificName')
+    //         ->orderBy('totalCount', 'DESC') // Facultatif : Trier par le nombre total d'individus comptés
+    //         ->getQuery()
+    //         ->getResult();
+    // }
+   
 
     //    /**
     //     * @return CollectedData[] Returns an array of CollectedData objects

@@ -168,5 +168,7 @@
             </div>
         </div>
     </section>
+    {% import 'macros/show_export_macros.html.twig' as macros %}
+    {{ macros.export_section(formExport, 'Export collected Data') }}
 </main>
 {% endblock %}

@@ -22,6 +22,7 @@ add_a_coverage: "إضافة تغطية"
 add_a_birdLifeTaxTreat: "إضافة معالجة تصنيفية لـ BirdLife"
 add_a_logo: "إضافة شعار"
 add_a_campaignStatus: "إضافة حالة حملة"
+add_a_nature_reserve: "إضافة محمية طبيعية"
 add_an_image: "إضافة صورة"
 choose_bird_family: "-- اختر عائلة الطيور --"
 consult_families: "عرض العائلات"
@@ -44,6 +45,9 @@ modification: 'تعديل'
 delete: "حذف"
 latitude: "خط العرض"
 longitude: "خط الطول"
+pages: "الصفحات"
+faq: "الأسئلة الشائعة"
+contact: "اتصل بنا"
 'Export Data Description': "اختر تنسيقًا لتنزيل البيانات."
 'Import Bird Species Data': "استيراد بيانات أنواع الطيور"
 'Export Bird Species Data': "تصدير بيانات أنواع الطيور"
@@ -94,7 +98,7 @@ export_format:
   xlsx: "إكسل (XLSX)"
   ods: "جدول بيانات OpenDocument (ODS)"
 print: "طباعة"
-campaign_remaining_time: "الوقت المتبقي للحملة"
+remaining_time: "الوقت المتبقي للحملة"
 created_by: 'أنشئ بواسطة'
 collector: "الجامع"
 back: 'رجوع'
@@ -110,6 +114,7 @@ msg_export_limit: "حجم التصدير كبير جدًا. يرجى تقليل 
 help: 'مساعدة'
 status: "حالة الحملة"
 settings: "الإعدادات"
+not_blank: "هذا الحقل لا يمكن أن يكون فارغاً."
 
 csv_import_title: "CSV استيراد ملف"
 csv_import_instruction: "تأكد من أن ملفك يحتوي على الأعمدة المطلوبة."
@@ -269,7 +274,7 @@ agentsGroup:
   edit_agents_group: "تعديل مجموعة الوكلاء"
   edit_group: "تعديل هذه المجموعة"
   manage_groups: "إدارة المجموعات"
-  create_a_new_agent_group: 'إنشاء مجموعة وكلاء جديدة'
+  create_a_new_agent_group: 'إنشاء مجموعة وكلاء'
   informations: 'معلومات المجموعة'
   # Detail
   details_of_an_agent_group: 'تفاصيل مجموعة الوكلاء'
@@ -532,6 +537,7 @@ collect:
   species_count: "العدد المحتسب لكل نوع"
   count: "العدد المحتسب"
   collect_add: "إنشاء عملية جمع"
+  condition: "تمت إضافة الحالة البيئية بنجاح إلى عملية الجمع"
   msg:
     created_success: "تم إنشاء عملية الجمع بنجاح"
     created_error: "حدث خطأ أثناء إنشاء عملية الجمع"
@@ -872,6 +878,37 @@ register:
 # Error messages for form validation
 form_error:
   general: "يرجى التحقق من المعلومات والمحاولة مرة أخرى."
+
+nature_reserve:
+  name: "المحمية الطبيعية"
+  reserveName: "اسم المحمية الطبيعية"
+  reserveLeader: "مسؤول المحمية الطبيعية"
+  select_leader: "-- اختر مسؤول المحمية الطبيعية --"
+  sites: "مواقع المحمية"
+  select_sites: "-- اختر الموقع(المواقع) الخاصة بالمحمية --"
+  viewSites: "عرض مواقع المحمية الطبيعية"
+  title: "إدارة المحميات الطبيعية"
+  manage: "إدارة المحميات الطبيعية"
+  title_add: "إضافة محمية طبيعية"
+  title_edit: "تعديل المحمية الطبيعية"
+  title_show: "تفاصيل المحمية الطبيعية"
+  informations: "معلومات عن المحمية الطبيعية"
+  the_new_informations: "المعلومات الجديدة عن المحمية الطبيعية"
+  return: "العودة إلى استعراض المحميات الطبيعية"
+  consult: "استعراض المحميات الطبيعية"
+  delete: "حذف المحمية الطبيعية"
+  none: "لا توجد محمية"
+  select_at_least_one_site: "يجب عليك اختيار موقع واحد على الأقل"
+  reserve_leader_required: "اختيار مسؤول المحمية إلزامي."
+  reserve_name_required: "اسم المحمية الطبيعية إلزامي."
+  msg:
+    created_success: "تم إنشاء المحمية الطبيعية بنجاح"
+    created_error: "حدث خطأ أثناء إنشاء المحمية الطبيعية"
+    updated_success: "تم تعديل المحمية الطبيعية بنجاح"
+    updated_error: "حدث خطأ أثناء تعديل المحمية الطبيعية"
+    deleted_success: "تم حذف المحمية الطبيعية بنجاح"
+    deleted_error: "حدث خطأ أثناء حذف المحمية الطبيعية"
+    name_and_code_required: "يجب تعبئة اسم ورمز المحمية."
 
 siteAgentsGroupType:
   collection_site: "موقع الجمع"

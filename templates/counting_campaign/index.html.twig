@@ -49,7 +49,7 @@
                       <th>{{ 'campaign.campaign_name'|trans }}</th>
                       <th>{{ 'campaign.start_date'|trans }}</th>
                       <th>{{ 'campaign.end_date'|trans }}</th>
-                      <th>{{ 'campaign_remaining_time'|trans }}</th>
+                      <th>{{ 'remaining_time'|trans }}</th>
                       <th>{{ 'campaign.status'|trans }}</th>
                       <th>{{ 'actions'|trans }}</th>
                     </tr>
@@ -130,11 +130,11 @@
                   <a href="{{ path('app_agents_group_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> {{ 'group.view_groups'|trans }}</a>
                   <a href="{{ path('app_collected_data_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-2"> {{ 'collect.consult'|trans }}</a>
                   <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="{{ 'condition.list_environmental_conditions'|trans }}"> {{ 'condition.view_conditions'|trans }}</a>
-                  <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill mx-2"> {{ 'site_collection.add_collection_site'|trans }}</a>
+                  <a href="{{ path('app_agents_group_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{'create_group'|trans }}</a>
               </div>
-              <div>
+              {# <div>
                 <button id="printButton" class="btn btn-sm btn-secondary bi bi-printer" title="{{ 'print'|trans }}"></button>
-              </div>
+              </div> #}
             </div>
 
           </div>

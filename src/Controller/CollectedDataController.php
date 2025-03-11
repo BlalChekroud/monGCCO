@@ -6,9 +6,11 @@ use App\Entity\CountingCampaign;
 use App\Entity\EnvironmentalConditions;
 use App\Entity\SiteCollection;
 use App\Entity\User;
+use App\Form\ExportType;
 use App\Repository\BirdSpeciesRepository;
 use App\Repository\EnvironmentalConditionsRepository;
 use App\Service\CampaignStatusService;
+use App\Service\ExportService;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\CollectedData;
 use App\Form\CollectedDataType;
@@ -24,15 +26,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CollectedDataController extends AbstractController
 {
     private $campaignStatusService;
+    private $exportService;
 
-    public function __construct(CampaignStatusService $campaignStatusService, private readonly TranslatorInterface $translator)
+    public function __construct(CampaignStatusService $campaignStatusService, ExportService $exportService, private readonly TranslatorInterface $translator)
     {
         $this->campaignStatusService = $campaignStatusService;
+        $this->exportService = $exportService;
     }
     
 
-    #[Route('/', name: 'app_collected_data_index', methods: ['GET'])]
-    public function index(CollectedDataRepository $collectedDataRepository): Response
+    #[Route('/', name: 'app_collected_data_index', methods: ['GET', 'POST'])]
+    public function index(ExportService $exportService, Request $request, CollectedDataRepository $collectedDataRepository): Response
     {
         $user = $this->getUser();
 
@@ -48,8 +52,39 @@ class CollectedDataController extends AbstractController
             // $collectedDatas = $collectedDataRepository->findBy(['createdBy' => $user]);
             $collectedDatas = $collectedDataRepository->getCollectesByUser($user);  // Récupérer les collectes où l'utilisateur est leader
         }
+
+        
+        // Exporter les données de la campagne
+        $formExport = $this->createForm(ExportType::class)
+                            ->handleRequest($request);
+
+        if ($formExport->isSubmitted() && $formExport->isValid()) {
+            if (!$this->isGranted('ROLE_EXPORT')) {
+                $this->addFlash('warning', $this->translator->trans('export_permission'));
+                return $this->redirectToRoute('app_collected_data_index');
+            }
+        $columnNames = ['Collecteur', 'Nom du site', 'Nombre total des oiseaux comptés', 'Numéro de la condition environnementale', 'Créé le'];
+
+        $data = [];
+            foreach ($collectedDatas as $collect) {
+                $data[] = [
+                    $collect->getCreatedBy() ?? '',
+                    $collect->getSiteCollection()?->getSiteName() ?? '',
+                    $collect->getTotalCount() ?? 0,
+                    $collect->getEnvironmentalConditions()?->getId() ?? '',
+                    $collect->getCreatedAt()?->format('d-m-Y H:i:s') ?? null,
+                ];
+            }
+
+        $format = $formExport->get('format')->getData();
+        $fileName = sprintf("Export_collections_%s", date('d-m-Y_His'));
+
+        return $this->exportService->export($columnNames, $data, $format, $fileName);
+        }
+
         return $this->render('collected_data/index.html.twig', [
             'collected_datas' => $collectedDatas,
+            'formExport' => $formExport->createView(),
         ]);
     }
 
@@ -226,8 +261,8 @@ class CollectedDataController extends AbstractController
     }
 
 
-    #[Route('/{id}', name: 'app_collected_data_show', methods: ['GET'])]
-    public function show(CollectedData $collectedDatum, CollectedDataRepository $collectedDataRepository): Response
+    #[Route('/{id}', name: 'app_collected_data_show', methods: ['GET', 'POST'])]
+    public function show(ExportService $exportService,Request $request , CollectedData $collectedDatum, CollectedDataRepository $collectedDataRepository): Response
     {
         $user = $this->getUser();
         $teamLeader = $collectedDataRepository->getLeaderByCollectedData($collectedDatum);
@@ -243,11 +278,70 @@ class CollectedDataController extends AbstractController
             $leaderEmail = null;
         }
 
+        // Formulaire d'exportation
+        $formExport = $this->createForm(ExportType::class);
+        $formExport->handleRequest($request);
+
+        if ($formExport->isSubmitted() && $formExport->isValid()) {
+            try {
+                $columnNames = ['Campagne de comptage','Nom du groupe','Chef du groupe',
+                                'Collecteur','Nom du site','Ville','Disturbé','Météo','Eaux',
+                                'Glace', 'Marée', 'Espèce', 'Nombre compté', 'Type de comptage effectué lors de cette visite', 
+                                'Qualité','Méthode(s) utilisées pour le comptage', 'créé le'];
+    
+                // Concaténer les méthodes dans une seule chaîne
+                $methodsArray = [];
+                foreach ($collectedDatum->getMethod() as $method) {
+                    $methodsArray[] = $method->getLabel() ?? '';
+                }
+                $methodsString = implode(', ', $methodsArray);
+
+                $collector = implode(' ', [
+                    $collectedDatum->getCreatedBy()->getName(), 
+                    $collectedDatum->getCreatedBy()->getLastName()
+                ]);
+
+                $leader = implode(' ', [$teamLeader['name'], $teamLeader['lastName']]);
+                // Préparer les données d'export
+                $data = [];
+                foreach ($collectedDatum->getBirdSpeciesCounts() as $specy) {
+                    $data[] = [
+                        $collectedDatum->getCountingCampaign()->getCampaignName() ?? '',
+                        $teamLeader['groupName'] ?? '',
+                        $leader ?? '',
+                        $collector ?? '',
+                        $collectedDatum->getSiteCollection()->getSiteName() ?? '',
+                        $collectedDatum->getSiteCollection()->getCity()->getName() ?? '',
+                        $collectedDatum->getEnvironmentalConditions()?->getDisturbed()?->getLabel() ?? '',
+                        $collectedDatum->getEnvironmentalConditions()?->getWeather()?->getLabel() ?? '',
+                        $collectedDatum->getEnvironmentalConditions()?->getWater()?->getLabel() ?? '',
+                        $collectedDatum->getEnvironmentalConditions()?->getIce()?->getLabel() ?? '',
+                        $collectedDatum->getEnvironmentalConditions()?->getTidal()?->getLabel() ?? '',
+                        $specy->getBirdSpecies()?->getScientificName() ?? '',
+                        $specy->getCount() ?? 0,
+                        $collectedDatum->getCountType()?->getLabel() ?? null,
+                        $collectedDatum->getQuality()?->getLabel() ?? null,
+                        $methodsString,  // Toutes les méthodes dans une seule colonne
+                        ($collectedDatum->getCreatedAt() ? $collectedDatum->getCreatedAt()->format('d-m-Y H:i:s') : null)
+                    ];
+                }
+    
+                $format = $formExport->get('format')->getData();
+                $fileName = sprintf("Export_Collected_data_%s", date('d-m-Y_His'));
+        
+                return $exportService->export($columnNames, $data, $format, $fileName);
+
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
+        }
+
         // Vérifiez si l'utilisateur est admin, créateur ou membre du groupe
         if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_VIEW') || $collectedDatum->getCreatedBy() === $user || $leaderEmail === $user->getEmail()) {
             return $this->render('collected_data/show.html.twig', [
                 'collected_datum' => $collectedDatum,
                 'teamLeader' => $teamLeader,
+                'formExport' => $formExport->createView(),
             ]);
             
         } else {
@@ -285,7 +379,8 @@ class CollectedDataController extends AbstractController
             $this->addFlash('warning', $this->translator->trans('collect.please_create_the_environmental_conditions_for_this_site_first'));
             return $this->redirectToRoute('app_environmental_conditions_new', [
                 'campaignId' => $campaign->getId(),
-                'siteId' => $site->getId()
+                'siteId' => $site->getId(),
+                'collectId' => $collectedDatum->getId()
             ]);
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\CollectedData;
 use App\Entity\CountingCampaign;
 use App\Entity\SiteCollection;
 use App\Entity\User;
@@ -52,9 +53,16 @@ class EnvironmentalConditionsController extends AbstractController
         $user = $this->getUser(); // Récupérer l'utilisateur actuel
         $siteId = $request->query->get('siteId');
         $campaignId = $request->query->get('campaignId');
+        $collectId = $request->query->get('collectId');
 
         $site = $entityManager->getRepository(SiteCollection::class)->find($siteId);
         $campaign = $entityManager->getRepository(CountingCampaign::class)->find($campaignId);
+        
+        if ($collectId) {
+            $collect = $entityManager->getRepository(CollectedData::class)->find($collectId);
+        } else {
+            $collect = null;
+        }
         
         // Vérifier si la campagne et le site existent
         if (!$campaign) {
@@ -87,24 +95,31 @@ class EnvironmentalConditionsController extends AbstractController
             'siteCollection' => $site,
             'countingCampaign' => $campaign
         ]);
-
         
         $environmentalCondition = new EnvironmentalConditions();
         $form = $this->createForm(EnvironmentalConditionsType::class, $environmentalCondition);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            if ($form->isValid()){
+            if ($form->isValid()) {
                 try{
                     $environmentalCondition->setCreatedAt(new \DateTimeImmutable());
                     $environmentalCondition->setSiteCollection($site);
                     $environmentalCondition->setCountingCampaign($campaign);
                     $environmentalCondition->setUser($user);
-                    $entityManager->persist($environmentalCondition);
-                    $entityManager->flush();
-        
-                    $this->addFlash('success', $this->translator->trans('condition.msg.created_success'));
-                    return $this->redirectToRoute('app_collected_data_new', ['campaignId' => $campaignId, 'siteId' => $siteId  ], Response::HTTP_SEE_OTHER);
+                      
+                    if ($collect !== null  && $collect->getEnvironmentalConditions() === null) {
+                        $environmentalCondition->setCollectedData($collect);
+                        $entityManager->persist($environmentalCondition);
+                        $entityManager->flush();
+                        $this->addFlash('success', $this->translator->trans('collect.condition'));
+                        return $this->redirectToRoute('app_collected_data_show', ['id' => $collect->getId()  ], Response::HTTP_SEE_OTHER);
+                    } else {
+                        $entityManager->persist($environmentalCondition);
+                        $entityManager->flush();
+                        $this->addFlash('success', $this->translator->trans('condition.msg.created_success'));
+                        return $this->redirectToRoute('app_collected_data_new', ['campaignId' => $campaignId, 'siteId' => $siteId  ], Response::HTTP_SEE_OTHER);
+                    }
                 } catch (\Exception $e) {
                     $this->addFlash('error', $e->getMessage());
                     return $this->redirectToRoute('app_environmental_conditions_new', [], Response::HTTP_SEE_OTHER);

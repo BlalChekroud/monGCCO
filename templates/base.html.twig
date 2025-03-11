@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang={{ app.request.session.get('_locale', app.request.locale) ??  'fr'}}>
-{# <html lang={{ app.user.language.iso2 ?? 'fr' }}> #}
-{# <html lang="{{ app.request.locale ?? 'fr' }}"> #}
 
   <head>
     <meta charset="utf-8">
@@ -595,17 +593,17 @@
 
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#reserves-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-tree"></i><span>Gestion des réserves</span><i class="bi bi-chevron-down ms-auto"></i>
+            <i class="bi bi-tree"></i><span>{{'nature_reserve.manage'|trans }}</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul id="reserves-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
               <a href="{{ path('app_nature_reserve_new') }}">
-                <i class="bi bi-circle"></i><span>Créer une réserve</span>
+                <i class="bi bi-circle"></i><span>{{'add_a_nature_reserve'|trans }}</span>
               </a>
             </li>
             <li>
               <a href="{{ path('app_nature_reserve_index') }}">
-                <i class="bi bi-circle"></i><span>Consultation des réserves</span>
+                <i class="bi bi-circle"></i><span>{{'nature_reserve.consult'|trans }}</span>
               </a>
             </li>
           </ul>
@@ -799,7 +797,7 @@
         <li class="nav-item">
           <a class="nav-link collapsed" href="{{ path('app_profile_edit', {'id': app.user.id}) }}">
             <i class="bi bi-person"></i>
-            <span>Profile</span>
+            <span>{{'user.profile'|trans }}</span>
           </a>
         </li><!-- End Profile Page Nav -->
       {% endif %}
@@ -807,28 +805,28 @@
         <li class="nav-item">
           <a class="nav-link collapsed" href="#">
             <i class="bi bi-question-circle"></i>
-            <span>F.A.Q</span>
+            <span>{{'faq'|trans }}</span>
           </a>
         </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="#">
             <i class="bi bi-envelope"></i>
-            <span>Contact</span>
+            <span>{{'contact'|trans }}</span>
           </a>
         </li><!-- End Contact Page Nav -->
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="{{ path('app_register') }}">
             <i class="bi bi-card-list"></i>
-            <span>Inscription</span>
+            <span>{{'register.page_title'|trans }}</span>
           </a>
         </li><!-- End Register Page Nav -->
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="{{ path('app_login') }}">
             <i class="bi bi-box-arrow-in-right"></i>
-            <span>Connexion</span>
+            <span>{{'Log_in'|trans }}</span>
           </a>
         </li><!-- End Login Page Nav -->
 

@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réserves naturelles{% endblock %}
+{% block title %}{{'nature_reserve.title'|trans }}{% endblock %}
 
 {% block body %}
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Consulter les réserves naturelles</h1>
+      <h1>{{'nature_reserve.title'|trans }}</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a></li>
-          <li class="breadcrumb-item active">Gestion des réserves</li>
+          <li class="breadcrumb-item active">{{ 'nature_reserve.manage'|trans }}</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -25,11 +25,12 @@
                 <table class="table datatable">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Nom de la réserve naturelle</th>
-                            <th>{{ 'created_at'|trans }}</th>
-                            <th>{{ 'Last_updated_at'|trans }}</th>
-                            <th>{{ 'actions'|trans }}</th>
+                            <th style="width: 2%;">#</th>
+                            <th style="width: 21%;">{{ 'nature_reserve.name'|trans }}</th>
+                            <th style="width: 21%;">{{ 'nature_reserve.reserveLeader'|trans }}</th>
+                            <th style="width: 32%;">{{ 'nature_reserve.sites'|trans }}</th>
+                            <th style="width: 12%;">{{ 'created_at'|trans }}</th>
+                            <th style="width: 12%;">{{ 'actions'|trans }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,8 +38,66 @@
                         <tr>
                             <td>{{ nature_reserve.id }}</td>
                             <td>{{ nature_reserve.reserveName }}</td>
-                            <td>{{ nature_reserve.createdAt ? nature_reserve.createdAt|date('d-m-Y H:i:s') : '' }}</td>
-                            <td>{{ nature_reserve.updatedAt ? nature_reserve.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ nature_reserve.reserveLeader ?? '' }}</td>
+                            {# <td>
+                              <div class="accordion accordion-flush" id="accordionFlushExample">
+                                <div class="accordion-item">
+                                  <h2 class="accordion-header" id="flush-headingOne">
+                                    <button class="btn text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ nature_reserve.id }}" aria-expanded="false" aria-controls="collapse{{ nature_reserve.id }}" title="{{'nature_reserve.viewSites'|trans }}">
+                                      <i class="bi bi-info-circle-fill text-info"></i>
+                                    </button>
+                                  </h2>
+                                  <div class="collapse" id="collapse{{ nature_reserve.id }}">
+                                      <div class="accordion-body">
+                                          {% if nature_reserve.siteCollections|length > 0 %}
+                                              {% set sorted_siteCollections = nature_reserve.siteCollections|sort((a, b) => a.siteName <=> b.siteName) %}
+                                              <ul>
+                                                  {% for siteCollection in sorted_siteCollections %}
+                                                      <li>{{ siteCollection.siteName }}</li>
+                                                  {% endfor %}
+                                              </ul>
+                                          {% else %}
+                                              <p>{{ 'site_collection.none'|trans }}</p>
+                                          {% endif %}
+                                      </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </td> #}
+                            <td>
+                              <div class="accordion explanation" id="accordionNatureReserve{{ nature_reserve.id }}">
+                                <div class="accordion-item border-0 shadow-sm">
+                                  <h2 class="accordion-header" id="heading{{ nature_reserve.id }}">
+                                    <button class="accordion-button collapsed bg-light text-dark p-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ nature_reserve.id }}" aria-expanded="false" aria-controls="collapse{{ nature_reserve.id }}" title="{{ 'nature_reserve.viewSites'|trans }}">
+                                      {# <i class="bi bi-building me-2 text-info"></i> #}
+                                      <i class="bi bi-geo-alt me-2 text-success"></i>
+                                    </button>
+                                  </h2>
+                                  <div id="collapse{{ nature_reserve.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ nature_reserve.id }}" data-bs-parent="#accordionNatureReserve{{ nature_reserve.id }}">
+                                    <div class="accordion-body bg-white">
+                                      {% if nature_reserve.siteCollections|length > 0 %}
+                                        {% set sortedSiteCollections = nature_reserve.siteCollections|sort((a, b) => a.siteName <=> b.siteName) %}
+                                        <div class="list-group list-group-flush">
+                                          {% for siteCollection in sortedSiteCollections %}
+                                            <ul class="d-flex justify-content-start">
+                                              <li>
+                                                <a href="{{ path('app_site_collection_show',{'id': siteCollection.id }) }}" class="text-success">
+                                                  {{ siteCollection.siteName }}
+                                                </a>
+                                              </li>
+                                            </ul>
+                                          {% endfor %}
+                                        </div>
+                                      {% else %}
+                                        <div class="text-muted">{{ 'site_collection.none'|trans }}</div>
+                                      {% endif %}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td>{{ nature_reserve.createdAt ? nature_reserve.createdAt|date('d-m-Y') : '' }}</td>
                             <td>
                                 <div class="d-flex justify-content-end">
                                     {% import 'macros/btn_actions_macros.html.twig' as macros %}
@@ -58,9 +117,9 @@
               
             </div>
             <div class="card-footer">
-                <a href="{{ path('app_nature_reserve_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> Ajouter une réserve naturelle</a>
-                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> Consultation des campagnes</a>
-                <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{ 'campaign.create_campaign'|trans }}</a>
+                <a href="{{ path('app_nature_reserve_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{ 'add_a_nature_reserve'|trans }}</a>
+                <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{ 'campaign.consult'|trans }}</a>
+                <a href="{{ path('app_site_collection_new') }}" class="btn btn-outline-info btn-sm bi bi bi-geo-alt-fill"> {{ 'site_collection.add_collection_site'|trans }}</a>
             </div>
           </div>
 

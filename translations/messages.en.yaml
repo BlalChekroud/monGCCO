@@ -22,6 +22,7 @@ add_a_coverage: "Add Coverage"
 add_a_birdLifeTaxTreat: "Add a BirdLife Taxonomic Treatment"
 add_a_logo: "Add a logo"
 add_a_campaignStatus: "Add a campaign status"
+add_a_nature_reserve: "Add a nature reserve"
 add_an_image: "Add an image"
 choose_bird_family: "-- Choose a Bird Family --"
 consult_families: "View families"
@@ -44,6 +45,9 @@ modification: 'Modification'
 delete: "Delete"
 latitude: "Latitude"
 longitude: "Longitude"
+pages: "Pages"
+faq: "F.A.Q"
+contact: "Contact"
 'Export Data Description': "Choose a format to download the data."
 'Import Bird Species Data': "Import Bird Species Data"
 'Export Bird Species Data': "Export Bird Species Data"
@@ -94,7 +98,7 @@ export_format:
   xlsx: "Excel (XLSX)"
   ods: "OpenDocument Spreadsheet (ODS)"
 print: "Print"
-campaign_remaining_time: "The remaining time of a campaign"
+remaining_time: "The remaining time of the campaign"
 created_by: 'Created by'
 collector: "Collector"
 back: 'Back'
@@ -110,6 +114,7 @@ msg_export_limit: "Export size too large. Please narrow your campaign or try a s
 help: 'Help'
 status: "Status"
 settings: "Settings"
+not_blank: "This field cannot be blank."
 
 csv_import_title: "Import a CSV File"
 csv_import_instruction: "Make sure your file contains the required columns."
@@ -269,7 +274,7 @@ agentsGroup:
   edit_agents_group: "Edit Agent Group"
   edit_group: "Edit This Group"
   manage_groups: "Manage Groups"
-  create_a_new_agent_group: 'Create a new agents group'
+  create_a_new_agent_group: 'Create an agents group'
   informations: 'Group information'
   # Detail
   details_of_an_agent_group: 'Details of an agent group'
@@ -532,6 +537,7 @@ collect:
   species_count: "Counted number for each species"
   count: "Counted number"
   collect_add: "Create a collection"
+  condition: "The environmental condition has been successfully added to the collection"
   msg:
     created_success: "The collection has been successfully created"
     created_error: "An error occurred while creating the collection"
@@ -872,6 +878,37 @@ register:
 # Error messages for form validation
 form_error:
   general: "Please check the information and try again."
+
+nature_reserve:
+  name: "Nature Reserve"
+  reserveName: "Nature Reserve Name"
+  reserveLeader: "Reserve Manager"
+  select_leader: "-- Choose a reserve manager --"
+  sites: "Reserve Sites"
+  select_sites: "-- Choose the reserve site(s) --"
+  viewSites: "View nature reserve sites"
+  title: "Nature Reserve Management"
+  manage: "Manage nature reserves"
+  title_add: "Add a nature reserve"
+  title_edit: "Edit the nature reserve"
+  title_show: "Nature reserve details"
+  informations: "Information about the nature reserve"
+  the_new_informations: "New information about the nature reserve"
+  return: "Return to nature reserves overview"
+  consult: "Nature reserves overview"
+  delete: "Delete the nature reserve"
+  none: "No nature reserve"
+  select_at_least_one_site: "You must select at least one site"
+  reserve_leader_required: "Selecting a reserve leader is mandatory."
+  reserve_name_required: "The name of the nature reserve is mandatory."
+  msg:
+    created_success: "The nature reserve has been successfully created"
+    created_error: "An error occurred while creating the nature reserve"
+    updated_success: "The nature reserve has been successfully updated"
+    updated_error: "An error occurred while updating the nature reserve"
+    deleted_success: "The nature reserve has been successfully deleted"
+    deleted_error: "An error occurred while deleting the nature reserve"
+    name_and_code_required: "The nature reserve name and code must be provided."
 
 siteAgentsGroupType:
   collection_site: "Collection Site"

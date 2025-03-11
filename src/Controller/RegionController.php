@@ -294,7 +294,7 @@ class RegionController extends AbstractController
     #[Route('/{id}', name: 'app_region_delete', methods: ['POST'])]
     public function delete(Request $request, Region $region, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$region->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$region->getId(), $request->getPayload()->get('_token'))) {
             try {
                 $entityManager->remove($region);
                 $entityManager->flush();

@@ -17,60 +17,60 @@ class CountingCampaignRepository extends ServiceEntityRepository
         parent::__construct($registry, CountingCampaign::class);
     }
 
-    // Récupère les données de campagne de comptage pour l'exportation
-    public function getBirdSpeciesDataForCampaign(int $campaignId): array
-    {
-        $qb = $this->createQueryBuilder('cc')
-            ->select(
-                'cc.campaignName',
-                'cc.startDate',
-                'cc.endDate',
-                'status.label AS campaignStatus',
-                'cc.description',
-                'cc.createdAt',
-                'cc.updatedAt',
-                'creator.email AS createdBy',
-                'city.name AS cityName',
-                'site.siteName',
-                'cd.createdAt AS collectedDate',
-                'collector.email AS collectedBy',
-                'bs.scientificName',
-                'bs.wispeciescode', // Vérifiez que ce champ correspond exactement à la base de données
-                'SUM(bsc.count) AS totalBirdCount' // Total des comptages pour chaque espèce
-            )
-            ->innerJoin('cc.siteAgentsGroups', 'sag')
-            ->innerJoin('sag.siteCollection', 'site')
-            ->innerJoin('site.city', 'city')
-            ->innerJoin('site.collectedData', 'cd')
-            ->innerJoin('cd.environmentalConditions', 'ec')
-            ->innerJoin('cd.createdBy', 'collector')
-            ->innerJoin('cd.birdSpeciesCounts', 'bsc')
-            ->innerJoin('bsc.birdSpecies', 'bs')
-            ->innerJoin('cc.createdBy', 'creator')
-            ->innerJoin('cc.campaignStatus', 'status')
-            ->where('cc.id = :campaignId') // Associer la campagne spécifiée
-            ->andWhere('ec.countingCampaign = :campaignId') // Garantir que les collectedData appartiennent à cette campagne
-            ->andWhere('sag.countingCampaign = :campaignId') // Garantir que les siteCollections appartiennent à cette campagne
-            ->setParameter('campaignId', $campaignId)
-            ->groupBy('bs.id', 'cd.id') // Grouper par espèce et collecte
-            ->orderBy('city.name', 'ASC')
-            ->addOrderBy('site.siteName', 'ASC')
-            ->addOrderBy('bs.scientificName', 'ASC');
+    // // Récupère les données de campagne de comptage pour l'exportation
+    // public function getBirdSpeciesDataForCampaign(int $campaignId): array
+    // {
+    //     $qb = $this->createQueryBuilder('cc')
+    //         ->select(
+    //             'cc.campaignName',
+    //             'cc.startDate',
+    //             'cc.endDate',
+    //             'status.label AS campaignStatus',
+    //             'cc.description',
+    //             'cc.createdAt',
+    //             'cc.updatedAt',
+    //             'creator.email AS createdBy',
+    //             'city.name AS cityName',
+    //             'site.siteName',
+    //             'cd.createdAt AS collectedDate',
+    //             'collector.email AS collectedBy',
+    //             'bs.scientificName',
+    //             'bs.wispeciescode', // Vérifiez que ce champ correspond exactement à la base de données
+    //             'SUM(bsc.count) AS totalBirdCount' // Total des comptages pour chaque espèce
+    //         )
+    //         ->innerJoin('cc.siteAgentsGroups', 'sag')
+    //         ->innerJoin('sag.siteCollection', 'site')
+    //         ->innerJoin('site.city', 'city')
+    //         ->innerJoin('site.collectedData', 'cd')
+    //         ->innerJoin('cd.environmentalConditions', 'ec')
+    //         ->innerJoin('cd.createdBy', 'collector')
+    //         ->innerJoin('cd.birdSpeciesCounts', 'bsc')
+    //         ->innerJoin('bsc.birdSpecies', 'bs')
+    //         ->innerJoin('cc.createdBy', 'creator')
+    //         ->innerJoin('cc.campaignStatus', 'status')
+    //         ->where('cc.id = :campaignId') // Associer la campagne spécifiée
+    //         ->andWhere('ec.countingCampaign = :campaignId') // Garantir que les collectedData appartiennent à cette campagne
+    //         ->andWhere('sag.countingCampaign = :campaignId') // Garantir que les siteCollections appartiennent à cette campagne
+    //         ->setParameter('campaignId', $campaignId)
+    //         ->groupBy('bs.id', 'cd.id') // Grouper par espèce et collecte
+    //         ->orderBy('city.name', 'ASC')
+    //         ->addOrderBy('site.siteName', 'ASC')
+    //         ->addOrderBy('bs.scientificName', 'ASC');
         
-        // Exécuter la requête pour récupérer les résultats
-        $result = $qb->getQuery()->getArrayResult();
+    //     // Exécuter la requête pour récupérer les résultats
+    //     $result = $qb->getQuery()->getArrayResult();
         
-        // Formatage des dates dans les résultats
-        foreach ($result as &$row) {
-            $row['startDate'] = $row['startDate'] ? $row['startDate']->format('d-m-Y H:i:s') : null;
-            $row['endDate'] = $row['endDate'] ? $row['endDate']->format('d-m-Y H:i:s') : null;
-            $row['createdAt'] = $row['createdAt'] ? $row['createdAt']->format('d-m-Y H:i:s') : null;
-            $row['updatedAt'] = $row['updatedAt'] ? $row['updatedAt']->format('d-m-Y H:i:s') : null;
-            $row['collectedDate'] = $row['collectedDate'] ? $row['collectedDate']->format('d-m-Y H:i:s') : null;
-        }
+    //     // Formatage des dates dans les résultats
+    //     foreach ($result as &$row) {
+    //         $row['startDate'] = $row['startDate'] ? $row['startDate']->format('d-m-Y H:i:s') : null;
+    //         $row['endDate'] = $row['endDate'] ? $row['endDate']->format('d-m-Y H:i:s') : null;
+    //         $row['createdAt'] = $row['createdAt'] ? $row['createdAt']->format('d-m-Y H:i:s') : null;
+    //         $row['updatedAt'] = $row['updatedAt'] ? $row['updatedAt']->format('d-m-Y H:i:s') : null;
+    //         $row['collectedDate'] = $row['collectedDate'] ? $row['collectedDate']->format('d-m-Y H:i:s') : null;
+    //     }
         
-        return $result;
-    }
+    //     return $result;
+    // }
         
     
     /**
@@ -97,69 +97,6 @@ class CountingCampaignRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
-
-    // /**
-    //  * Récupère le nombre total de comptages d'oiseaux pour chaque site dans une campagne de comptage spécifique.
-    //  *
-    //  * @param CountingCampaign $campaign La campagne de comptage cible
-    //  * @return array Un tableau associatif contenant le nom de chaque site et le nombre total d'oiseaux comptés
-    //  */
-    // public function getTotalBirdsCountPerSitesInCampaign(CountingCampaign $campaign): array
-    // {
-    //     $result = $this->createQueryBuilder('sc')
-    //         ->select('siteCollection.siteName', 'COALESCE(SUM(bsc.count), 0) AS totalBirdCount') // Utilisation de COALESCE pour gérer les valeurs nulles
-    //         ->join('sc.siteAgentsGroups', 'sag')  // Jointure avec les groupes d'agents des sites
-    //         ->join('sag.countingCampaign', 'cc')  // Jointure avec la campagne de comptage
-    //         ->join('sag.siteCollection', 'siteCollection')  // Jointure avec la collection de sites
-    //         ->leftJoin('sc.collectedData', 'cd')  // Utilisation de LEFT JOIN pour inclure les sites sans données collectées
-    //         ->leftJoin('cd.birdSpeciesCounts', 'bsc')  // Utilisation de LEFT JOIN pour inclure les sites sans comptages d'espèces
-    //         ->where('cc = :campaign')  // Filtrer par la campagne spécifiée
-    //         ->setParameter('campaign', $campaign)  // Passer la campagne spécifiée
-    //         ->groupBy('siteCollection.id')  // Grouper par chaque site pour obtenir un total par site
-    //         ->getQuery()
-    //         ->getResult();
-
-    //     // Assurez-vous que si un site n'a pas de comptage, il retourne 0
-    //     return $result;
-    // }
-    // public function getBirdsCountPerSitesInCampaign(CountingCampaign $campaign): array
-    // {
-    //     $result = $this->createQueryBuilder('sc')
-    //         ->select('siteCollection.siteName', 'bsc.count AS totalBirdCount')  // Sélectionner les comptages sans somme
-    //         ->join('sc.siteAgentsGroups', 'sag') 
-    //         ->join('sag.countingCampaign', 'cc')  // Associer avec la campagne
-    //         ->join('sc.collectedData', 'cd')
-    //         ->join('cd.birdSpeciesCounts', 'bsc')
-    //         ->join('sag.siteCollection', 'siteCollection')  // Joindre avec les collections de sites
-    //         ->where('cc.id = :campaignId')  // Filtrer par l'ID de la campagne
-    //         ->setParameter('campaignId', $campaign->getId())  // Utiliser l'ID de la campagne spécifiée
-    //         ->getQuery()
-    //         ->getResult();
-
-    //     return $result;
-    // }
-
-
-    // /**
-    //  * Calcule le nombre total d'oiseaux comptés dans la campagne
-    //  *
-    //  * @param CountingCampaign $campaign
-    //  * @return int
-    //  */
-    // public function getTotalCountsCampaign(CountingCampaign $campaign): int
-    // {
-    //     return (int) $this->createQueryBuilder('cc')
-    //         ->select('SUM(bsc.count) AS totalCount') // Somme des comptages d'oiseaux
-    //         ->join('cc.siteAgentsGroups', 'sag') // Jointure avec les groupes d'agents de site
-    //         ->join('sag.siteCollection', 'sc') // Accès aux collections de site via siteAgentsGroups
-    //         ->join('sc.collectedData', 'cd') // Jointure avec les données collectées
-    //         ->join('cd.birdSpeciesCounts', 'bsc') // Jointure avec les comptages d'espèces d'oiseaux
-    //         ->where('cc.id = :campaignId') // Condition sur l'identifiant de la campagne
-    //         ->setParameter('campaignId', $campaign->getId()) // Paramètre de la campagne
-    //         ->getQuery()
-    //         ->getSingleScalarResult(); // Récupère le résultat unique
-    // }
-
 
     // Le nombre total de collectes associées à une campagne de comptage
     public function countCollectedDataByCampaign(CountingCampaign $campaign): int

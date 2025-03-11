@@ -36,14 +36,6 @@
                                     <td>{{ site_collection.siteCode }}</td>
                                 </tr>
                                 <tr>
-                                    <th>{{ 'created_at'|trans }}</th>
-                                    <td>{{ site_collection.createdAt ? site_collection.createdAt|date('d-m-Y H:i:s') : '' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>{{ 'Last_updated_at'|trans }}</th>
-                                    <td>{{ site_collection.updatedAt ? site_collection.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
-                                </tr>
-                                <tr>
                                     <th>{{'site_collection.nationalSiteCode'|trans }}</th>
                                     <td>{{ site_collection.nationalSiteCode }}</td>
                                 </tr>
@@ -62,6 +54,10 @@
                                 <tr>
                                     <th>{{'site_collection.longFin'|trans }}</th>
                                     <td>{{ site_collection.longFin }}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{'nature_reserve.name'|trans }}</th>
+                                    <td>{{ site_collection.natureReserve.reserveName ?? '' }}</td>
                                 </tr>
                                 <tr>
                                     <th>{{'site_collection.parentSite'|trans }}</th>
@@ -117,6 +113,14 @@
                                     <td>
                                         {{ totalBirdCountsForSite ?? 0 }}
                                     </td>
+                                </tr>
+                                <tr>
+                                    <th>{{ 'created_at'|trans }}</th>
+                                    <td>{{ site_collection.createdAt ? site_collection.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>{{ 'Last_updated_at'|trans }}</th>
+                                    <td>{{ site_collection.updatedAt ? site_collection.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
                                 </tr>
                             </tbody>
                         </table>

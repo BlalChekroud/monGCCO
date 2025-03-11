@@ -22,6 +22,7 @@ add_a_coverage: "Ajouter une couverture"
 add_a_birdLifeTaxTreat: "Ajouter un traitement taxonomique BirdLife"
 add_a_logo: "Ajouter un logo"
 add_a_campaignStatus: "Ajouter un état de campagne"
+add_a_nature_reserve: "Ajouter une réserve naturelle"
 add_an_image: "Ajouter une image"
 choose_bird_family: "-- Choisir une Famille d'Oiseaux --"
 consult_families: "Consultation des familles"
@@ -44,6 +45,9 @@ modification: 'Modification'
 delete: 'Supprimer'
 latitude: "Latitude"
 longitude: "Longitude"
+pages: "Pages"
+faq: "F.A.Q"
+contact: "Contact"
 'Export Data Description': "Choisissez un format pour télécharger les données."
 'Import Bird Species Data': "Importer les données des espèces d'oiseaux"
 'Export Bird Species Data': "Exporter les données des espèces d'oiseaux"
@@ -94,7 +98,7 @@ export_format:
   xlsx: "Excel (XLSX)"
   ods: "OpenDocument Spreadsheet (ODS)"
 print: "Imprimer"
-campaign_remaining_time: "Le temps restant d'une campagne"
+remaining_time: "Le temps restant de la campagne"
 created_by: 'Créé par'
 collector: "Collecteur"
 back: 'Retour'
@@ -110,6 +114,7 @@ msg_export_limit: "La taille de l'exportation est trop grande. Veuillez restrein
 help: 'Aide'
 status: "État"
 settings: "Paramètres"
+not_blank: "Ce champ ne peut pas être vide."
 
 csv_import_title: "Importer un fichier CSV"
 csv_import_instruction: "Assurez-vous que votre fichier contient les colonnes nécessaires."
@@ -269,7 +274,7 @@ agentsGroup:
   edit_agents_group: "Modifier groupe d'agents"
   edit_group: "Modifier ce groupe"
   manage_groups: "Gestion des groupes"
-  create_a_new_agent_group: "Créer un nouveau groupe d'agents"
+  create_a_new_agent_group: "Créer un groupe d'agents"
   informations: 'Les informations du groupe' 
   # Detail
   details_of_an_agent_group: "Détail d'un groupe d'agents"
@@ -532,6 +537,7 @@ collect:
   species_count: "Nombre compté pour chaque espèce"
   count: "Nombre compté"
   collect_add: "Créer une collecte"
+  condition: "La condition environnementale a bien été ajoutée à la collecte"
   msg:
     created_success: "La collecte a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la collecte"
@@ -872,6 +878,37 @@ register:
 # Messages pour les erreurs de formulaire
 form_error:
   general: "Veuillez vérifier les informations et réessayer."
+
+nature_reserve:
+  name: "Réserve naturelle"
+  reserveName: "Nom de la réserve naturelle"
+  reserveLeader: "Responsable de la réserve"
+  select_leader: "-- Choisir un responsable de la réserve --"
+  sites: "Sites de la réserve"
+  select_sites: "-- Choisir le(s) site(s) de la réserve --"
+  viewSites: "Voir les sites de la réserve naturelle"
+  title: "Gestion des réserves naturelles"
+  manage: "Gestion des réserves naturelles"
+  title_add: "Ajout d'une réserve naturelle"
+  title_edit: "Modifier la réserve naturelle"
+  title_show: "Détail de la réserve naturelle"
+  informations: "Informations sur la réserve naturelle"
+  the_new_informations: "Les nouvelles informations de la réserve naturelle"
+  return: "Retour à la consultation des réserves naturelles"
+  consult: "Consultation des réserves naturelles"
+  delete: "Supprimer la réserve naturelle"
+  none: "Aucune réserve naturelle"
+  select_at_least_one_site: "Vous devez sélectionner au moins un site"
+  reserve_leader_required: "Le choix du responsable de la réserve est obligatoire."
+  reserve_name_required: "Le nom de la réserve naturelle est obligatoire."
+  msg:
+    created_success: "La réserve naturelle a été créée avec succès"
+    created_error: "Une erreur s'est produite lors de la création de la réserve naturelle"
+    updated_success: "La réserve naturelle a été modifiée avec succès"
+    updated_error: "Une erreur s'est produite lors de la modification de la réserve naturelle"
+    deleted_success: "La réserve naturelle a été supprimée avec succès"
+    deleted_error: "Une erreur s'est produite lors de la suppression de la réserve naturelle"
+    name_and_code_required: "Le nom et le code de la réserve doivent être remplis."
 
 siteAgentsGroupType:
   collection_site: "Site de collecte"

@@ -43,7 +43,9 @@
                                     <th>{{'condition.collection_associated'|trans }}<h6 class="explanation">{{'condition.collection_date'|trans }}</h6></th>
                                     {% if environmental_condition.collectedData is not empty %}
                                         <td>
-                                            {{ environmental_condition.collectedData.id }}
+                                            <a href="{{ path('app_collected_data_show', {'id': environmental_condition.collectedData.id} ) }}" title="{{'condition.collection_associated'|trans }}">
+                                                {{ environmental_condition.collectedData.id }}
+                                            </a>
                                             <p class="explanation">{{ environmental_condition.collectedData.createdAt ? environmental_condition.createdAt|date('d-m-Y') : '' }}</p>
                                         </td>
                                     {% else %}
