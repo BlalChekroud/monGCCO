@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\CollectedData;
 use App\Entity\CountingCampaign;
 
+use App\Entity\SiteCollection;
 use App\Entity\User;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -74,19 +75,46 @@ class CollectedDataRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    // Pas bon
-    // public function getCountBySpecies(): array
-    // {
-    //     return $this->createQueryBuilder('bsc')
-    //         ->select('bs.scientificName AS speciesName, SUM(bsc.count) AS totalCount')
-    //         ->join('bsc.birdSpecies', 'bs')
-    //         ->groupBy('bs.scientificName')
-    //         ->orderBy('totalCount', 'DESC') // Facultatif : Trier par le nombre total d'individus comptés
-    //         ->getQuery()
-    //         ->getResult();
-    // }
+    // retourner toutes les collectes (collectedData) d'un site donné dans une campagne donnée
+    public function getCollectedDataBySiteInCampaign(SiteCollection $site, CountingCampaign $campaign): array
+    {
+        return $this->createQueryBuilder('cd')
+            ->where('cd.siteCollection = :site')
+            ->andWhere('cd.countingCampaign = :campaign')
+            ->setParameter('site', $site)
+            ->setParameter('campaign', $campaign)
+            ->orderBy('cd.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+    
+    # Les espèces et leurs nombres pour une collecte donnée
+    public function getSpeciesAndCountsByCollectedData(CollectedData $collectedData): array
+    {
+        return $this->createQueryBuilder('cd')
+            ->select('bs.scientificName as specy, SUM(bsc.count) as count')
+            ->join('cd.birdSpeciesCounts', 'bsc')
+            ->join('bsc.birdSpecies', 'bs')
+            ->where('cd = :collected_data')
+            ->setParameter('collected_data', $collectedData)
+            ->groupBy('bs.scientificName')
+            ->orderBy('bs.scientificName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
    
-
+    public function finByTotalCountForCollect(CollectedData $collectedData): int
+    {
+        $result = $this->createQueryBuilder('cd')
+            ->select('SUM(bsc.count) as total')
+            ->join('cd.birdSpeciesCounts', 'bsc')
+            ->where('cd = :collect')
+            ->setParameter('collect', $collectedData)
+            ->getQuery()
+            ->getSingleScalarResult();
+    
+        return (int) ($result ?? 0);
+    }
     //    /**
     //     * @return CollectedData[] Returns an array of CollectedData objects
     //     */

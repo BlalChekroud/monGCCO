@@ -48,6 +48,8 @@ longitude: "Longitude"
 pages: "Pages"
 faq: "F.A.Q"
 contact: "Contact"
+yes: 'Oui'
+no: 'Non'
 'Export Data Description': "Choisissez un format pour télécharger les données."
 'Import Bird Species Data': "Importer les données des espèces d'oiseaux"
 'Export Bird Species Data': "Exporter les données des espèces d'oiseaux"
@@ -414,6 +416,7 @@ campaign:
   cancel_campaign: "Annuler la campagne"
   campaign_details: "Détail de la campagne"
   consult: "Consultation des campagnes"
+  select_campaign: "Choisissez une campagne"
   not_allowed_modify: "Vous n'avez pas l'autorisation pour faire la modification"
   campaign_closed_no_modify: "Une campagne %statusClosed% ne peut pas être modifiée"
   campaign_suspended_no_modify: "Une campagne %statusSuspended% ne peut pas être modifiée"
@@ -488,7 +491,7 @@ campaign_statistics:
   environmental_conditions: "Conditions Environnementales"
   observed_species: "Espèces d'oiseaux observées"
   no_species_observed: "Aucune espèce observée"
-  total: "Total"
+  total: "Total:"
   no_sites_found: "Aucun site trouvé pour cette campagne"
 species_statistics:
   total_species_counted: "Nombre total compté pour chaque espèce"
@@ -573,7 +576,7 @@ condition:
   campaign_not_found: "La campagne spécifiée est introuvable"
   site_not_found: "Le site spécifié est introuvable."
   access_denied_environment: "Vous n'avez pas accès à cette condition environnementale"
-  condition_number: "Numéro de condition"
+  condition_number: "Numéro de la condition"
   msg:
     created_success: "La condition environnementale a bien été créée"
     created_error: "Une erreur s'est produite lors de la création de la condition environnementale"
@@ -898,9 +901,11 @@ nature_reserve:
   consult: "Consultation des réserves naturelles"
   delete: "Supprimer la réserve naturelle"
   none: "Aucune réserve naturelle"
+  collect_the_data: "Collecter les données"
   select_at_least_one_site: "Vous devez sélectionner au moins un site"
   reserve_leader_required: "Le choix du responsable de la réserve est obligatoire."
   reserve_name_required: "Le nom de la réserve naturelle est obligatoire."
+  reserve_details: "Détail de la réserve naturelle"
   msg:
     created_success: "La réserve naturelle a été créée avec succès"
     created_error: "Une erreur s'est produite lors de la création de la réserve naturelle"
@@ -1007,6 +1012,8 @@ user:
   password_blank: "Veuillez saisir un mot de passe"
   password_too_short: "Votre mot de passe doit avoir au moins {{ limit }} caractères."
   password_mismatch: "Les deux mots de passe doivent correspondre."
+  account_not_verified: "Votre compte n'a pas encore été vérifié. Veuillez consulter votre email pour activer votre compte."
+  isVerified: "Vérifié"
   msg:
     created: "L'utilisateur a bien été créé."
     updated: "L'utilisateur a bien été modifié."

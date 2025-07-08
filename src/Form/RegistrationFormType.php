@@ -2,7 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\City;
+use App\Repository\CityRepository;
 use App\Validator\PasswordMatch;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -37,7 +40,7 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('name',TextType::class, [
-                'label' => false,
+                // 'label' => false,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Veuillez saisir votre nom',
@@ -51,7 +54,7 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('lastName',TextType::class, [
-                'label' => false,
+                // 'label' => false,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Veuillez saisir votre prénom',
@@ -65,7 +68,7 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('phone',TextType::class, [
-                'label' => false,
+                // 'label' => false,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Veuillez saisir votre Numéro de téléphone',
@@ -80,9 +83,9 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
-                // 'label' => $this->translator->trans('register.form.agree_terms') ."<span class='requiredField'>*</span>",
-                'label' => false,
-                // 'label_html' => true,
+                'label' => $this->translator->trans('register.form.agree_terms') ."<span class='requiredField'>*</span>",
+                // 'label' => false,
+                'label_html' => true,
                 'required' => true,
                 'constraints' => [
                     new IsTrue([
@@ -102,7 +105,7 @@ class RegistrationFormType extends AbstractType
                 'visible_label' => 'visible_label',
                 // 'visible_icon' => null,
                 // 'hidden_icon' => null,
-                'label' => false,
+                // 'label' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank([
@@ -121,7 +124,7 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('passwordConfirm', PasswordType::class, [
                 'mapped' => false,
-                'label' => false,
+                // 'label' => false,
                 'toggle' => true,
                 'hidden_label' => 'hidden_label',
                 'visible_label' => 'visible_label',

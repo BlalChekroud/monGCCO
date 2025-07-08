@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\BirdSpeciesCount;
 use App\Entity\CountingCampaign;
+use App\Entity\NatureReserve;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -18,20 +19,6 @@ class BirdSpeciesCountRepository extends ServiceEntityRepository
     }
 
     // Les trois espèces les plus comptées dans une campagne spécifique
-    // public function getTopThreeBirdSpeciesInCampaign(CountingCampaign $campaign)
-    // {
-    //     return $this->createQueryBuilder('bsc')
-            // ->select('species.scientificName AS scientificName', 'SUM(bsc.count) AS topThreeCount') // Sélectionne le nom de l'espèce et le total compté
-            // ->join('bsc.collectedData', 'cd') // Jointure avec CollectedData
-            // ->join('bsc.birdSpecies', 'species') // Jointure avec l'entité BirdSpecies
-            // ->where('cd.countingCampaign = :campaignId') // Filtre par campagne
-            // ->setParameter('campaignId', $campaign->getId()) // Passe l'ID de la campagne
-            // ->groupBy('species.scientificName') // Groupe par nom de l'espèce
-            // ->orderBy('topThreeCount', 'DESC') // Trie par total compté de manière décroissante
-            // ->setMaxResults(3) // Limite aux trois espèces les plus comptées
-            // ->getQuery()
-            // ->getResult(); // Exécute la requête et récupère les résultats
-    // }
     public function getTopThreeBirdSpeciesInCampaignWithImages(CountingCampaign $campaign): array
     {
         return $this->createQueryBuilder('bsc')
@@ -131,6 +118,54 @@ class BirdSpeciesCountRepository extends ServiceEntityRepository
         return !empty($result[0]['uniqueSpeciesCount']) ? (int) $result[0]['uniqueSpeciesCount'] : 0; // Retourner 0 si aucune donnée n'est trouvée
     }
 
+    /**
+     * Calcule le nombre total d'oiseaux comptés d'une réserve naturelle par campagne
+     *
+     * @param NatureReserve     $natureReserve
+     * @param CountingCampaign  $campaign
+     * @return int
+     */
+    public function countTotalBirdsInCampaignForReserve(NatureReserve $natureReserve, CountingCampaign $campaign): int
+    {
+        $qb = $this->createQueryBuilder('bsc')
+            ->select('COALESCE(SUM(bsc.count), 0)')
+            ->innerJoin('bsc.collectedData',    'cd')
+            ->innerJoin('cd.siteCollection',    'sc')
+            ->innerJoin('sc.natureReserve',     'nr')
+            ->where('cd.countingCampaign = :campaign')
+            ->andWhere('nr = :natureReserve')
+            ->setParameter('campaign',       $campaign)
+            ->setParameter('natureReserve',  $natureReserve)
+        ;
+
+        // getSingleScalarResult renvoie directement la valeur agrégée
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+
+    /**
+     * Compte le nombre total d'espèces uniques observées dans une campagne.
+     *
+     * @param NatureReserve     $natureReserve
+     * @param CountingCampaign $campaign
+     * @return int
+     */
+    public function countUniqueBirdSpeciesInCampaignForReserve(NatureReserve $natureReserve, CountingCampaign $campaign): int
+    {
+        $qb = $this->createQueryBuilder('bsc')
+            ->select('COUNT(DISTINCT bsc.birdSpecies) AS uniqueSpeciesCount') // Compte distinct des espèces d'oiseaux
+            ->innerJoin('bsc.collectedData',    'cd')
+            ->innerJoin('cd.siteCollection',    'sc')
+            ->innerJoin('sc.natureReserve',     'nr')
+            ->where('cd.countingCampaign = :campaign')
+            ->andWhere('nr = :natureReserve')
+            ->setParameter('campaign',       $campaign)
+            ->setParameter('natureReserve',  $natureReserve);
+
+        // getSingleScalarResult renvoie directement la valeur agrégée
+        return (int) $qb->getQuery()->getSingleScalarResult();
+
+    }
 
     //    /**
     //     * @return BirdSpeciesCount[] Returns an array of BirdSpeciesCount objects

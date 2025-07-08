@@ -9,8 +9,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 use Symfony\Component\Translation\LocaleSwitcher;
 use App\Entity\User;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class UserLocaleListener
 {
@@ -19,6 +21,7 @@ final class UserLocaleListener
         private readonly LocaleSwitcher $localeSwitcher,
         private readonly RouterInterface $router,
         private readonly LoggerInterface $logger, // Optionnel
+        private readonly TranslatorInterface $translator,
         private readonly string $defaultLocale = 'fr'
     ) {}
 
@@ -32,6 +35,11 @@ final class UserLocaleListener
                 // Log or handle unexpected status
                 return;
             }
+
+            // Si l'email n'est pas vérifié, bloquer la connexion
+            // if ((!$user->isVerified() || !$user->isVerified() == null) & $user->getEmail() != 'gccom@gmail.com') {
+            //     throw new CustomUserMessageAccountStatusException($this->translator->trans('user.account_not_verified'));
+            // }
               
             if ($user->getUserStatus()->getLabel() !== 'Actif') {
                 // Déconnexion de l'utilisateur

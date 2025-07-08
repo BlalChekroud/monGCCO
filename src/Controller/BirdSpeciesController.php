@@ -221,6 +221,13 @@ class BirdSpeciesController extends AbstractController
                 $processedSpecies[$scientificName] = true;
             }
 
+            if ($invalidCount > 0) {
+                $this->addFlash('info', $translator->trans('birdSpecies.error.invalid_lines', [
+                    '%invalidCount%' => $invalidCount,
+                    '%invalidRows%' => implode(', ', $invalidRows) // Conversion du tableau en chaîne
+                ]));
+            }
+
             // Affichez le nombre de lignes importées et non importées    
             try {
                 $entityManager->flush();
@@ -229,12 +236,6 @@ class BirdSpeciesController extends AbstractController
                 $this->addFlash('error', $translator->trans('birdSpecies.error.import', ['%message%' => $e->getMessage()]));
             }
             
-            if ($invalidCount > 0) {
-                $this->addFlash('error', $translator->trans('birdSpecies.error.invalid_lines', [
-                    '%invalidCount%' => $invalidCount,
-                    '%invalidRows%' => implode(', ', $invalidRows) // Conversion du tableau en chaîne
-                ]));
-            }
             return $this->redirectToRoute('app_bird_species_index');
         }
 

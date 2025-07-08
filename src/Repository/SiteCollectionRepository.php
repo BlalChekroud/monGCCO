@@ -111,20 +111,21 @@ class SiteCollectionRepository extends ServiceEntityRepository
      */
     public function getTotalBirdCountsForSiteInCampaign(SiteCollection $siteCollection, CountingCampaign $countingCampaign): ?int
     {
-        return $this->createQueryBuilder('s')
-            ->select('SUM(DISTINCT bsc.count) AS totalBirdCounts') // Total des comptages d'oiseaux, en évitant les doublons
-            ->join('s.siteAgentsGroups', 'sag') // Jointure avec SiteAgentsGroups
-            ->join('s.collectedData', 'cd') // Jointure avec CollectedData
-            ->join('cd.birdSpeciesCounts', 'bsc') // Jointure avec BirdSpeciesCount
-            ->join('cd.countingCampaign', 'cc') // Jointure avec CountingCampaign
+        $result = $this->createQueryBuilder('s')
+            ->select('SUM(bsc.count) AS totalBirdCounts')
+            ->leftJoin('s.collectedData', 'cd')
+            ->leftJoin('cd.birdSpeciesCounts', 'bsc')
+            ->leftJoin('cd.countingCampaign', 'cc')
             ->where('s.id = :siteId')
-            ->andWhere('cc.id = :campaignId') // Condition pour filtrer par campagne
+            ->andWhere('cc.id = :campaignId')
             ->setParameter('siteId', $siteCollection->getId())
-            ->setParameter('campaignId', $countingCampaign->getId()) // Paramètre pour la campagne
+            ->setParameter('campaignId', $countingCampaign->getId())
             ->getQuery()
-            ->getSingleScalarResult(); // Retourne le total en tant que valeur scalaire
+            ->getOneOrNullResult(); // ✅ Retourne NULL au lieu d'une erreur
+    
+        return $result['totalBirdCounts'] ?? 0; // ✅ Retourne 0 si aucun résultat
     }
-
+    
 
     public function getExportDataByCampaign(CountingCampaign $campaign): array
     {
@@ -155,7 +156,6 @@ class SiteCollectionRepository extends ServiceEntityRepository
    
         return $qb->getQuery()->getArrayResult();
     }
-    
     
     //    /**
     //     * @return SiteCollection[] Returns an array of SiteCollection objects

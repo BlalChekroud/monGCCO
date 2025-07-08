@@ -32,6 +32,7 @@
                       <th>{{'user.email'|trans }}</th>
                       <th>{{'user.role'|trans }}</th>
                       <th>{{'status'|trans }}</th>
+                      <th>{{'user.isVerified'|trans }}</th>
                       <th>{{ 'actions'|trans }}</th>
                     </tr>
                   </thead>
@@ -57,6 +58,9 @@
                         </td>
                         <td>
                             {{ user.userStatus.label ?? ''}}
+                        </td>
+                        <td>
+                            {{ user.isVerified ? 'yes'|trans : 'no'|trans }}
                         </td>
                         <td>
                           <div class="d-flex justify-content-center">

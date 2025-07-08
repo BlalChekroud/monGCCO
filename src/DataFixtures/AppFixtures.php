@@ -28,15 +28,15 @@ class AppFixtures extends Fixture
 
         // Création d'un utilisateur super administrateur
         $user = new User();
-        $user->setEmail('superadmin@gmail.com')
+        $user->setEmail('gccom@gmail.com')
              ->setName('super')
              ->setLastName('Admin')
              ->setPhone('')
              ->setCreatedAt(new \DateTimeImmutable())
              ->setRoles(['ROLE_SUPER_ADMIN'])
              ->setUserStatus($actifStatus)
-             ->setPassword($this->userPasswordHasher->hashPassword($user, 'admin'));
-             //  ->setIsVerified(true)
+             ->setPassword($this->userPasswordHasher->hashPassword($user, 'admin'))
+             ->setIsVerified(true);
              //  ->setApiToken('admin_token')
         $manager->persist($user);
 

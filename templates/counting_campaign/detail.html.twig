@@ -41,11 +41,11 @@
                 <td><i class="bi bi-cloud-sun-fill"></i> {{ 'campaign_statistics.most_frequent_conditions'|trans }}</td>
                 <td>
                     <ul>
-                        <li>{{ 'conditionDisturbed.description'|trans }} : {{ frequentConditions.disturbed ?? 'Aucune' }}</li>
-                        <li>{{ 'ice_cover'|trans }} : {{ frequentConditions.ice ?? 'Aucune' }}</li>
-                        <li>{{ 'tidal'|trans }} : {{ frequentConditions.tidal ?? 'Aucune' }}</li>
-                        <li>{{ 'water_condition'|trans }} : {{ frequentConditions.water ?? 'Aucune' }}</li>
-                        <li>{{ 'campaign_statistics.weather_conditions'|trans }} : {{ frequentConditions.weather ?? 'Aucune' }}</li>
+                        <li>{{ 'conditionDisturbed.description'|trans }} : {{ frequentConditions.disturbed ?? 'none'|trans }}</li>
+                        <li>{{ 'ice_cover'|trans }} : {{ frequentConditions.ice ?? 'none'|trans }}</li>
+                        <li>{{ 'tidal'|trans }} : {{ frequentConditions.tidal ?? 'none'|trans }}</li>
+                        <li>{{ 'water_condition'|trans }} : {{ frequentConditions.water ?? 'none'|trans }}</li>
+                        <li>{{ 'campaign_statistics.weather_conditions'|trans }} : {{ frequentConditions.weather ?? 'none'|trans }}</li>
                     </ul>
                 </td>
             </tr>
@@ -151,16 +151,12 @@
                                     <!-- Espèces d'oiseaux observées -->
                                     <td>
                                         <ul>
-                                            {% if collect.birdSpeciesCounts|length > 0 %}
-                                                {% for species, count in collect.getCountBySpecies %}
-                                                    <li>{{ species }}: {{ count }}</li>
-                                                {% else %}
-                                                    <li class="text-muted">{{ 'campaign_statistics.no_species_observed'|trans }}</li>
-                                                {% endfor %}
-                                                <strong>Total:</strong> <span class="badge bg-success">{{ collect.totalCount }}</span>
+                                            {% for specy in speciesAndCountsByCollectedData[collect.id] %}
+                                                <li>{{ specy.specy }}: {{ specy.count }}</li>
                                             {% else %}
                                                 <li class="text-muted">{{ 'campaign_statistics.no_species_observed'|trans }}</li>
-                                            {% endif %}
+                                            {% endfor %}
+                                            <strong>{{ 'campaign_statistics.total'|trans }}</strong> <span class="badge bg-success">{{ totalCountForCollect[collect.id] }}</span>
                                         </ul>
                                     </td>
                                 </tr>

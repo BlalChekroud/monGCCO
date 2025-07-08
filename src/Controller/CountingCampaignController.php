@@ -281,7 +281,7 @@ class CountingCampaignController extends AbstractController
     }
 
     #[IsGranted(CountingCampaignVoter::DELETE, 'countingCampaign')]
-    #[Route('/{id}', name: 'app_counting_campaign_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_counting_campaign_delete', methods: ['POST'])]
     public function delete(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$countingCampaign->getId(), $request->getPayload()->get('_token'))) {
@@ -372,6 +372,7 @@ class CountingCampaignController extends AbstractController
             }
         }
 
+        
         /**
          * DES STATISTIQUES
          */
@@ -393,6 +394,12 @@ class CountingCampaignController extends AbstractController
         
         $totalCountBySpecies = $countingCampaignRepository->getTotalCountBySpecies($countingCampaign->getId());
 
+        $speciesAndCountsByCollectedData = [];
+        foreach ($countingCampaign->getCollectedData() as $collect) {
+            $speciesAndCountsByCollectedData[$collect->getId()] = $collectedDataRepository->getSpeciesAndCountsByCollectedData($collect);
+            $totalCountForCollect[$collect->getId()] = $collectedDataRepository->finByTotalCountForCollect($collect);
+        }
+
         // Exporter les données de la campagne
         $formExport = $this->createForm(ExportType::class)
                             ->handleRequest($request);
@@ -403,11 +410,53 @@ class CountingCampaignController extends AbstractController
                 return $this->redirectToRoute('app_counting_campaign_show', ['id' => $countingCampaign->getId()]);
             }
 
-        $columnNames = ['Nom de la campagne', 'Date de début', 'Date de fin', 'Etat de la campagne', 'Description', 'Créé le', 'Dernière mise à jour', 'Créé par',
-         'Ville', 'Nom du site', 'Date de collecte', 'Collecté par', 'Nom de l\'espèce', 'Code de l\'espèce', 'Nombre d\'oiseaux'];
-         
-         $data = $countingCampaignRepository->getBirdSpeciesDataForCampaign($countingCampaign->getId());
+        $columnNames = ['Nom de la campagne', 'Date de début', 'Date de fin', 'Etat de la campagne', 'Description', 'Créé le', 
+                        'Dernière mise à jour', 'Créé par', 'Total général des comptages dans la campagne', "Total d'espèces uniques observées",
+                        'site', 'Nombre total des oiseaux comptés', 'Disturbé(e)', 'Météo', 'Glace', 'Marée', 'Eaux', 
+                        'Numéro de collecte', 'Collecteur', 'Date de collecte', 'Type de comptage', 'Qualité de comptage', 'Méthodes de collecte utilisées', 
+                        'Nom scientifique de l\'espèce', 'Nombre total'];
 
+        $data = [];
+        foreach ($siteCollectionsByCampaign as $site) {
+            foreach ($collectedDataRepository->getCollectedDataBySiteInCampaign($site, $countingCampaign) as $collect) {
+                // Convertir les méthodes en une seule chaîne
+                $methodLabels = array_map(
+                    fn($method) => $method->getLabel(), 
+                    $collect->getMethod()->toArray()
+                );
+                $methodsString = implode(', ', $methodLabels);
+
+                foreach ($speciesAndCountsByCollectedData[$collect->getId()] as $speciesData) {
+                    $data[] = [
+                        $countingCampaign->getCampaignName() ?? '',
+                        $countingCampaign->getStartDate()->format('d-m-Y H:i:s') ?? '',
+                        $countingCampaign->getEndDate()->format('d-m-Y H:i:s') ?? '',
+                        $countingCampaign->getCampaignStatus()->getLabel() ?? '',
+                        $countingCampaign->getDescription() ?? '',
+                        $countingCampaign->getCreatedAt()->format('d-m-Y H:i:s') ?? '',
+                        $countingCampaign->getUpdatedAt()->format('d-m-Y H:i:s') ?? '',
+                        $countingCampaign->getCreatedBy()->getEmail() ?? '',
+                        $totalBirdsCountedInCampaign,
+                        $totalcountUniqueBirdSpeciesInCampaign,
+                        $site->getSiteName() ?? '',
+                        $siteCollectionRepository->getTotalBirdCountsForSiteInCampaign($site, $countingCampaign) ?? 0,
+                        $collect->getEnvironmentalConditions()->getDisturbed()->getLabel() ?? '',
+                        $collect->getEnvironmentalConditions()->getWeather()->getLabel() ?? '',
+                        $collect->getEnvironmentalConditions()->getIce()->getLabel() ?? '',
+                        $collect->getEnvironmentalConditions()->getTidal()->getLabel() ?? '',
+                        $collect->getEnvironmentalConditions()->getWater()->getLabel() ?? '',                           
+                        $collect->getId() ?? '',
+                        $collect->getCreatedBy()->getEmail() ?? '',
+                        $collect->getCreatedAt()->format('d-m-Y H:i:s') ?? '',
+                        $collect->getCountType()->getLabel() ?? '',
+                        $collect->getQuality()->getLabel() ?? '',
+                        $methodsString ?? '',
+                        $speciesData['specy'] ?? '',
+                        $speciesData['count'] ?? 0,
+                    ];                            
+                }
+            }
+        }
         $format = $formExport->get('format')->getData();
         $fileName = sprintf("Counting_campaign_export_%s", date('d-m-Y_His'));
 
@@ -433,6 +482,8 @@ class CountingCampaignController extends AbstractController
             'siteCollectionsByCampaign' => $siteCollectionsByCampaign,
             'formExport' => $formExport->createView(),
             'totalCountBySpecies' => $totalCountBySpecies,
+            'speciesAndCountsByCollectedData' => $speciesAndCountsByCollectedData,
+            'totalCountForCollect' => $totalCountForCollect,
         ]);
     }
 

@@ -68,6 +68,7 @@
                 </table>
             </div>
             <div class="card-footer">
+              <a href="{{ path('app_nature_reserve_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{'consult_reserves'|trans }}</a>
               <a href="{{ path('app_counting_campaign_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1"> {{ 'campaign.consult'|trans }}</a>
               <a href="{{ path('app_environmental_conditions_index') }}" class="btn btn-outline-info btn-sm bi bi-list-task mx-1" title="{{'condition.list_environmental_conditions'|trans }}"> {{ 'condition.consult'|trans }}</a>
               <a href="{{ path('app_counting_campaign_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted mx-1"> {{ 'campaign.create_campaign'|trans }}</a>

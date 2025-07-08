@@ -1,4 +1,11 @@
 {% if is_granted('ROLE_SUPER_ADMIN') %}
+    <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" onsubmit="return confirm('{{ 'sweetalert.confirm_text_user'|trans }}');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+        <button class="btn btn-danger btn-sm bi bi-trash mx-2" title="{{ 'user.delete'|trans }}"></button>
+    </form>
+{% endif %}
+
+{# {% if is_granted('ROLE_SUPER_ADMIN') %}
 <form id="delete-form" method="post" action="{{ path('app_user_delete', {'id': user.id}) }}">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
     <button type="button" onclick="confirmDelete()" class="btn btn-danger btn-sm bi bi-trash mx-2" title="{{'user.delete'|trans }}"></button>
@@ -40,4 +47,4 @@
             }
         });
     }
-</script>
+</script> #}

@@ -72,8 +72,8 @@ class SecurityController extends AbstractController
     public function logout(): void
     {
         // throw new \LogicException('Ce champ de méthode peut être vide - il sera intercepté par la clé de déconnexion de votre pare-feu.');
+        $this->addFlash('warning','Vous étes déconnecté.');
         throw new \LogicException($this->translator->trans('user.msg.disconnected'));
-        // $this->addFlash('warning','Vous étes déconnecté.');
     }
 
     #[Route('/admin/profile', name: 'app_profile', methods: ['GET'])]
@@ -194,14 +194,4 @@ class SecurityController extends AbstractController
         return $this->redirectToRoute('app_profile', [], Response::HTTP_SEE_OTHER);
     }
 
-
-    // public function onAuthenticationSuccess(Request $request, TokenInteface $token, string $firewallName): ?Response
-    // {
-    //     if ($targetPath =this->getTargetPath($request->getSession(), $firewallName)){
-    //         return new RedirectResponse($targetPath);
-    //     }
-
-    //     return new RedirectResponse($this->urlGenerator->generate(name: 'app_collected_data_index'));
-    //     throw new \Exception(message: 'TODO: provide a valid redirect inside '.__FILE__);
-    // }
 }

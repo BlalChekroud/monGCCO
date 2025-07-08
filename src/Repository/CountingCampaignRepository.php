@@ -118,9 +118,11 @@ class CountingCampaignRepository extends ServiceEntityRepository
             ->join('cc.siteAgentsGroups', 'sag') // Jointure avec les SiteAgentsGroups
             ->join('sag.siteCollection', 'sc') // Jointure avec les SiteCollections
             ->join('sc.collectedData', 'cd') // Jointure avec les données collectées
+            ->join('cd.environmentalConditions', 'ec') // <- ce lien permet de valider l'appartenance de cd à la campagne
             ->join('cd.method', 'm') // Jointure avec les méthodes de collecte
-            ->where('cc.id = :campaignId')
-            ->setParameter('campaignId', $campaign->getId())
+            ->where('cc = :campaign')
+            ->andWhere('ec.countingCampaign = :campaign') // <- filtre fort ici
+            ->setParameter('campaign', $campaign)
             ->getQuery()
             ->getArrayResult();
 

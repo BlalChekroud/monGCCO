@@ -4,6 +4,9 @@ namespace App\Repository;
 
 use App\Entity\CountingCampaign;
 use App\Entity\EnvironmentalConditions;
+use App\Entity\NatureReserve;
+use App\Entity\SiteCollection;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,7 +19,7 @@ class EnvironmentalConditionsRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, EnvironmentalConditions::class);
     }
-    
+
     /**
      * Récupérer les valeurs les plus fréquentes des conditions environnementales dans une campagne donnée.
      *
@@ -108,6 +111,73 @@ class EnvironmentalConditionsRepository extends ServiceEntityRepository
         }
 
         return $result;
+    }
+
+
+    # Récupérer les valeurs les plus fréquentes des conditions environnementales dans une campagne pour une reserve donnée.
+
+    public function getMostFrequentEnvCondsForReserve(NatureReserve $natureReserve, CountingCampaign $campaign): array
+    {
+        $result = [];
+    
+        $fields = [
+            'disturbed' => 'd',
+            'ice' => 'i',
+            'tidal' => 't',
+            'water' => 'w',
+            'weather' => 'we',
+        ];
+    
+        foreach ($fields as $field => $alias) {
+            try {
+                $qb = $this->createQueryBuilder('ec')
+                    ->select("$alias.label")
+                    ->join("ec.$field", $alias)
+                    ->join('ec.siteCollection', 'sc')
+                    ->join('sc.natureReserve', 'nr')
+                    ->where('ec.countingCampaign = :campaign')
+                    ->andWhere('nr = :reserve')
+                    ->setParameter('campaign', $campaign)
+                    ->setParameter('reserve', $natureReserve)
+                    ->groupBy("$alias.id")
+                    ->orderBy("COUNT($alias.id)", 'DESC')
+                    ->setMaxResults(1);
+    
+                $result[$field] = $qb->getQuery()->getSingleScalarResult();
+            } catch (\Doctrine\ORM\NoResultException) {
+                $result[$field] = null;
+            }
+        }
+    
+        return $result;
+    }
+    
+    /**
+     * Retourne la dernière condition environnementale (sans collecte associée)
+     * pour un utilisateur, une campagne et un site donné.
+     *
+     * @param User $user
+     * @param CountingCampaign $campaign
+     * @param SiteCollection $siteCollection
+     * @return EnvironmentalConditions|null
+     */
+    public function getLatestConditionForUserAndCampaign(
+        User $user,
+        CountingCampaign $campaign,
+        SiteCollection $siteCollection
+    ): ?EnvironmentalConditions {
+        return $this->createQueryBuilder('ec')
+            ->where('ec.user = :user')
+            ->andWhere('ec.countingCampaign = :campaign')
+            ->andWhere('ec.siteCollection = :site')
+            ->andWhere('ec.collectedData IS NULL') // uniquement les conditions sans collecte
+            ->setParameter('user', $user)
+            ->setParameter('campaign', $campaign)
+            ->setParameter('site', $siteCollection)
+            ->orderBy('ec.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult(); // évite l'erreur si aucun résultat
     }
 
 

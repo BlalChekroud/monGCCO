@@ -40,15 +40,15 @@
                 .catch(err => console.log("Erreur Service Worker", err));
         }
     </script> #}
-    <script>
+    {# <script>
       window.addEventListener('load', () => {
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('../sw.js')
+          navigator.serviceWorker.register('../sw.js') #}
             {# .then(reg => console.log("Service Worker enregistré", reg))
             .catch(err => console.log("Erreur Service Worker", err)); #}
-        }
+        {# }
       });
-    </script>
+    </script> #}
     <script>
       function printDiv() {
           const printableContent = document.getElementById("printableArea").innerHTML;
@@ -347,12 +347,12 @@
           <li class="nav-item dropdown">
               <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                   <i class="bi bi-chat-left-text"></i>
-                  <span class="badge bg-success badge-number">{% if unreadNotifications %}{{ unreadNotifications }}{% endif %}</span>
+                  <span class="badge bg-success badge-number">{{ unreadNotifications|default(''|trans) }}</span>
               </a><!-- End Messages Icon -->
 
               <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
                   <li class="dropdown-header">
-                      {{ 'notification.you_have'|trans }} {{ unreadNotifications }} {{ 'notification.new_message'|trans }}
+                      {{ 'notification.you_have'|trans }} {{ unreadNotifications|default(''|trans) }} {{ 'notification.new_message'|trans }}
                       <a href="{{ path('all_notifications') }}"><span class="badge rounded-pill bg-primary p-2 ms-2">{{ 'notification.view_all'|trans }}</span></a>
                   </li>
                   <li><hr class="dropdown-divider"></li>
@@ -361,7 +361,7 @@
                       <a href="#">
                           <div>
                               <ul class="notifications-list">
-                                  {% if app.user.notifications|length > 0 %}
+                                  {% if app.user is not null and  app.user.notifications|length > 0 %}
                                       {% for notification in app.user.notifications|reverse %}
                                           <li class="notification-item">
                                               <div class="notification-content">

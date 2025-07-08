@@ -19,120 +19,430 @@
     <section class="section">
         <div class="row">
             <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
                 <div class="card">
                     <div class="card-body">
-                     <div id="printableArea">
-                        <h5 class="card-title">{{'show'|trans }}</h5>
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <th>{{ 'nature_reserve.name'|trans }}:</th>
-                                    <td>{{ nature_reserve.reserveName }}</td>
-                                </tr>
-                                <tr>
-                                    <th>{{'nature_reserve.reserveLeader'|trans }}:</th>
-                                    <td>{{ nature_reserve.reserveLeader }}</td>
-                                </tr>
-                                <tr>
-                                    <th>{{'nature_reserve.sites'|trans }}: </th>
-                                    <td>
-                                        {% if nature_reserve.siteCollections|length > 0 %}
-                                            {% set sorted_siteCollections = nature_reserve.siteCollections|sort((a, b) => a.siteName <=> b.siteName) %}
-                                            <ul>
-                                                {% for site in sorted_siteCollections %}
-                                                    <li>
-                                                        {{ site.siteCode }} - {{ site.SiteName }}
-                                                    </li>                                                    
-                                                {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            <p>{{'site_collection.none'|trans }}</p>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>{{ 'created_at'|trans }}:</th>
-                                    <td>{{ nature_reserve.createdAt ? nature_reserve.createdAt|date('d-m-Y H:i:s') : '' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>{{ 'Last_updated_at'|trans }}:</th>
-                                    <td>{{ nature_reserve.updatedAt ? nature_reserve.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                     </div>
-
-                     {% for campaign in reserveCampaigns %}
-                        <li>
-                            {{ campaign.campaignName }} - {{ campaign.campaignId }}
-                        </li>
-                    {% else %}
-                        <p>{{'campaign.none'|trans }}</p>
-                    {% endfor %}
-
-                    </div>
-                    <div class="card-footer d-flex justify-content-between">
-                        <div>
-                            <a href="{{ path('app_nature_reserve_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'nature_reserve.return'|trans }}">{{ 'back'|trans }}</a>
-                            <a href="{{ path('app_nature_reserve_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'add_a_nature_reserve'|trans }}</a>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            {% import 'macros/btn_actions_macros.html.twig' as macros %}
-                            {{ macros.action_buttons('app_nature_reserve_new','app_nature_reserve_show', 'app_nature_reserve_edit', 'nature_reserve/_delete_form.html.twig', nature_reserve, app.request.attributes.get('_route')) }}
-                            {{ include('nature_reserve/_delete_form.html.twig') }}
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-    <section>
-        <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
-              <div id="printableArea">
-                <div class="card">
-                    <div class="card-body">
-                        <!-- Accordion without outline borders -->
-                        <div class="accordion accordion-flush" id="accordionFlushExample">
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="flush-headingOne">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                                        <h6 class="mt-4"><i class="bi bi-info-circle-fill text-info"></i> {{ 'campaign.campaign_details'|trans }}</h6>
-                                    </button>
-                                </h2>
-                                <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                                    <div class="accordion-body">
-                                        {% for site in nature_reserve.siteCollections %}
-                                        <div class="mb-3">
-                                            <h5>{{ site.siteName }}</h5>
-                                            {% set campaigns = campaignsBySite[site.id] %}
-                                            {% if campaigns is not empty %}
-                                            <ul class="list-group list-group-flush">
-                                                {% for campaign in campaigns|reverse %}
-                                                <li class="list-group-item">
-                                                    {{ campaign.campaignName }}
-                                                </li>
-                                                {% endfor %}
-                                            </ul>
-                                            {% else %}
-                                            <p class="text-muted">{{ 'no_campaign_found'|trans }}</p>
-                                            {% endif %}
-                                        </div>
-                                        {% endfor %}
+                        <!-- Default Tabs -->
+                        <ul class="nav nav-tabs d-flex" id="myTabjustified" role="tablist">
+                            <li class="nav-item flex-fill" role="presentation">
+                                <button class="nav-link w-100 active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-justified" type="button" role="tab" aria-controls="home" aria-selected="true"><h6>{{ 'nature_reserve.reserve_details'|trans }}</h6></button>
+                            </li>
+                            <li class="nav-item flex-fill" role="presentation">
+                                <button class="nav-link w-100" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-justified" type="button" role="tab" aria-controls="profile" aria-selected="false"><h6>{{ 'nature_reserve.collect_the_data'|trans }}</h6></button>
+                            </li>
+                            <li class="nav-item flex-fill" role="presentation">
+                                <button class="nav-link w-100" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-justified" type="button" role="tab" aria-controls="contact" aria-selected="false">{{ 'campaign.detail_counting_campaign'|trans }}</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content pt-2" id="myTabjustifiedContent">
+                            <div class="tab-pane fade show active" id="home-justified" role="tabpanel" aria-labelledby="home-tab">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <th>{{ 'nature_reserve.reserveName'|trans }}:</th>
+                                            <td>{{ nature_reserve.reserveName }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>{{'nature_reserve.reserveLeader'|trans }}:</th>
+                                            <td>{{ nature_reserve.reserveLeader }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>{{'nature_reserve.sites'|trans }}: </th>
+                                            <td>
+                                                {% if nature_reserve.siteCollections|length > 0 %}
+                                                    <ul>
+                                                        {% for site in nature_reserve.siteCollections %}
+                                                            <li>
+                                                                <a href="{{ path('app_site_collection_show',{'id': site.id }) }}">{{ site.siteCode ?? '' }} - {{ site.SiteName ?? '' }}</a> ({{ site.city.name ?? '' }} / {{ site.city.region.name ?? '' }})
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <p>{{'site_collection.none'|trans }}</p>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>{{ 'created_at'|trans }}:</th>
+                                            <td>{{ nature_reserve.createdAt ? nature_reserve.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>{{ 'Last_updated_at'|trans }}:</th>
+                                            <td>{{ nature_reserve.updatedAt ? nature_reserve.updatedAt|date('d-m-Y H:i:s') : '' }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <a href="{{ path('app_nature_reserve_index') }}" class="btn btn-sm btn-outline-secondary mx-1" title="{{ 'nature_reserve.return'|trans }}">{{ 'back'|trans }}</a>
+                                        <a href="{{ path('app_nature_reserve_new') }}" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted"> {{'add_a_nature_reserve'|trans }}</a>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        {% import 'macros/btn_actions_macros.html.twig' as macros %}
+                                        {{ macros.action_buttons('app_nature_reserve_new','app_nature_reserve_show', 'app_nature_reserve_edit', 'nature_reserve/_delete_form.html.twig', nature_reserve, app.request.attributes.get('_route')) }}
+                                        {{ include('nature_reserve/_delete_form.html.twig') }}
                                     </div>
                                 </div>
-
                             </div>
-                        </div><!-- End Accordion without outline borders -->
-                    </div>
 
+                            <div class="tab-pane fade" id="profile-justified" role="tabpanel" aria-labelledby="profile-tab">
+                                <table class="table datatable">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>{{ 'campaign.campaign_name'|trans }}</th>
+                                            <th>{{ 'remaining_time'|trans }}</th>
+                                            <th>{{ 'campaign.status'|trans }}</th>
+                                            <th>{{ 'actions'|trans }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {# * $campaignStatuses[0] -> "Planifiée"
+                                        * $campaignStatuses[1] -> "En cours"
+                                        * $campaignStatuses[2] -> "Terminée"
+                                        * $campaignStatuses[3] -> "Clôturée"
+                                        * $campaignStatuses[4] -> "Erreur"
+                                        * $campaignStatuses[5] -> "Suspendue"
+                                        * $campaignStatuses[6] -> "Annulée #}
+                                        {% set status_classes = {
+                                            0: 'info',   
+                                            1: 'success',      
+                                            2: 'warning',   
+                                            3: 'light', 
+                                            4: 'danger',    
+                                            5: 'secondary',   
+                                            6: 'dark'       
+                                        } %}
+                                        {% for counting_campaign in reserveCampaigns|reverse %}
+                                            <tr>
+                                                <td>{{ counting_campaign.id }}</td>
+                                                <td>
+                                                    <a href="{{ path('app_counting_campaign_show', {'id': counting_campaign.id}) }}" title="{{ 'show'|trans }}">{{ counting_campaign.campaignName }}</a>
+                                                    <p class="explanation">{{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y') : '' }} / {{ counting_campaign.endDate ? counting_campaign.endDate|date('d-m-Y') : '' }}</p>
+                                                </td>
+                                                <td>
+                                                {# Calculer le pourcentage du temps restant #}
+                                                    {% set totalDuration = date(counting_campaign.endDate)|date('U') - date(counting_campaign.startDate)|date('U') %}
+                                                    {% set timeRemaining = date(counting_campaign.endDate)|date('U') - date("now")|date('U') %}
+                                                    {% set progressPercentage = (timeRemaining / totalDuration) * 100 %}
+                                                    {% set progressPercentage = progressPercentage < 0 ? 0 : (progressPercentage > 100 ? 100 : progressPercentage) %}
+                                                    {% set barColor = progressPercentage > 50 ? 'bg-success' : (progressPercentage > 20 ? 'bg-warning' : 'bg-danger') %}
+                                                    {# Afficher la barre de progression #}
+                                                    <div class="progress mt-3">
+                                                        <div class="progress-bar progress-bar-striped {{ barColor }} progress-bar-animated" role="progressbar" 
+                                                            style="width: {{ progressPercentage }}%;" 
+                                                            aria-valuenow="{{ progressPercentage|round }}" 
+                                                            aria-valuemin="0" aria-valuemax="100">
+                                                            {{ progressPercentage|round }}%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {# Utiliser le label du statut pour obtenir l'index depuis statusIndexMap #}
+                                                    {% set campaignStatusIndex = statusIndexMap[counting_campaign.campaignStatus.id] %}
+                                                    <div class="badge bg-{{ status_classes[campaignStatusIndex] ?? 'secondary' }}">
+                                                        <i class="bi bi-circle-fill"></i>
+                                                        {{ counting_campaign.campaignStatus.label }}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {% set currentDate = "now"|date('Y-m-d H:i:s') %}
+                                                    <ul>
+                                                        {% for site in rsfSites[counting_campaign.id] %}
+                                                            <li>
+                                                                <h6>{{ site.siteName }}</h6> 
+                                                                {% if userIsInGroup[counting_campaign.id] is defined or is_granted('ROLE_SUPER_ADMIN') %}
+                                                                    
+                                                                    {% if counting_campaign.startDate|date('Y-m-d H:i:s') <= currentDate %}
+                                                                        {% if counting_campaign.campaignStatus != statusClosed and counting_campaign.campaignStatus != statusSuspended %}
+                                                                            {# Vérifiez si le site a des conditions environnementales associées #}
+                                                                            {# Vérifiez si `collectedData` est défini et vide pour la condition #}
+                                                                            {% if conditions[counting_campaign.id][site.id] %}
+                                                                                <a href="{{ path('app_collected_data_new', {'campaignId': counting_campaign.id, 'siteId': site.id}) }}" class="btn btn-success btn-sm" title="{{ 'campaign.start_collecting'|trans }}"> {{ 'campaign.collect_data'|trans }}
+                                                                                    <i class="bi bi-arrow-bar-right">
+                                                                                        <div class="spinner-grow spinner-grow-sm text-light" role="status"></div>
+                                                                                    </i>
+                                                                                </a>
+                                                                            {% else %}
+                                                                                <a href="{{ path('app_environmental_conditions_new', {'siteId': site.id, 'campaignId': counting_campaign.id}) }}" class="btn btn-outline-success btn-sm my-2" title="{{ 'campaign.add_conditions_then_start_collecting'|trans }}">
+                                                                                    {{ 'campaign.add_environmental_conditions'|trans }}
+                                                                                </a>
+                                                                            {% endif %}
+                                                                        {% endif %}                                                                        
+                                                                    {% else %}
+                                                                        <code>
+                                                                            <i class="text-warning bi bi-exclamation-triangle"></i> 
+                                                                            {{ 'campaign.cannot_start_collecting_before'|trans }} : 
+                                                                            {{ counting_campaign.startDate ? counting_campaign.startDate|date('d-m-Y H:i:s') : '' }}
+                                                                            <i class="text-warning bi bi-exclamation-triangle"></i>
+                                                                        </code>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    <i class="text-warning bi bi-exclamation-triangle me-1"> {{ 'campaign.reserved_for_site_agents'|trans }}</i>
+                                                                {% endif %}
+                                                                <p>
+                                                                    {% for group in groupsByCampAndSite[counting_campaign.id][site.id] %}
+                                                                        <ul>
+                                                                            <li>
+                                                                                <h6>{{ group.groupName }} ({{ 'campaign.leader'|trans }} : {{ group.leader.name }} {{ group.leader.lastName }})</h6>
+                                                                                <ul>
+                                                                                    {% for agent in group.groupMember %}
+                                                                                        <li>{{ agent.name }} {{ agent.lastName }}</li>
+                                                                                    {% endfor %}
+                                                                                </ul>
+                                                                            </li>
+                                                                        </ul>
+                                                                    {% endfor %}
+                                                                </p>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                            {% else %}
+                                            <tr>
+                                                <td colspan="7">{{ 'no_record_found'|trans }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade" id="contact-justified" role="tabpanel" aria-labelledby="contact-tab">
+                                <section>
+                                    <div class="row">
+                                        <div class="col-xxl-6 col-md-6 d-flex justify-content-start">
+                                            <h5 class="card-title">{{'campaign.select_campaign'|trans }} : </h5>
+                                            <form method="get" action="{{ path('app_nature_reserve_show', {'id': nature_reserve.id}) }}" class="my-3">
+                                                <select id="campaignSelector" name="rsf" class="form-control" onchange="this.form.submit()">
+                                                    {% for c in reserveCampaigns|reverse %}
+                                                    <option value="{{ c.id }}" {% if campaignSelected is not null and c.id == campaignSelected.id %}selected{% endif %}>
+                                                        {{ c.campaignName }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <div id="printableArea">
+                                        <!-- Détails de la campagne -->
+                                        <table class="table table-hover table-striped">
+                                            <tr><td><strong>{{ 'campaign.campaign_name'|trans }} :</strong></td><td>{{ campaignSelected.campaignName ?? '' }}</td></tr>
+                                            <tr><td><strong>{{ 'campaign.start_date'|trans }} :</strong></td><td>{{ campaignSelected.startDate ? campaignSelected.startDate|date('d-m-Y H:i:s') : '' }}</td></tr>
+                                            <tr><td><strong>{{ 'campaign.end_date'|trans }} :</strong></td><td>{{ campaignSelected.endDate ? campaignSelected.endDate|date('d-m-Y H:i:s') : '' }}</td></tr>
+                                            <tr><td><strong>{{ 'campaign.status'|trans }} :</strong></td><td>{{ campaignSelected.campaignStatus }}</td></tr>
+                                            <tr><td><strong>{{ 'created_at'|trans }} :</strong></td><td>{{ campaignSelected.createdAt ? campaignSelected.createdAt|date('d-m-Y H:i:s') : '' }}</td></tr>
+                                            <tr><td><strong>{{ 'Last_updated_at'|trans }} :</strong></td><td>{{ campaignSelected.updatedAt ? campaignSelected.updatedAt|date('d-m-Y H:i:s') : '' }}</td></tr>
+                                            <tr><td><strong>{{ 'description'|trans }} :</strong></td><td>{{ campaignSelected.description }}</td></tr>
+                                            <tr><td><strong>{{ 'created_by'|trans }} :</strong></td><td>{{ campaignSelected.createdBy.getEmail }}</td></tr>
+                                        </table>
+
+                                        <!-- Statistiques de la campagne -->
+                                        <h6 class="mt-4"><i class="bi bi-bar-chart-line-fill"></i> {{ 'campaign_statistics.title'|trans }} :</h6>
+                                        <table class="table table-hover table-bordered table-striped table-sm">
+                                            <thead class="table-secondary">
+                                                <tr>
+                                                    <th>{{ 'campaign_statistics.statistic'|trans }}</th>
+                                                    <th>{{ 'campaign_statistics.value'|trans }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><i class="bi bi-geo-alt-fill text-warning"></i> {{ 'campaign_statistics.sites_involved'|trans }}</td>
+                                                    <td><span class="badge bg-info">{{ rsfSitesByCampaign|length }}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><i class="bi bi-person-fill text-success"></i> {{ 'campaign_statistics.total_agents_participating'|trans }}</td>
+                                                    <td>
+                                                        <span class="badge bg-success">{{ totalAgentsCount ?? 0 }}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><i class="bi bi-file-earmark-bar-graph-fill text-primary"></i> {{ 'campaign_statistics.total_collections'|trans }}</td>
+                                                    <td>
+                                                        <span class="badge bg-primary">{{ totalCollectedDataCount ?? 0 }}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><i class="bi bi-cloud-sun-fill"></i> {{ 'campaign_statistics.most_frequent_conditions'|trans }}</td>
+                                                    <td>
+                                                        <ul>
+                                                            <li>{{ 'conditionDisturbed.description'|trans }} : {{ frequentConditions.disturbed ?? 'none'|trans }}</li>
+                                                            <li>{{ 'ice_cover'|trans }} : {{ frequentConditions.ice ?? 'none'|trans }}</li>
+                                                            <li>{{ 'tidal'|trans }} : {{ frequentConditions.tidal ?? 'none'|trans }}</li>
+                                                            <li>{{ 'water_condition'|trans }} : {{ frequentConditions.water ?? 'none'|trans }}</li>
+                                                            <li>{{ 'campaign_statistics.weather_conditions'|trans }} : {{ frequentConditions.weather ?? 'none'|trans }}</li>
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><i class="bi bi-list-ol"></i> {{ 'campaign_statistics.methods_used'|trans }}</td>
+                                                    <td>
+                                                        <ul>
+                                                            {% for method in methodsUsed %}
+                                                                <li>{{ method }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <!-- Sites et collectes -->
+                                        <h6 class="mt-4"> {{ 'campaign_statistics.sites_and_collections'|trans }} :</h6>
+                                        {% if campaignSelected.siteAgentsGroups|length > 0 %}
+                                            <ol>
+                                            {% for siteAgentsGroup in campaignSelected.siteAgentsGroups %}
+                                                {% set site = siteAgentsGroup.siteCollection %}
+                                                {% if site in rsfSitesByCampaign %}
+                                                    <div class="site-section mb-4">
+                                                        <h6 class="mb-3">
+                                                            <li> <i class="bi bi-geo-alt-fill text-warning me-2"></i>{{ 'site_collection.site'|trans }} : {{ site.siteName }} ({{ site.city.name }} / {{ site.city.region.name }})</li>
+                                                        </h6>
+                                                        <!-- Active Table -->
+                                                        <table class="table table-borderless">
+                                                            <thead class="table-secondary">
+                                                                <tr>
+                                                                    <th scope="col"><i class="bi bi-people-fill"></i> {{ 'campaign.associated_agent_groups'|trans }}</th>
+                                                                    <th scope="col"><i class="bi bi-file-earmark-bar-graph-fill"></i> {{ 'campaign_statistics.total_birds_counted'|trans }}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        {% if siteAgentsGroup.agentsGroup|length > 0 %}
+                                                                            <ul>
+                                                                                {% for group in siteAgentsGroup.agentsGroup %}
+                                                                                    <li>{{ group.groupName }}; ({{ 'campaign.leader'|trans }}: {{ group.leader.getEmail }})</li>
+                                                                                    <ul>
+                                                                                        {% for agent in group.groupMember %}
+                                                                                            <li>{{ agent.getEmail }} ({{ agent.name }} {{ agent.lastName }})</li>
+                                                                                        {% else %}
+                                                                                            <li>{{ 'campaign_statistics.no_agents_assigned'|trans }}</li>
+                                                                                        {% endfor %}
+                                                                                    </ul>
+                                                                                {% endfor %}
+                                                                            </ul>
+                                                                        {% else %}
+                                                                            <p class="text-muted">{{ 'campaign_statistics.no_groups_found'|trans }}.</p>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                    <td class="d-flex justify-content-center"><h5><span class="badge bg-info">{{ totalBirdCountsForReserveSiteInCampaign[site.id][campaignSelected.id] ?? 0 }}</span></h5></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                        <!-- End Tables without borders -->
+
+                                                        <!-- Collectes de ce site -->
+                                                        {% for collect in site.collectedData %}
+                                                            {% if collect.countingCampaign == campaignSelected %}
+                                                                <h6 class="mt-3"><i class="bi bi-file-earmark-bar-graph-fill"></i> {{ 'campaign_statistics.collection_number'|trans }}: {{ collect.id }} - {{ 'collector'|trans }}: {{ collect.createdBy.getEmail }}</h6>
+                                                                <table class="table table-bordered table-sm">
+                                                                    <thead class="table-secondary">
+                                                                        <tr>
+                                                                            <th>{{ 'campaign_statistics.counting'|trans }}</th>
+                                                                            <th>{{ 'campaign_statistics.environmental_conditions'|trans }}</th>
+                                                                            <th>{{ 'campaign_statistics.observed_species'|trans }}</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <!-- Collecte -->
+                                                                            <td>
+                                                                                <ul>
+                                                                                    <li><i>{{ 'type'|trans }} : </i> {{ collect.countType.label }}</li>
+                                                                                    <li><i>{{ 'quality'|trans }} : </i> {{ collect.quality.label }}</li>
+                                                                                </ul>
+                                                                                <span><i class="bi bi-list-ol"> {{ 'methods'|trans }}:</i>
+                                                                                    <ul>
+                                                                                        {% for method in collect.method %}
+                                                                                            <li>{{ method.label }}</li>
+                                                                                        {% else %}
+                                                                                            <span class="text-muted">{{ 'no_method'|trans }}</span>
+                                                                                        {% endfor %}
+                                                                                    </ul>
+                                                                                </span>
+                                                                            </td>
+                                                                            <!-- Conditions Environnementales -->
+                                                                            <td>
+                                                                                <ul>
+                                                                                    <li><i>{{ 'conditionDisturbed.description'|trans }}:</i> {{ collect.environmentalConditions.disturbed ?? '' }}</li>
+                                                                                    <li><i>{{ 'weather'|trans }}:</i> {{ collect.environmentalConditions.weather.label ?? '' }}</li>
+                                                                                    <li><i>{{ 'ice'|trans }}:</i> {{ collect.environmentalConditions.ice.label ?? '' }}</li>
+                                                                                    <li><i>{{ 'tidal'|trans }}:</i> {{ collect.environmentalConditions.tidal.label ?? '' }}</li>
+                                                                                    <li><i>{{ 'water'|trans }}:</i> {{ collect.environmentalConditions.water.label ?? '' }}</li>
+                                                                                </ul>
+                                                                            </td>
+                                                                            <!-- Espèces d'oiseaux observées -->
+                                                                            <td>
+                                                                                <ul>
+                                                                                    {% for specy in speciesAndCountsByCollectedData[collect.id] %}
+                                                                                        <li>{{ specy.specy }}: {{ specy.count }}</li>
+                                                                                    {% else %}
+                                                                                        <li class="text-muted">{{ 'campaign_statistics.no_species_observed'|trans }}</li>
+                                                                                    {% endfor %}
+                                                                                    <strong>{{ 'campaign_statistics.total'|trans }}</strong> <span class="badge bg-success">{{ totalCountForCollect[collect.id] }}</span>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </ol>
+                                        {% else %}
+                                            <p class="text-muted">{{ 'campaign_statistics.no_sites_found'|trans }}.</p>
+                                        {% endif %}
+
+                                        <!-- Nombre total compté pour chaque espèce -->
+                                        <h6 class="mt-4"><i class="bi bi-bar-chart-line-fill"></i> {{ 'species_statistics.total_species_counted'|trans }} :</h6>
+                                        <table class="table table-hover table-bordered table-striped table-sm">
+                                            <thead class="table-secondary">
+                                                <tr>
+                                                    <th>{{ 'species_statistics.species'|trans }}</th>
+                                                    <th>{{ 'species_statistics.total_count'|trans }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for totalCountBySpecie in totalCountBySpeciesForReserve %}
+                                                    <tr>
+                                                        <td><i class="bi bi-twitter text-primary"></i> {{ totalCountBySpecie.species }}</td>
+                                                        <td><span class="badge bg-success">{{ totalCountBySpecie.totalCount }}</span></td>
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted">
+                                                            <i class="bi bi-exclamation-circle"></i> {{ 'species_statistics.no_species_observed'|trans }}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+
+                                        <!-- Total général -->
+                                        <div class="alert alert-primary mt-4 d-flex justify-content-between">
+                                                <span class="mb-0">
+                                                    <i class="bi bi-bar-chart-fill"></i> {{ 'overall_totals.general_count_total'|trans }} : <b>{{ totalBirdsCountedInCampaignForReserve ?? 0 }}</b>
+                                                </span>
+                                                <span class="mb-0">
+                                                    <i class="bx bxs-bar-chart-square"></i> {{ 'overall_totals.unique_species_observed'|trans }} : <b>{{ countUniqueBirdSpeciesInCampaignForReserve ?? 0 }}</b>
+                                                </span>
+                                        </div>
+                                        <button onclick="printDiv()" class="btn btn-sm btn-outline-secondary bi bi-printer" title="{{ 'print'|trans }}"></button>
+                                    </div>
+                                </section>
+                                {% import 'macros/show_export_macros.html.twig' as macros %}
+                                {{ macros.export_section(formExport, 'Export nature reserves Data') }}
+                            </div>
+                        </div><!-- End Default Tabs -->
+
+                    </div>
                 </div>
-            
-              </div>
             </div>
         </div>
-
     </section>
 </main>
 {% endblock %}
