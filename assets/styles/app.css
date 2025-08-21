@@ -82,7 +82,7 @@ color: white; /* Assurez-vous que la couleur du texte soit visible */
 /* ----------------------------
 # Notifications
 -------------------------------*/
-.notifications-container {
+/* .notifications-container {
 width: 100%;
 max-width: 900px;
 margin: 0 auto;
@@ -90,7 +90,7 @@ padding: 20px;
 background-color: #f4f7fb;
 border-radius: 15px;
 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
+} */
 
 .notifications-header {
 padding: 15px;
@@ -174,11 +174,11 @@ padding: 10px;
 border-bottom: 1px solid #e1e1e1;
 }
 
-.notification-item .notification-content {
+/* .notification-item .notification-content {
 display: flex;
 flex-direction: column;
 justify-content: space-between;
-}
+} */
 
 .notification-item .notification-message {
 font-size: 14px;
@@ -889,7 +889,7 @@ table, h5, h6 {
 }
 
 .header-nav .messages .message-item:hover {
-  background-color: #f6f9ff;
+  background-color: #02223549;
 }
 
 .header-nav .profile {
@@ -1614,6 +1614,18 @@ background-color: #01081f46;
 color: #ffffff;
 }
 
+body.dark-mode .btn-outline-dark {
+  background-color: #01040e00;
+  color: #000;
+  border-color:#000;
+}
+
+body.dark-mode .btn-outline-dark:hover {
+  background-color: #010007;
+  color: #e9f0e9;
+  border-color: #010007;
+}
+
 body.dark-mode .btn-outline-success {
 background-color: #11800200;
 color: #dfe2df;
@@ -1731,9 +1743,12 @@ color: #000000;
 }
 
 
-body.dark-mode .card {
-background-color: #022235;
-color: #e1e1e1;
+body.dark-mode .card,
+body.dark-mode .card-footer,
+body.dark-mode .card-header {
+  background-color: #022235;
+  color: #e1e1e1;
+  border: none; /* supprime les lignes/blocages */
 }
 
 /* Pour forcer le changement des classes "bg-light" et "text-dark" si besoin */

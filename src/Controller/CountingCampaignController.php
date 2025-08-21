@@ -2,7 +2,21 @@
 
 namespace App\Controller;
 
+use App\Entity\BirdSpeciesCount;
+use App\Entity\CollectedData;
+use App\Entity\SiteAgentsGroup;
+use App\Repository\BirdSpeciesRepository;
+use App\Repository\CountTypeRepository;
+use App\Repository\DisturbedRepository;
+use App\Repository\IceRepository;
+use App\Repository\MethodRepository;
+use App\Repository\QualityRepository;
+use App\Repository\TidalRepository;
+use App\Repository\WaterRepository;
+use App\Repository\WeatherRepository;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ExportType;
+use App\Form\ImportCsvType;
 use App\Service\ExportService;
 use App\Entity\EnvironmentalConditions;
 use App\Repository\AgentsGroupRepository;
@@ -37,7 +51,18 @@ class CountingCampaignController extends AbstractController
     }
 
     #[Route('/', name: 'app_counting_campaign_index', methods: ['GET','POST'])]
-    public function index(Request $request, CampaignStatusRepository $campaignStatusRepository, CountingCampaignRepository $countingCampaignRepository, EntityManagerInterface $entityManager): Response
+    public function index(AgentsGroupRepository $agentsGroupRepository, SiteCollectionRepository $siteCollectionRepository, Request $request, CampaignStatusRepository $campaignStatusRepository, CountingCampaignRepository $countingCampaignRepository, EntityManagerInterface $entityManager,
+                            DisturbedRepository $disturbedRepository, 
+                            WeatherRepository $weatherRepository,
+                            IceRepository $iceRepository,
+                            TidalRepository $tidalRepository,
+                            WaterRepository $waterRepository,
+                            CountTypeRepository $countTypeRepository,
+                            QualityRepository $qualityRepository,
+                            MethodRepository $methodRepository,
+                            BirdSpeciesRepository $birdSpeciesRepository,
+                            CollectedDataRepository $collectedDataRepository,
+                            ): Response
     {
         $user = $this->getUser();
         
@@ -49,10 +74,10 @@ class CountingCampaignController extends AbstractController
         $statusIndexMap = $statuses['statusIndexMap'];
         
         // Vérifier si l'utilisateur a le rôle ADMIN
-        if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_VIEW')) {
+        if ($this->isGranted('ROLE_ADMIN') && $this->isGranted('ROLE_VIEW')) {
             $countingCampaigns = $countingCampaignRepository->findAll();
         } else {
-            $countingCampaigns = $countingCampaignRepository->findByUser($user);
+            $countingCampaigns = $countingCampaignRepository->findAllCampaignByUser($user);
         }
         
         $needsFlush = false; // Variable pour suivre si flush est nécessaire
@@ -87,31 +112,663 @@ class CountingCampaignController extends AbstractController
                 $this->addFlash('warning', $this->translator->trans('export_permission'));
                 return $this->redirectToRoute('app_counting_campaign_index');
             }
-        $columnNames = ['Nom de la campagne', 'Date de début', 'Date de fin', 'Etat de la campagne', 'Créé le', 'Dernière mise à jour', 'Créé par'];
+            $columnNames = ['Nom de la campagne', 'Date de début', 'Date de fin', 'Etat de la campagne', 'Créé le', 'Dernière mise à jour', 'Créé par'];
 
-        $data = [];
-            foreach ($countingCampaigns as $countingCampaign) {
-                $data[] = [
-                    $countingCampaign->getCampaignName() ?? '',
-                    $countingCampaign->getStartDate()?->format('d-m-Y H:i:s') ?? null,
-                    $countingCampaign->getEndDate()?->format('d-m-Y H:i:s') ?? null,
-                    $countingCampaign->getCampaignStatus() ?? '',
-                    $countingCampaign->getCreatedAt()?->format('d-m-Y H:i:s') ?? null,
-                    $countingCampaign->getUpdatedAt()?->format('d-m-Y H:i:s') ?? null,
-                    $countingCampaign->getCreatedBy()?->getEmail() ?? '',
-                ];
-            }
+            $data = [];
+                foreach ($countingCampaigns as $countingCampaign) {
+                    $data[] = [
+                        $countingCampaign->getCampaignName() ?? '',
+                        $countingCampaign->getStartDate()?->format('d-m-Y H:i:s') ?? null,
+                        $countingCampaign->getEndDate()?->format('d-m-Y H:i:s') ?? null,
+                        $countingCampaign->getCampaignStatus() ?? '',
+                        $countingCampaign->getCreatedAt()?->format('d-m-Y H:i:s') ?? null,
+                        $countingCampaign->getUpdatedAt()?->format('d-m-Y H:i:s') ?? null,
+                        $countingCampaign->getCreatedBy()?->getEmail() ?? '',
+                    ];
+                }
 
-        $format = $formExport->get('format')->getData();
-        $fileName = sprintf("Counting_campaigns_export_%s", date('d-m-Y_His'));
+            $format = $formExport->get('format')->getData();
+            $fileName = sprintf("Counting_campaigns_export_%s", date('d-m-Y_His'));
 
-        return $this->exportService->export($columnNames, $data, $format, $fileName);
+            return $this->exportService->export($columnNames, $data, $format, $fileName);
         }
+
+        // Importer les données de la campagne
+        $form = $this->createForm(ImportCsvType::class);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $csvFile */
+            $csvFile = $form->get('csvFile')->getData();
+            
+            if ($csvFile) {
+                if (!$this->isGranted('ROLE_IMPORT')) {
+                    throw $this->createNotFoundException($this->translator->trans('import_permission'));
+                }
+
+                $csvData = file_get_contents($csvFile->getPathname());
+
+                // Convertir l'encodage si nécessaire
+                if (!mb_check_encoding($csvData, 'UTF-8')) {
+                    $csvData = mb_convert_encoding($csvData, 'UTF-8', 'ISO-8859-1'); // Changez 'ISO-8859-1' si besoin
+                }
+
+                // Vérifiez si la conversion a réussi
+                if (!mb_check_encoding( $csvData, 'UTF-8')) {
+                    $this->addFlash('error', $this->translator->trans('error.invalid_csv'));
+                    return $this->redirectToRoute('app_counting_campaign_index');
+                }
+
+                $rows = array_map(function($row) {
+                    return str_getcsv($row, ';'); // Assurez-vous que le séparateur correspond au fichier CSV
+                }, explode("\n", $csvData));
+                
+                $headers = array_shift($rows); // Enlever la première ligne qui contient les en-têtes
+    
+                return $this->render('counting_campaign/index.html.twig', [
+                    'countingCampaigns' => $countingCampaigns,
+                    'form' => $form->createView(),
+                    'headers' => $headers,
+                    'rows' => $rows,
+                    'csvData' => $csvData,
+                    'formExport' => $formExport->createView(),
+                    'campaign_statuses' => $campaignStatusRepository->findAll(),
+                    'counting_campaigns' => $countingCampaigns,
+                    'statusIndexMap' => $statusIndexMap,  // Passer le tableau d'index des statuts
+                ]);
+            }
+        }
+    
+        if ($request->isMethod('POST') && $request->request->get('action') === 'import') {
+            $csvData = $request->request->get('csvData');
+            $rows = array_map(function($row) {
+                return str_getcsv($row, ';');
+            }, explode("\n", $csvData));
+        
+            $headers = array_shift($rows);
+            $importedLines = []; // Pour stocker les détails des lignes importées
+            $skippedLines = []; // Pour stocker les détails des lignes non importées
+            $processedCampaigns = [];
+            $processedSites = [];
+            $processedGroups = [];
+            $processedCollectNums = []; // Tableau pour suivre les collectes déjà traitées dans ce fichier
+            
+            try {
+                $entityManager->beginTransaction();
+        
+                foreach ($rows as $lineNumber => $row) {
+                    try {
+                        // Ignorer les lignes vides
+                        if (empty(array_filter($row))) {
+                            continue;
+                        }
+        
+                        // Vérifier le nombre de colonnes
+                        if (count($row) !== count($headers)) {
+                            $skippedLines[] = [
+                                'line' => $lineNumber + 2,
+                                'reason' => 'Nombre de colonnes incorrect'
+                            ];
+                            continue;
+                        }
+        
+                        $data = array_combine($headers, $row);
+                        if ($data === false) {
+                            $skippedLines[] = [
+                                'line' => $lineNumber + 2,
+                                'reason' => 'Impossible de combiner les en-têtes avec les données'
+                            ];
+                            continue;
+                        }
+                        
+                        // Récupérer les données
+                        $campaignName = $data['Campaign name'] ?? null;
+                        $startDate = $data['Start date'] ?? null;
+                        $endDate = $data['End date'] ?? null;
+                        $description = $data['Description'] ?? null;
+                        $siteName = $data['Site name'] ?? null;
+                        $site = $siteCollectionRepository->findOneBy(['siteName' => $siteName]) ?? null;
+                        $disturbed = $disturbedRepository->findOneBy(['label' => $data['Disturbed']]) ?? null;
+                        $weather = $weatherRepository->findOneBy(['label' => $data['Weather']]) ?? null;
+                        $ice = $iceRepository->findOneBy(['label' => $data['Ice']]) ?? null;
+                        $tidal = $tidalRepository->findOneBy(['label' => $data['Tidal']]) ?? null;
+                        $water = $waterRepository->findOneBy(['label' => $data['Water']]) ?? null;
+                        $countType = $countTypeRepository->findOneBy(['label' => $data['CountType']]) ?? null;
+                        $quality = $qualityRepository->findOneBy(['label' => $data['Quality']]) ?? null;
+                        $scientificName = $data['Scientific name'] ?? null;
+                        $birdSpecies = $birdSpeciesRepository->findOneBy(['scientificName' => $scientificName]) ?? null;
+                        $total = $data['Total'] ?? null;
+                        // $createdAt = $data['Created at'] ?? null;
+                        $collectNum = $data['Collect number'] ?? null;
+                        $group = $agentsGroupRepository->findOneBy(['groupName' => $data['Group name']]) ?? null;
+                        // Traitement des méthodes
+                        $methodCodes = array_filter(array_map('trim', explode(',', $data['Methods'])));
+                        $methods = [];
+                        foreach ($methodCodes as $code) {
+                            $method = $methodRepository->findOneBy(['label' => trim($code)]);
+                            if (!$method) {
+                                throw new \Exception(sprintf("Méthode non trouvée: %s", $code));
+                            }
+                            $methods[] = $method;
+                        }                        
+                         
+                        // Vérifier d'abord si la campagne a déjà été traitée dans ce fichier
+                        if (isset($processedCampaigns[$campaignName])) {
+                            $campaign = $processedCampaigns[$campaignName];
+                        } else {
+                            // Si non, chercher dans la base de données
+                            $campaign = $countingCampaignRepository->findOneBy(['campaignName' => $campaignName]);
+                        }
+                        // Stocker la campagne dans le tableau des campagnes traitées
+                        $processedCampaigns[$campaignName] = $campaign;
+                        $collectKey = $campaignName . '|' . $site->getId() . '|' . $collectNum;
+
+                        // Vérifier si la campagne existe
+                        if ($campaign) {
+                            if ($site) {
+                                // Vérifier si le site est déjà associé à cette campagne
+                                if ($group) {
+                                    $exists = false;
+                                    foreach ($campaign->getSiteAgentsGroups() as $sag) {
+                                        if (
+                                            $sag->getSiteCollection()->getId() === $site->getId() &&
+                                            $sag->getAgentsGroups()->contains($group)
+                                        ) {
+                                            $exists = true;
+                                            break;
+                                        }
+                                    }
+                                
+                                    if (!$exists) {
+                                        $siteAgentsGroup = new SiteAgentsGroup();
+                                        $siteAgentsGroup->setSiteCollection($site);
+                                        $siteAgentsGroup->addAgentsGroup($group);
+                                        $siteAgentsGroup->setCountingCampaign($campaign);
+                                        $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
+                                        $entityManager->persist($siteAgentsGroup);
+                                        
+                                        $entityManager->persist($campaign);
+                                        // $processedCampaigns[$campaignName] = $campaign;
+                                        $processedSites[$site->getSiteName()] = $site;
+
+                                        $importedLines[] = [
+                                            'line' => $lineNumber + 2,
+                                            'campaign' => $campaignName,
+                                            'site' => $siteName,
+                                            'action' => 'Ajout à collecte existante dans le fichier'
+                                        ];
+                                    }
+                                } else {
+                                    $skippedLines[] = [
+                                        'line' => $lineNumber + 2,
+                                        'site' => $site,
+                                        'reason' => sprintf('Ligne %d, Groupe non trouvée',  $lineNumber)
+                                    ];
+                                    continue;
+                                }
+                                
+                            } else {
+                                $skippedLines[] = [
+                                    'line' => $lineNumber + 2,
+                                    'campaign' => $campaignName,
+                                    'reason' => sprintf('Ligne %d, site non trouvé',  $lineNumber)
+                                ];
+                                continue;
+                            }
+
+                        } else {
+                            // Créer une nouvelle campagne
+                            $campaign = new CountingCampaign();
+                            $campaign->setCampaignName($campaignName);
+                            $campaign->setStartDate(new \DateTimeImmutable($startDate));
+                            $campaign->setEndDate(new \DateTimeImmutable($endDate));
+                            $campaign->setDescription($description);
+                            $campaign->setCreatedAt(new \DateTimeImmutable());
+                            $campaign->setCreatedBy($this->getUser());
+                            // Mettre à jour le statut de la campagne
+                            $this->updateCampaignStatus($campaign, $campaignStatusRepository);
+                            $entityManager->persist($campaign);
+                            $processedCampaigns[$campaignName] = $campaign; // Stocker la campagne dans le tableau des campagnes traitées
+
+                            // Ajouter les sites
+                            if ($site) {
+                                // Vérifier si le site est déjà associé à cette campagne
+                                if ($group) {
+                                    $exists = false;
+                                    foreach ($campaign->getSiteAgentsGroups() as $sag) {
+                                        if (
+                                            $sag->getSiteCollection()->getId() === $site->getId() &&
+                                            $sag->getAgentsGroups()->contains($group)
+                                        ) {
+                                            $exists = true;
+                                            break;
+                                        }
+                                    }
+                                
+                                    if (!$exists) {
+                                        $siteAgentsGroup = new SiteAgentsGroup();
+                                        $siteAgentsGroup->setSiteCollection($site);
+                                        $siteAgentsGroup->addAgentsGroup($group);
+                                        $siteAgentsGroup->setCountingCampaign($campaign);
+                                        $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
+                                        $entityManager->persist($siteAgentsGroup);
+                                        
+                                        $entityManager->persist($campaign);
+                                        // $processedCampaigns[$campaignName] = $campaign;
+                                        $processedSites[$site->getSiteName()] = $site;
+
+                                        $importedLines[] = [
+                                            'line' => $lineNumber + 2,
+                                            'campaign' => $campaignName,
+                                            'site' => $siteName,
+                                            'action' => 'Ajout à collecte existante dans le fichier'
+                                        ];
+                                    }
+                                } else {
+                                    $skippedLines[] = [
+                                        'line' => $lineNumber + 2,
+                                        'site' => $site,
+                                        'reason' => sprintf('Ligne %d, Groupe non trouvée',  $lineNumber)
+                                    ];
+                                    continue;
+                                }
+
+                            } else {
+                                $skippedLines[] = [
+                                    'line' => $lineNumber + 2,
+                                    'reason' => sprintf('Ligne %d, site non trouvé',  $lineNumber)
+                                ];
+                                continue;
+                            }                        
+                        }
+                    } catch (\Exception $e) {
+                        $skippedLines[] = [
+                            'line' => $lineNumber + 2,
+                            'reason' => $e->getMessage()
+                        ];
+                    }
+                }
+        
+                $entityManager->flush();
+                $entityManager->commit();
+        
+                // Afficher le résumé de l'import
+                if (!empty($importedLines)) {
+                    $importMessage = "Lignes importées avec succès:\n";
+                    foreach ($importedLines as $line) {
+                        $importMessage .= sprintf(
+                            "Ligne %d - Campagne: %s - %s\n",
+                            $line['line'],
+                            $line['campaign'],
+                            // $line['collect'],
+                            $line['action']
+                        );
+                    }
+                    $this->addFlash('success', $importMessage);
+                }
+        
+                if (!empty($skippedLines)) {
+                    $skipMessage = "Lignes non importées:\n";
+                    foreach ($skippedLines as $line) {
+                        $skipMessage .= sprintf(
+                            "Ligne %d - Raison: %s\n",
+                            $line['line'],
+                            $line['reason']
+                        );
+                    }
+                    $this->addFlash('warning', $skipMessage);
+                }
+        
+            } catch (\Exception $e) {
+                // $entityManager->rollback();
+                $this->addFlash('error', 'Erreur lors de l\'import: ' . $e->getMessage());
+            }
+            
+            // try {
+            //     // $entityManager->beginTransaction();
+        
+            //     foreach ($rows as $lineNumber => $row) {
+            //         try {
+            //             // Ignorer les lignes vides
+            //             if (empty(array_filter($row))) {
+            //                 continue;
+            //             }
+        
+            //             // Vérifier le nombre de colonnes
+            //             if (count($row) !== count($headers)) {
+            //                 $skippedLines[] = [
+            //                     'line' => $lineNumber + 2,
+            //                     'reason' => 'Nombre de colonnes incorrect'
+            //                 ];
+            //                 continue;
+            //             }
+        
+            //             $data = array_combine($headers, $row);
+            //             if ($data === false) {
+            //                 $skippedLines[] = [
+            //                     'line' => $lineNumber + 2,
+            //                     'reason' => 'Impossible de combiner les en-têtes avec les données'
+            //                 ];
+            //                 continue;
+            //             }
+                        
+            //             // Récupérer les données
+            //             $campaignName = $data['Campaign name'] ?? null;
+            //             $startDate = $data['Start date'] ?? null;
+            //             $endDate = $data['End date'] ?? null;
+            //             $description = $data['Description'] ?? null;
+            //             $siteName = $data['Site name'] ?? null;
+            //             $site = $siteCollectionRepository->findOneBy(['siteName' => $siteName]) ?? null;
+            //             $disturbed = $disturbedRepository->findOneBy(['label' => $data['Disturbed']]) ?? null;
+            //             $weather = $weatherRepository->findOneBy(['label' => $data['Weather']]) ?? null;
+            //             $ice = $iceRepository->findOneBy(['label' => $data['Ice']]) ?? null;
+            //             $tidal = $tidalRepository->findOneBy(['label' => $data['Tidal']]) ?? null;
+            //             $water = $waterRepository->findOneBy(['label' => $data['Water']]) ?? null;
+            //             $countType = $countTypeRepository->findOneBy(['label' => $data['CountType']]) ?? null;
+            //             $quality = $qualityRepository->findOneBy(['label' => $data['Quality']]) ?? null;
+            //             $scientificName = $data['Scientific name'] ?? null;
+            //             $birdSpecies = $birdSpeciesRepository->findOneBy(['scientificName' => $scientificName]) ?? null;
+            //             $total = $data['Total'] ?? null;
+            //             // $createdAt = $data['Created at'] ?? null;
+            //             $collectNum = $data['Collect number'] ?? null;
+            //             $group = $agentsGroupRepository->findOneBy(['groupName' => $data['Group name']]) ?? null;
+            //             // Traitement des méthodes
+            //             $methodCodes = array_filter(array_map('trim', explode(',', $data['Methods'])));
+            //             $methods = [];
+            //             foreach ($methodCodes as $code) {
+            //                 $method = $methodRepository->findOneBy(['label' => trim($code)]);
+            //                 if (!$method) {
+            //                     throw new \Exception(sprintf("Méthode non trouvée: %s", $code));
+            //                 }
+            //                 $methods[] = $method;
+            //             }                        
+                         
+            //             // Vérifier d'abord si la campagne a déjà été traitée dans ce fichier
+            //             if (isset($processedCampaigns[$campaignName])) {
+            //                 $campaign = $processedCampaigns[$campaignName];
+            //             } else {
+            //                 // Si non, chercher dans la base de données
+            //                 $campaign = $countingCampaignRepository->findOneBy(['campaignName' => $campaignName]);
+            //             }
+            //             // Stocker la campagne dans le tableau des campagnes traitées
+            //             $processedCampaigns[$campaignName] = $campaign;
+            //             $collectKey = $campaignName . '|' . $site->getId() . '|' . $collectNum;
+
+            //             // Vérifier si la campagne existe
+            //             if ($campaign) {
+            //                 if ($site) {
+            //                     // Vérifier si le site est déjà associé à cette campagne
+            //                     $existingSiteAgentsGroup = null;
+            //                     foreach ($campaign->getSiteAgentsGroups() as $sag) {
+            //                         if ($sag->getSiteCollection()->getId() === $site->getId()) {
+            //                             $existingSiteAgentsGroup = $sag;
+            //                             break;
+            //                         }
+            //                     }
+
+            //                     // Si le site n'est pas encore associé, créer une nouvelle association
+            //                     if (!$existingSiteAgentsGroup && $group) {
+            //                         $siteAgentsGroup = new SiteAgentsGroup();
+            //                         $siteAgentsGroup->setSiteCollection($site);
+            //                         $siteAgentsGroup->addAgentsGroup($group);
+            //                         $siteAgentsGroup->setCountingCampaign($campaign);
+            //                         $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
+            //                         $entityManager->persist($siteAgentsGroup);
+            //                     }
+                                
+            //                     // // Vérifier si cette collecte a déjà été traitée dans ce fichier 
+            //                     // if (isset($processedCollectNums[$collectKey])) {
+            //                     //     // Récupérer la collecte déjà créée dans ce fichier
+            //                     //     $existingCollect = $processedCollectNums[$collectKey];
+                                
+            //                     //     if ($birdSpecies && (int)$total>0) {
+            //                     //         $birdCount = new BirdSpeciesCount();
+            //                     //         $birdCount->setBirdSpecies($birdSpecies);
+            //                     //         $birdCount->setCount((int)$total);
+            //                     //         $birdCount->setCollectedData($existingCollect);
+            //                     //         $existingCollect->addBirdSpeciesCount($birdCount);
+                                
+            //                     //         $entityManager->persist($birdCount);
+                                
+            //                     //         $importedLines[] = [
+            //                     //             'line' => $lineNumber + 2,
+            //                     //             'campaign' => $campaignName,
+            //                     //             'site' => $siteName,
+            //                     //             'species' => $scientificName,
+            //                     //             'action' => 'Ajout à collecte existante dans le fichier'
+            //                     //         ];
+            //                     //     }                                
+            //                     //     continue; // pas besoin de créer une nouvelle collecte
+            //                     // } else {
+            //                     //     // Créer les conditions environnementales
+            //                     //     if ($disturbed && $weather && $ice && $tidal && $water) {
+            //                     //         $conditions = new EnvironmentalConditions();
+            //                     //         $conditions->setDisturbed($disturbed);
+            //                     //         $conditions->setWeather($weather);
+            //                     //         $conditions->setIce($ice);
+            //                     //         $conditions->setTidal($tidal);
+            //                     //         $conditions->setWater($water);
+            //                     //         $conditions->setSiteCollection($site);
+            //                     //         $conditions->setCountingCampaign($campaign);
+            //                     //         $conditions->setUser($this->getUser());
+            //                     //         $conditions->setCreatedAt(new \DateTimeImmutable());
+                                        
+            //                     //         $entityManager->persist($conditions);
+            //                     //     }
+            //                     //     // Créer une nouvelle collecte
+            //                     //     $collectedData = new CollectedData();
+            //                     //     $collectedData->setCountType($countType);
+            //                     //     $collectedData->setQuality($quality);
+            //                     //     $collectedData->setEnvironmentalConditions($conditions ?? null);
+            //                     //     $collectedData->setSiteCollection($site);
+            //                     //     $collectedData->setCreatedBy($this->getUser());
+            //                     //     $collectedData->setCreatedAt(new \DateTimeImmutable());
+            //                     //     $collectedData->setCountingCampaign($campaign);
+            //                     //     // Ajouter les méthodes
+            //                     //     foreach ($methods as $method) {
+            //                     //         $collectedData->addMethod($method);
+            //                     //     }
+                                    
+            //                     //     // Comptage d'espèce
+            //                     //     if ($birdSpecies && (int)$total>0) {
+            //                     //         $birdCount = new BirdSpeciesCount();
+            //                     //         $birdCount->setBirdSpecies($birdSpecies);
+            //                     //         $birdCount->setCount((int)$total);
+            //                     //         $birdCount->setCollectedData($collectedData);
+
+            //                     //         $collectedData->addBirdSpeciesCount($birdCount);
+
+            //                     //         $entityManager->persist($birdCount);
+            //                     //         $entityManager->persist($collectedData);
+
+            //                     //         // Stocker la collecte pour l’usage futur
+            //                     //         $processedCollectNums[$collectKey] = $collectedData;
+
+            //                     //         $importedLines[] = [
+            //                     //             'line' => $lineNumber + 2,
+            //                     //             'campaign' => $campaignName,
+            //                     //             'site' => $siteName,
+            //                     //             'species' => $scientificName,
+            //                     //             'action' => 'Nouvelle collecte'
+            //                     //         ];
+            //                     //     } else {
+            //                     //         $skippedLines[] = [
+            //                     //             'line' => $lineNumber + 2,
+            //                     //             'collect' => $collectNum,
+            //                     //             'reason' => sprintf('Espèce non trouvée: %s',  $scientificName)
+            //                     //         ];
+            //                     //         continue;
+            //                     //     }
+            //                     // }
+
+            //                 } else {
+            //                     $skippedLines[] = [
+            //                         'line' => $lineNumber + 2,
+            //                         'campaign' => $campaignName,
+            //                         'reason' => sprintf('Ligne %d, site non trouvé',  $lineNumber)
+            //                     ];
+            //                     continue;
+            //                 }
+
+            //             } else {
+            //                 // Créer une nouvelle campagne
+            //                 $campaign = new CountingCampaign();
+            //                 $campaign->setCampaignName($campaignName);
+            //                 $campaign->setStartDate(new \DateTimeImmutable($startDate));
+            //                 $campaign->setEndDate(new \DateTimeImmutable($endDate));
+            //                 $campaign->setDescription($description);
+            //                 $campaign->setCreatedAt(new \DateTimeImmutable());
+            //                 $campaign->setCreatedBy($this->getUser());
+            //                 $this->updateCampaignStatus($campaign, $campaignStatusRepository);
+            //                 // Mettre à jour le statut de la campagne
+            //                 $entityManager->persist($campaign);
+            //                 $processedCampaigns[$campaignName] = $campaign; // Stocker la campagne dans le tableau des campagnes traitées
+
+            //                 // Ajouter les sites
+            //                 if ($site) {
+            //                     if ($group) {
+            //                         $siteAgentsGroup = new SiteAgentsGroup();
+            //                         $siteAgentsGroup->setSiteCollection($site);
+            //                         $siteAgentsGroup->addAgentsGroup($group);
+            //                         $siteAgentsGroup->setCountingCampaign($campaign);
+            //                         $siteAgentsGroup->setCreatedAt(new \DateTimeImmutable());
+            //                         $entityManager->persist($siteAgentsGroup);
+            //                         // if ($collectNum) {
+            //                         //     // Créer les conditions environnementales
+            //                         //     if ($disturbed && $weather && $ice && $tidal && $water) {
+            //                         //         $conditions = new EnvironmentalConditions();
+            //                         //         $conditions->setDisturbed($disturbed);
+            //                         //         $conditions->setWeather($weather);
+            //                         //         $conditions->setIce($ice);
+            //                         //         $conditions->setTidal($tidal);
+            //                         //         $conditions->setWater($water);
+            //                         //         $conditions->setSiteCollection($site);
+            //                         //         $conditions->setCountingCampaign($campaign);
+            //                         //         $conditions->setUser($this->getUser());
+            //                         //         $conditions->setCreatedAt(new \DateTimeImmutable());
+                                            
+            //                         //         $entityManager->persist($conditions);
+            //                         //     }
+            //                         //     // Créer une nouvelle collecte
+            //                         //     $collectedData = new CollectedData();
+            //                         //     $collectedData->setCountType($countType);
+            //                         //     $collectedData->setQuality($quality);
+            //                         //     $collectedData->setEnvironmentalConditions($conditions);
+            //                         //     $collectedData->setSiteCollection($site);
+            //                         //     $collectedData->setCreatedBy($this->getUser());
+            //                         //     $collectedData->setCreatedAt(new \DateTimeImmutable());
+            //                         //     // Ajouter les méthodes
+            //                         //     foreach ($methods as $method) {
+            //                         //         $collectedData->addMethod($method);
+            //                         //     }
+            //                         //     // Créer et ajouter le comptage d'espèces
+            //                         //     if (!$birdSpecies) {
+            //                         //         $skippedLines[] = [
+            //                         //             'line' => $lineNumber + 2,
+            //                         //             'collect' => $collectNum,
+            //                         //             'reason' => sprintf('Espèce non trouvée: %d',  $scientificName)
+            //                         //         ];
+            //                         //         continue;
+            //                         //     } elseif ((int)$total>0) {
+            //                         //         $birdCount = new BirdSpeciesCount();
+            //                         //         $birdCount->setBirdSpecies($birdSpecies);
+            //                         //         $birdCount->setCount((int)$total);
+            //                         //         $birdCount->setCollectedData($collectedData);
+                                        
+            //                         //         // Associer la collecte à la campagne
+            //                         //         $collectedData->setCountingCampaign($campaign);
+                                        
+            //                         //         // Ajouter le comptage d'espèces à la collecte
+            //                         //         $collectedData->addBirdSpeciesCount($birdCount);
+                                            
+            //                         //         $entityManager->persist($birdCount);
+            //                         //         $entityManager->persist($collectedData);
+                                            
+            //                         //         $processedCollectNums[$collectNum] = $collectedData;
+            //                         //         $importedLines[] = [
+            //                         //             'line' => $lineNumber + 2,
+            //                         //             'campaign' => $campaignName,
+            //                         //             'site' => $site,
+            //                         //             'species' => $scientificName,
+            //                         //             'action' => 'Nouvelle collecte'
+            //                         //         ];
+            //                         //     }
+            //                         // } else {
+            //                         //     $skippedLines[] = [
+            //                         //         'line' => $lineNumber + 2,
+            //                         //         'collect' => $collectNum,
+            //                         //         'reason' => sprintf('Collecte non trouvée: %d',  $lineNumber)
+            //                         //     ];
+            //                         //     continue;
+            //                         // }
+            //                     } else {
+            //                         $skippedLines[] = [
+            //                             'line' => $lineNumber + 2,
+            //                             'site' => $site,
+            //                             'reason' => sprintf('Ligne %d, Groupe non trouvée',  $lineNumber)
+            //                         ];
+            //                         continue;
+            //                     }
+            //                 } else {
+            //                     $skippedLines[] = [
+            //                         'line' => $lineNumber + 2,
+            //                         'reason' => sprintf('Ligne %d, site non trouvé',  $lineNumber)
+            //                     ];
+            //                     continue;
+            //                 }                        
+            //             }
+            //         } catch (\Exception $e) {
+            //             $skippedLines[] = [
+            //                 'line' => $lineNumber + 2,
+            //                 'reason' => $e->getMessage()
+            //             ];
+            //         }
+            //     }
+        
+            //     // $entityManager->flush();
+            //     // $entityManager->commit();
+        
+            //     // Afficher le résumé de l'import
+            //     if (!empty($importedLines)) {
+            //         $importMessage = "Lignes importées avec succès:\n";
+            //         foreach ($importedLines as $line) {
+            //             $importMessage .= sprintf(
+            //                 "Ligne %d - Campagne: %s - Collecte: %s - %s\n",
+            //                 $line['line'],
+            //                 $line['campaign'],
+            //                 $line['collect'],
+            //                 $line['action']
+            //             );
+            //         }
+            //         $this->addFlash('success', $importMessage);
+            //     }
+        
+            //     if (!empty($skippedLines)) {
+            //         $skipMessage = "Lignes non importées:\n";
+            //         foreach ($skippedLines as $line) {
+            //             $skipMessage .= sprintf(
+            //                 "Ligne %d - Raison: %s\n",
+            //                 $line['line'],
+            //                 $line['reason']
+            //             );
+            //         }
+            //         $this->addFlash('warning', $skipMessage);
+            //     }
+        
+            // } catch (\Exception $e) {
+            //     $entityManager->rollback();
+            //     $this->addFlash('error', 'Erreur lors de l\'import: ' . $e->getMessage());
+            // }
+        
+            return $this->redirectToRoute('app_counting_campaign_index');
+        }
+
 
         return $this->render('counting_campaign/index.html.twig', [
             'counting_campaigns' => $countingCampaigns,
             'statusIndexMap' => $statusIndexMap,  // Passer le tableau d'index des statuts
             'formExport' => $formExport->createView(),
+            'form' => $form->createView(),
             'campaign_statuses' => $campaignStatusRepository->findAll(),
         ]);
     }
@@ -284,17 +941,17 @@ class CountingCampaignController extends AbstractController
     #[Route('/{id}/delete', name: 'app_counting_campaign_delete', methods: ['POST'])]
     public function delete(Request $request, CountingCampaign $countingCampaign, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$countingCampaign->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$countingCampaign->getId(), $request->getPayload()->get('_token'))) {
                 $entityManager->remove($countingCampaign);
                 $entityManager->flush();
                 $this->addFlash('success', $this->translator->trans('campaignController.deleted'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $this->translator->trans('campaignController.delete_error') . $e->getMessage());
+            }  else {
+                // Ajouter un message d'erreur si le jeton CSRF est invalide
+                $this->addFlash('error', $this->translator->trans('campaignController.csrf_invalid'));
             }
-        }  else {
-            // Ajouter un message d'erreur si le jeton CSRF est invalide
-            $this->addFlash('error', $this->translator->trans('campaignController.csrf_invalid'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_counting_campaign_index', [], Response::HTTP_SEE_OTHER);
@@ -483,7 +1140,7 @@ class CountingCampaignController extends AbstractController
             'formExport' => $formExport->createView(),
             'totalCountBySpecies' => $totalCountBySpecies,
             'speciesAndCountsByCollectedData' => $speciesAndCountsByCollectedData,
-            'totalCountForCollect' => $totalCountForCollect,
+            'totalCountForCollect' => $totalCountForCollect ?? 0,
         ]);
     }
 

@@ -33,10 +33,11 @@ class NatureReserveController extends AbstractController
     {
         $user = $this->getUser();
         // Vérifier si l'utilisateur a le rôle ADMIN
-        if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_VIEW')) {
+        if ($this->isGranted('ROLE_ADMIN') && $this->isGranted('ROLE_VIEW')) {
             $natureReserves = $natureReserveRepository->findAll();
         } else {
-            $natureReserves = $natureReserveRepository->findByUser($user);
+            // $natureReserves = $natureReserveRepository->findByUser($user);
+            $natureReserves = $natureReserveRepository->findAll();
         }
         
         return $this->render('nature_reserve/index.html.twig', [
@@ -351,8 +352,8 @@ class NatureReserveController extends AbstractController
     #[Route('/{id}', name: 'app_nature_reserve_delete', methods: ['POST'])]
     public function delete(Request $request, NatureReserve $natureReserve, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$natureReserve->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$natureReserve->getId(), $request->getPayload()->get('_token'))) {
                 if (!$natureReserve->getSiteCollections()->isEmpty()) {
                     foreach ($natureReserve->getSiteCollections() as $siteCollection) {
                         $siteCollection->setNatureReserve(null);
@@ -362,12 +363,11 @@ class NatureReserveController extends AbstractController
                 $entityManager->remove($natureReserve);
                 $entityManager->flush();
                 $this->addFlash('success', $this->translator->trans('nature_reserve.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_nature_reserve_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error',$this->translator->trans('nature_reserve.msg.deleted_error'));
             }
-        } else {
-            $this->addFlash('error',$this->translator->trans('nature_reserve.msg.deleted_error'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
         return $this->redirectToRoute('app_nature_reserve_index', [], Response::HTTP_SEE_OTHER);
     }

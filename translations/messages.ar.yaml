@@ -342,6 +342,7 @@ birdSpecies:
   informations: "معلومات النوع الجديد"
   return: "العودة إلى استعراض أنواع الطيور"
   consult: "عرض الأنواع"
+  coverage_title: "إنشاء  تغطية جديدة لنوع من الطيور"
   modal_birdlife_tax_treat_title: "إنشاء تصنيف جديد من BirdLife"
   modal_iucn_title: "إنشاء تصنيف جديد لـ IUCN"
   scientific_name: "الاسم العلمي"
@@ -838,6 +839,11 @@ notification:
   new_message: "رسالة جديدة"
   unread_notifications: "الإشعارات غير المقروءة"
   mark_as_seen: "تحديد كمقروء"
+  delete: "حذف الإشعار"
+  delete_all: "حذف الكل"
+  msg:
+    deleted_success: "تم حذف الإشعار بنجاح"
+    deleted_error: "حدث خطأ أثناء حذف الإشعار"
 
 collectQuality:
   title: "إدارة جودة جمع البيانات"

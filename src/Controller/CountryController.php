@@ -305,17 +305,16 @@ class CountryController extends AbstractController
     #[Route('/{id}', name: 'app_country_delete', methods: ['POST'])]
     public function delete(Request $request, Country $country, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$country->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$country->getId(), $request->getPayload()->get('_token'))) {
                 $entityManager->remove($country);
                 $entityManager->flush();
                 $this->addFlash('success', $this->translator->trans('country.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error',$this->translator->trans('country.msg.deleted_error'));
             }
-        } else {
-            $this->addFlash('error',$this->translator->trans('country.msg.deleted_error'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_country_index', [], Response::HTTP_SEE_OTHER);

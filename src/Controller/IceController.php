@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ExportType;
 use App\Form\ImportCsvType;
 use App\Service\ExportService;
@@ -262,18 +263,17 @@ class IceController extends AbstractController
     #[Route('/{id}', name: 'app_ice_delete', methods: ['POST'])]
     public function delete(Request $request, Ice $ice, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$ice->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$ice->getId(), $request->getPayload()->get('_token'))) {
                 $entityManager->remove($ice);
                 $entityManager->flush();
                 $this->addFlash('success', $this->translator->trans('conditionIce.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_ice_index', [], Response::HTTP_SEE_OTHER);
-            }
-        } else {
-            $this->addFlash('error',$this->translator->trans('conditionIce.msg.deleted_error'));
-        } 
+            } else {
+                $this->addFlash('error',$this->translator->trans('conditionIce.msg.deleted_error'));
+            } 
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
 
         return $this->redirectToRoute('app_ice_index', [], Response::HTTP_SEE_OTHER);
     }

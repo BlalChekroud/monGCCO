@@ -71,9 +71,13 @@ class SiteAgentsGroupController extends AbstractController
     #[Route('/{id}', name: 'app_site_agents_group_delete', methods: ['POST'])]
     public function delete(Request $request, SiteAgentsGroup $siteAgentsGroup, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$siteAgentsGroup->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($siteAgentsGroup);
-            $entityManager->flush();
+        try {
+            if ($this->isCsrfTokenValid('delete'.$siteAgentsGroup->getId(), $request->getPayload()->get('_token'))) {
+                $entityManager->remove($siteAgentsGroup);
+                $entityManager->flush();
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_site_agents_group_index', [], Response::HTTP_SEE_OTHER);

@@ -338,17 +338,16 @@ class SiteCollectionController extends AbstractController
     #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     public function delete(Request $request, SiteCollection $siteCollection, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$siteCollection->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$siteCollection->getId(), $request->getPayload()->get('_token'))) {
                 $entityManager->remove($siteCollection);
                 $entityManager->flush();
                 $this->addFlash('success', $this->translator->trans('site_collection.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_siteCollection_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error',$this->translator->trans('site_collection.msg.deleted_error'));
             }
-        } else {
-            $this->addFlash('error',$this->translator->trans('site_collection.msg.deleted_error'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_site_collection_index', [], Response::HTTP_SEE_OTHER);

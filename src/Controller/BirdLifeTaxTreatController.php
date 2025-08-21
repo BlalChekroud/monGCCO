@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ExportType;
 use App\Form\ImportCsvType;
 use App\Service\ExportService;
@@ -205,18 +206,20 @@ class BirdLifeTaxTreatController extends AbstractController
     public function newAjax(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $birdLifeTaxTreat = new BirdLifeTaxTreat();
-        $form = $this->createForm(BirdLifeTaxTreatType::class, $birdLifeTaxTreat);
-        $form->handleRequest($request);
+        $birdLifeTaxTreatForm = $this->createForm(BirdLifeTaxTreatType::class, $birdLifeTaxTreat);
+        $birdLifeTaxTreatForm->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($birdLifeTaxTreatForm->isSubmitted() && $birdLifeTaxTreatForm->isValid()) {
+            $birdLifeTaxTreat->setCreatedAt(new \DateTimeImmutable());
             $entityManager->persist($birdLifeTaxTreat);
             $entityManager->flush();
 
             return new JsonResponse(['success' => true, 'birdLifeTaxTreat' => ['id' => $birdLifeTaxTreat->getId(), 'label' => $birdLifeTaxTreat->getLabel()]]);
         }
 
-        return new JsonResponse(['success' => false, 'errors' => (string) $form->getErrors(true, false)]);
+        return new JsonResponse(['success' => false, 'errors' => (string) $birdLifeTaxTreatForm->getErrors(true, false)]);
     }
+
     
     #[Route('/list', name: 'app_bird_life_tax_treat_list', methods: ['GET'])]
     public function list(EntityManagerInterface $entityManager): JsonResponse
@@ -296,17 +299,17 @@ class BirdLifeTaxTreatController extends AbstractController
     #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     public function delete(Request $request, BirdLifeTaxTreat $birdLifeTaxTreat, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$birdLifeTaxTreat->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$birdLifeTaxTreat->getId(), $request->getPayload()->get('_token'))) {
                 $entityManager->remove($birdLifeTaxTreat);
                 $entityManager->flush();
                 $this->addFlash('success', $this->translator->trans('birdLifeTaxTreat.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
+            } else {
+                $this->addFlash('error',$this->translator->trans('birdLifeTaxTreat.msg.deleted_error'));
                 return $this->redirectToRoute('app_bird_life_tax_treat_index', [], Response::HTTP_SEE_OTHER);
             }
-        } else {
-            $this->addFlash('error',$this->translator->trans('birdLifeTaxTreat.msg.deleted_error'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_bird_life_tax_treat_index', [], Response::HTTP_SEE_OTHER);

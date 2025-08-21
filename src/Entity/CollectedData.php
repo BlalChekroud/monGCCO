@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\UniqueConstraint(name: 'uniq_client_uuid', columns: ['client_uuid'])]
 #[ORM\Entity(repositoryClass: CollectedDataRepository::class)]
 class CollectedData
 {
@@ -16,6 +17,20 @@ class CollectedData
     #[ORM\Column]
     private ?int $id = null;
 
+    
+    #[ORM\Column(type: 'guid', unique: true, nullable: true)]
+    private ?string $clientUuid = null;
+
+    public function getClientUuid(): ?string
+    {
+        return $this->clientUuid;
+    }
+    public function setClientUuid(?string $clientUuid): self
+    {
+        $this->clientUuid = $clientUuid;
+        return $this;
+    }
+    
     /**
      * @var Collection<int, BirdSpecies>
      */

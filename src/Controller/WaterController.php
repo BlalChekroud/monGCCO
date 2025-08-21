@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ExportType;
 use App\Form\ImportCsvType;
 use App\Service\ExportService;
@@ -262,17 +263,16 @@ class WaterController extends AbstractController
     #[Route('/{id}', name: 'app_water_delete', methods: ['POST'])]
     public function delete(Request $request, Water $water, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$water->getId(), $request->getPayload()->get('_token'))) {
-            try {
-                $entityManager->remove($water);
-                $entityManager->flush();
-                $this->addFlash('success', $this->translator->trans('conditionWater.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_water_index', [], Response::HTTP_SEE_OTHER);
+        try {
+            if ($this->isCsrfTokenValid('delete'.$water->getId(), $request->getPayload()->get('_token'))) {
+                    $entityManager->remove($water);
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('conditionWater.msg.deleted_success'));
+            } else {
+                $this->addFlash('error',$this->translator->trans('conditionWater.msg.deleted_error'));
             }
-        } else {
-            $this->addFlash('error',$this->translator->trans('conditionWater.msg.deleted_error'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_water_index', [], Response::HTTP_SEE_OTHER);

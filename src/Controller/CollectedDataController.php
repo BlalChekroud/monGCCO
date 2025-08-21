@@ -2,15 +2,22 @@
 
 namespace App\Controller;
 
+use App\Entity\BirdSpeciesCount;
 use App\Entity\CountingCampaign;
 use App\Entity\EnvironmentalConditions;
 use App\Entity\SiteCollection;
 use App\Entity\User;
 use App\Form\ExportType;
 use App\Repository\BirdSpeciesRepository;
+use App\Repository\CountingCampaignRepository;
+use App\Repository\CountTypeRepository;
 use App\Repository\EnvironmentalConditionsRepository;
+use App\Repository\MethodRepository;
+use App\Repository\QualityRepository;
+use App\Repository\SiteCollectionRepository;
 use App\Service\CampaignStatusService;
 use App\Service\ExportService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\CollectedData;
 use App\Form\CollectedDataType;
@@ -209,6 +216,206 @@ class CollectedDataController extends AbstractController
         ]);
     }
 
+    #[Route('/api/collects', name: 'api_collects', methods: ['POST'])]
+    public function storeCollect(
+        Request $request,
+        EntityManagerInterface $em,
+        CountingCampaignRepository $campaignRepo,
+        SiteCollectionRepository $siteRepo,
+        BirdSpeciesRepository $speciesRepo,
+        CountTypeRepository $countTypeRepo,
+        QualityRepository $qualityRepo,
+        MethodRepository $methodRepo
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+    
+        if (!$data) {
+            return $this->json(['error' => 'Invalid payload'], 400);
+        }
+    
+        // Récupération des entités liées
+        $campaign = $campaignRepo->find($data['campaignId']);
+        $site = $siteRepo->find($data['siteId']);
+        $countType = $countTypeRepo->find($data['countType']);
+        $quality = $qualityRepo->find($data['quality']);
+        $method = $methodRepo->find($data['method']);
+    
+        if (!$campaign || !$site) {
+            return $this->json(['error' => 'Invalid campaign or site'], 400);
+        }
+    
+        // Création collecte
+        $collect = new CollectedData();
+        $collect->setCountingCampaign($campaign);
+        $collect->setSiteCollection($site);
+        $collect->setCountType($countType);
+        $collect->setQuality($quality);
+        $collect->setMethod($method);
+        $collect->setCreatedAt(new \DateTimeImmutable($data['createdAt'] ?? 'now'));
+        $collect->setCreatedBy($this->getUser());
+    
+        // Espèces observées
+        foreach ($data['birdSpeciesCounts'] as $spData) {
+            $species = $speciesRepo->find($spData['birdSpeciesId']);
+            if ($species) {
+                $birdCount = new BirdSpeciesCount();
+                $birdCount->setBirdSpecies($species);
+                $birdCount->setCount($spData['count']);
+                $birdCount->setCollectedData($collect);
+                $em->persist($birdCount);
+            }
+        }
+    
+        $em->persist($collect);
+        $em->flush();
+    
+        return $this->json(['success' => true, 'id' => $collect->getId()]);
+    }
+    
+    // --- Nouvelle méthode "sync" pour offline → online ---
+    #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
+    #[Route('/sync', name: 'collected_data_sync', methods: ['POST'])]
+    public function sync(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        BirdSpeciesRepository $birdSpeciesRepository,
+        EnvironmentalConditionsRepository $environmentalConditionsRepository
+    ): JsonResponse {
+        $user = $this->getUser();
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return new JsonResponse(['error' => 'Invalid data'], 400);
+        }
+
+        try {
+            $campaign = $entityManager->getRepository(CountingCampaign::class)->find($data['campaignId'] ?? null);
+            $site     = $entityManager->getRepository(SiteCollection::class)->find($data['siteId'] ?? null);
+
+            if (!$campaign || !$site) {
+                return new JsonResponse(['error' => 'Campagne ou site introuvable'], 400);
+            }
+
+            // Autorisations
+            if (!$this->isUserSiteMember($user, $site) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+                return new JsonResponse(['error' => 'Accès refusé'], 403);
+            }
+
+            // Conditions environnementales
+            $environmentalConditions = $environmentalConditionsRepository->find($data['environmentalConditionsId'] ?? null);
+            if (!$environmentalConditions) {
+                return new JsonResponse(['error' => 'Conditions environnementales manquantes'], 400);
+            }
+
+            // Vérifier campagne modifiable
+            if (!$this->campaignStatusService->ensureCampaignIsEditable($campaign)) {
+                return new JsonResponse(['error' => 'Campagne non modifiable'], 400);
+            }
+
+            // Création CollectedData
+            $collectedDatum = new CollectedData();
+            $collectedDatum->setCountingCampaign($campaign);
+            $collectedDatum->setSiteCollection($site);
+            $collectedDatum->setEnvironmentalConditions($environmentalConditions);
+            $collectedDatum->setCreatedBy($user);
+            $collectedDatum->setCreatedAt(new \DateTimeImmutable($data['createdAt'] ?? 'now'));
+            $collectedDatum->setQuality($data['quality'] ?? null);
+            $collectedDatum->setCountType($data['countType'] ?? null);
+            $collectedDatum->addMethod($data['methods'] ?? []);
+
+            // Espèces
+            foreach ($data['birdSpeciesCounts'] ?? [] as $item) {
+                $species = $birdSpeciesRepository->find($item['birdSpeciesId'] ?? null);
+                if ($species && isset($item['count'])) {
+                    $speciesCount = new BirdSpeciesCount();
+                    $speciesCount->setBirdSpecies($species);
+                    $speciesCount->setCount((int) $item['count']);
+                    $speciesCount->setCollectedData($collectedDatum);
+                    $entityManager->persist($speciesCount);
+                }
+            }
+
+            $entityManager->persist($collectedDatum);
+            $entityManager->flush();
+
+            return new JsonResponse(['status' => 'ok']);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
+    }
+    // #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
+    // #[Route('/sync', name: 'app_collected_data_sync', methods: ['POST'])]
+    // public function sync(
+    //     Request $request,
+    //     BirdSpeciesRepository $birdSpeciesRepository,
+    //     EntityManagerInterface $entityManager,
+    //     EnvironmentalConditionsRepository $environmentalConditionsRepository
+    // ): JsonResponse {
+    //     $user = $this->getUser();
+    //     $payload = json_decode($request->getContent(), true);
+    
+    //     // Dans sync(), avant traitement
+    //     $token = $request->headers->get('X-CSRF-TOKEN');
+    //     if (!$this->isCsrfTokenValid('sync_collected_data', $token)) {
+    //         return new JsonResponse(['error' => 'Invalid CSRF token'], 419);
+    //     }
+
+    //     if (!$payload || !isset($payload['campaignId'], $payload['siteId'], $payload['birdSpeciesCounts'])) {
+    //         return $this->json(['error' => 'Invalid JSON payload'], Response::HTTP_BAD_REQUEST);
+    //     }
+    
+    //     $campaign = $entityManager->getRepository(CountingCampaign::class)->find($payload['campaignId']);
+    //     $site = $entityManager->getRepository(SiteCollection::class)->find($payload['siteId']);
+    
+    //     if (!$campaign || !$site) {
+    //         return $this->json(['error' => 'Campaign or Site not found'], Response::HTTP_NOT_FOUND);
+    //     }
+    
+    //     if (!$this->isUserSiteMember($user, $site) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+    //         return $this->json(['error' => 'Access denied'], Response::HTTP_FORBIDDEN);
+    //     }
+    
+    //     $environmentalConditions = $environmentalConditionsRepository->findOneBy(
+    //         ['user' => $user, 'siteCollection' => $site, 'countingCampaign' => $campaign],
+    //         ['createdAt' => 'DESC']
+    //     );
+    
+    //     if (!$environmentalConditions) {
+    //         return $this->json(['error' => 'Please create environmental conditions first'], Response::HTTP_CONFLICT);
+    //     }
+    
+    //     // Créer la collecte
+    //     $collectedData = new CollectedData();
+    //     $collectedData->setCountingCampaign($campaign);
+    //     $collectedData->setSiteCollection($site);
+    //     $collectedData->setEnvironmentalConditions($environmentalConditions);
+    //     $collectedData->setCreatedBy($user);
+    //     $collectedData->setCreatedAt(new \DateTimeImmutable());
+    
+    //     $entityManager->persist($collectedData);
+    
+    //     // Ajouter les espèces d’oiseaux collectées
+    //     foreach ($payload['birdSpeciesCounts'] as $birdData) {
+    //         $species = $birdSpeciesRepository->find($birdData['speciesId']);
+    //         if ($species) {
+    //             $birdSpeciesCount = new BirdSpeciesCount();
+    //             $birdSpeciesCount->setCollectedData($collectedData);
+    //             $birdSpeciesCount->setBirdSpecies($species);
+    //             $birdSpeciesCount->setCount($birdData['count'] ?? 0);
+    //             $entityManager->persist($birdSpeciesCount);
+    //         }
+    //     }
+    
+    //     $entityManager->flush();
+    
+    //     return $this->json([
+    //         'status' => 'success',
+    //         'message' => 'Collected data synchronized successfully',
+    //         'collectedDataId' => $collectedData->getId(),
+    //     ], Response::HTTP_CREATED);
+    // }
+
+    
     private function isUserSiteMember(User $user, SiteCollection $site): bool
     {
         foreach ($site->getSiteAgentsGroups() as $siteAgentsGroup) {
@@ -416,24 +623,23 @@ class CollectedDataController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_collected_data_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_collected_data_delete', methods: ['POST'])]
     public function delete(Request $request, CollectedData $collectedDatum, EntityManagerInterface $entityManager): Response
     {
-        if ($this->getUser() !== $collectedDatum->getCreatedBy() && !$this->isGranted('ROLE_DELETE')){
-            $this->addFlash('error', $this->translator->trans('delete_permission'));
-            return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
-        }
-        if ($this->isCsrfTokenValid('delete'.$collectedDatum->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->getUser() !== $collectedDatum->getCreatedBy() && !$this->isGranted('ROLE_DELETE')){
+                $this->addFlash('error', $this->translator->trans('delete_permission'));
+                return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
+            }
+            if ($this->isCsrfTokenValid('delete'.$collectedDatum->getId(), $request->getPayload()->get('_token'))) {
                 $entityManager->remove($collectedDatum);
                 $entityManager->flush();
                 $this->addFlash('success', $this->translator->trans('collect.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error',$this->translator->trans('collect.msg.deleted_error'));
             }
-        } else {
-            $this->addFlash('error',$this->translator->trans('collect.msg.deleted_error'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_collected_data_index', [], Response::HTTP_SEE_OTHER);

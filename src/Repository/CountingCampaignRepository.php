@@ -155,6 +155,61 @@ class CountingCampaignRepository extends ServiceEntityRepository
             ->getResult();
     }
     
+    // Retourne uniquement les campagnes où l’utilisateur participe (créateur OU membre d’un groupe assigné) avec leurs sites
+    public function findCampaignByUser(User $user, array $validStatuses): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.siteAgentsGroups', 'sag')
+            ->addSelect('sag') // <--- indispensable !
+            ->leftJoin('sag.agentsGroup', 'g')
+            ->leftJoin('g.groupMember', 'm')
+            ->leftJoin('c.campaignStatus', 'status')
+            ->leftJoin('sag.siteCollection', 's')
+            ->addSelect('s') // maintenant OK
+            ->where('c.createdBy = :user')
+            ->orWhere('m = :user')
+            ->andWhere('status.label IN (:statuses)')
+            ->setParameter('user', $user)
+            ->setParameter('statuses', $validStatuses)
+            ->getQuery()
+            ->getResult();
+    }
+    
+
+    // Retourne uniquement les campagnes où l’utilisateur participe (créateur OU membre d’un groupe assigné)
+    public function findCampaignByUser1(User $user, array $validStatuses = []): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.siteAgentsGroups', 'sag')
+            ->leftJoin('sag.agentsGroup', 'g')
+            ->leftJoin('g.groupMember', 'm')
+            ->leftJoin('c.campaignStatus', 'status')
+            ->where('c.createdBy = :user')
+            ->orWhere('m = :user')
+            ->andWhere('status.label IN (:statuses)')
+            ->setParameter('user', $user)
+            ->setParameter('statuses', $validStatuses)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllCampaignByUser(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.siteAgentsGroups', 'sag')
+            ->leftJoin('sag.agentsGroup', 'g')
+            ->leftJoin('g.groupMember', 'm')
+            ->leftJoin('c.campaignStatus', 'status') // jointure sur le statut
+            ->where('c.createdBy = :user')
+            ->orWhere('m = :user')
+            ->andWhere('status.label IN (:statuses)') // filtre par statut
+            ->setParameter('user', $user)
+            ->setParameter('statuses', ['En cours', 'Terminée']) // ⚡ tu ajustes ici
+            ->getQuery()
+            ->getResult();
+    }
+   
+    
     // public function findByCampaign($campaign)
     // {
     //     return $this->createQueryBuilder('c')

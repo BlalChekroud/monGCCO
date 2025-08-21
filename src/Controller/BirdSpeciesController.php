@@ -245,46 +245,6 @@ class BirdSpeciesController extends AbstractController
             'formExport' => $formExport->createView(),
         ]);
     }
-
-    // # VALIDE #
-    // #[Route('/export', name: 'app_bird_species_export')]
-    // public function export(Request $request, BirdSpeciesRepository $birdSpeciesRepository): Response
-    // {
-    //     $form = $this->createForm(ExportType::class)
-    //                 ->handleRequest($request);
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         $columnNames = ['Scientific Name', 'French Name', 'Created at'];
-    //         $birdSpecies = $birdSpeciesRepository->findAll();
-            
-    //         // Prepare an array to store the data rows
-    //         $data = [];
-    //         foreach ($birdSpecies as $birdSpecy) {
-    //             // Extract data from the BirdSpecies entity and map it to an array
-    //             $row = [
-    //                 $birdSpecy->getScientificName(),
-    //                 $birdSpecy->getFrenchName(),
-    //                 $birdSpecy->getCreatedAt()->format('Y-m-d H:i:s'),
-    //             ];
-                
-    //             // Add the row to the array of rows
-    //             $data[] = $row;
-    //         }
-
-    //         /** @var ExportFormat $format */
-    //         $format = $form->get('format')->getData();
-
-    //         $response = new StreamedResponse(fn () => $this->exporter->export($columnNames, $data, $format));
-            
-    //         $response->headers->set('Content-Type', $format->contentType());
-            
-    //         return $response;
-    //     }
-
-    //     return $this->render('bird_species/export.html.twig', [
-    //         'formExport' => $form->createView(),
-    //     ]);
-    // }
     
 
     #[Route('/new', name: 'app_bird_species_new', methods: ['GET', 'POST'])]
@@ -294,6 +254,9 @@ class BirdSpeciesController extends AbstractController
         $birdSpecy = new BirdSpecies();
         $form = $this->createForm(BirdSpeciesType::class, $birdSpecy);
         $form->handleRequest($request);
+        $coverageForm = $this->createForm(CoverageType::class);
+        $birdLifeTaxTreatForm = $this->createForm(BirdLifeTaxTreatType::class);
+        $iucnRedListCategoryForm = $this->createForm(IucnRedListCategoryType::class);
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
@@ -328,18 +291,16 @@ class BirdSpeciesController extends AbstractController
             }
         }
 
-        // $coverageForm = $this->createForm(CoverageType::class);
-        $birdLifeTaxTreatForm = $this->createForm(BirdLifeTaxTreatType::class);
-        $iucnRedListCategoryForm = $this->createForm(IucnRedListCategoryType::class);
 
         return $this->render('bird_species/new.html.twig', [
             'bird_specy' => $birdSpecy,
             'form' => $form,
-            // 'coverageForm' => $coverageForm->createView(),
+            'coverageForm' => $coverageForm->createView(),
             'birdLifeTaxTreatForm' => $birdLifeTaxTreatForm->createView(),
             'iucnRedListCategoryForm' => $iucnRedListCategoryForm->createView(),
         ]);
     }
+
 
     // #[Route('/get-bird-image/{id}', name: 'get_bird_image', methods: ['GET'])]
     // public function getBirdImage(BirdSpecies $birdSpecies): JsonResponse
@@ -425,7 +386,9 @@ class BirdSpeciesController extends AbstractController
     #[Route('/{id}/edit', name: 'app_bird_species_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, BirdSpecies $birdSpecy, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
-        
+        $coverageForm = $this->createForm(CoverageType::class);
+        $birdLifeTaxTreatForm = $this->createForm(BirdLifeTaxTreatType::class);
+        $iucnRedListCategoryForm = $this->createForm(IucnRedListCategoryType::class);
         $form = $this->createForm(BirdSpeciesType::class, $birdSpecy);
         $form->handleRequest($request);
 
@@ -467,6 +430,9 @@ class BirdSpeciesController extends AbstractController
         return $this->render('bird_species/edit.html.twig', [
             'bird_specy' => $birdSpecy,
             'form' => $form,
+            'coverageForm' => $coverageForm->createView(),
+            'birdLifeTaxTreatForm' => $birdLifeTaxTreatForm->createView(),
+            'iucnRedListCategoryForm' => $iucnRedListCategoryForm->createView(),
         ]);
     }
 
@@ -474,12 +440,16 @@ class BirdSpeciesController extends AbstractController
     #[Route('/{id}', name: 'app_bird_species_delete', methods: ['POST'])]
     public function delete(Request $request, BirdSpecies $birdSpecy, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$birdSpecy->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($birdSpecy);
-            $entityManager->flush();
-            $this->addFlash('success', $translator->trans('birdSpecies.msg.success_delete'));
-        } else {
-            $this->addFlash('error', $translator->trans('birdSpecies.error.deletion_failed'));
+        try {
+            if ($this->isCsrfTokenValid('delete'.$birdSpecy->getId(), $request->getPayload()->get('_token'))) {
+                $entityManager->remove($birdSpecy);
+                $entityManager->flush();
+                $this->addFlash('success', $translator->trans('birdSpecies.msg.success_delete'));
+            } else {
+                $this->addFlash('error', $translator->trans('birdSpecies.error.deletion_failed'));
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_bird_species_index', [], Response::HTTP_SEE_OTHER);

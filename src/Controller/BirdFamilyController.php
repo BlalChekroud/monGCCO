@@ -292,17 +292,19 @@ class BirdFamilyController extends AbstractController
     #[Route('/{id}', name: 'app_bird_family_delete', methods: ['POST'])]
     #[IsGranted('ROLE_DELETE', message: 'Vous n\'avez pas l\'accès.')]
     public function delete(Request $request, BirdFamily $birdFamily, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
-    {
-        $csrfToken = $request->request->get('_token'); // Utilisation de `request->request` pour obtenir le payload
-    
-        if ($this->isCsrfTokenValid('delete' . $birdFamily->getId(), $csrfToken)) {
-            $entityManager->remove($birdFamily);
-            $entityManager->flush();
-            $this->addFlash('success', $translator->trans('birdFamily.msg.success_delete'));
-        } else {
-            $this->addFlash('error', $translator->trans('birdFamily.error.deletion_failed'));
+    {    
+        try {
+            if ($this->isCsrfTokenValid('delete'.$birdFamily->getId(), $request->getPayload()->get('_token'))) {
+                $entityManager->remove($birdFamily);
+                $entityManager->flush();
+                $this->addFlash('success', $translator->trans('birdFamily.msg.success_delete'));
+            } else {
+                $this->addFlash('error', $translator->trans('birdFamily.error.deletion_failed'));
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
-    
+
         return $this->redirectToRoute('app_bird_family_index', [], Response::HTTP_SEE_OTHER);
     }
     

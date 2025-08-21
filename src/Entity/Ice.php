@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Repository\IceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[UniqueEntity(fields: ['label'], message: 'Il existe déjà')]
 #[ORM\Entity(repositoryClass: IceRepository::class)]
 class Ice
 {

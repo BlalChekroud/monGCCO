@@ -103,17 +103,16 @@ class ImageController extends AbstractController
     #[Route('/{id}', name: 'app_image_delete', methods: ['POST'])]
     public function delete(Request $request, Image $image, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$image->getId(), $request->getPayload()->get('_token'))) {
-            try {
-                $entityManager->remove($image);
-                $entityManager->flush();
-                $this->addFlash('success', $this->translator->trans('image.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_image_index', [], Response::HTTP_SEE_OTHER);
+        try {
+            if ($this->isCsrfTokenValid('delete'.$image->getId(), $request->getPayload()->get('_token'))) {
+                    $entityManager->remove($image);
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('image.msg.deleted_success'));
+            } else {
+                $this->addFlash('error',$this->translator->trans('image.msg.deleted_error'));
             }
-        } else {
-            $this->addFlash('error',$this->translator->trans('image.msg.deleted_error'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_image_index', [], Response::HTTP_SEE_OTHER);

@@ -210,17 +210,21 @@ class AgentsGroupController extends AbstractController
     #[Route('/{id}', name: 'app_agents_group_delete', methods: ['POST'])]
     public function delete(Request $request, AgentsGroup $agentsGroup, EntityManagerInterface $entityManager, TranslatorInterface $translator): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$agentsGroup->getId(), $request->getPayload()->get('_token'))) {
-            
-            foreach ($agentsGroup->getGroupMember() as $member) {
-                $this->notificationService->sendNotification($member, 'delete', $this->getUser(), $agentsGroup);
+        try {
+            if ($this->isCsrfTokenValid('delete'.$agentsGroup->getId(), $request->getPayload()->get('_token'))) {
+                
+                foreach ($agentsGroup->getGroupMember() as $member) {
+                    $this->notificationService->sendNotification($member, 'delete', $this->getUser(), $agentsGroup);
+                }
+    
+                $entityManager->remove($agentsGroup);
+                $entityManager->flush();
+                $this->addFlash('success', $translator->trans('agentsGroup.msg.deleted'));
+            } else {
+                $this->addFlash('error', $translator->trans('agentsGroup.error.deletion_failed'));
             }
-
-            $entityManager->remove($agentsGroup);
-            $entityManager->flush();
-            $this->addFlash('success', $translator->trans('agentsGroup.msg.deleted'));
-        } else {
-            $this->addFlash('error', $translator->trans('agentsGroup.error.deletion_failed'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_agents_group_index', [], Response::HTTP_SEE_OTHER);

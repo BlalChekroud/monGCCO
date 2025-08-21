@@ -9,6 +9,7 @@
 import './styles/app.css';
 
 import './bootstrap.js';
+import './js/notifications.js';
 
 import './vendor/apexcharts/apexcharts.min.js';
 import './vendor/bootstrap/js/bootstrap.bundle.min.js';

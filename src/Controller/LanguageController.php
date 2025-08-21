@@ -82,17 +82,16 @@ class LanguageController extends AbstractController
     #[Route('/{id}', name: 'app_language_delete', methods: ['POST'])]
     public function delete(Request $request, Language $language, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$language->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$language->getId(), $request->getPayload()->get('_token'))) {
                 $entityManager->remove($language);
                 $entityManager->flush();
-                $this->addFlash('success', $this->translator->trans('language.msg.deleted'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $this->translator->trans('language.error.deletion_failed') . $e->getMessage());
-                return $this->redirectToRoute('app_language_index', [], Response::HTTP_SEE_OTHER);
-            }    
-        } else {
-            $this->addFlash('error',$this->translator->trans('invalid_form'));
+                $this->addFlash('success', $this->translator->trans('language.msg.deleted'));  
+            } else {
+                $this->addFlash('error',$this->translator->trans('invalid_form'));
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_language_index', [], Response::HTTP_SEE_OTHER);

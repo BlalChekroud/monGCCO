@@ -38,7 +38,7 @@ class CountingCampaign
     /**
      * @var Collection<int, CollectedData>
      */
-    #[ORM\OneToMany(targetEntity: CollectedData::class, mappedBy: 'countingCampaign')]
+    #[ORM\OneToMany(targetEntity: CollectedData::class, mappedBy: 'countingCampaign', cascade: ['persist', 'remove'])]
     private Collection $collectedData;
 
     #[ORM\Column(length: 255, nullable: true)]

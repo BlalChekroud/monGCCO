@@ -182,13 +182,17 @@ class SecurityController extends AbstractController
     #[Route('/admin/profile/{id}', name: 'app_user_delete', methods: ['POST'])]
     public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->get('_token'))) {
-
-            $entityManager->remove($user);
-            $entityManager->flush();
-            $this->addFlash('success', $this->translator->trans('user.msg.deleted'));
-        } else {
-            $this->addFlash('error', $this->translator->trans('user.error.deletion_failed'));
+        try {
+            if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->get('_token'))) {
+    
+                $entityManager->remove($user);
+                $entityManager->flush();
+                $this->addFlash('success', $this->translator->trans('user.msg.deleted'));
+            } else {
+                $this->addFlash('error', $this->translator->trans('user.error.deletion_failed'));
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_profile', [], Response::HTTP_SEE_OTHER);

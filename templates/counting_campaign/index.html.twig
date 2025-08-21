@@ -142,8 +142,19 @@
         </div>
       </div>
     </section>
-    {% import 'macros/show_export_macros.html.twig' as macros %}
+    {# {% import 'macros/show_export_macros.html.twig' as macros %}
+    {{ macros.export_section(formExport, 'Export counting campaign Data') }} #}
 
-    {{ macros.export_section(formExport, 'Export counting campaign Data') }}
+    {% import 'macros/form_macros.html.twig' as form_macros %}
+    {{ form_macros.csv_import_form(form, 'app_counting_campaign_index', formExport, 'Import counting campaign Data', 'Export counting campaign Data') }}
+
+
+    {% if headers is defined and rows is defined %}
+        {{ form_macros.csv_modal(headers, rows, csvData, 'app_counting_campaign_index', ['Campaign name', 'Start date', 'End date', 'Site name', 'Group name', 'Disturbed', 'Weather', 'Ice', 'Tidal', 'Water', 'Collect number', 'CountType', 'Quality', 'Methods', 'Scientific name', 'Total'],['Description', 'Created at']) }}
+    {% endif %}
+
+    {# {% for campaign in findCampaignByUser|reverse %}
+      <p>{{ campaign.id }} + {{ campaign.campaignName }} + {{ campaign.campaignStatus }}</p>
+    {% endfor %} #}
 </main><!-- End #main -->
 {% endblock %}

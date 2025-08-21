@@ -92,19 +92,17 @@ class CampaignStatusController extends AbstractController
     #[Route('/{id}', name: 'app_campaign_status_delete', methods: ['POST'])]
     public function delete(Request $request, CampaignStatus $campaignStatus, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$campaignStatus->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$campaignStatus->getId(), $request->getPayload()->get('_token'))) {
                 // Tentative de suppression de l'état de campagne
                 $entityManager->remove($campaignStatus);
                 $entityManager->flush();
-                $this->addFlash('success', $this->translator->trans('campaignStatus.msg.deleted_success'));
-            } catch (\Exception $e) {
-                // Gestion des erreurs lors de la suppression
-                $this->addFlash('error', $this->translator->trans('campaignStatus.msg.deleted_error') . $e->getMessage());
-                return $this->redirectToRoute('app_campaign_status_index', [], Response::HTTP_SEE_OTHER);
-            }            
-        } else {
-            $this->addFlash('error', $this->translator->trans('campaignStatus.msg.deleted_error'));
+                $this->addFlash('success', $this->translator->trans('campaignStatus.msg.deleted_success'));           
+            } else {
+                $this->addFlash('error', $this->translator->trans('campaignStatus.msg.deleted_error'));
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_campaign_status_index', [], Response::HTTP_SEE_OTHER);

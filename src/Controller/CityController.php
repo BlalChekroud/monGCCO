@@ -309,18 +309,17 @@ class CityController extends AbstractController
     #[Route('/{id}', name: 'app_city_delete', methods: ['POST'])]
     public function delete(Request $request, City $city, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$city->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$city->getId(), $request->getPayload()->get('_token'))) {
                 $entityManager->remove($city);
                 $entityManager->flush();
                 $this->addFlash('success', $this->translator->trans('city.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_city_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error',$this->translator->trans('city.msg.deleted_error'));
             }
-        } else {
-            $this->addFlash('error',$this->translator->trans('city.msg.deleted_error'));
-        } 
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
 
         return $this->redirectToRoute('app_city_index', [], Response::HTTP_SEE_OTHER);
     }

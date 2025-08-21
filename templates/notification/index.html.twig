@@ -19,7 +19,7 @@
       <div class="row">
         <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
           
-          <div class="notifications-container">
+          <div class="notifications-containerhg">
               <div class="notifications-header">
                   <h3>
                     {{ 'notification.your_notifications'|trans }} 
@@ -40,10 +40,19 @@
                                           <p class="notification-time">
                                               {{ notification.createdAt ? notification.createdAt|date('d-m-Y H:i:s') : '' }}
                                           </p>
-                                          {# Ajoutez un lien pour marquer comme vu #}
-                                        {% if not notification.seen %}
-                                            <a href="{{ path('notification_mark_as_seen', { 'id': notification.id }) }}" class="mark-as-seen">{{ 'notification.mark_as_seen'|trans }}</a>
-                                        {% endif %}
+                                          <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 d-flex justify-content-between">
+                                            <div class="d-flex justify-content-start">
+                                              {# Ajoutez un lien pour marquer comme vu #}
+                                              {% if not notification.seen %}
+                                                  <a href="{{ path('notification_mark_as_seen', { 'id': notification.id }) }}" class="mark-as-seen btn btn-sm" data-id="{{ notification.id }}">
+                                                    {{ 'notification.mark_as_seen'|trans }}
+                                                  </a>
+                                              {% endif %}
+                                            </div>
+                                            <div class="d-flex justify-content-end">
+                                              {{ include('notification/_delete_form.html.twig') }}
+                                            </div>
+                                          </div>
                                       </div>
                                   </li>
                               {% else %}
@@ -62,4 +71,34 @@
     </section>
 
   </main><!-- End #main -->
+  {# <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.mark-as-seen').forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const url = this.getAttribute('href');
+                const notificationItem = this.closest('.notification-item');
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Retirer le bouton
+                        this.remove();
+                        // Optionnel: changer l'apparence de la notification
+                        notificationItem.style.opacity = "0.5";
+                    }
+                })
+                .catch(err => console.error(err));
+            });
+        });
+    });
+  </script> #}
+
 {% endblock %}

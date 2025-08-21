@@ -1,11 +1,4 @@
 {% macro csv_import_form(form, submit_action, formExport, import_title, export_title) %}
-    {# <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">{{ 'csv_import_title'|trans }}</h5>
-        <div>
-            <button id="printButton" class="btn btn-outline-secondary btn-sm me-2 bi bi-printer" title="{{ 'print'|trans }}"></button>
-            <button id="exportCSVButton" class="btn btn-secondary btn-sm bi bi-folder" title="{{ 'export_as_CSV'|trans }}"></button>
-        </div>
-    </div> #}
     <section class="section py-4">
         <div class="container">
             <div class="card shadow border-0">
@@ -128,7 +121,7 @@
             </div>
         </div>
     </div>
-    <script src="{{ asset('./js/csv.js') }}"></script>
+    {# <script src="{{ asset('./js/csv.js') }}"></script> #}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var myModal = new bootstrap.Modal(document.getElementById('csvPreviewModal'), {});

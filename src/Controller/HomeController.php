@@ -144,75 +144,68 @@ class HomeController extends AbstractController
         ]);
     }
 
-    // #[Route('/get-campaign-data', name: 'campaign_details', methods: ['GET'])]
-    // public function getCampaignDetails(
-    //     Request $request,
-    //     BirdSpeciesRepository $birdSpeciesRepository,
-    //     BirdSpeciesCountRepository $birdSpeciesCountRepository,
-    //     EnvironmentalConditionsRepository $environmentalConditionsRepository, 
-    //     AgentsGroupRepository $agentsGroupRepository, 
-    //     CollectedDataRepository $collectedDataRepository, 
-    //     SiteCollectionRepository $siteCollectionRepository, 
-    //     CountingCampaignRepository $countingCampaignRepository
-    // ): JsonResponse {
-    //     $campaignId = $request->query->get('campaign_id');
-
-    //     if (!$campaignId) {
-    //         return new JsonResponse(['error' => 'Campaign ID is required'], 400);
-    //     }
-
-    //     $campaign = $countingCampaignRepository->find($campaignId);
-
-    //     if (!$campaign) {
-    //         return new JsonResponse(['error' => 'Campaign not found'], 404);
-    //     }
-
-    //     // Récupérer les données principales
-    //     $collectedDataInCampaign = $collectedDataRepository->findByCountingCampaign($campaign);
-    //     $totalCollectedDataCount = $countingCampaignRepository->countCollectedDataByCampaign($campaign);
-    //     $totalAgentsCount = $agentsGroupRepository->countAgentsByCountingCampaign($campaign);
-    //     $methodsUsed = $countingCampaignRepository->getMethodsUsedInCampaign($campaign);
-    //     $totalBirdsCountedInCampaign = $birdSpeciesCountRepository->countTotalBirdsInCampaign($campaign);
-    //     $totalUniqueBirdSpeciesInCampaign = $birdSpeciesCountRepository->countUniqueBirdSpeciesInCampaign($campaign);
-    //     $totalBirdsCountByCampaign = $birdSpeciesCountRepository->getTotalBirdsCountByCampaign();
-    //     $totalUniqueBirdSpeciesCountByCampaign = $birdSpeciesCountRepository->getTotalUniqueBirdSpeciesCountByCampaign();
-    //     $siteCollectionsByCampaign = $siteCollectionRepository->getSiteCollectionsByCampaign($campaign);
-    //     $topThreeBirdSpeciesInCampaign = $birdSpeciesCountRepository->getTopThreeBirdSpeciesInCampaignWithImages($campaign);
-    //     $frequentConditions = $environmentalConditionsRepository->getMostFrequentEnvironmentalConditions($campaign);
-
-    //     // Calculer les données par site
-    //     $totalBirdsCountPerSitesInCampaign = [];
-    //     $uniqueBirdSpeciesCountForSite = [];
-    //     $uniqueBirdSpeciesCountForSiteInCampaign = [];
-
-    //     foreach ($siteCollectionsByCampaign as $site) {    
-    //         if ($site) {
-    //             $totalBirdsCountPerSitesInCampaign[$site->getId()] = $siteCollectionRepository->getTotalBirdCountsForSiteInCampaign($site, $campaign);
-    //             $uniqueBirdSpeciesCountForSite[$site->getId()] = $siteCollectionRepository->getUniqueBirdSpeciesCountForSite($site);
-    //             $uniqueBirdSpeciesCountForSiteInCampaign[$site->getId()] = $siteCollectionRepository->getUniqueBirdSpeciesCountForSiteInCampaign($site, $campaign);
-    //         }
-    //     }
-
-    //     // Préparer la réponse
-    //     $response = [
-    //         'collectedDataInCampaign' => $collectedDataInCampaign,
-    //         'totalCollectedDataCount' => $totalCollectedDataCount,
-    //         'totalAgentsCount' => $totalAgentsCount,
-    //         'methodsUsed' => $methodsUsed,
-    //         'totalBirdsCountedInCampaign' => $totalBirdsCountedInCampaign,
-    //         'totalUniqueBirdSpeciesInCampaign' => $totalUniqueBirdSpeciesInCampaign,
-    //         'siteCollectionsByCampaign' => $siteCollectionsByCampaign,
-    //         'frequentConditions' => $frequentConditions,
-    //         'totalBirdsCountPerSitesInCampaign' => $totalBirdsCountPerSitesInCampaign,
-    //         'uniqueBirdSpeciesCountForSite' => $uniqueBirdSpeciesCountForSite,
-    //         'totalBirdsCountByCampaign' => $totalBirdsCountByCampaign,
-    //         'totalUniqueBirdSpeciesCountByCampaign' => $totalUniqueBirdSpeciesCountByCampaign,
-    //         'uniqueBirdSpeciesCountForSiteInCampaign' => $uniqueBirdSpeciesCountForSiteInCampaign,
-    //         'topThreeBirdSpeciesInCampaign' => $topThreeBirdSpeciesInCampaign,
-    //         'bird_species' => $birdSpeciesRepository->findAll(),
-    //     ];
-
-    //     return new JsonResponse($response);
-    // }
-
+    #[Route('/get-campaign-data', name: 'get_campaign_data')]
+    public function getCampaignData(
+        Request $request,
+        BirdSpeciesRepository $birdSpeciesRepository,
+        BirdSpeciesCountRepository $birdSpeciesCountRepository,
+        EnvironmentalConditionsRepository $environmentalConditionsRepository, 
+        AgentsGroupRepository $agentsGroupRepository, 
+        CollectedDataRepository $collectedDataRepository, 
+        SiteCollectionRepository $siteCollectionRepository, 
+        CountingCampaignRepository $countingCampaignRepository
+    ): JsonResponse {
+        $campaignId = $request->query->get('campaign_id');
+        $campaign = $countingCampaignRepository->find($campaignId);
+    
+        if (!$campaign) {
+            return new JsonResponse(['error' => 'Campagne introuvable'], 404);
+        }
+    
+        // mêmes calculs que dans index()
+        $collectedDataInCampaign = $collectedDataRepository->findByCountingCampaign($campaign);
+        $totalCollectedDataCount = $countingCampaignRepository->countCollectedDataByCampaign($campaign);
+        $totalAgentsCount = $agentsGroupRepository->countAgentsByCountingCampaign($campaign);
+        $methodsUsed = $countingCampaignRepository->getMethodsUsedInCampaign($campaign);
+        $totalBirdsCountedInCampaign = $birdSpeciesCountRepository->countTotalBirdsInCampaign($campaign);
+        $totalcountUniqueBirdSpeciesInCampaign = $birdSpeciesCountRepository->countUniqueBirdSpeciesInCampaign($campaign);
+        $totalBirdsCountByCampaign = $birdSpeciesCountRepository->getTotalBirdsCountByCampaign();
+        $totalUniqueBirdSpeciesCountByCampaign = $birdSpeciesCountRepository->getTotalUniqueBirdSpeciesCountByCampaign();
+        $siteCollectionsByCampaign = $siteCollectionRepository->getSiteCollectionsByCampaign($campaign);
+    
+        $totalBirdsCountPerSitesInCamapign = [];
+        $uniqueBirdSpeciesCountForSiteInCampaign = [];
+        foreach ($siteCollectionsByCampaign as $site) {    
+            $totalBirdsCountPerSitesInCamapign[$site->getId()] = $siteCollectionRepository->getTotalBirdCountsForSiteInCampaign($site, $campaign);
+            $uniqueBirdSpeciesCountForSiteInCampaign[$site->getId()] = $siteCollectionRepository->getUniqueBirdSpeciesCountForSiteInCampaign($site, $campaign);
+        }
+    
+        $topThreeBirdSpeciesInCampaign = $birdSpeciesCountRepository->getTopThreeBirdSpeciesInCampaignWithImages($campaign);
+        $frequentConditions = $environmentalConditionsRepository->getMostFrequentEnvironmentalConditions($campaign);
+    
+        return new JsonResponse([
+            'campaignName' => $campaign->getCampaignName(),
+            'campaignStatus' => (string)$campaign->getCampaignStatus(),
+            'totalCollectedDataCount' => $totalCollectedDataCount,
+            'totalAgentsCount' => $totalAgentsCount,
+            'methodsUsed' => $methodsUsed,
+            'totalBirdsCountedInCampaign' => $totalBirdsCountedInCampaign,
+            'totalcountUniqueBirdSpeciesInCampaign' => $totalcountUniqueBirdSpeciesInCampaign,
+            'siteCollections' => array_map(fn($s) => [
+                'id' => $s->getId(),
+                'siteName' => $s->getSiteName(),
+                'totalBirds' => $totalBirdsCountPerSitesInCamapign[$s->getId()] ?? 0,
+                'uniqueSpecies' => $uniqueBirdSpeciesCountForSiteInCampaign[$s->getId()] ?? 0,
+            ], $siteCollectionsByCampaign),
+            'topThree' => array_map(fn($s) => [
+                'scientificName' => $s['scientificName'],
+                'topThreeCount' => $s['topThreeCount'],
+                'imagePath' => $s['imagePath'] ?? null,
+            ], $topThreeBirdSpeciesInCampaign),
+            'frequentConditions' => $frequentConditions,
+            'totalBirdsCountByCampaign' => $totalBirdsCountByCampaign,
+            'totalUniqueBirdSpeciesCountByCampaign' => $totalUniqueBirdSpeciesCountByCampaign,
+        ]);
+    }
+    
 }

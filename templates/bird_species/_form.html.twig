@@ -89,8 +89,21 @@
     </div>
   </div> #}
 
-
   <div class="row mb-3">
+    <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+      {{ form_label(form.coverage, 'coverageFor'|trans) }}
+    </div>
+    <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
+      {{ form_widget(form.coverage, {'attr': {'class': 'form-control', 'id': 'coverage_select'}}) }}
+      {{ form_errors(form.coverage) }}
+    </div>
+    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+      <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#coverageModal"> {{ 'add'|trans }}</button>
+    </div>
+  </div>
+
+  {# birdlife_tax_treat #}
+  {# <div class="row mb-3">
       <label for="birdLifeTaxTreat" class="col-sm-3 col-md-3 col-lg-3 col-xl-3 col-form-label">{{ 'birdlife_tax_treat'|trans }}</label>
       <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
           <select id="birdLifeTaxTreatDropdown" name="birdLifeTaxTreatDropdown" class="form-control">
@@ -102,21 +115,51 @@
       <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
           <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#birdLifeTaxTreatModal"> {{ 'add'|trans }}</button>
       </div>
-  </div>
+  </div> #}
 
   <div class="row mb-3">
+    <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+      {{ form_label(form.birdLifeTaxTreat, 'birdlife_tax_treat'|trans) }}
+    </div>
+    <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
+      {{ form_widget(form.birdLifeTaxTreat, {'attr': {'class': 'form-control', 'id': 'birdLifeTaxTreat_select'}}) }}
+      {{ form_errors(form.birdLifeTaxTreat) }}
+    </div>
+    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+      <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#birdLifeTaxTreatModal"> {{ 'add'|trans }}</button>
+    </div>
+  </div>
+  {# <div class="row mb-3">
       <label for="iucnRedListCategory" class="col-sm-3 col-md-3 col-lg-3 col-xl-3 col-form-label">{{ 'iucn_red_list_category'|trans }}</label>
-      <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
-          <select id="iucnRedListCategoryDropdown" name="iucnRedListCategoryDropdown" class="form-control">
+      <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6"> #}
+          {# <select id="iucn_category_select" name="iucnRedListCategoryDropdown" class="form-control">
               {% for option in form.iucnRedListCategory.vars.choices %}
                   <option value="{{ option.value }}">{{ option.label }}</option>
               {% endfor %}
+          </select> #}
+          {# <select id="iucn_category_select" name="iucn_category_select" class="form-control">
+              {% if form.iucnRedListCategory %}
+                <option value="{{ form_widget(form.iucnRedListCategory, {'attr': {'class': 'form-control'}}) }}"></option>
+              {% endif %}
           </select>
       </div>
       <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
           <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#iucnRedListCategoryModal"> {{ 'add'|trans }}</button>
       </div>
+  </div> #}
+  <div class="row mb-3">
+    <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+      {{ form_label(form.iucnRedListCategory, 'iucn_red_list_category'|trans) }}
+    </div>
+    <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
+      {{ form_widget(form.iucnRedListCategory, {'attr': {'class': 'form-control', 'id': 'iucn_category_select'}}) }}
+      {{ form_errors(form.iucnRedListCategory) }}
+    </div>
+    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+      <button type="button" class="btn btn-outline-info btn-sm bi bi-plus-circle-dotted" data-bs-toggle="modal" data-bs-target="#iucnRedListCategoryModal"> {{ 'add'|trans }}</button>
+    </div>
   </div>
+
   
   <div class="row mb-3">
     <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
@@ -191,3 +234,110 @@
   {% import 'macros/btn_actions_macros.html.twig' as macros %}
   {{ macros.action_buttons('app_bird_species_new', 'app_bird_species_show', 'app_bird_species_edit', 'bird_species/_delete_form.html.twig', bird_specy, app.request.attributes.get('_route')) }}
 {{ form_end(form) }}<!-- End General Form Elements -->
+
+
+<!-- Coverage Modal -->
+{# <div class="modal fade" id="coverageModal" tabindex="-1" aria-labelledby="coverageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="coverageModalLabel">Créer une nouvelle Couverture</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="coverageForm">
+                    <div class="mb-3">
+                        {{ form_widget(coverageForm) }}
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{'cancel'|trans }}</button>
+                    <button type="submit" class="btn btn-primary" id="saveCoverage">{{'save'|trans }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> #}
+<div class="modal fade" id="coverageModal" tabindex="-1" aria-labelledby="coverageModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="coverageModalLabel">
+          {{ 'birdSpecies.coverage_title'|trans }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        {{ form_start(coverageForm, { attr: { id: 'coverageForm' } }) }}
+          {{ form_widget(coverageForm) }}
+          <div class="mt-3 d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">{{'cancel'|trans }}</button>
+            <button type="submit" class="btn btn-primary">{{'save'|trans }}</button>
+          </div>
+        {{ form_end(coverageForm) }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- birdLifeTaxTreat Modal -->
+<div class="modal fade" id="birdLifeTaxTreatModal" tabindex="-1" aria-labelledby="birdLifeTaxTreatModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="birdLifeTaxTreatModalLabel">{{'birdSpecies.modal_birdlife_tax_treat_title'|trans }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              {{ form_start(birdLifeTaxTreatForm, { attr: { id: 'birdLifeTaxTreatForm' } }) }}
+                {{ form_widget(birdLifeTaxTreatForm) }}
+                <div class="mt-3 d-flex justify-content-end">
+                  <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">{{'cancel'|trans }}</button>
+                  <button type="submit" class="btn btn-primary">{{'save'|trans }}</button>
+                </div>
+              {{ form_end(birdLifeTaxTreatForm) }}
+            </div>
+        </div> 
+    </div>
+</div>
+
+<!-- iucnRedListCategory Modal -->
+{# <div class="modal fade" id="iucnRedListCategoryModal" tabindex="-1" aria-labelledby="iucnRedListCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="iucnRedListCategoryModalLabel">Créer une nouvelle catégorie de la liste rouge de l'IUCN 2022</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="iucnRedListCategoryForm">
+                    <div class="mb-3">
+                        {{ form_widget(iucnRedListCategoryForm) }}
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{'cancel'|trans }}</button>
+                    <button type="submit" class="btn btn-primary">{{'save'|trans }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> #}
+<div class="modal fade" id="iucnRedListCategoryModal" tabindex="-1" aria-labelledby="iucnRedListCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="iucnRedListCategoryModalLabel">
+          {{ 'birdSpecies.modal_iucn_title'|trans }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        {{ form_start(iucnRedListCategoryForm, { attr: { id: 'iucnRedListCategoryForm' } }) }}
+          {{ form_widget(iucnRedListCategoryForm) }}
+          <div class="mt-3 d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">{{'cancel'|trans }}</button>
+            <button type="submit" class="btn btn-primary">{{'save'|trans }}</button>
+          </div>
+        {{ form_end(iucnRedListCategoryForm) }}
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{{ asset('/js/species.js') }}"></script>

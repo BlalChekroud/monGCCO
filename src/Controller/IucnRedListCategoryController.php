@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ExportType;
 use App\Form\ImportCsvType;
 use App\Service\ExportService;
@@ -205,18 +206,29 @@ class IucnRedListCategoryController extends AbstractController
     public function newAjax(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $iucnRedListCategory = new IucnRedListCategory();
-        $form = $this->createForm(IucnRedListCategoryType::class, $iucnRedListCategory);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
+        $iucnRedListCategoryForm = $this->createForm(IucnRedListCategoryType::class, $iucnRedListCategory);
+        $iucnRedListCategoryForm->handleRequest($request);
+    
+        if ($iucnRedListCategoryForm->isSubmitted() && $iucnRedListCategoryForm->isValid()) {
+            $iucnRedListCategory->setCreatedAt(new \DateTimeImmutable());
             $entityManager->persist($iucnRedListCategory);
             $entityManager->flush();
-
-            return new JsonResponse(['success' => true, 'iucnRedListCategory' => ['id' => $iucnRedListCategory->getId(), 'label' => $iucnRedListCategory->getLabel()]]);
+    
+            return new JsonResponse([
+                'success' => true,
+                'iucnRedListCategory' => [
+                    'id' => $iucnRedListCategory->getId(),
+                    'label' => $iucnRedListCategory->getLabel()
+                ]
+            ]);
         }
-
-        return new JsonResponse(['success' => false, 'errors' => (string) $form->getErrors(true, false)]);
+    
+        return new JsonResponse([
+            'success' => false,
+            'errors' => (string) $iucnRedListCategoryForm->getErrors(true, false)
+        ]);
     }
+    
     
     #[Route('/list', name: 'app_iucn_red_list_category_list', methods: ['GET'])]
     public function list(EntityManagerInterface $entityManager): JsonResponse
@@ -244,7 +256,7 @@ class IucnRedListCategoryController extends AbstractController
                     $iucnRedListCategory->setCreatedAt(new \DateTimeImmutable());
                     $entityManager->persist($iucnRedListCategory);
                     $entityManager->flush();
-                    $this->addFlash('success', $this->translator->trans('iucn_red_list_category.msg.created_success'));
+                    $this->addFlash('success', $this->translator->trans('iucn.msg.created_success'));
 
                     return $this->redirectToRoute('app_iucn_red_list_category_index', [], Response::HTTP_SEE_OTHER);
                 } catch (\Exception $e) {
@@ -252,7 +264,7 @@ class IucnRedListCategoryController extends AbstractController
                     return $this->redirectToRoute('app_iucn_red_list_category_new', [], Response::HTTP_SEE_OTHER);
                 }
             } else {
-                $this->addFlash('error', $this->translator->trans('iucn_red_list_category.msg.created_error'));
+                $this->addFlash('error', $this->translator->trans('iucn.msg.created_error'));
             }
         }
 
@@ -280,7 +292,7 @@ class IucnRedListCategoryController extends AbstractController
                     $this->addFlash('error', $e->getMessage());
                     return $this->redirectToRoute('app_iucn_red_list_category_edit', ['id' => $iucnRedListCategory->getId()], Response::HTTP_SEE_OTHER);}
             } else {
-                $this->addFlash('error', $this->translator->trans('iucn_red_list_category.msg.updated_error'));
+                $this->addFlash('error', $this->translator->trans('iucn.msg.updated_error'));
             }
         }
 
@@ -293,11 +305,15 @@ class IucnRedListCategoryController extends AbstractController
     #[Route('/{id}', name: 'app_iucn_red_list_category_delete', methods: ['POST'])]
     public function delete(Request $request, IucnRedListCategory $iucnRedListCategory, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$iucnRedListCategory->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($iucnRedListCategory);
-            $entityManager->flush();
+        
+        try {
+            if ($this->isCsrfTokenValid('delete'.$iucnRedListCategory->getId(), $request->getPayload()->get('_token'))) {
+                $entityManager->remove($iucnRedListCategory);
+                $entityManager->flush();
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
-
         return $this->redirectToRoute('app_iucn_red_list_category_index', [], Response::HTTP_SEE_OTHER);
     }
 }

@@ -1,176 +1,940 @@
 <!-- <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulaire hors ligne</title>
-    <script src="/js/db.js" defer></script>
-    <script src="/js/form-handler.js" defer></script>
-    <script src="/js/sync.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouvelle collecte (hors ligne)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body>
-    <form>
-        <label for="siteCollection">Site :</label>
-        <input type="text" id="siteCollection" name="siteCollection" required><br>
+<body class="p-4 bg-light">
+  <div class="container">
+    <h2 class="mb-4">Nouvelle collecte (hors ligne)</h2>
 
-        <label for="weatherEffect">Effet météo :</label>
-        <input type="text" id="weatherEffect" name="weatherEffect" required><br>
-
-        <label for="waterState">État de l'eau :</label>
-        <input type="text" id="waterState" name="waterState" required><br>
-
-        <label for="quality">Qualité :</label>
-        <input type="text" id="quality" name="quality" required><br>
-
-        <label for="method">Méthode :</label>
-        <input type="text" id="method" name="method" required><br>
-
-        <div class="specy-group">
-            <label>Espèce :</label>
-            <input type="text" class="specy" required>
-            <label>Nombre :</label>
-            <input type="number" class="count" required>
+    <form id="offline-form">
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <label for="countType" class="form-label">Type de comptage</label>
+          <input type="text" id="countType" name="countType" class="form-control shadow-sm rounded" required>
         </div>
-        
-        <button type="submit">Soumettre</button>
+        <div class="col-md-6 mb-4">
+          <label for="quality" class="form-label">Qualité</label>
+          <input type="number" id="quality" name="quality" class="form-control shadow-sm rounded" min="0" required>
+        </div>
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="method" class="form-label">Méthode</label>
+        <input type="text" id="method" name="method" class="form-control shadow-sm rounded" required>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label class="form-label">Espèces observées</label>
+            <div id="birdSpeciesCountsContainer"></div>
+          </div>
+        </div>
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <button type="button" class="btn btn-sm btn-primary rounded-pill shadow-sm add-item">
+              <i class="bi bi-twitter me-2"></i> Ajouter une espèce
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">Soumettre</button>
+        <button type="reset" class="btn btn-secondary">Réinitialiser</button>
+      </div>
     </form>
+  </div>
+
+  <script>
+    const DB_NAME = "WingWatchDB";
+    const STORE = "collects";
+    const SYNC_TAG = "sync-collects";
+    const container = document.getElementById("birdSpeciesCountsContainer");
+    const addButton = document.querySelector(".add-item");
+    let index = 0;
+
+    // Ouvrir IndexedDB
+    async function openDb() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(STORE)) {
+            db.createObjectStore(STORE, { keyPath: "id", autoIncrement: true });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function putItem(record) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, "readwrite");
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.objectStore(STORE).add(record);
+      });
+    }
+
+    // Ajouter une ligne d’espèce
+    function addBirdSpeciesRow() {
+      const row = document.createElement("div");
+      row.classList.add("row", "mb-3", "birdSpeciesCountsContainer-item");
+      row.innerHTML = `
+        <div class="col-sm-5">
+          <input type="text" name="birdSpeciesCounts[${index}][birdSpecies]" class="form-control shadow-sm" placeholder="Espèce" required>
+        </div>
+        <div class="col-sm-3">
+          <div class="input-group">
+            <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-${index}">-</button>
+            <input type="number" id="count-${index}" name="birdSpeciesCounts[${index}][count]" value="0" class="form-control text-center">
+            <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-${index}">+</button>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-danger remove-birdSpeciesCount">🗑</button>
+        </div>
+      `;
+      container.appendChild(row);
+
+      // Gérer les boutons +/–
+      row.querySelector(".increaseButton").addEventListener("click", () => {
+        const input = row.querySelector(`#count-${index}`);
+        input.value = parseInt(input.value) + 1;
+      });
+      row.querySelector(".decreaseButton").addEventListener("click", () => {
+        const input = row.querySelector(`#count-${index}`);
+        input.value = Math.max(0, parseInt(input.value) - 1);
+      });
+
+      // Supprimer la ligne
+      row.querySelector(".remove-birdSpeciesCount").addEventListener("click", () => row.remove());
+
+      index++;
+    }
+
+    addButton.addEventListener("click", addBirdSpeciesRow);
+    addBirdSpeciesRow(); // Ajouter une première ligne par défaut
+
+    // Sérialiser le formulaire
+    function serializeForm(form) {
+      const birdSpeciesCounts = [];
+      form.querySelectorAll(".birdSpeciesCountsContainer-item").forEach(row => {
+        const birdSpecies = row.querySelector("input[name*='[birdSpecies]']").value;
+        const count = parseInt(row.querySelector("input[name*='[count]']").value || "0", 10);
+        if (birdSpecies && count > 0) {
+          birdSpeciesCounts.push({ birdSpecies, count });
+        }
+      });
+
+      return {
+        countType: form.countType.value,
+        quality: form.quality.value,
+        method: form.method.value,
+        birdSpeciesCounts,
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    // Soumission → IndexedDB
+    document.getElementById("offline-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = serializeForm(e.target);
+      await putItem({ payload, csrfToken: "" });
+
+      alert("📦 Collecte sauvegardée hors ligne. Elle sera envoyée automatiquement quand vous serez en ligne.");
+      e.target.reset();
+
+      // Déclencher la sync si supportée
+      if ("serviceWorker" in navigator && "SyncManager" in window) {
+        const reg = await navigator.serviceWorker.ready;
+        await reg.sync.register(SYNC_TAG);
+      }
+    });
+  </script>
 </body>
 </html> -->
+
+
+<!-- <!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouvelle collecte (hors ligne)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="p-4 bg-light">
+  <div class="container">
+    <h2 class="mb-4">Nouvelle collecte (hors ligne)</h2>
+
+    <form id="offline-form">
+
+      <div class="mb-3">
+        <label for="campaignId" class="form-label">Campagne</label>
+        <select id="campaignId" name="campaignId" class="form-select shadow-sm rounded" required>
+          <option value="">-- Choisir une campagne --</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="siteId" class="form-label">Site</label>
+        <select id="siteId" name="siteId" class="form-select shadow-sm rounded" required>
+          <option value="">-- Choisir un site --</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <label for="countType" class="form-label">Type de comptage</label>
+          <input type="text" id="countType" name="countType" class="form-control shadow-sm rounded" required>
+        </div>
+        <div class="col-md-6 mb-4">
+          <label for="quality" class="form-label">Qualité</label>
+          <input type="number" id="quality" name="quality" class="form-control shadow-sm rounded" min="0" required>
+        </div>
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="method" class="form-label">Méthode</label>
+        <input type="text" id="method" name="method" class="form-control shadow-sm rounded" required>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label class="form-label">Espèces observées</label>
+            <div id="birdSpeciesCountsContainer"></div>
+          </div>
+        </div>
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <button type="button" class="btn btn-sm btn-primary rounded-pill shadow-sm add-item">
+              <i class="bi bi-twitter me-2"></i> Ajouter une espèce
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">Soumettre</button>
+        <button type="reset" class="btn btn-secondary">Réinitialiser</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const DB_NAME = "WingWatchDB";
+    const STORE = "collects";
+    const SYNC_TAG = "sync-collects";
+    const container = document.getElementById("birdSpeciesCountsContainer");
+    const addButton = document.querySelector(".add-item");
+    let index = 0;
+
+    // Ouvrir IndexedDB
+    async function openDb() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(STORE)) {
+            db.createObjectStore(STORE, { keyPath: "id", autoIncrement: true });
+          }
+          if (!db.objectStoreNames.contains("metadata")) {
+            db.createObjectStore("metadata", { keyPath: "key" }); // pour campagnes/sites/espèces
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function putItem(record) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, "readwrite");
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.objectStore(STORE).add(record);
+      });
+    }
+
+    async function getMetadata(key) {
+      const db = await openDb();
+      return new Promise((resolve) => {
+        const tx = db.transaction("metadata", "readonly");
+        const req = tx.objectStore("metadata").get(key);
+        req.onsuccess = () => resolve(req.result?.value || []);
+      });
+    }
+
+    // Charger campagnes/sites/espèces dans les <select>
+    async function populateSelects() {
+      const campaigns = await getMetadata("campaigns");
+      const sites = await getMetadata("sites");
+      const species = await getMetadata("species");
+
+      const campaignSelect = document.getElementById("campaignId");
+      campaigns.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.id;
+        opt.textContent = c.name;
+        campaignSelect.appendChild(opt);
+      });
+
+      const siteSelect = document.getElementById("siteId");
+      sites.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = s.name;
+        siteSelect.appendChild(opt);
+      });
+
+      // Sauvegarder la liste des espèces pour addBirdSpeciesRow()
+      window.cachedSpecies = species;
+    }
+
+    // Ajouter une ligne espèce avec dropdown
+    function addBirdSpeciesRow() {
+      const row = document.createElement("div");
+      row.classList.add("row", "mb-3", "birdSpeciesCountsContainer-item");
+
+      let speciesOptions = `<option value="">-- Espèce --</option>`;
+      (window.cachedSpecies || []).forEach(sp => {
+        speciesOptions += `<option value="${sp.id}">${sp.name}</option>`;
+      });
+
+      row.innerHTML = `
+        <div class="col-sm-5">
+          <select name="birdSpeciesCounts[${index}][birdSpeciesId]" class="form-select shadow-sm" required>
+            ${speciesOptions}
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <div class="input-group">
+            <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-${index}">-</button>
+            <input type="number" id="count-${index}" name="birdSpeciesCounts[${index}][count]" value="0" class="form-control text-center">
+            <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-${index}">+</button>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-danger remove-birdSpeciesCount">🗑</button>
+        </div>
+      `;
+      container.appendChild(row);
+
+      // Gérer +/–
+      row.querySelector(".increaseButton").addEventListener("click", () => {
+        const input = row.querySelector(`#count-${index}`);
+        input.value = parseInt(input.value) + 1;
+      });
+      row.querySelector(".decreaseButton").addEventListener("click", () => {
+        const input = row.querySelector(`#count-${index}`);
+        input.value = Math.max(0, parseInt(input.value) - 1);
+      });
+
+      // Supprimer la ligne
+      row.querySelector(".remove-birdSpeciesCount").addEventListener("click", () => row.remove());
+
+      index++;
+    }
+
+    addButton.addEventListener("click", addBirdSpeciesRow);
+
+    // Sérialiser formulaire
+    function serializeForm(form) {
+      const birdSpeciesCounts = [];
+      form.querySelectorAll(".birdSpeciesCountsContainer-item").forEach(row => {
+        const birdSpeciesId = row.querySelector("select").value;
+        const count = parseInt(row.querySelector("input[type=number]").value || "0", 10);
+        if (birdSpeciesId && count > 0) {
+          birdSpeciesCounts.push({ birdSpeciesId, count });
+        }
+      });
+
+      return {
+        campaignId: form.campaignId.value,
+        siteId: form.siteId.value,
+        countType: form.countType.value,
+        quality: form.quality.value,
+        method: form.method.value,
+        birdSpeciesCounts,
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    // Soumission → IndexedDB
+    document.getElementById("offline-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = serializeForm(e.target);
+      await putItem({ payload, csrfToken: "" });
+
+      alert("📦 Collecte sauvegardée hors ligne. Elle sera envoyée automatiquement quand vous serez en ligne.");
+      e.target.reset();
+
+      if ("serviceWorker" in navigator && "SyncManager" in window) {
+        const reg = await navigator.serviceWorker.ready;
+        await reg.sync.register(SYNC_TAG);
+      }
+    });
+
+    // Charger données au démarrage
+    document.addEventListener("DOMContentLoaded", populateSelects);
+  </script>
+</body>
+</html> -->
+
+
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vous êtes hors ligne</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-            background-color: #f4f4f9;
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            color: #666;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouvelle collecte (hors ligne)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    #status-banner {
+      text-align: center;
+      padding: 8px;
+      font-weight: bold;
+    }
+    #status-banner.online {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    #status-banner.offline {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  </style>
 </head>
-<body>
-    <h1>Vous êtes hors ligne</h1>
-    <p>Impossible de charger le contenu. Veuillez vérifier votre connexion Internet.</p>
-    
-    <div class="card mx-auto" style="max-width: 800px;">
-        <div class="card-body">
-            <h5 class="card-title mb-4">Informations sur les conditions environnementales</h5>
+<body class="p-4 bg-light">
 
-            <form class="row g-3">
-                
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="siteCollection" placeholder="Site">
-                        <label for="siteCollection">Site de collecte</label>
-                    </div>
-                </div>
-                <div class="col-md-5">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="weatherEffect" placeholder="Weather">
-                        <label for="weatherEffect">Effets des conditions météorologiques</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="waterState" placeholder="Water">
-                        <label for="waterState">État des eaux</label>
-                    </div>
-                </div>
+  <!-- Bandeau status -->
+  <div id="status-banner" class="online">⚠️ Vous êtes hors ligne</div>
 
-                <h5 class="mt-4">Informations sur la nouvelle collection</h5>
-                <div class="col-md-3">
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="quality" placeholder="Qualité">
-                        <label for="quality">Qualité</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="method" placeholder="Méthode">
-                        <label for="method">Méthode(s) utilisées</label>
-                    </div>
-                </div>
+  <div class="container">
+    <h2 class="mb-4">Nouvelle collecte (hors ligne)</h2>
 
-                <div class="container my-4">
-                    <h6>Espèces observées</h6>
-                    <div id="speciesContainer" class="mb-3">
+    <form id="offline-form">
 
-                        <div class="row mb-3 specy-group">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control specy" id="birdName" placeholder="Nom ou Code d'oiseau">
-                                    <label for="birdName">Code ou Nom d'oiseau</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    <input type="number" class="form-control count" id="birdCount" placeholder="Nombre">
-                                    <label for="birdCount">Nombre</label>
-                                </div>
-                            </div>
-                            <div class="col-md-2 d-flex align-items-center">
-                                <button class="btn btn-danger btn-remove" type="button">Supprimer</button>
-                            </div>
-                        </div>
-                    </div>
-                    <button id="addSpecyBtn" class="btn btn-primary" type="button">Ajouter une espèce</button>
-                </div>
+      <!-- Sélection Campagne -->
+      <div class="mb-3">
+        <label for="campaignId" class="form-label">Campagne</label>
+        <select id="campaignId" name="campaignId" class="form-select shadow-sm rounded" required>
+          <option value="">-- Choisir une campagne --</option>
+        </select>
+      </div>
 
-                <div class="text-center">
-                    <button type="submit" class="btn btn-primary">Soumettre</button>
-                    <button type="reset" class="btn btn-secondary">Réinitialiser</button>
-                </div>
-            </form>
+      <!-- Sélection Site -->
+      <div class="mb-3">
+        <label for="siteId" class="form-label">Site</label>
+        <select id="siteId" name="siteId" class="form-select shadow-sm rounded" required>
+          <option value="">-- Choisir un site --</option>
+        </select>
+      </div>
+
+      <!-- Type / Qualité -->
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <label for="countType" class="form-label">Type de comptage</label>
+          <select id="countType" name="countType" class="form-select shadow-sm rounded" required>
+            <option value="">-- Choisir --</option>
+          </select>
         </div>
-    </div>
+        <div class="col-md-6 mb-4">
+          <label for="quality" class="form-label">Qualité</label>
+          <select id="quality" name="quality" class="form-select shadow-sm rounded" required>
+            <option value="">-- Choisir --</option>
+          </select>
+        </div>
+      </div>
 
-    <script>
-        document.getElementById("addSpecyBtn").addEventListener("click", function () {
-            const container = document.getElementById("speciesContainer");
+      <!-- Méthode -->
+      <div class="form-group mb-4">
+        <label for="method" class="form-label">Méthode</label>
+        <select id="method" name="method" class="form-select shadow-sm rounded" required>
+          <option value="">-- Choisir --</option>
+        </select>
+      </div>
 
-            const newGroup = document.createElement("div");
-            newGroup.className = "row mb-3 specy-group";
-            newGroup.innerHTML = `
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input type="text" class="form-control specy" placeholder="Nom ou Code d'oiseau">
-                        <label>Code ou Nom d'oiseau</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating">
-                        <input type="number" class="form-control count" placeholder="Nombre">
-                        <label>Nombre</label>
-                    </div>
-                </div>
-                <div class="col-md-2 d-flex align-items-center">
-                    <button class="btn btn-danger btn-remove" type="button">Supprimer</button>
-                </div>
-            `;
+      <!-- Espèces -->
+      <div class="container">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label class="form-label">Espèces observées</label>
+            <div id="birdSpeciesCountsContainer"></div>
+          </div>
+        </div>
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <button type="button" class="btn btn-sm btn-primary rounded-pill shadow-sm add-item">
+              ➕ Ajouter une espèce
+            </button>
+          </div>
+        </div>
+      </div>
 
-            container.appendChild(newGroup);
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">Soumettre</button>
+        <button type="reset" class="btn btn-secondary">Réinitialiser</button>
+      </div>
+    </form>
+  </div>
 
-            newGroup.querySelector(".btn-remove").addEventListener("click", function () {
-                newGroup.remove();
-            });
+  <!-- <script>
+    const DB_NAME = "WingWatchDB";
+    const STORE = "collects";
+    const SYNC_TAG = "sync-collects";
+    const container = document.getElementById("birdSpeciesCountsContainer");
+    const addButton = document.querySelector(".add-item");
+    let index = 0;
+
+    // --- Banner dynamique online/offline ---
+    function updateStatusBanner() {
+      const banner = document.getElementById("status-banner");
+      if (navigator.onLine) {
+        banner.textContent = "✅ Vous êtes en ligne";
+        banner.className = "online";
+      } else {
+        banner.textContent = "⚠️ Vous êtes hors ligne";
+        banner.className = "offline";
+      }
+    }
+    window.addEventListener("online", updateStatusBanner);
+    window.addEventListener("offline", updateStatusBanner);
+    updateStatusBanner();
+
+    // --- IndexedDB ---
+    async function openDb() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(STORE)) {
+            db.createObjectStore(STORE, { keyPath: "id", autoIncrement: true });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function putItem(record) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, "readwrite");
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.objectStore(STORE).add(record);
+      });
+    }
+
+    // Charger metadata
+    async function fetchAndFill(url) {
+      try {
+        const res = await fetch(url);
+        return await res.json();
+      } catch (e) {
+        console.warn("⚠️ Impossible de charger", url, e);
+        return [];
+      }
+    }
+
+    async function populateSelects() {
+      // Campagnes
+      const campaigns = await fetchAndFill("/api/metadata/campaigns");
+      const campaignSelect = document.getElementById("campaignId");
+      campaignSelect.innerHTML = '<option value="">-- Choisir une campagne --</option>';
+      campaigns.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.id;
+        opt.textContent = c.campaignName;
+        opt.dataset.sites = JSON.stringify(c.sites);
+        campaignSelect.appendChild(opt);
+      });
+
+      // Espèces
+      const species = await fetchAndFill("/api/metadata/species");
+      window.cachedSpecies = species;
+
+      // Types
+      const countTypes = await fetchAndFill("/api/metadata/countType");
+      const ctSelect = document.getElementById("countType");
+      ctSelect.innerHTML = '<option value="">-- Choisir --</option>';
+      countTypes.forEach(ct => {
+        const opt = document.createElement("option");
+        opt.value = ct.id;
+        opt.textContent = ct.label;
+        ctSelect.appendChild(opt);
+      });
+
+      // Qualités
+      const qualities = await fetchAndFill("/api/metadata/quality");
+      const qSelect = document.getElementById("quality");
+      qSelect.innerHTML = '<option value="">-- Choisir --</option>';
+      qualities.forEach(q => {
+        const opt = document.createElement("option");
+        opt.value = q.id;
+        opt.textContent = q.label;
+        qSelect.appendChild(opt);
+      });
+
+      // Méthodes
+      const methods = await fetchAndFill("/api/metadata/method");
+      const mSelect = document.getElementById("method");
+      mSelect.innerHTML = '<option value="">-- Choisir --</option>';
+      methods.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m.id;
+        opt.textContent = m.label;
+        mSelect.appendChild(opt);
+      });
+    }
+
+    // Quand on change de campagne -> maj des sites
+    document.getElementById("campaignId").addEventListener("change", (e) => {
+      const selected = e.target.selectedOptions[0];
+      const sites = selected ? JSON.parse(selected.dataset.sites || "[]") : [];
+      const siteSelect = document.getElementById("siteId");
+      siteSelect.innerHTML = '<option value="">-- Choisir un site --</option>';
+      sites.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = s.siteName;
+        siteSelect.appendChild(opt);
+      });
+    });
+
+    // Espèces observées
+    function addBirdSpeciesRow() {
+      const row = document.createElement("div");
+      row.classList.add("row", "mb-3", "birdSpeciesCountsContainer-item");
+
+      let speciesOptions = `<option value="">-- Espèce --</option>`;
+      (window.cachedSpecies || []).forEach(sp => {
+        speciesOptions += `<option value="${sp.id}">${sp.frenchName} (${sp.scientificName})</option>`;
+      });
+
+      row.innerHTML = `
+        <div class="col-sm-5">
+          <select name="birdSpeciesCounts[${index}][birdSpeciesId]" class="form-select shadow-sm" required>
+            ${speciesOptions}
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <div class="input-group">
+            <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-${index}">-</button>
+            <input type="number" id="count-${index}" name="birdSpeciesCounts[${index}][count]" value="0" class="form-control text-center">
+            <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-${index}">+</button>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-danger remove-birdSpeciesCount">🗑</button>
+        </div>
+      `;
+      container.appendChild(row);
+
+      row.querySelector(".increaseButton").addEventListener("click", () => {
+        const input = row.querySelector(`#count-${index}`);
+        input.value = parseInt(input.value) + 1;
+      });
+      row.querySelector(".decreaseButton").addEventListener("click", () => {
+        const input = row.querySelector(`#count-${index}`);
+        input.value = Math.max(0, parseInt(input.value) - 1);
+      });
+      row.querySelector(".remove-birdSpeciesCount").addEventListener("click", () => row.remove());
+
+      index++;
+    }
+
+    addButton.addEventListener("click", addBirdSpeciesRow);
+
+    // Serialize form
+    function serializeForm(form) {
+      const birdSpeciesCounts = [];
+      form.querySelectorAll(".birdSpeciesCountsContainer-item").forEach(row => {
+        const birdSpeciesId = row.querySelector("select").value;
+        const count = parseInt(row.querySelector("input[type=number]").value || "0", 10);
+        if (birdSpeciesId && count > 0) {
+          birdSpeciesCounts.push({ birdSpeciesId, count });
+        }
+      });
+
+      return {
+        campaignId: form.campaignId.value,
+        siteId: form.siteId.value,
+        countType: form.countType.value,
+        quality: form.quality.value,
+        method: form.method.value,
+        birdSpeciesCounts,
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    // Submit
+    document.getElementById("offline-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = serializeForm(e.target);
+      await putItem({ payload });
+
+      alert("📦 Collecte sauvegardée hors ligne. Elle sera envoyée automatiquement quand vous serez en ligne.");
+      e.target.reset();
+
+      if ("serviceWorker" in navigator && "SyncManager" in window) {
+        const reg = await navigator.serviceWorker.ready;
+        await reg.sync.register(SYNC_TAG);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", populateSelects);
+  </script> -->
+
+  <script>
+    const DB_NAME = "wingwatch-db";
+    const COLLECTS_STORE = "collects";
+    const METADATA_STORE = "metadata";
+    const SYNC_TAG = "sync-collects";
+    const container = document.getElementById("birdSpeciesCountsContainer");
+    const addButton = document.querySelector(".add-item");
+    let index = 0;
+  
+    // --- Banner dynamique online/offline ---
+    function updateStatusBanner() {
+      const banner = document.getElementById("status-banner");
+      if (navigator.onLine) {
+        banner.textContent = "✅ Vous êtes en ligne";
+        banner.className = "online";
+      } else {
+        banner.textContent = "⚠️ Vous êtes hors ligne";
+        banner.className = "offline";
+      }
+    }
+    window.addEventListener("online", updateStatusBanner);
+    window.addEventListener("offline", updateStatusBanner);
+    updateStatusBanner();
+  
+    // --- IndexedDB ---
+    async function openDb() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(COLLECTS_STORE)) {
+            db.createObjectStore(COLLECTS_STORE, { keyPath: "id", autoIncrement: true });
+          }
+          if (!db.objectStoreNames.contains(METADATA_STORE)) {
+            db.createObjectStore(METADATA_STORE, { keyPath: "url" });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+  
+    async function putCollect(record) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(COLLECTS_STORE, "readwrite");
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.objectStore(COLLECTS_STORE).add(record);
+      });
+    }
+  
+    async function getMetadata(url) {
+      const db = await openDb();
+      const tx = db.transaction(METADATA_STORE, "readonly");
+      const store = tx.objectStore(METADATA_STORE);
+      return new Promise((resolve) => {
+        const req = store.get(url);
+        req.onsuccess = () => resolve(req.result ? req.result.data : []);
+        req.onerror = () => resolve([]);
+      });
+    }
+  
+    // Charger metadata (SWR : cache IndexedDB si offline, fetch sinon)
+    async function fetchAndFill(url, targetSelect, labelField = "label", valueField = "id") {
+      let data = [];
+      try {
+        const res = await fetch(url);
+        data = await res.json();
+      } catch (e) {
+        console.warn("⚠️ Offline, lecture depuis IndexedDB pour", url);
+        data = await getMetadata(url);
+      }
+  
+      // remplir le select
+      targetSelect.innerHTML = `<option value="">-- Choisir --</option>`;
+      data.forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item[valueField];
+        opt.textContent = item[labelField];
+        targetSelect.appendChild(opt);
+      });
+  
+      return data;
+    }
+  
+    async function populateSelects() {
+      // Campagnes
+      const campaigns = await fetchAndFill(
+        "/api/metadata/campaigns",
+        document.getElementById("campaignId"),
+        "campaignName",
+        "id"
+      );
+      const campaignSelect = document.getElementById("campaignId");
+      campaignSelect.querySelectorAll("option").forEach((opt, i) => {
+        if (i > 0) opt.dataset.sites = JSON.stringify(campaigns[i - 1].sites || []);
+      });
+  
+      // Espèces
+      window.cachedSpecies = await fetchAndFill(
+        "/api/metadata/species",
+        document.createElement("select"),
+        "scientificName",
+        "frenchName",
+        "id"
+      );
+  
+      // Types
+      await fetchAndFill("/api/metadata/countType", document.getElementById("countType"));
+  
+      // Qualités
+      await fetchAndFill("/api/metadata/quality", document.getElementById("quality"));
+  
+      // Méthodes
+      await fetchAndFill("/api/metadata/method", document.getElementById("method"));
+    }
+  
+    // Quand on change de campagne -> maj des sites
+    document.getElementById("campaignId").addEventListener("change", (e) => {
+      const selected = e.target.selectedOptions[0];
+      const sites = selected ? JSON.parse(selected.dataset.sites || "[]") : [];
+      const siteSelect = document.getElementById("siteId");
+      siteSelect.innerHTML = '<option value="">-- Choisir un site --</option>';
+      sites.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = s.siteName;
+        siteSelect.appendChild(opt);
+      });
+    });
+  
+    // Espèces observées
+    function addBirdSpeciesRow() {
+      const row = document.createElement("div");
+      row.classList.add("row", "mb-3", "birdSpeciesCountsContainer-item");
+  
+      let speciesOptions = `<option value="">-- Espèce --</option>`;
+      (window.cachedSpecies || []).forEach(sp => {
+        speciesOptions += `<option value="${sp.id}">${sp.scientificName} (${sp.frenchName})</option>`;
+      });
+  
+      row.innerHTML = `
+        <div class="col-sm-5">
+          <select name="birdSpeciesCounts[${index}][birdSpeciesId]" class="form-select shadow-sm" required>
+            ${speciesOptions}
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <div class="input-group">
+            <button type="button" class="btn btn-outline-secondary decreaseButton" data-target="count-${index}">-</button>
+            <input type="number" id="count-${index}" name="birdSpeciesCounts[${index}][count]" value="0" class="form-control text-center">
+            <button type="button" class="btn btn-outline-secondary increaseButton" data-target="count-${index}">+</button>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-danger remove-birdSpeciesCount">🗑</button>
+        </div>
+      `;
+      container.appendChild(row);
+  
+      row.querySelector(".increaseButton").addEventListener("click", () => {
+        const input = row.querySelector(`#count-${index}`);
+        input.value = parseInt(input.value) + 1;
+      });
+      row.querySelector(".decreaseButton").addEventListener("click", () => {
+        const input = row.querySelector(`#count-${index}`);
+        input.value = Math.max(0, parseInt(input.value) - 1);
+      });
+      row.querySelector(".remove-birdSpeciesCount").addEventListener("click", () => row.remove());
+  
+      index++;
+    }
+    addButton.addEventListener("click", addBirdSpeciesRow);
+  
+  // 📌 Fonction pour formater une date en 'd-m-Y H:i:s'
+  function formatDate(date) {
+    const pad = (n) => n.toString().padStart(2, "0");
+    return (
+      pad(date.getDate()) + "-" +
+      pad(date.getMonth() + 1) + "-" +
+      date.getFullYear() + " " +
+      pad(date.getHours()) + ":" +
+      pad(date.getMinutes()) + ":" +
+      pad(date.getSeconds())
+    );
+  }
+
+  // Serialize form
+  function serializeForm(form) {
+    const birdSpeciesCounts = [];
+    form.querySelectorAll(".birdSpeciesCountsContainer-item").forEach(row => {
+      const birdSpeciesId = row.querySelector("select").value;
+      const count = parseInt(row.querySelector("input[type=number]").value || "0", 10);
+      if (birdSpeciesId && count > 0) {
+        birdSpeciesCounts.push({ birdSpeciesId, count });
+      }
+    });
+
+    return {
+      campaignId: form.campaignId.value,
+      siteId: form.siteId.value,
+      countType: form.countType.value,
+      quality: form.quality.value,
+      method: form.method.value,
+      birdSpeciesCounts,
+      createdAt: formatDate(new Date()) // ⬅️ format d-m-Y H:i:s
+    };
+  }
+
+  
+    // Submit
+    document.getElementById("offline-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = serializeForm(e.target);
+  
+      await putCollect({ payload });
+  
+      // informer le SW pour synchronisation
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: "ADD_COLLECT",
+          collect: payload
         });
-
-        document.querySelectorAll(".btn-remove").forEach((button) => {
-            button.addEventListener("click", function () {
-                button.closest(".specy-group").remove();
-            });
-        });
-    </script>
+      }
+  
+      alert("📦 Collecte sauvegardée hors ligne. Elle sera envoyée automatiquement quand vous serez en ligne.");
+      e.target.reset();
+  
+      if ("serviceWorker" in navigator && "SyncManager" in window) {
+        const reg = await navigator.serviceWorker.ready;
+        await reg.sync.register(SYNC_TAG);
+      }
+    });
+  
+    document.addEventListener("DOMContentLoaded", populateSelects);
+  </script>
+  
 </body>
 </html>

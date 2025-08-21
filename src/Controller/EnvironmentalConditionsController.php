@@ -223,21 +223,20 @@ class EnvironmentalConditionsController extends AbstractController
     #[Route('/{id}', name: 'app_environmental_conditions_delete', methods: ['POST'])]
     public function delete(Request $request, EnvironmentalConditions $environmentalCondition, EntityManagerInterface $entityManager): Response
     {
-        if ($this->getUser() !== $environmentalCondition->getUser() && !$this->isGranted('ROLE_DELETE')){
-            $this->addFlash('error', $this->translator->trans('delete_permission'));
-            return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
-        }
-        if ($this->isCsrfTokenValid('delete'.$environmentalCondition->getId(), $request->getPayload()->get('_token'))) {
-            try {
-                $entityManager->remove($environmentalCondition);
-                $entityManager->flush();
-                $this->addFlash('success', $this->translator->trans('condition.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
+        try {
+            if ($this->getUser() !== $environmentalCondition->getUser() && !$this->isGranted('ROLE_DELETE')){
+                $this->addFlash('error', $this->translator->trans('delete_permission'));
                 return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);
             }
-        } else {
-            $this->addFlash('error',$this->translator->trans('condition.msg.deleted_error'));
+            if ($this->isCsrfTokenValid('delete'.$environmentalCondition->getId(), $request->getPayload()->get('_token'))) {
+                    $entityManager->remove($environmentalCondition);
+                    $entityManager->flush();
+                    $this->addFlash('success', $this->translator->trans('condition.msg.deleted_success'));
+            } else {
+                $this->addFlash('error',$this->translator->trans('condition.msg.deleted_error'));
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_environmental_conditions_index', [], Response::HTTP_SEE_OTHER);

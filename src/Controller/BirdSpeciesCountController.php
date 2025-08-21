@@ -75,11 +75,14 @@ class BirdSpeciesCountController extends AbstractController
     #[Route('/{id}', name: 'app_bird_species_count_delete', methods: ['POST'])]
     public function delete(Request $request, BirdSpeciesCount $birdSpeciesCount, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$birdSpeciesCount->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($birdSpeciesCount);
-            $entityManager->flush();
+        try {
+            if ($this->isCsrfTokenValid('delete'.$birdSpeciesCount->getId(), $request->getPayload()->get('_token'))) {
+                $entityManager->remove($birdSpeciesCount);
+                $entityManager->flush();
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
-
         return $this->redirectToRoute('app_bird_species_count_index', [], Response::HTTP_SEE_OTHER);
     }
 }

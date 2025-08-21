@@ -342,6 +342,7 @@ birdSpecies:
   informations: "New bird species information"
   return: "Back to bird species overview"
   consult: "View species"
+  coverage_title: "Create a new coverage for a bird species"
   modal_birdlife_tax_treat_title: "Create a new BirdLife Taxonomic Treatment"
   modal_iucn_title: "Create a new IUCN Red List Category"
   scientific_name: "Scientific Name"
@@ -838,6 +839,11 @@ notification:
   new_message: "new message(s)"
   unread_notifications: "Unread Notifications"
   mark_as_seen: "Mark as Seen"
+  delete: "Delete Notification"
+  delete_all: "Delete All Notifications"
+  msg:
+    deleted_success: "The notification has been successfully deleted"
+    deleted_error: "An error occurred while deleting the notification"
 
 collectQuality:
   title: "Data Collection Quality Management"

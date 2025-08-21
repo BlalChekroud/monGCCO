@@ -1,3 +1,246 @@
+{# {% extends 'base.html.twig' %}
+
+{% block title %}{{ 'breadcrumb_home'|trans }}{% endblock %}
+
+{% block body %}
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>{{ 'home_page'|trans }}</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active">
+            <a href="{{ path('home') }}"><i class="ri-home-4-line"></i> {{ 'breadcrumb_home'|trans }}</a>
+          </li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    {% if campaigns %}
+    <section class="section dashboard">
+      <div class="row">
+
+        <!-- Sélecteur de Campagne -->
+        <div class="col-xxl-4 col-md-4">
+          <div class="card info-card sales-card">
+            <div class="card-body">
+              <h5 class="card-title">{{'campaign.select_campaign'|trans }} :</h5>
+              <div class="d-flex align-items-center">
+                <div class="ps-3">
+                  <div class="form-group">
+                    <select id="campaignSelector" name="campaign_id" class="form-control">
+                      {% for campaign in campaigns|reverse %}
+                        <option value="{{ campaign.id }}" {% if campaign.id == recentCampaign.id %}selected{% endif %}>
+                          {{ campaign.campaignName ?? ''}}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <span class="explanation">({{ recentCampaign.campaignStatus ?? '' }})</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Birds Card -->
+        <div class="col-xxl-4 col-md-4">
+          <div class="card info-card sales-card">
+            <div class="card-body">
+              <h5 class="card-title">Total d'espèces observées <span class="explanation"><br/>({{ recentCampaign.campaignName }})</span></h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="ri-stack-line" style="color: #ffc107;"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>{{ totalBirdsCountedInCampaign ?? 0 }}</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- End Total Birds Card -->
+
+        <!-- Total Unique Species Card -->
+        <div class="col-xxl-4 col-md-4">
+          <div class="card info-card revenue-card">
+            <div class="card-body">
+              <h5 class="card-title">Total d'espèces uniques observées <span class="explanation"><br/>({{ recentCampaign.campaignName }})</span></h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="ri-twitter-fill" style="color: #2eca6a;"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>{{ totalcountUniqueBirdSpeciesInCampaign }}</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- End Total Unique Species Card -->
+        
+        <!-- Column Chart -->
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ recentCampaign.campaignName }} <span>/ Aujourd'hui</span></h5>
+              <div id="columnChart"></div>
+            </div>
+          </div>
+        </div><!-- End Column Chart -->
+
+        <!-- Reports -->
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Rapports <span>/Aujourd'hui</span></h5>
+              <div id="reportsChart"></div>
+            </div>
+          </div>
+        </div><!-- End Reports -->
+
+        <!-- Recent Sales -->
+        <div class="col-12">
+          <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+              <h5 class="card-title">Campagnes récentes <span>| Aujourd'hui</span></h5>
+              <table class="table table-borderless datatable">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Date de fin</th>
+                    <th scope="col">Campagne de comptage</th>
+                    <th scope="col">Nombre de sites impliqués</th>
+                    <th scope="col">Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for campaign in campaigns|reverse %}
+                    <tr>
+                      <th scope="row"><a href="#">{{ loop.index }}</a></th>
+                      <td>{{ campaign.endDate ? campaign.endDate|date('Y-m-d H:i') : '' }}</td>
+                      <td><a href="{{ path('app_counting_campaign_show', {'id': campaign.id}) }}" class="text-primary">{{ campaign.campaignName }}</a></td>
+                      <td>{{ campaign.siteAgentsGroups|length }}</td>
+                      <td>
+                        <div class="badge bg-secondary">{{ campaign.campaignStatus }}</div>
+                      </td>
+                    </tr>
+                  {% else %}
+                    <tr><td colspan="5">{{ 'no_record_found'|trans }}</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div><!-- End Recent Sales -->
+
+      </div><!-- End Left side columns -->
+
+      <!-- Right side columns -->
+      <div class="col-lg-4"> 
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Les espèces les plus comptées dans <span class="explanation">({{ recentCampaign.campaignName }})</span></h5>
+            <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-indicators"></div>
+              <div class="carousel-inner"></div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              </button>
+            </div>
+          </div>
+        </div>        
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Statistiques de total d'espèces observées par site <span class="explanation">({{ recentCampaign.campaignName }})</span></h5>
+            <div id="pieChart"></div>
+          </div>
+        </div>
+      </div><!-- End Right side columns -->
+
+    </section>
+    {% endif %}
+
+  </main><!-- End #main -->
+
+  <!-- ===================== JS AJAX ===================== -->
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const campaignSelector = document.getElementById("campaignSelector");
+
+    campaignSelector.addEventListener("change", (event) => {
+      const campaignId = event.target.value;
+
+      fetch(`/get-campaign-data?campaign_id=${campaignId}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) return;
+
+          // === Totaux
+          document.querySelector(".sales-card h6").textContent = data.totalBirdsCountedInCampaign;
+          document.querySelector(".revenue-card h6").textContent = data.totalcountUniqueBirdSpeciesInCampaign;
+          document.querySelectorAll(".explanation").forEach(el => el.textContent = `(${data.campaignName})`);
+
+          // === Graphique colonnes
+          const chartCol = ApexCharts.getChartByID("columnChart");
+          if (chartCol) {
+            chartCol.updateOptions({
+              xaxis: { categories: data.siteCollections.map(s => s.siteName) },
+              series: [
+                { name: 'Oiseaux comptés', data: data.siteCollections.map(s => s.totalBirds) },
+                { name: 'Espèces uniques', data: data.siteCollections.map(s => s.uniqueSpecies) }
+              ]
+            });
+          }
+
+          // === Graphique line Reports
+          const chartReports = ApexCharts.getChartByID("reportsChart");
+          if (chartReports) {
+            chartReports.updateOptions({
+              xaxis: { categories: data.totalBirdsCountByCampaign.map(c => c.endDate ?? '') },
+              series: [
+                { name: "Total oiseaux", data: data.totalBirdsCountByCampaign.map(c => c.totalBirdCount) },
+                { name: "Espèces uniques", data: data.totalUniqueBirdSpeciesCountByCampaign.map(c => c.uniqueBirdSpeciesCount) }
+              ]
+            });
+          }
+
+          // === Graphique Pie
+          const chartPie = ApexCharts.getChartByID("pieChart");
+          if (chartPie) {
+            chartPie.updateOptions({
+              labels: data.siteCollections.map(s => s.siteName),
+              series: data.siteCollections.map(s => s.totalBirds)
+            });
+          }
+
+          // === Carrousel Top 3
+          const carouselInner = document.querySelector(".carousel-inner");
+          const indicators = document.querySelector(".carousel-indicators");
+          carouselInner.innerHTML = "";
+          indicators.innerHTML = "";
+          data.topThree.forEach((specy, i) => {
+            indicators.innerHTML += `<button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="${i}" class="${i===0?'active':''}"></button>`;
+            carouselInner.innerHTML += `
+              <div class="carousel-item ${i===0?'active':''}">
+                ${specy.imagePath 
+                  ? `<img src="${specy.imagePath}" class="d-block w-100">` 
+                  : `<p>Aucune image pour ${specy.scientificName}</p>`}
+                <div class="carousel-caption d-none d-md-block">
+                  <h5>${specy.scientificName}</h5>
+                  <p>Total : ${specy.topThreeCount}</p>
+                </div>
+              </div>`;
+          });
+        })
+        .catch(err => console.error("Erreur AJAX :", err));
+    });
+  });
+  </script>
+{% endblock %} #}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ 'breadcrumb_home'|trans }}{% endblock %}
@@ -18,94 +261,6 @@
     {% if campaigns %}
     <section class="section dashboard">
       <div class="row">
-        {# <!-- Sélecteur de Campagne -->
-        <div class="form-group">
-          <select id="campaignSelector" name="campaign_id" class="form-control">
-            {% for campaign in campaigns %}
-              <option value="{{ campaign.id }}" {% if campaign.id == recentCampaign.id %}selected{% endif %}>
-                {{ campaign.campaignName }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-xxl-4 col-md-4">
-          <div class="card info-card sales-card">
-            <div class="card-body">
-              <h5 class="card-title">Total d'espèces observées <span class="campaignName">({{ recentCampaign.campaignName }})</span></h5>
-              <div class="d-flex align-items-center">
-                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                  <i class="ri-stack-line" style="color: #ffc107;"></i>
-                </div>
-                <div class="ps-3">
-                  <h6 class="totalBirdsCounted">{{ totalBirdsCountedInCampaign ?? 0 }}</h6>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Carte d'Infos -->
-        <div class="col-xxl-4 col-md-4 total-birds">
-          <h6>{{ totalBirdsCountedInCampaign ?? 0 }}</h6>
-        </div>
-
-        <div class="col-xxl-4 col-md-4 unique-birds">
-          <h6>{{ totalcountUniqueBirdSpeciesInCampaign ?? 0 }}</h6>
-        </div>
-
-        <!-- Graphique -->
-        <div id="columnChart"></div>
-
-        <script>
-          document.addEventListener("DOMContentLoaded", () => {
-            const campaignSelector = document.getElementById("campaignSelector");
-
-            campaignSelector.addEventListener("change", (event) => {
-              const campaignId = event.target.value;
-
-              // Faire une requête AJAX pour récupérer les données
-              fetch(`/get-campaign-data?campaign_id=${campaignId}`)
-                .then(response => {
-                  if (!response.ok) {
-                    throw new Error("Failed to fetch campaign data.");
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  if (data.error) {
-                    console.error(data.error);
-                    return;
-                  }
-
-                  // Mettre à jour les éléments HTML avec les nouvelles données
-                  document.querySelector(".totalBirdsCounted").textContent = data.totalBirdsCount ?? 0;
-                  document.querySelector(".totalUniqueSpecies").textContent = data.totalUniqueSpecies ?? 0;
-                  document.querySelector(".campaignName").textContent = data.campaignName;
-
-                  // Mettre à jour le graphique des sites
-                  const siteNames = data.siteData.map(site => site.siteName);
-                  const totalBirds = data.siteData.map(site => site.totalBirdsCount);
-                  const uniqueSpecies = data.siteData.map(site => site.uniqueSpeciesCount);
-
-                  updateChart(siteNames, totalBirds, uniqueSpecies);
-                })
-                .catch(error => console.error("Error:", error));
-            });
-
-            // Fonction pour mettre à jour le graphique
-            function updateChart(categories, totalBirds, uniqueSpecies) {
-              const chart = ApexCharts.getChartByID("columnChart");
-              chart.updateOptions({
-                xaxis: { categories },
-                series: [
-                  { name: 'Total des oiseaux Comptés', data: totalBirds },
-                  { name: 'Espèces uniques observées', data: uniqueSpecies },
-                ],
-              });
-            }
-          });
-        </script> #}
-
 
         <!-- Left side columns -->
         <div class="col-lg-8">
@@ -120,7 +275,6 @@
                     <div class="ps-3">
                       <form method="get" action="{{ path('home') }}">
                         <div class="form-group">
-                          {# <label for="campaignSelector">Choisissez une campagne :</label> #}
                           <select id="campaignSelector" name="campaign_id" class="form-control" onchange="this.form.submit()">
                             {% for campaign in campaigns|reverse %}
                               <option value="{{ campaign.id }}" {% if campaign.id == recentCampaign.id %}selected{% endif %}>

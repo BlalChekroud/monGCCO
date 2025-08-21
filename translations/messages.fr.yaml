@@ -342,6 +342,7 @@ birdSpecies:
   informations: "Les informations de la nouvelle espèce d'oiseau"
   return: "Retour vers la consultation des espèces d'oiseaux"
   consult: 'Consultation des espèces'
+  coverage_title: "Créer une nouvelle couverture pour une espèce d’oiseau"
   modal_birdlife_tax_treat_title: "Créer un nouveau traitement taxonomique pour BirdLife"
   modal_iucn_title: "Créer une nouvelle catégorie de la liste rouge de l'IUCN"
   scientific_name: "Nom Scientifique"
@@ -394,6 +395,7 @@ campaign:
   detail_counting_campaign: "Détail d'une campagne de comptage"
   cannot_start_collecting_before: "Vous ne pouvez pas commencer à collecter avant"
   status: "État de la campagne"
+  created_by: "Créé par"
   sites_and_groups: "Sites et Groupes"
   start_collecting: "Commencez à collecter"
   collect_data: "Collecter des données"
@@ -837,6 +839,11 @@ notification:
   new_message: "nouveau(x) message(s)"
   unread_notifications: "Notifications non lues"
   mark_as_seen: "Marquer comme vu"
+  delete: "Supprimer la notification"
+  delete_all: "Supprimer toutes les notifications"
+  msg:
+    deleted_success: "La notification a bien été supprimée"
+    deleted_error: "Une erreur s'est produite lors de la suppression de la notification"
 
 collectQuality:
   title: "Gestion de la qualité de collecte de données"

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ExportType;
 use App\Form\ImportCsvType;
 use App\Service\ExportService;
@@ -262,18 +263,17 @@ class QualityController extends AbstractController
     #[Route('/{id}', name: 'app_quality_delete', methods: ['POST'])]
     public function delete(Request $request, Quality $quality, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$quality->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$quality->getId(), $request->getPayload()->get('_token'))) {
                 $entityManager->remove($quality);
                 $entityManager->flush();
                 $this->addFlash('success', $this->translator->trans('collectQuality.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_quality_index', [], Response::HTTP_SEE_OTHER);
-            }
-        } else {
-            $this->addFlash('error',$this->translator->trans('collectQuality.msg.deleted_error'));
-        } 
+            } else {
+                $this->addFlash('error',$this->translator->trans('collectQuality.msg.deleted_error'));
+            } 
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
 
         return $this->redirectToRoute('app_quality_index', [], Response::HTTP_SEE_OTHER);
     }

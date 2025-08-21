@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\ExportType;
 use App\Form\ImportCsvType;
 use App\Service\ExportService;
@@ -205,10 +206,10 @@ class CoverageController extends AbstractController
     public function newAjax(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $coverage = new Coverage();
-        $form = $this->createForm(CoverageType::class, $coverage);
-        $form->handleRequest($request);
+        $coverageForm = $this->createForm(CoverageType::class, $coverage);
+        $coverageForm->handleRequest($request);
     
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($coverageForm->isSubmitted() && $coverageForm->isValid()) {
             $coverage->setCreatedAt(new \DateTimeImmutable());
             $entityManager->persist($coverage);
             $entityManager->flush();
@@ -216,9 +217,8 @@ class CoverageController extends AbstractController
             return new JsonResponse(['success' => true, 'coverage' => ['id' => $coverage->getId(), 'label' => $coverage->getLabel()]]);
         }
     
-        return new JsonResponse(['success' => false, 'errors' => (string) $form->getErrors(true, false)]);
+        return new JsonResponse(['success' => false, 'errors' => (string) $coverageForm->getErrors(true, false)]);
     }
-    
     
     
     #[Route('/list', name: 'app_coverage_list', methods: ['GET'])]
@@ -234,6 +234,7 @@ class CoverageController extends AbstractController
         return new JsonResponse(['coverages' => $data]);
     }
 
+    
     #[Route('/new', name: 'app_coverage_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -296,17 +297,16 @@ class CoverageController extends AbstractController
     #[Route('/{id}', name: 'app_coverage_delete', methods: ['POST'])]
     public function delete(Request $request, Coverage $coverage, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$coverage->getId(), $request->getPayload()->get('_token'))) {
-            try {
+        try {
+            if ($this->isCsrfTokenValid('delete'.$coverage->getId(), $request->getPayload()->get('_token'))) {
                 $entityManager->remove($coverage);
                 $entityManager->flush();
                 $this->addFlash('success', $this->translator->trans('coverage.msg.deleted_success'));
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_coverage_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                $this->addFlash('error',$this->translator->trans('coverage.msg.deleted_error'));
             }
-        } else {
-            $this->addFlash('error',$this->translator->trans('coverage.msg.deleted_error'));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_coverage_index', [], Response::HTTP_SEE_OTHER);
