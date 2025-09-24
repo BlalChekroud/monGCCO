@@ -7,16 +7,18 @@
 
     <meta content="" name="description">
     <meta content="" name="keywords">
+    <meta name="csrf-token" content="{{ csrf_token('collected_data') }}">
+    <meta name="api-csrf-token" content="{{ csrf_token('api_token') }}">
 
     <!-- Favicons -->
-    <link href="{{ asset('/img/favicon.png') }}" rel="icon" type="image/png">
+    {# <link href="{{ asset('/img/favicon.png') }}" rel="icon" type="image/png"> #}
     {# <link href="{{ asset('/img/favicon.ico') }}" rel="icon" type="image/x-icon"> #}
 
     <link href="{{ asset('/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+    {# <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet"> #}
     {# <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans|Nunito|Poppins" as="style" onload="this.onload=null;this.rel='stylesheet'"> #}
     <noscript><link href="https://fonts.googleapis.com/css?family=Open+Sans|Nunito|Poppins" rel="stylesheet"></noscript>
 
@@ -33,13 +35,57 @@
     {# <script src="{{ asset('js/birdAjax.js') }}"></script> #}
     <link rel="manifest" href="{{ asset('manifest.json') }}"/>
     {# <script src="{{ asset('./js/offline.js') }}"></script> #}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.all.min.js"></script>
-    <script>
+    <script src="{{ asset('js/sw-messages.js') }}" defer></script>
+    {# <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js')
                 .then(reg => console.log("Service Worker enregistré", reg))
                 .catch(err => console.log("Erreur Service Worker", err));
         }
+    </script> #}
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+          try {
+            const registration = await navigator.serviceWorker.register('/sw.js', {
+              scope: '/'
+            });
+            console.log('Service Worker enregistré:', registration);
+
+            // Attendre que le service worker soit actif
+            await navigator.serviceWorker.ready;
+            console.log('Service Worker actif');
+
+            const registerBackgroundSync = async () => {
+              try {
+                if ('sync' in registration) {
+                  await registration.sync.register('sync-collects');
+                  console.log('Synchronisation background enregistrée');
+                } else {
+                  console.log('La synchronisation en arrière-plan n\'est pas supportée');
+                  if (navigator.onLine && registration.active) {
+                    registration.active.postMessage({ type: 'SYNC_NOW' });
+                  }
+                }
+              } catch (syncError) {
+                console.error('Erreur lors de l\'enregistrement de la synchronisation:', syncError);
+                if (navigator.onLine && registration.active) {
+                  registration.active.postMessage({ type: 'SYNC_NOW' });
+                }
+              }
+            };
+
+            // Enregistrer la synchronisation initiale
+            await registerBackgroundSync();
+
+            // Écouter les changements de connectivité
+            window.addEventListener('online', registerBackgroundSync);
+
+          } catch (error) {
+            console.error('Erreur d\'enregistrement du Service Worker:', error);
+          }
+        });
+      }
     </script>
     {# <script>
       window.addEventListener('load', () => {

@@ -334,8 +334,8 @@ birdFamily:
     deletion_failed: "Failed to delete the bird family."
 
 birdSpecies:
-  title: "Bird species"
-  bird_species: "Bird species management"
+  title: "Bird species management"
+  bird_species: "Bird species"
   title_add: "Add a bird species"
   delete_specy: "Delete bird species"
   breadcrumb_manage: "Species management"

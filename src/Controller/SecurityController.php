@@ -94,12 +94,19 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
     
+        // // Vérifier si l'utilisateur est actif avant de permettre l'édition
+        // if ($this->getUser()->getUserStatus()->getLabel() !== 'Actif') {
+        //     // throw new CustomUserMessageAuthenticationException('Votre compte est désactivé.');
+        //     $this->addFlash('warning',$this->translator->trans('Your_account_is_disabled'));
+        //     return $this->redirectToRoute('app_logout');
+        // }
         // Vérifier si l'utilisateur est actif avant de permettre l'édition
-        if ($this->getUser()->getUserStatus()->getLabel() !== 'Actif') {
+        if (!$this->getUser() instanceof User || $this->getUser()->getUserStatus()->getLabel() !== 'Actif') {
             // throw new CustomUserMessageAuthenticationException('Votre compte est désactivé.');
             $this->addFlash('warning',$this->translator->trans('Your_account_is_disabled'));
             return $this->redirectToRoute('app_logout');
         }
+
         // Autoriser l'utilisateur à modifier son propre profil ou si c'est un administrateur
         if ($this->getUser() !== $user && !$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('info', $this->translator->trans('edit_permission'));

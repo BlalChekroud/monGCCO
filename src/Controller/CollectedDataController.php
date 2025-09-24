@@ -227,53 +227,92 @@ class CollectedDataController extends AbstractController
         QualityRepository $qualityRepo,
         MethodRepository $methodRepo
     ): JsonResponse {
-        $data = json_decode($request->getContent(), true);
-    
-        if (!$data) {
-            return $this->json(['error' => 'Invalid payload'], 400);
-        }
-    
-        // Récupération des entités liées
-        $campaign = $campaignRepo->find($data['campaignId']);
-        $site = $siteRepo->find($data['siteId']);
-        $countType = $countTypeRepo->find($data['countType']);
-        $quality = $qualityRepo->find($data['quality']);
-        $method = $methodRepo->find($data['method']);
-    
-        if (!$campaign || !$site) {
-            return $this->json(['error' => 'Invalid campaign or site'], 400);
-        }
-    
-        // Création collecte
-        $collect = new CollectedData();
-        $collect->setCountingCampaign($campaign);
-        $collect->setSiteCollection($site);
-        $collect->setCountType($countType);
-        $collect->setQuality($quality);
-        $collect->setMethod($method);
-        $collect->setCreatedAt(new \DateTimeImmutable($data['createdAt'] ?? 'now'));
-        $collect->setCreatedBy($this->getUser());
-    
-        // Espèces observées
-        foreach ($data['birdSpeciesCounts'] as $spData) {
-            $species = $speciesRepo->find($spData['birdSpeciesId']);
-            if ($species) {
-                $birdCount = new BirdSpeciesCount();
-                $birdCount->setBirdSpecies($species);
-                $birdCount->setCount($spData['count']);
-                $birdCount->setCollectedData($collect);
-                $em->persist($birdCount);
+        try {
+            $data = json_decode($request->getContent(), true);
+        
+            if (!$data) {
+                return $this->json(['error' => 'Invalid payload'], 400);
             }
+        
+            // Récupération des entités liées
+            $campaign = $campaignRepo->find($data['campaignId']);
+            $site = $siteRepo->find($data['siteId']);
+            $countType = $countTypeRepo->find($data['countType']);
+            $quality = $qualityRepo->find($data['quality']);
+            $method = $methodRepo->find($data['method']);
+        
+            if (!$campaign || !$site) {
+                return $this->json(['error' => 'Invalid campaign or site'], 400);
+            }
+            
+            if (!$countType || !$quality || !$method) {
+                return $this->json(['error' => 'Missing required data'], 400);
+            }
+        
+            // Création collecte
+            $collect = new CollectedData();
+            // // ✅ Conversion createdAt (format d-m-Y H:i:s → DateTimeImmutable)
+            // if (!empty($data['createdAt'])) {
+            //     $createdAt = \DateTimeImmutable::createFromFormat('d-m-Y H:i:s', $data['createdAt']);
+            //     if ($createdAt === false) {
+            //         return $this->json(['error' => 'Invalid createdAt format'], 400);
+            //     }
+            //     $collect->setCreatedAt($createdAt);
+            // } else {
+            //     $collect->setCreatedAt(new \DateTimeImmutable());
+            // }
+            $collect->setCountingCampaign($campaign);
+            $collect->setSiteCollection($site);
+            $collect->setCountType($countType);
+            $collect->setQuality($quality);
+            if ($method) {
+                $collect->addMethod($method);
+            }
+            // $collect->setCreatedAt(new \DateTimeImmutable($data['createdAt'] ?? 'now'));
+            $collect->setCreatedAt(new \DateTimeImmutable());
+            $collect->setCreatedBy($this->getUser());
+        
+            // Espèces observées
+            // foreach ($data['birdSpeciesCounts'] as $spData) {
+            //     $species = $speciesRepo->find($spData['birdSpeciesId']);
+            //     if ($species) {
+            //         $birdCount = new BirdSpeciesCount();
+            //         $birdCount->setBirdSpecies($species);
+            //         $birdCount->setCount($spData['count']);
+            //         $birdCount->setCollectedData($collect);
+            //         $em->persist($birdCount);
+            //     }
+            // }
+            // Handle bird species counts
+            if (!empty($data['birdSpeciesCounts'])) {
+                foreach ($data['birdSpeciesCounts'] as $spData) {
+                    if (isset($spData['birdSpeciesId'], $spData['count'])) {
+                        $species = $speciesRepo->find($spData['birdSpeciesId']);
+                        if ($species) {
+                            $birdCount = new BirdSpeciesCount();
+                            $birdCount->setBirdSpecies($species);
+                            $birdCount->setCount((int)$spData['count']);
+                            $birdCount->setCollectedData($collect);
+                            $em->persist($birdCount);
+                        }
+                    }
+                }
+            }
+        
+            $em->persist($collect);
+            $em->flush();
+        
+            return $this->json(['success' => true, 'id' => $collect->getId()]);
+            
+        } catch (\Exception $e) {
+            return $this->json([
+                'error' => 'Server error: ' . $e->getMessage()
+            ], 500);
         }
-    
-        $em->persist($collect);
-        $em->flush();
-    
-        return $this->json(['success' => true, 'id' => $collect->getId()]);
     }
     
     // --- Nouvelle méthode "sync" pour offline → online ---
-    #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
+    // #[IsGranted('ROLE_COLLECTOR', message: 'Vous n\'avez pas l\'accès.')]
     #[Route('/sync', name: 'collected_data_sync', methods: ['POST'])]
     public function sync(
         Request $request,
@@ -544,7 +583,8 @@ class CollectedDataController extends AbstractController
         }
 
         // Vérifiez si l'utilisateur est admin, créateur ou membre du groupe
-        if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_VIEW') || $collectedDatum->getCreatedBy() === $user || $leaderEmail === $user->getEmail()) {
+        // if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_VIEW') || $collectedDatum->getCreatedBy() === $user || $leaderEmail === $user->getEmail()) {
+        if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_VIEW') || $collectedDatum->getCreatedBy() === $user) {
             return $this->render('collected_data/show.html.twig', [
                 'collected_datum' => $collectedDatum,
                 'teamLeader' => $teamLeader,

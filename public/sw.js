@@ -1,401 +1,3 @@
-// const PREFIX = "WingWatch-v1";
-// const OFFLINE_URL = "/offline.html";
-// const DB_NAME = "WingWatchDB";
-// const STORE = "collects";
-
-// // Installation : mettre offline.html en cache
-// self.addEventListener("install", (event) => {
-//   event.waitUntil(
-//     (async () => {
-//       const cache = await caches.open(PREFIX);
-//       await cache.addAll([OFFLINE_URL, "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"]);
-//     })()
-//   );
-//   self.skipWaiting();
-//   console.log(`${PREFIX} installé`);
-// });
-
-// // Activation : nettoyer les anciens caches
-// self.addEventListener("activate", (event) => {
-//   event.waitUntil(
-//     (async () => {
-//       const keys = await caches.keys();
-//       await Promise.all(keys.map((key) => {
-//         if (key !== PREFIX) return caches.delete(key);
-//       }));
-//     })()
-//   );
-//   self.clients.claim();
-//   console.log(`${PREFIX} activé`);
-// });
-
-// // Fetch : fournir offline.html si pas de réseau
-// self.addEventListener("fetch", (event) => {
-//   if (event.request.mode === "navigate") {
-//     event.respondWith(
-//       (async () => {
-//         try {
-//           return await fetch(event.request);
-//         } catch (e) {
-//           const cache = await caches.open(PREFIX);
-//           return cache.match(OFFLINE_URL);
-//         }
-//       })()
-//     );
-//   }
-// });
-
-// // Background Sync
-// self.addEventListener("sync", (event) => {
-//   if (event.tag === "sync-collects") {
-//     event.waitUntil(syncCollects());
-//   }
-// });
-
-// // ---------- Helpers pour IndexedDB ----------
-// function openDb() {
-//   return new Promise((resolve, reject) => {
-//     const req = indexedDB.open(DB_NAME, 1);
-//     req.onupgradeneeded = () => {
-//       const db = req.result;
-//       if (!db.objectStoreNames.contains(STORE)) {
-//         db.createObjectStore(STORE, { keyPath: "id", autoIncrement: true });
-//       }
-//     };
-//     req.onsuccess = () => resolve(req.result);
-//     req.onerror = () => reject(req.error);
-//   });
-// }
-
-// // Sync vers le serveur
-// async function syncCollects() {
-//   const db = await openDb();
-//   const tx = db.transaction(STORE, "readwrite");
-//   const store = tx.objectStore(STORE);
-//   const all = await store.getAll();
-
-//   for (const item of all) {
-//     try {
-//       const res = await fetch("/user/collected/data/sync", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           "X-CSRF-TOKEN": item.csrfToken || ""
-//         },
-//         credentials: "same-origin",
-//         body: JSON.stringify(item.payload)
-//       });
-//       if (res.ok) {
-//         store.delete(item.id); // Supprimer si bien envoyé
-//       }
-//     } catch (e) {
-//       console.warn("Sync échoué, sera retenté :", e);
-//     }
-//   }
-//   await tx.done;
-// }
-
-
-// const CACHE_NAME = "wingwatch-cache-v1";
-// const METADATA_URLS = [
-//   "/api/metadata/campaigns",
-//   "/api/metadata/species",
-//   "/api/metadata/countType",
-//   "/api/metadata/quality",
-//   "/api/metadata/method",
-// ];
-// const SYNC_TAG = "sync-collects";
-
-// // 📌 Fonction utilitaire pour ouvrir IndexedDB
-// function openDb() {
-//   return new Promise((resolve, reject) => {
-//     const req = indexedDB.open("WingWatchDB", 1);
-//     req.onsuccess = () => resolve(req.result);
-//     req.onerror = () => reject(req.error);
-//   });
-// }
-
-// // 📌 Lire les collectes hors ligne dans IndexedDB
-// async function getPendingCollects() {
-//   const db = await openDb();
-//   return new Promise((resolve) => {
-//     const tx = db.transaction("collects", "readonly");
-//     const store = tx.objectStore("collects");
-//     const req = store.getAll();
-//     req.onsuccess = () => resolve(req.result);
-//     req.onerror = () => resolve([]);
-//   });
-// }
-
-// // 📌 Supprimer une collecte une fois envoyée
-// async function removeCollect(id) {
-//   const db = await openDb();
-//   return new Promise((resolve) => {
-//     const tx = db.transaction("collects", "readwrite");
-//     tx.objectStore("collects").delete(id);
-//     tx.oncomplete = () => resolve();
-//   });
-// }
-
-// // Installation du SW → précache des pages et API metadata
-// self.addEventListener("install", (event) => {
-//   event.waitUntil(
-//     caches.open(CACHE_NAME).then((cache) =>
-//       cache.addAll([
-//         "/",
-//         "/offline.html",
-//         ...METADATA_URLS
-//       ])
-//     )
-//   );
-// });
-
-// // Activation → nettoyage des anciens caches
-// self.addEventListener("activate", (event) => {
-//   event.waitUntil(
-//     caches.keys().then((keys) =>
-//       Promise.all(keys.map((key) => key !== CACHE_NAME && caches.delete(key)))
-//     )
-//   );
-// });
-
-// // Fetch handler
-// self.addEventListener("fetch", (event) => {
-//   const { request } = event;
-
-//   // Si c’est un endpoint metadata
-//   if (METADATA_URLS.some((url) => request.url.includes(url))) {
-//     event.respondWith(
-//       fetch(request)
-//         .then((response) => {
-//           const clone = response.clone();
-//           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-//           return response;
-//         })
-//         .catch(() => caches.match(request))
-//     );
-//     return;
-//   }
-
-//   // Stratégie cache-first pour le reste
-//   event.respondWith(
-//     caches.match(request).then((cached) => {
-//       return (
-//         cached ||
-//         fetch(request).catch(() => {
-//           if (request.mode === "navigate") {
-//             return caches.match("/offline.html");
-//           }
-//         })
-//       );
-//     })
-//   );
-// });
-
-// // 📌 Background Sync → envoie les collectes en attente
-// self.addEventListener("sync", (event) => {
-//   if (event.tag === SYNC_TAG) {
-//     event.waitUntil(syncCollects());
-//   }
-// });
-
-// async function syncCollects() {
-//   const collects = await getPendingCollects();
-//   console.log("🔄 Tentative de sync des collectes hors ligne :", collects);
-
-//   for (const record of collects) {
-//     try {
-//       const response = await fetch("/api/collectedData", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           "X-CSRF-TOKEN": record.csrfToken || "" // si tu en as besoin
-//         },
-//         body: JSON.stringify(record.payload)
-//       });
-
-//       if (response.ok) {
-//         console.log("✅ Collecte envoyée :", record);
-//         await removeCollect(record.id);
-//       } else {
-//         console.warn("⚠️ Échec sync collecte :", await response.text());
-//       }
-//     } catch (err) {
-//       console.error("🚨 Erreur réseau pendant sync :", err);
-//     }
-//   }
-// }
-// // // 📌 Notification de succès
-// // self.addEventListener("notificationclick", (event) => {
-// //   event.notification.close();
-// //   event.waitUntil(
-// //     clients.openWindow("/").then(() => {
-// //       console.log("🔔 Notification cliquée, fenêtre ouverte !");
-// //     })
-// //   );
-// // });
-// // // 📌 Notification de réception
-// // self.addEventListener("push", (event) => {
-// //   const data = event.data ? event.data.json() : { title: "Nouvelle collecte", body: "Une nouvelle collecte a été ajoutée." };
-// //   const options = {
-// //     body: data.body,
-// //     icon: "/images/icon-192x192.png",
-// //     badge: "/images/badge-72x72.png"
-// //   };
-
-// //   event.waitUntil(
-// //     self.registration.showNotification(data.title, options)
-// //   );
-// // });
-// // // 📌 Notification de fermeture
-// // self.addEventListener("notificationclose", (event) => {
-// //   console.log("🔔 Notification fermée :", event.notification);
-// // });
-// // // 📌 Notification de clic
-// // self.addEventListener("notificationclick", (event) => {
-// //   event.notification.close();
-// //   event.waitUntil(
-// //     clients.matchAll({ type: "window" }).then((clientList) => {
-// //       if (clientList.length > 0) {
-// //         return clientList[0].focus();
-// //       }
-// //       return clients.openWindow("/");
-// //     })
-// //   );
-// // });
-// // // 📌 Notification de synchronisation
-// // self.addEventListener("sync", (event) => {
-// //   if (event.tag === SYNC_TAG) {
-// //     event.waitUntil(syncCollects());
-// //   }
-// // });
-// // // 📌 Synchronisation des collectes
-// // async function syncCollects() {
-// //   const collects = await getPendingCollects();
-// //   console.log("🔄 Tentative de synchronisation des collectes :", collects);
-
-// //   for (const record of collects) {
-// //     try {
-// //       const response = await fetch("/api/collectedData", {
-// //         method: "POST",
-// //         headers: {
-// //           "Content-Type": "application/json",
-// //           "X-CSRF-TOKEN": record.csrfToken || ""
-// //         },
-// //         body: JSON.stringify(record.payload)
-// //       });
-
-// //       if (response.ok) {
-// //         console.log("✅ Collecte envoyée :", record);
-// //         await removeCollect(record.id);
-// //       } else {
-// //         console.warn("⚠️ Échec de la synchronisation de la collecte :", await response.text());
-// //       }
-// //     } catch (err) {
-// //       console.error("🚨 Erreur réseau pendant la synchronisation :", err);
-// //     }
-// //   }
-// // }
-
-
-// const PREFIX = "WingWatch-v1";
-// const OFFLINE_URL = "/offline.html";
-// const DB_NAME = "WingWatchDB";
-// const STORE = "collects";
-
-// // Installation : mettre offline.html en cache
-// self.addEventListener("install", (event) => {
-//   event.waitUntil(
-//     (async () => {
-//       const cache = await caches.open(PREFIX);
-//       await cache.addAll([OFFLINE_URL, "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"]);
-//     })()
-//   );
-//   self.skipWaiting();
-//   console.log(`${PREFIX} installé`);
-// });
-
-// // Activation : nettoyer les anciens caches
-// self.addEventListener("activate", (event) => {
-//   event.waitUntil(
-//     (async () => {
-//       const keys = await caches.keys();
-//       await Promise.all(keys.map((key) => {
-//         if (key !== PREFIX) return caches.delete(key);
-//       }));
-//     })()
-//   );
-//   self.clients.claim();
-//   console.log(`${PREFIX} activé`);
-// });
-
-// // Fetch : fournir offline.html si pas de réseau
-// self.addEventListener("fetch", (event) => {
-//   if (event.request.mode === "navigate") {
-//     event.respondWith(
-//       (async () => {
-//         try {
-//           return await fetch(event.request);
-//         } catch (e) {
-//           const cache = await caches.open(PREFIX);
-//           return cache.match(OFFLINE_URL);
-//         }
-//       })()
-//     );
-//   }
-// });
-
-// // Background Sync
-// self.addEventListener("sync", (event) => {
-//   if (event.tag === "sync-collects") {
-//     event.waitUntil(syncCollects());
-//   }
-// });
-
-// // ---------- Helpers pour IndexedDB ----------
-// function openDb() {
-//   return new Promise((resolve, reject) => {
-//     const req = indexedDB.open(DB_NAME, 1);
-//     req.onupgradeneeded = () => {
-//       const db = req.result;
-//       if (!db.objectStoreNames.contains(STORE)) {
-//         db.createObjectStore(STORE, { keyPath: "id", autoIncrement: true });
-//       }
-//     };
-//     req.onsuccess = () => resolve(req.result);
-//     req.onerror = () => reject(req.error);
-//   });
-// }
-
-// // Sync vers le serveur
-// async function syncCollects() {
-//   const db = await openDb();
-//   const tx = db.transaction(STORE, "readwrite");
-//   const store = tx.objectStore(STORE);
-//   const all = await store.getAll();
-
-//   for (const item of all) {
-//     try {
-//       const res = await fetch("/user/collected/data/sync", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           "X-CSRF-TOKEN": item.csrfToken || ""
-//         },
-//         credentials: "same-origin",
-//         body: JSON.stringify(item.payload)
-//       });
-//       if (res.ok) {
-//         store.delete(item.id); // Supprimer si bien envoyé
-//       }
-//     } catch (e) {
-//       console.warn("Sync échoué, sera retenté :", e);
-//     }
-//   }
-//   await tx.done;
-// }
-
-
 const CACHE_NAME = "wingwatch-cache-v1";
 const METADATA_URLS = [
   "/api/metadata/campaigns",
@@ -405,138 +7,316 @@ const METADATA_URLS = [
   "/api/metadata/method",
 ];
 const SYNC_TAG = "sync-collects";
+const DB_NAME = "WingWatchDB";
+const STORE_NAME = "collects";
 
-// 📌 Fonction utilitaire pour ouvrir IndexedDB
+// Fonction utilitaire pour ouvrir IndexedDB
 function openDb() {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open("WingWatchDB", 1);
+    const req = indexedDB.open(DB_NAME, 1);
+    
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+      }
+    };
+    
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
 }
 
-// 📌 Lire les collectes hors ligne dans IndexedDB
+// Gestion des collectes en attente
 async function getPendingCollects() {
   const db = await openDb();
   return new Promise((resolve) => {
-    const tx = db.transaction("collects", "readonly");
-    const store = tx.objectStore("collects");
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const store = tx.objectStore(STORE_NAME);
     const req = store.getAll();
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => resolve([]);
   });
 }
 
-// 📌 Supprimer une collecte une fois envoyée
 async function removeCollect(id) {
   const db = await openDb();
   return new Promise((resolve) => {
-    const tx = db.transaction("collects", "readwrite");
-    tx.objectStore("collects").delete(id);
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).delete(id);
     tx.oncomplete = () => resolve();
   });
 }
 
-// Installation du SW → précache des pages et API metadata
+// Installation
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
       cache.addAll([
         "/",
         "/offline.html",
+        // "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",
         ...METADATA_URLS
       ])
     )
   );
+  self.skipWaiting();
 });
 
-// Activation → nettoyage des anciens caches
+// Activation
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.map((key) => key !== CACHE_NAME && caches.delete(key)))
     )
   );
+  self.clients.claim();
 });
 
 // Fetch handler
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
-  // Si c’est un endpoint metadata
-  if (METADATA_URLS.some((url) => request.url.includes(url))) {
+  // Vérifier si l'URL est supportée pour la mise en cache
+  const url = new URL(request.url);
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    return;
+  }
+
+  // Intercepter les requêtes POST de collecte
+  if (request.method === 'POST' && url.pathname === '/user/collected/data/api/collects') {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          return response;
+      fetch(request.clone())
+        .catch(async (err) => {
+          // Si hors ligne, sauvegarder dans IndexedDB
+          const payload = await request.clone().json();
+          const headers = {};
+          request.headers.forEach((value, key) => {
+            headers[key] = value;
+          });
+          
+          const db = await openDb();
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          const store = tx.objectStore(STORE_NAME);
+          
+          const collectData = {
+            payload: payload,
+            csrfToken: headers['x-csrf-token'] || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+          };
+          
+          await store.add(collectData);
+          console.log("💾 Collecte sauvegardée hors ligne:", collectData);
+          
+          // Enregistrer une demande de synchronisation
+          await self.registration.sync.register(SYNC_TAG);
+          
+          // Retourner une réponse de succès
+          return new Response(JSON.stringify({
+            success: true,
+            message: "Collecte sauvegardée hors ligne"
+          }), {
+            headers: { 'Content-Type': 'application/json' }
+          });
         })
-        .catch(() => caches.match(request))
     );
     return;
   }
 
-  // Stratégie cache-first pour le reste
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      return (
-        cached ||
-        fetch(request).catch(() => {
-          if (request.mode === "navigate") {
-            return caches.match("/offline.html");
+  // Ne pas intercepter les autres requêtes POST
+  if (request.method === 'POST') {
+    return;
+  }
+
+  // Stratégie pour les endpoints metadata
+  if (METADATA_URLS.some((metadataUrl) => url.pathname.includes(metadataUrl))) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
           }
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            // Vérifier à nouveau le protocole avant la mise en cache
+            if (['http:', 'https:'].includes(url.protocol)) {
+              cache.put(request, clone);
+            }
+          });
+          return response;
         })
-      );
-    })
+        .catch(() => {
+          return caches.match(request)
+            .then(cached => {
+              if (cached) return cached;
+              return new Response(JSON.stringify({ error: 'Network error' }), {
+                headers: { 'Content-Type': 'application/json' }
+              });
+            });
+        })
+    );
+    return;
+  }
+
+  // Stratégie pour les autres requêtes
+  event.respondWith(
+    caches.match(request)
+      .then((cached) => {
+        if (cached) return cached;
+        
+        return fetch(request)
+          .then(response => {
+            // Mettre en cache les réponses réussies
+            if (response.ok && request.method === 'GET') {
+              const clone = response.clone();
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+                  const requestUrl = new URL(request.url);
+                  if (['http:', 'https:'].includes(requestUrl.protocol)) {
+                    cache.put(request, clone);
+                  }
+                });
+            }
+            return response;
+          })
+          .catch(() => {
+            if (request.mode === "navigate") {
+              return caches.match("/offline.html");
+            }
+            // Renvoyer une réponse par défaut pour les ressources
+            if (request.url.match(/\.(jpg|jpeg|png|gif|svg|ico)$/)) {
+              return new Response(null, { status: 404 });
+            }
+            return new Response(JSON.stringify({ error: 'Network error' }), {
+              headers: { 'Content-Type': 'application/json' }
+            });
+          });
+      })
   );
 });
 
-// 📌 Background Sync → envoie les collectes en attente
+
+// Synchronisation
 self.addEventListener("sync", (event) => {
   if (event.tag === SYNC_TAG) {
     event.waitUntil(syncCollects());
   }
 });
 
+// Écoute des messages pour la synchronisation immédiate
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SYNC_NOW') {
+    console.log('📢 Demande de synchronisation immédiate reçue');
+    syncCollects();
+  }
+});
+
 async function syncCollects() {
+  console.log("🚀 Début de la synchronisation des collectes");
   const collects = await getPendingCollects();
-  console.log("🔄 Tentative de sync des collectes hors ligne :", collects);
+  console.log("� Nombre de collectes en attente:", collects.length);
+  console.log("📝 Détail des collectes:", collects);
 
   for (const record of collects) {
+    console.log("🔄 Tentative de synchronisation pour la collecte ID:", record.id);
+    console.log("📄 Données à envoyer:", record.payload);
+    
+    // Vérification des champs requis
+    const requiredFields = ['campaignId', 'siteId', 'countType', 'quality', 'method'];
+    const missingFields = requiredFields.filter(field => !record.payload || !record.payload[field]);
+    if (missingFields.length > 0) {
+        console.warn("⚠️ Champs manquants dans le payload:", missingFields);
+    }
+    
+    console.log("🔍 Détail des champs :");
+    console.log("- campaignId:", record.payload?.campaignId);
+    console.log("- siteId:", record.payload?.siteId);
+    console.log("- countType:", record.payload?.countType);
+    console.log("- quality:", record.payload?.quality);
+    console.log("- method:", record.payload?.method);
+    
+    console.log("🔑 CSRF Token:", record.csrfToken ? "Présent" : "Manquant");
+
     try {
-      const response = await fetch("/api/collects", {
+      const requestData = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRF-TOKEN": record.csrfToken || "" // si tu en as besoin
+          "X-CSRF-TOKEN": record.csrfToken || ""
         },
+        credentials: "include", // Changé de 'same-origin' à 'include' pour s'assurer que les cookies sont envoyés
         body: JSON.stringify(record.payload)
-      });
+      };
+      console.log("📨 Configuration de la requête:", requestData);
+
+      const response = await fetch("/user/collected/data/api/collects", requestData);
+      console.log("📥 Status de la réponse:", response.status);
+      const responseText = await response.text();
+      console.log("📫 Contenu de la réponse:", responseText);
 
       if (response.ok) {
-        console.log("✅ Collecte envoyée :", record);
+        console.log("✅ Collecte synchronisée avec succès:", record.id);
         await removeCollect(record.id);
+        
+        // Notifier le succès
+        await self.registration.showNotification("Synchronisation réussie", {
+          body: "Une collecte a été synchronisée avec succès",
+          icon: "/images/icon-192x192.png"
+        });
+
+        // Informer toutes les fenêtres du succès
+        const clients = await self.clients.matchAll({ type: 'window' });
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'SYNC_SUCCESS',
+            message: 'Collecte synchronisée avec succès',
+            collectId: record.id
+          });
+        });
       } else {
-        console.warn("⚠️ Échec sync collecte :", await response.text());
+        const errorMsg = `Échec de la synchronisation (${response.status}): ${responseText}`;
+        console.warn("⚠️", errorMsg);
+        
+        // Informer toutes les fenêtres de l'erreur
+        const clients = await self.clients.matchAll({ type: 'window' });
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'SYNC_ERROR',
+            error: errorMsg,
+            collectId: record.id,
+            status: response.status
+          });
+        });
       }
     } catch (err) {
-      console.error("🚨 Erreur réseau pendant sync :", err);
+      const errorMsg = `Erreur de synchronisation: ${err.message || err}`;
+      console.error("🚨", errorMsg);
+      
+      // Informer toutes les fenêtres de l'erreur
+      const clients = await self.clients.matchAll({ type: 'window' });
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SYNC_ERROR',
+          error: errorMsg,
+          collectId: record.id
+        });
+      });
+      
+      // Notifier l'erreur
+      await self.registration.showNotification("Erreur de synchronisation", {
+        body: errorMsg,
+        icon: "/images/icon-192x192.png"
+      });
     }
   }
 }
-// 📌 Notification de succès
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  event.waitUntil(
-    clients.openWindow("/").then(() => {
-      console.log("🔔 Notification cliquée, fenêtre ouverte !");
-    })
-  );
-});
-// 📌 Notification de réception
+
+// Notifications
 self.addEventListener("push", (event) => {
-  const data = event.data ? event.data.json() : { title: "Nouvelle collecte", body: "Une nouvelle collecte a été ajoutée." };
+  const data = event.data ? event.data.json() : {
+    title: "Nouvelle collecte",
+    body: "Une nouvelle collecte a été ajoutée."
+  };
+  
   const options = {
     body: data.body,
     icon: "/images/icon-192x192.png",
@@ -547,11 +327,7 @@ self.addEventListener("push", (event) => {
     self.registration.showNotification(data.title, options)
   );
 });
-// 📌 Notification de fermeture
-self.addEventListener("notificationclose", (event) => {
-  console.log("🔔 Notification fermée :", event.notification);
-});
-// 📌 Notification de clic
+
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   event.waitUntil(
@@ -563,136 +339,3 @@ self.addEventListener("notificationclick", (event) => {
     })
   );
 });
-// 📌 Notification de synchronisation
-self.addEventListener("sync", (event) => {
-  if (event.tag === SYNC_TAG) {
-    event.waitUntil(syncCollects());
-  }
-});
-// 📌 Synchronisation des collectes
-async function syncCollects() {
-  const collects = await getPendingCollects();
-  console.log("🔄 Tentative de synchronisation des collectes :", collects);
-
-  for (const record of collects) {
-    try {
-      const response = await fetch("/api/collects", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-TOKEN": record.csrfToken || ""
-        },
-        body: JSON.stringify(record.payload)
-      });
-
-      if (response.ok) {
-        console.log("✅ Collecte envoyée :", record);
-        await removeCollect(record.id);
-      } else {
-        console.warn("⚠️ Échec de la synchronisation de la collecte :", await response.text());
-      }
-    } catch (err) {
-      console.error("🚨 Erreur réseau pendant la synchronisation :", err);
-    }
-  }
-}
-
-// const CACHE_NAME = "wingwatch-cache-v1";
-// const OFFLINE_URL = "/offline.html";
-// const API_COLLECTS = "/api/collects";
-
-// const urlsToCache = [
-//   "/",
-//   "/offline.html",
-//   "/api/metadata/campaigns",
-//   "/api/metadata/species",
-//   "/api/metadata/countType",
-//   "/api/metadata/quality",
-//   "/api/metadata/method",
-//   "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",
-// ];
-// // Installation du SW
-// self.addEventListener("install", (event) => {
-//   event.waitUntil(
-//     caches.open(CACHE_NAME).then(async (cache) => {
-//       for (const url of urlsToCache) {
-//         try {
-//           await cache.add(url);
-//           console.log("✅ Cached:", url);
-//         } catch (e) {
-//           console.warn("⚠️ Impossible de mettre en cache:", url, e);
-//         }
-//       }
-//     })
-//   );
-// });
-
-// // Fichiers statiques à mettre en cache dès l'installation
-// // const STATIC_ASSETS = [
-// //   "/",
-// //   "/offline.html",
-// //   "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",
-// // ];
-
-// // Lors de l'installation → on met en cache les fichiers essentiels
-// // self.addEventListener("install", (event) => {
-// //   event.waitUntil(
-// //     caches.open(CACHE_NAME).then((cache) => {
-// //       return cache.addAll(STATIC_ASSETS);
-// //     })
-// //   );
-// //   console.log("✅ Service Worker installé et fichiers statiques mis en cache");
-// // });
-
-// // Activation → nettoyage des anciens caches
-// self.addEventListener("activate", (event) => {
-//   event.waitUntil(
-//     caches.keys().then((keys) =>
-//       Promise.all(
-//         keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-//       )
-//     )
-//   );
-//   console.log("♻️ Service Worker activé, anciens caches nettoyés");
-// });
-
-// // Intercepter les requêtes
-// self.addEventListener("fetch", (event) => {
-//   const url = new URL(event.request.url);
-
-//   // Si c'est une requête vers ton API
-//   if (url.pathname.startsWith("/api/")) {
-//     event.respondWith(
-//       fetch(event.request) // d’abord réseau
-//         .then((response) => {
-//           // clone et stocke la réponse en cache
-//           const clone = response.clone();
-//           caches.open(CACHE_NAME).then((cache) => {
-//             cache.put(event.request, clone);
-//           });
-//           return response;
-//         })
-//         .catch(() => {
-//           // si échec → cherche en cache
-//           return caches.match(event.request).then((res) => {
-//             return (
-//               res ||
-//               new Response(
-//                 JSON.stringify({ error: "⚠️ Données API indisponibles hors ligne" }),
-//                 { headers: { "Content-Type": "application/json" } }
-//               )
-//             );
-//           });
-//         })
-//     );
-//   } else {
-//     // Pour les autres requêtes (HTML, CSS, JS, images…)
-//     event.respondWith(
-//       fetch(event.request).catch(() => {
-//         return caches.match(event.request).then((res) => {
-//           return res || caches.match("/offline.html");
-//         });
-//       })
-//     );
-//   }
-// });

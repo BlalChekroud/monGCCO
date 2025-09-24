@@ -47,6 +47,7 @@ security:
         #  - { path: ^/teamLeader, roles: ROLE_TEAMLEADER }
          - { path: ^/collector, roles: ROLE_COLLECTOR }
          - { path: ^/user, roles: ROLE_USER }
+         - { path: ^/sw.js, roles: PUBLIC_ACCESS }
 
     role_hierarchy:
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_COLLECTOR, ROLE_ALLOWED_TO_SWITCH, IS_AUTHENTICATED_FULLY]
